@@ -1,11 +1,13 @@
 #pragma once
 
 #ifdef PINE_PLATFORM_WINDOWS
-	#ifdef PINE_BUILD_DLL
-		#define PINE_API __declspec(dllexport)
-	#else
-		#define PINE_API __declspec(dllimport)
-	#endif
+#ifdef PINE_BUILD_DLL
+#define PINE_API __declspec(dllexport)
 #else
-	#error Pine only supprt windows!
+#define PINE_API __declspec(dllimport)
 #endif
+#else
+#error Pine only supprt windows!
+#endif
+
+#define BIT(x) (1 << x)
