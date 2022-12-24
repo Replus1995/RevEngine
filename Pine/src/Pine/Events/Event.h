@@ -2,9 +2,6 @@
 
 #include "Pine/Core.h"
 
-#include <string>
-#include <functional>
-
 namespace Pine
 {
 	//Naive blocking events

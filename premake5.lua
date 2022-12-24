@@ -10,6 +10,13 @@ workspace "Pine"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
+--Include directories relative to root folder (solution directory)
+IncludeDir = {}
+IncludeDir["GLFW"] = "Pine/vendor/GLFW/include"
+
+LibDir = {}
+LibDir["GLFW"] = "Pine/vendor/GLFW/lib"
+
 project "Pine"
     location"Pine"
     kind "SharedLib"
@@ -17,6 +24,9 @@ project "Pine"
 
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+
+    pchheader "pinepch.h"
+    pchsource "Pine/src/pinepch.cpp"
 
     files
     {
@@ -27,7 +37,19 @@ project "Pine"
     includedirs
     {
         "%{prj.name}/src",
-        "%{prj.name}/vendor/spdlog/include"
+        "%{prj.name}/vendor/spdlog/include",
+        "%{IncludeDir.GLFW}"
+    }
+
+    libdirs
+    {
+        "%{LibDir.GLFW}"
+    }
+
+    links
+    {
+        "glfw3",
+        "opengl32"
     }
 
     filter "system:windows"

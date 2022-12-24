@@ -1,3 +1,4 @@
+#include "pinepch.h"
 #include "Application.h"
 
 #include "Pine/Events/ApplicationEvent.h"
@@ -8,6 +9,7 @@ namespace Pine
 
 	Application::Application()
 	{
+		mWindow = std::unique_ptr<Window>(Window::Create());
 	}
 
 	Application::~Application()
@@ -16,12 +18,9 @@ namespace Pine
 
 	void Application::Run()
 	{
-		WindowResizeEvent e(1280, 720);
-		PINE_TRACE(e);
-
-		while (true)
+		while (mRunning)
 		{
-
+			mWindow->OnUpdate();
 		}
 	}
 }

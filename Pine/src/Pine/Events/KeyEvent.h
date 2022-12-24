@@ -2,8 +2,6 @@
 
 #include "Event.h"
 
-#include <sstream>
-
 namespace Pine
 {
 	class PINE_API KeyEvent : public Event
