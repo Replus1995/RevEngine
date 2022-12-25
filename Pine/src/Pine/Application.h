@@ -2,6 +2,8 @@
 
 #include "Core.h"
 #include "Window.h"
+#include "Events/Event.h"
+#include "Events/ApplicationEvent.h"
 
 namespace Pine
 {
@@ -12,7 +14,11 @@ namespace Pine
 		virtual ~Application();
 
 		void Run();
+
+		void OnEvent(Event& e);
 	private:
+		bool OnWindowClose(WindowCloseEvent& e);
+
 		std::unique_ptr<Window> mWindow;
 		bool mRunning = true;
 	};

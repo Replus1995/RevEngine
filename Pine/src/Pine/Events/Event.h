@@ -62,7 +62,7 @@ namespace Pine
 			if (mEvent.GetEventType() == T::GetStaticType())
 			{
 				mEvent.mHandled = func(*(T*)&mEvent);
-				return true
+				return true;
 			}
 			return false;
 		}
@@ -75,4 +75,6 @@ namespace Pine
 	{
 		return os << e.ToString();
 	}
+
+#define BIND_EVENT_FN(fn, owner) std::bind(&fn, owner, std::placeholders::_1)
 }
