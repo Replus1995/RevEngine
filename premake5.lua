@@ -71,14 +71,17 @@ project "Pine"
 
     filter "configurations:Debug"
         defines "PINE_DEBUG"
+        buildoptions  "/MDd"
         symbols "On"
 
     filter "configurations:Release"
         defines "PINE_RELEASE"
+        buildoptions  "/MD"
         optimize "On"
 
     filter "configurations:Dist"
         defines "PINE_DIST"
+        buildoptions  "/MD"
         optimize "On"
 
 project "Sandbox"
@@ -118,12 +121,15 @@ project "Sandbox"
 
     filter "configurations:Debug"
         defines "PINE_DEBUG"
+        buildoptions  "/MDd"
         symbols "On"
 
     filter "configurations:Release"
         defines "PINE_RELEASE"
+        buildoptions  "/MD"
         optimize "On"
 
     filter "configurations:Dist"
         defines "PINE_DIST"
+        buildoptions  "/MD"
         optimize "On"

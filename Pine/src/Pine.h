@@ -2,10 +2,9 @@
 
 //For Pine applications
 
-#include "Pine/Core.h"
-#include "Pine/Log.h"
 #include "Pine/Application.h"
-
+#include "Pine/Layer.h"
+#include "Pine/Log.h"
 
 //-------------EntryPoint-------------//
 #include "Pine/EntryPoint.h"
