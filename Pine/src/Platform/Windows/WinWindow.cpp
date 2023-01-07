@@ -6,6 +6,8 @@
 #include "Pine/Events/KeyEvent.h"
 #include "Pine/Events/MouseEvent.h"
 
+#include <glad/glad.h>
+
 namespace Pine
 {
 	static bool sGLFWInitialized = false;
@@ -71,6 +73,10 @@ namespace Pine
 
 		mWindow = glfwCreateWindow((int)props.Width, (int)props.Height, mData.Title.c_str(), nullptr, nullptr);
 		glfwMakeContextCurrent(mWindow);
+
+		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+		PINE_CORE_ASSERT(status, "Failed to initialize Glad.");
+
 		glfwSetWindowUserPointer(mWindow, &mData);
 		SetVSync(true);
 

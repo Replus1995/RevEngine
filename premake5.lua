@@ -13,9 +13,12 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 --Include directories relative to root folder (solution directory)
 IncludeDir = {}
 IncludeDir["GLFW"] = "Pine/vendor/GLFW/include"
+IncludeDir["Glad"] = "Pine/vendor/Glad/include"
 
 LibDir = {}
 LibDir["GLFW"] = "Pine/vendor/GLFW/lib"
+
+include "Pine/vendor/Glad"
 
 project "Pine"
     location"Pine"
@@ -38,7 +41,8 @@ project "Pine"
     {
         "%{prj.name}/src",
         "%{prj.name}/vendor/spdlog/include",
-        "%{IncludeDir.GLFW}"
+        "%{IncludeDir.GLFW}",
+        "%{IncludeDir.Glad}"
     }
 
     libdirs
@@ -48,6 +52,7 @@ project "Pine"
 
     links
     {
+        "Glad",
         "glfw3",
         "opengl32"
     }
@@ -60,7 +65,8 @@ project "Pine"
         defines
         {
             "PINE_PLATFORM_WINDOWS",
-            "PINE_BUILD_DLL"
+            "PINE_BUILD_DLL",
+            "GLFW_INCLUDE_NONE"
         }
 
         postbuildcommands
