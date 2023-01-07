@@ -20,12 +20,18 @@ namespace Pine
 
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* layer);
+
+		inline Window& GetWindow() { return *mWindow; }
+		static Application& Get() { return *sInstance; };
 	private:
 		bool OnWindowClose(WindowCloseEvent& e);
 
 		std::unique_ptr<Window> mWindow;
 		bool mRunning = true;
 		LayerStack mLayerStack;
+
+	private:
+		static Application* sInstance;
 	};
 
 	//To be defined in client

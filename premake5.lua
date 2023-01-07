@@ -14,11 +14,13 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 IncludeDir = {}
 IncludeDir["GLFW"] = "Pine/vendor/GLFW/include"
 IncludeDir["Glad"] = "Pine/vendor/Glad/include"
+IncludeDir["ImGui"] = "Pine/vendor/imgui"
 
 LibDir = {}
 LibDir["GLFW"] = "Pine/vendor/GLFW/lib"
 
 include "Pine/vendor/Glad"
+include "Pine/vendor/imgui"
 
 project "Pine"
     location"Pine"
@@ -42,7 +44,8 @@ project "Pine"
         "%{prj.name}/src",
         "%{prj.name}/vendor/spdlog/include",
         "%{IncludeDir.GLFW}",
-        "%{IncludeDir.Glad}"
+        "%{IncludeDir.Glad}",
+        "%{IncludeDir.ImGui}"
     }
 
     libdirs
@@ -53,6 +56,7 @@ project "Pine"
     links
     {
         "Glad",
+        "ImGui",
         "glfw3",
         "opengl32"
     }

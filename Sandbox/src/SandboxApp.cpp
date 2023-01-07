@@ -9,12 +9,12 @@ public:
 
 	void OnUpdate() override
 	{
-		PINE_INFO("ExampleLayer::Update");
+		//PINE_INFO("ExampleLayer::Update");
 	}
 
 	void OnEvent(Pine::Event& e) override
 	{
-		PINE_TRACE("{0}",e);
+		//PINE_TRACE("{0}",e);
 	}
 };
 
@@ -25,6 +25,7 @@ public:
 	SandBox() 
 	{
 		PushLayer(new ExampleLayer());
+		PushLayer(new Pine::ImGuiLayer());
 	};
 	~SandBox() {};
 };

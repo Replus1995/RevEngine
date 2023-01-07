@@ -5,9 +5,13 @@
 
 namespace Pine
 {
+	Application* Application::sInstance = nullptr;
 
 	Application::Application()
 	{
+		PINE_CORE_ASSERT(!sInstance, "Application already exists!");
+		sInstance = this;
+
 		mWindow = std::unique_ptr<Window>(Window::Create());
 		mWindow->SetEventCallback(BIND_EVENT_FN(Application::OnEvent, this));
 	}
@@ -32,7 +36,7 @@ namespace Pine
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::OnWindowClose, this));
 
-		PINE_CORE_TRACE("{0}", e);
+		//PINE_CORE_TRACE("{0}", e);
 
 		for (auto iter = mLayerStack.end(); iter != mLayerStack.begin();)
 		{
@@ -45,11 +49,13 @@ namespace Pine
 	void Application::PushLayer(Layer* layer)
 	{
 		mLayerStack.PushLayer(layer);
+		layer->OnAttach();
 	}
 
 	void Application::PushOverlay(Layer* layer)
 	{
 		mLayerStack.PushOverlay(layer);
+		layer->OnAttach();
 	}
 
 	bool Application::OnWindowClose(WindowCloseEvent& e)
