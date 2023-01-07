@@ -14,6 +14,6 @@
 
 #include <Pine/Log.h>
 
-#ifdef PINE_PLATFORM_WINDOWS
+#ifdef PE_PLATFORM_WINDOWS
 	#include <Windows.h>
 #endif

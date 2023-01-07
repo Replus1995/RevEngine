@@ -21,6 +21,11 @@ namespace Pine
 		virtual void SetVSync(bool enabled) override;
 		virtual bool IsVSync() const override;
 
+		virtual float GetDeltaTime() override;
+
+		virtual void SetClipboardText(const char* text) override;
+		virtual const char* GetClipboardText() override;
+
 	private:
 		virtual void Init(const WindowProps& props);
 		virtual void Shutdown();
@@ -35,6 +40,8 @@ namespace Pine
 			EventCallbackFn EventCallback;
 		};
 		WindowData mData;
+
+		double mTime{ 0.0f };
 	};
 }
 

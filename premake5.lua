@@ -68,8 +68,8 @@ project "Pine"
 
         defines
         {
-            "PINE_PLATFORM_WINDOWS",
-            "PINE_BUILD_DLL",
+            "PE_PLATFORM_WINDOWS",
+            "PE_BUILD_DLL",
             "GLFW_INCLUDE_NONE"
         }
 
@@ -80,17 +80,17 @@ project "Pine"
         }
 
     filter "configurations:Debug"
-        defines "PINE_DEBUG"
+        defines { "PE_DEBUG", "PE_ENABLE_ASSERTS" }
         buildoptions  "/MDd"
         symbols "On"
 
     filter "configurations:Release"
-        defines "PINE_RELEASE"
+        defines { "PE_RELEASE", "PE_ENABLE_ASSERTS" }
         buildoptions  "/MD"
         optimize "On"
 
     filter "configurations:Dist"
-        defines "PINE_DIST"
+        defines "PE_DIST"
         buildoptions  "/MD"
         optimize "On"
 
@@ -126,20 +126,20 @@ project "Sandbox"
 
         defines
         {
-            "PINE_PLATFORM_WINDOWS"
+            "PE_PLATFORM_WINDOWS"
         }
 
     filter "configurations:Debug"
-        defines "PINE_DEBUG"
+        defines { "PE_DEBUG", "PE_ENABLE_ASSERTS" }
         buildoptions  "/MDd"
         symbols "On"
 
     filter "configurations:Release"
-        defines "PINE_RELEASE"
+        defines { "PE_RELEASE", "PE_ENABLE_ASSERTS" }
         buildoptions  "/MD"
         optimize "On"
 
     filter "configurations:Dist"
-        defines "PINE_DIST"
+        defines "PE_DIST"
         buildoptions  "/MD"
         optimize "On"

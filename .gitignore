@@ -21,3 +21,4 @@ Release*
 bin-int
 *.sln
 *.vcxproj*
+Sandbox/imgui.ini

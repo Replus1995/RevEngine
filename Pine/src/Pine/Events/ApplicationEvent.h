@@ -2,6 +2,8 @@
 
 #include "Event.h"
 
+#include <sstream>
+
 namespace Pine
 {
 	class PINE_API WindowResizeEvent : public Event

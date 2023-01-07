@@ -14,7 +14,7 @@ namespace Pine
 
 	static void GLFWErrorCallback(int error, const char* description)
 	{
-		PINE_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
+		PE_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
 	}
 
 	Window* Window::Create(const WindowProps& props)
@@ -54,6 +54,24 @@ namespace Pine
 		return mData.VSync;
 	}
 
+	float WinWindow::GetDeltaTime()
+	{
+		double time = glfwGetTime();
+		float dt = mTime > 0.0 ? (float)(time - mTime) : (float)(1.0f / 60.0f);;
+		mTime = time;
+		return dt;
+	}
+
+	void WinWindow::SetClipboardText(const char* text)
+	{
+		glfwSetClipboardString(mWindow, text);
+	}
+
+	const char* WinWindow::GetClipboardText()
+	{
+		return glfwGetClipboardString(mWindow);
+	}
+
 	void WinWindow::Init(const WindowProps& props)
 	{
 		mData.Title = props.Title;
@@ -61,12 +79,12 @@ namespace Pine
 		mData.Height = props.Height;
 		mData.VSync = true;
 
-		PINE_CORE_INFO("Create Window {0} ({1}, {2})", props.Title, props.Width, props.Height);
+		PE_CORE_INFO("Create Window {0} ({1}, {2})", props.Title, props.Width, props.Height);
 
 		if (!sGLFWInitialized)
 		{
 			int success = glfwInit();
-			PINE_CORE_ASSERT(success, "Could not initialze GLFW!");
+			PE_CORE_ASSERT(success, "Could not initialze GLFW!");
 			glfwSetErrorCallback(GLFWErrorCallback);
 			sGLFWInitialized = true;
 		}
@@ -75,7 +93,7 @@ namespace Pine
 		glfwMakeContextCurrent(mWindow);
 
 		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-		PINE_CORE_ASSERT(status, "Failed to initialize Glad.");
+		PE_CORE_ASSERT(status, "Failed to initialize Glad.");
 
 		glfwSetWindowUserPointer(mWindow, &mData);
 		SetVSync(true);
@@ -121,6 +139,13 @@ namespace Pine
 					break;
 				}
 			}
+		});
+
+		glfwSetCharCallback(mWindow, [](GLFWwindow* window, unsigned int key)
+		{
+			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+			KeyTypedEvent event(key);
+			data.EventCallback(event);
 		});
 
 		glfwSetMouseButtonCallback(mWindow, [](GLFWwindow* window, int button, int action, int mods)

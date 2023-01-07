@@ -1,7 +1,7 @@
 #pragma once
 
-#ifdef PINE_PLATFORM_WINDOWS
-	#ifdef PINE_BUILD_DLL
+#ifdef PE_PLATFORM_WINDOWS
+	#ifdef PE_BUILD_DLL
 		#define PINE_API __declspec(dllexport)
 	#else
 		#define PINE_API __declspec(dllimport)
@@ -10,15 +10,14 @@
 	#error Pine only supprt windows!
 #endif
 
-#ifdef PINE_ENABLE_ASSERTS
-	#define PINE_ASSERT(x, ...) { if(!(x)) { PINE_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
-	#define PINE_CORE_ASSERT(x, ...) { if(!(x)) { PINE_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
+#ifdef PE_ENABLE_ASSERTS
+	#define PE_ASSERT(x, ...) { if(!(x)) { PE_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
+	#define PE_CORE_ASSERT(x, ...) { if(!(x)) { PE_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
 #else
-	#define PINE_ASSERT(x, ...)
-	#define PINE_CORE_ASSERT(x, ...)
-#endif // PINE_ENABLE_ASSERTS
-
+	#define PE_ASSERT(x, ...)
+	#define PE_CORE_ASSERT(x, ...)
+#endif
 
 #define BIT(x) (1 << x)
 
-#include "pinepch.h"
+#define PE_BIND_EVENT_FN(fn, owner) std::bind(&fn, owner, std::placeholders::_1)

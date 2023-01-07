@@ -7,14 +7,14 @@ public:
 		: Layer("Example")
 	{}
 
-	void OnUpdate() override
+	void OnUpdate(float dt) override
 	{
-		//PINE_INFO("ExampleLayer::Update");
+		//PE_INFO("ExampleLayer::Update");
 	}
 
 	void OnEvent(Pine::Event& e) override
 	{
-		//PINE_TRACE("{0}",e);
+		//PE_TRACE("{0}",e);
 	}
 };
 

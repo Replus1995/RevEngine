@@ -3,17 +3,19 @@
 
 #include "Pine/Log.h"
 
+#include "glad/glad.h"
+
 namespace Pine
 {
 	Application* Application::sInstance = nullptr;
 
 	Application::Application()
 	{
-		PINE_CORE_ASSERT(!sInstance, "Application already exists!");
+		PE_CORE_ASSERT(!sInstance, "Application already exists!");
 		sInstance = this;
 
 		mWindow = std::unique_ptr<Window>(Window::Create());
-		mWindow->SetEventCallback(BIND_EVENT_FN(Application::OnEvent, this));
+		mWindow->SetEventCallback(PE_BIND_EVENT_FN(Application::OnEvent, this));
 	}
 
 	Application::~Application()
@@ -24,8 +26,12 @@ namespace Pine
 	{
 		while (mRunning)
 		{
+			glClearColor(.3f, .3f, .8f, 1.0f);
+			glClear(GL_COLOR_BUFFER_BIT);
+
+			float deltaTime = mWindow->GetDeltaTime();
 			for (Layer* layer : mLayerStack)
-				layer->OnUpdate();
+				layer->OnUpdate(deltaTime);
 
 			mWindow->OnUpdate();
 		}
@@ -34,7 +40,7 @@ namespace Pine
 	void Application::OnEvent(Event& e)
 	{
 		EventDispatcher dispatcher(e);
-		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::OnWindowClose, this));
+		dispatcher.Dispatch<WindowCloseEvent>(PE_BIND_EVENT_FN(Application::OnWindowClose, this));
 
 		//PINE_CORE_TRACE("{0}", e);
 

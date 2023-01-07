@@ -2,6 +2,9 @@
 
 #include "Pine/Core.h"
 
+#include <string>
+#include <functional>
+
 namespace Pine
 {
 	//Naive blocking events
@@ -11,7 +14,7 @@ namespace Pine
 		None = 0,
 		WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoved,
 		AppTick, AppUpdate, AppRender,
-		KeyPressed, KeyReleased,
+		KeyPressed, KeyReleased, KeyTyped,
 		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled
 	};
 
@@ -76,6 +79,4 @@ namespace Pine
 	{
 		return os << e.ToString();
 	}
-
-#define BIND_EVENT_FN(fn, owner) std::bind(&fn, owner, std::placeholders::_1)
 }
