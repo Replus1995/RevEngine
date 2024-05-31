@@ -1,10 +1,10 @@
 #include "pinepch.h"
-#include "ImGuiLayer.h"
-#include "Pine/Application.h"
+#include "Pine/ImGui/ImGuiLayer.h"
+#include "Pine/Core/Application.h"
+#include "Pine/Core/Window.h"
 
-#include "imgui.h"
-
-#include "Platform/OpenGL/ImGuiOpenGLRenderer.h"
+#include <imgui.h>
+#include <backends/imgui_impl_opengl3.h>
 
 //temp
 #include <GLFW/glfw3.h>
@@ -135,11 +135,11 @@ namespace Pine
     }
     static void ImGuiLayer_SetClipboardText(void* user_data, const char* text)
     {
-        Application::Get().GetWindow().SetClipboardText(text);
+        Application::GetApp().GetWindow()->SetClipboardText(text);
     }
     static const char* ImGuiLayer_GetClipboardText(void* user_data)
     {
-        return Application::Get().GetWindow().GetClipboardText();
+        return Application::GetApp().GetWindow()->GetClipboardText();
     }
 
     
@@ -174,10 +174,10 @@ namespace Pine
 
 	void ImGuiLayer::OnUpdate(float dt)
 	{
-		Application& app = Application::Get();
+		Application& app = Application::GetApp();
 
 		ImGuiIO& io = ImGui::GetIO();
-		io.DisplaySize = ImVec2(app.GetWindow().GetWidth(), app.GetWindow().GetHeight());
+		io.DisplaySize = ImVec2(app.GetWindow()->GetWidth(), app.GetWindow()->GetHeight());
 		io.DeltaTime = 1.0f/60.0f;
 
 		ImGui_ImplOpenGL3_NewFrame();

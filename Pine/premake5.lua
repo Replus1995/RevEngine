@@ -21,6 +21,7 @@ project "Pine"
         "%{IncludeDir.spdlog}",
         "%{IncludeDir.glfw}",
         "%{IncludeDir.Glad}",
+        "%{IncludeDir.glm}",
         "%{IncludeDir.ImGui}"
     }
 

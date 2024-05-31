@@ -1,12 +1,9 @@
 #include "pinepch.h"
-#include "WinWindow.h"
-
-#include "Pine/Log.h"
+#include "GLFWWindow.h"
+#include "Pine/Core/Application.h"
 #include "Pine/Events/ApplicationEvent.h"
 #include "Pine/Events/KeyEvent.h"
 #include "Pine/Events/MouseEvent.h"
-
-#include <glad/glad.h>
 
 namespace Pine
 {
@@ -17,29 +14,24 @@ namespace Pine
 		PE_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
 	}
 
-	Window* Window::Create(const WindowProps& props)
+	GLFWWindow::GLFWWindow(const WindowProps& props)
 	{
-		return new WinWindow(props);
-	}
-
-
-	WinWindow::WinWindow(const WindowProps& props)
-	{
+		mType = EWindowType::GLFW;
 		Init(props);
 	}
 
-	WinWindow::~WinWindow()
+	GLFWWindow::~GLFWWindow()
 	{
 		Shutdown();
 	}
 
-	void WinWindow::OnUpdate()
+	void GLFWWindow::OnUpdate()
 	{
 		glfwPollEvents();
 		glfwSwapBuffers(mWindow);
 	}
 
-	void WinWindow::SetVSync(bool enabled)
+	void GLFWWindow::SetVSync(bool enabled)
 	{
 		if (enabled)
 			glfwSwapInterval(1);
@@ -49,12 +41,12 @@ namespace Pine
 		mData.VSync = enabled;
 	}
 
-	bool WinWindow::IsVSync() const
+	bool GLFWWindow::IsVSync() const
 	{
 		return mData.VSync;
 	}
 
-	float WinWindow::GetDeltaTime()
+	float GLFWWindow::GetDeltaTime()
 	{
 		double time = glfwGetTime();
 		float dt = mTime > 0.0 ? (float)(time - mTime) : (float)(1.0f / 60.0f);;
@@ -62,17 +54,17 @@ namespace Pine
 		return dt;
 	}
 
-	void WinWindow::SetClipboardText(const char* text)
+	void GLFWWindow::SetClipboardText(const char* text)
 	{
 		glfwSetClipboardString(mWindow, text);
 	}
 
-	const char* WinWindow::GetClipboardText()
+	const char* GLFWWindow::GetClipboardText()
 	{
 		return glfwGetClipboardString(mWindow);
 	}
 
-	void WinWindow::Init(const WindowProps& props)
+	void GLFWWindow::Init(const WindowProps& props)
 	{
 		mData.Title = props.Title;
 		mData.Width = props.Width;
@@ -85,6 +77,14 @@ namespace Pine
 		{
 			int success = glfwInit();
 			PE_CORE_ASSERT(success, "Could not initialze GLFW!");
+
+			switch (Application::GetRenderAPI())
+			{
+			case ERenderAPI::Vulkan:
+				glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+				break;
+			}
+
 			glfwSetErrorCallback(GLFWErrorCallback);
 			sGLFWInitialized = true;
 		}
@@ -92,8 +92,8 @@ namespace Pine
 		mWindow = glfwCreateWindow((int)props.Width, (int)props.Height, mData.Title.c_str(), nullptr, nullptr);
 		glfwMakeContextCurrent(mWindow);
 
-		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-		PE_CORE_ASSERT(status, "Failed to initialize Glad.");
+		//int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+		//PE_CORE_ASSERT(status, "Failed to initialize Glad.");
 
 		glfwSetWindowUserPointer(mWindow, &mData);
 		SetVSync(true);
@@ -183,7 +183,7 @@ namespace Pine
 		});
 	}
 
-	void WinWindow::Shutdown()
+	void GLFWWindow::Shutdown()
 	{
 		glfwDestroyWindow(mWindow);
 	}

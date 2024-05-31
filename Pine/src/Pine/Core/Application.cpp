@@ -1,33 +1,39 @@
 #include "pinepch.h"
-#include "Application.h"
-
-#include "Pine/Log.h"
-
-#include "glad/glad.h"
+#include "Pine/Core/Application.h"
+#include "Pine/Core/Log.h"
+#include "Pine/Core/Window.h"
+#include "Pine/Render/Renderer.h"
+#include "Pine/Render/RenderCmd.h"
 
 namespace Pine
 {
 	Application* Application::sInstance = nullptr;
+	ERenderAPI Application::sRenderAPI = ERenderAPI::None;
 
 	Application::Application()
 	{
 		PE_CORE_ASSERT(!sInstance, "Application already exists!");
 		sInstance = this;
 
+		sRenderAPI = ERenderAPI::OpenGL;
+
 		mWindow = std::unique_ptr<Window>(Window::Create());
 		mWindow->SetEventCallback(PE_BIND_EVENT_FN(Application::OnEvent, this));
+
+		Renderer::Init();
 	}
 
 	Application::~Application()
 	{
+		Renderer::Shutdown();
 	}
 
 	void Application::Run()
 	{
 		while (mRunning)
 		{
-			glClearColor(.3f, .3f, .8f, 1.0f);
-			glClear(GL_COLOR_BUFFER_BIT);
+			RenderCmd::SetClearColor(glm::vec4{ .3f, .3f, .8f, 1.0f });
+			RenderCmd::Clear();
 
 			float deltaTime = mWindow->GetDeltaTime();
 			for (Layer* layer : mLayerStack)
@@ -37,18 +43,23 @@ namespace Pine
 		}
 	}
 
+	void Application::Close()
+	{
+		mRunning = false;
+	}
+
 	void Application::OnEvent(Event& e)
 	{
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(PE_BIND_EVENT_FN(Application::OnWindowClose, this));
-
+		dispatcher.Dispatch<WindowResizeEvent>(PE_BIND_EVENT_FN(Application::OnWindowResize, this));
 		//PINE_CORE_TRACE("{0}", e);
 
-		for (auto iter = mLayerStack.end(); iter != mLayerStack.begin();)
+		for (auto iter = mLayerStack.rbegin(); iter != mLayerStack.rend(); ++iter)
 		{
-			(*--iter)->OnEvent(e);
 			if (e.mHandled)
 				break;
+			(*iter)->OnEvent(e);
 		}
 	}
 
@@ -58,15 +69,27 @@ namespace Pine
 		layer->OnAttach();
 	}
 
-	void Application::PushOverlay(Layer* layer)
+	void Application::PushOverlay(Layer* overlay)
 	{
-		mLayerStack.PushOverlay(layer);
-		layer->OnAttach();
+		mLayerStack.PushOverlay(overlay);
+		overlay->OnAttach();
 	}
 
 	bool Application::OnWindowClose(WindowCloseEvent& e)
 	{
 		mRunning = false;
 		return true;
+	}
+
+	bool Application::OnWindowResize(WindowResizeEvent& e)
+	{
+		if (e.GetWidth() == 0 || e.GetHeight() == 0)
+		{
+			mMinimized = true;
+			return false;
+		}
+		mMinimized = false;
+		Renderer::OnWindowResize(e.GetWidth(), e.GetHeight());
+		return false;
 	}
 }

@@ -1,4 +1,7 @@
 #pragma once
+#include "Pine/Core/Base.h"
+#include "Pine/Core/Application.h"
+#include "Pine/Core/Log.h"
 
 #ifdef PE_PLATFORM_WINDOWS
 

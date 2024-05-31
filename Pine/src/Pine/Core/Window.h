@@ -1,6 +1,6 @@
 #pragma once
-#include "Core.h"
-#include "Events/Event.h"
+#include "Pine/Core/Base.h"
+#include "Pine/Events/Event.h"
 
 namespace Pine
 {
@@ -16,6 +16,12 @@ namespace Pine
 			: Title(title), Width(width), Height(height)
 		{
 		}
+	};
+
+	enum class EWindowType : uint8_t
+	{
+		UNKNOWN = 0,
+		GLFW = 1
 	};
 
 
@@ -41,6 +47,11 @@ namespace Pine
 		virtual void SetClipboardText(const char* text) = 0;
 		virtual const char* GetClipboardText() = 0;
 
+		EWindowType GetType() const { return mType; }
+
 		static Window* Create(const WindowProps& props = WindowProps());
+
+	protected:
+		EWindowType mType = EWindowType::UNKNOWN;
 	};
 }

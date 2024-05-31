@@ -1,16 +1,16 @@
 #pragma once
 
-#include "Pine/Window.h"
+#include "Pine/Core/Window.h"
 
 #include <GLFW/glfw3.h>
 
 namespace Pine
 {
-	class WinWindow : public Window
+	class GLFWWindow : public Window
 	{
 	public:
-		WinWindow(const WindowProps& props);
-		virtual ~WinWindow();
+		GLFWWindow(const WindowProps& props);
+		virtual ~GLFWWindow();
 
 		void OnUpdate() override;
 

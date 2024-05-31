@@ -2,12 +2,12 @@
 
 //For Pine applications
 
-#include "Pine/Application.h"
-#include "Pine/Layer.h"
-#include "Pine/Log.h"
+#include "Pine/Core/Application.h"
+#include "Pine/Core/Layer.h"
+#include "Pine/Core/Log.h"
 
 #include "Pine/ImGui/ImGuiLayer.h"
 
 //-------------EntryPoint-------------//
-#include "Pine/EntryPoint.h"
+#include "Pine/Core/EntryPoint.h"
 //------------------------------------//

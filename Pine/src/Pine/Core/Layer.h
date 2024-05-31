@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Pine/Core.h"
+#include "Pine/Core/Base.h"
 #include "Pine/Events/Event.h"
 
 namespace Pine
