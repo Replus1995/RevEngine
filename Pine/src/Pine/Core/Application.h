@@ -35,6 +35,7 @@ namespace Pine
 		bool mRunning = true;
 		bool mMinimized = false;
 		LayerStack mLayerStack;
+		float mLastFrameTime = 0.0f;
 
 	private:
 		static Application* sInstance;

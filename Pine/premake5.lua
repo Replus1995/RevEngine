@@ -19,15 +19,17 @@ project "Pine"
     {
         "src",
         "%{IncludeDir.spdlog}",
-        "%{IncludeDir.glfw}",
-        "%{IncludeDir.Glad}",
         "%{IncludeDir.glm}",
-        "%{IncludeDir.ImGui}"
+        "%{IncludeDir.glfw}",
+        "%{IncludeDir.ImGui}",
+        "%{IncludeDir.Glad}",
+        "%{IncludeDir.VulkanSDK}",
     }
 
     libdirs
     {
-        "%{LibraryDir.glfw}"
+        "%{LibraryDir.glfw}",
+        "%{LibraryDir.VulkanSDK}"
     }
 
     links
@@ -35,7 +37,8 @@ project "Pine"
         "Glad",
         "ImGui",
         "opengl32",
-        "%{Library.glfw}"
+        "%{Library.glfw}",
+        "%{Library.Vulkan}"
     }
 
     filter "system:windows"

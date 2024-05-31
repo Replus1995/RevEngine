@@ -4,6 +4,7 @@
 #include "Pine/Core/Window.h"
 #include "Pine/Render/Renderer.h"
 #include "Pine/Render/RenderCmd.h"
+#include "Pine/Core/Clock.h"
 
 namespace Pine
 {
@@ -30,14 +31,19 @@ namespace Pine
 
 	void Application::Run()
 	{
+		Clock timer;
+
 		while (mRunning)
 		{
+			float time = timer.Elapsed();
+			float dt = time - mLastFrameTime;
+			mLastFrameTime = time;
+
 			RenderCmd::SetClearColor(glm::vec4{ .3f, .3f, .8f, 1.0f });
 			RenderCmd::Clear();
 
-			float deltaTime = mWindow->GetDeltaTime();
 			for (Layer* layer : mLayerStack)
-				layer->OnUpdate(deltaTime);
+				layer->OnUpdate(dt);
 
 			mWindow->OnUpdate();
 		}
