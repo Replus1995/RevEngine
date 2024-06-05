@@ -23,3 +23,4 @@ bin-int
 *.vcxproj*
 Sandbox/imgui.ini
 /build
+/.vscode

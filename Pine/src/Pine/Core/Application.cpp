@@ -8,9 +8,13 @@
 
 namespace Pine
 {
-	Application* Application::sInstance = nullptr;
-	ERenderAPI Application::sRenderAPI = ERenderAPI::None;
+	static ERenderAPI sRenderAPI = ERenderAPI::None;
+	ERenderAPI GetRenderAPI()
+	{
+		return sRenderAPI;
+	}
 
+	Application* Application::sInstance = nullptr;
 	Application::Application()
 	{
 		PE_CORE_ASSERT(!sInstance, "Application already exists!");

@@ -34,4 +34,9 @@ void RenderCmd::Clear()
 	sRHI->Clear();
 }
 
+void RenderCmd::DrawIndexed(const std::shared_ptr<VertexArray>& vertexArray, uint32_t indexCount)
+{
+	sRHI->DrawIndexed(vertexArray, indexCount);
+}
+
 }

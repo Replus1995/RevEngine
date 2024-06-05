@@ -70,7 +70,7 @@ void GLFWWindow::Init(const WindowProps& props)
 		int success = glfwInit();
 		PE_CORE_ASSERT(success, "Could not initialze GLFW!");
 
-		switch (Application::GetRenderAPI())
+		switch (GetRenderAPI())
 		{
 		case ERenderAPI::Vulkan:
 			glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);

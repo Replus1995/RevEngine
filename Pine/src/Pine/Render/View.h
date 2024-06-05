@@ -3,7 +3,7 @@
 
 namespace Pine
 {
-class RenderView
+class View
 {
 
 };

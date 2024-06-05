@@ -23,9 +23,7 @@ namespace Pine
 		void PushOverlay(Layer* overlay);
 
 		inline Window* GetWindow() { return mWindow.get(); }
-
 		static Application& GetApp() { return *sInstance; }
-		static ERenderAPI GetRenderAPI() { return sRenderAPI; }
 	private:
 		bool OnWindowClose(WindowCloseEvent& e);
 		bool OnWindowResize(WindowResizeEvent& e);
@@ -39,7 +37,6 @@ namespace Pine
 
 	private:
 		static Application* sInstance;
-		static ERenderAPI sRenderAPI;
 	};
 
 	//To be defined in client
