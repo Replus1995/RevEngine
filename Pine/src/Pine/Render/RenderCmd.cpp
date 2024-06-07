@@ -1,11 +1,11 @@
 #include "pinepch.h"
 #include "Pine/Render/RenderCmd.h"
 #include "Pine/Render/BaseRHI.h"
-#include "Pine/Core/Log.h"
+#include "Pine/Core/Assert.h"
 
 namespace Pine
 {
-std::unique_ptr<BaseRHI> RenderCmd::sRHI;
+Scope<BaseRHI> RenderCmd::sRHI;
 
 void RenderCmd::Init()
 {
@@ -34,7 +34,7 @@ void RenderCmd::Clear()
 	sRHI->Clear();
 }
 
-void RenderCmd::DrawIndexed(const std::shared_ptr<VertexArray>& vertexArray, uint32_t indexCount)
+void RenderCmd::DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount)
 {
 	sRHI->DrawIndexed(vertexArray, indexCount);
 }

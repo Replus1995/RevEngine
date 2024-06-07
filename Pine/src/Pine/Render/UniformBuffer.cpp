@@ -1,15 +1,19 @@
 #include "pinepch.h"
 #include "Pine/Render/UniformBuffer.h"
+#include "Pine/Render/RenderCore.h"
+#include "Pine/Core/Assert.h"
+
+#include "Platform/OpenGL/OpenGLUniformBuffer.h"
 
 namespace Pine
 {
 
-std::shared_ptr<UniformBuffer> UniformBuffer::Create(uint32_t size, uint32_t binding)
+Ref<UniformBuffer> UniformBuffer::Create(uint32_t size, uint32_t binding)
 {
-	switch (Renderer::GetAPI())
+	switch (GetRenderAPI())
 	{
-		case RendererAPI::API::None:    PE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
-		case RendererAPI::API::OpenGL:  return std::make_shared<OpenGLUniformBuffer>(size, binding);
+		case ERenderAPI::None:    PE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
+		case ERenderAPI::OpenGL:  return CreateRef<OpenGLUniformBuffer>(size, binding);
 	}
 
 	PE_CORE_ASSERT(false, "Unknown RenderAPI!");

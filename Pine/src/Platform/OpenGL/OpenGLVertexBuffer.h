@@ -19,7 +19,7 @@ public:
 	virtual const BufferLayout& GetLayout() const override { return mLayout; }
 	virtual void SetLayout(const BufferLayout& layout) override { mLayout = layout; }
 private:
-	uint32_t mHandle;
+	uint32_t mHandle = 0;
 	BufferLayout mLayout;
 };
 
@@ -34,8 +34,8 @@ public:
 
 	virtual uint32_t GetCount() const { return mCount; }
 private:
-	uint32_t mHandle;
-	uint32_t mCount;
+	uint32_t mHandle = 0;
+	uint32_t mCount = 0;
 };
 
 class OpenGLVertexArray : public VertexArray
@@ -53,7 +53,7 @@ public:
 	virtual const std::vector<std::shared_ptr<VertexBuffer>>& GetVertexBuffers() const { return m_VertexBuffers; }
 	virtual const std::shared_ptr<IndexBuffer>& GetIndexBuffer() const { return m_IndexBuffer; }
 private:
-	uint32_t mHandle;
+	uint32_t mHandle = 0;
 	uint32_t m_VertexBufferIndex = 0;
 	std::vector<std::shared_ptr<VertexBuffer>> m_VertexBuffers;
 	std::shared_ptr<IndexBuffer> m_IndexBuffer;

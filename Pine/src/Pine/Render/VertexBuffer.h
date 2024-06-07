@@ -1,4 +1,5 @@
 #pragma once
+#include "Pine/Core/Base.h"
 #include "Pine/Render/RenderCore.h"
 #include <string>
 
@@ -70,8 +71,8 @@ public:
 	virtual const BufferLayout& GetLayout() const = 0;
 	virtual void SetLayout(const BufferLayout& layout) = 0;
 
-	static std::shared_ptr<VertexBuffer> Create(uint32_t size);
-	static std::shared_ptr<VertexBuffer> Create(float* vertices, uint32_t size);
+	static Ref<VertexBuffer> Create(uint32_t size);
+	static Ref<VertexBuffer> Create(float* vertices, uint32_t size);
 };
 
 class IndexBuffer
@@ -84,7 +85,7 @@ public:
 
 	virtual uint32_t GetCount() const = 0;
 
-	static std::shared_ptr<IndexBuffer> Create(uint32_t* indices, uint32_t count);
+	static Ref<IndexBuffer> Create(uint32_t* indices, uint32_t count);
 };
 
 class VertexArray
@@ -95,13 +96,13 @@ public:
 	virtual void Bind() const = 0;
 	virtual void Unbind() const = 0;
 
-	virtual void AddVertexBuffer(const std::shared_ptr<VertexBuffer>& vertexBuffer) = 0;
-	virtual void SetIndexBuffer(const std::shared_ptr<IndexBuffer>& indexBuffer) = 0;
+	virtual void AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer) = 0;
+	virtual void SetIndexBuffer(const Ref<IndexBuffer>& indexBuffer) = 0;
 
-	virtual const std::vector<std::shared_ptr<VertexBuffer>>& GetVertexBuffers() const = 0;
-	virtual const std::shared_ptr<IndexBuffer>& GetIndexBuffer() const = 0;
+	virtual const std::vector<Ref<VertexBuffer>>& GetVertexBuffers() const = 0;
+	virtual const Ref<IndexBuffer>& GetIndexBuffer() const = 0;
 
-	static std::shared_ptr<VertexArray> Create();
+	static Ref<VertexArray> Create();
 };
 
 }

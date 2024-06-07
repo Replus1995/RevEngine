@@ -1,6 +1,9 @@
 #include "pinepch.h"
 #include "Pine/Math/Math.h"
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/matrix_decompose.hpp>
+
 namespace Pine::Math
 {
 

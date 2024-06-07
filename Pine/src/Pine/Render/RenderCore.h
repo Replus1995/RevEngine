@@ -10,7 +10,7 @@ enum class ERenderAPI : uint8_t
     OpenGL = 1,
     Vulkan = 2
 };
-static ERenderAPI GetRenderAPI();
+ERenderAPI GetRenderAPI();
 
 enum class EShaderDataType
 {
@@ -27,6 +27,6 @@ enum class EShaderDataType
     Int4,
     Bool
 };
-static uint32_t ShaderDataTypeSize(EShaderDataType type);
+uint32_t ShaderDataTypeSize(EShaderDataType type);
 
 }

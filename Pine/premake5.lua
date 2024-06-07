@@ -24,6 +24,8 @@ project "Pine"
         "%{IncludeDir.ImGui}",
         "%{IncludeDir.Glad}",
         "%{IncludeDir.VulkanSDK}",
+        "%{IncludeDir.stb}",
+        "%{IncludeDir.entt}",
     }
 
     libdirs
@@ -38,7 +40,10 @@ project "Pine"
         "ImGui",
         "opengl32",
         "%{Library.glfw}",
-        "%{Library.Vulkan}"
+        "%{Library.Vulkan}",
+        "%{Library.ShaderC}",
+        "%{Library.SPIRV_Cross}",
+        "%{Library.SPIRV_Cross_GLSL}"
     }
 
     filter "system:windows"
@@ -55,7 +60,7 @@ project "Pine"
 
     filter "configurations:Debug"
         defines { "PE_DEBUG", "PE_ENABLE_ASSERTS" }
-        buildoptions  "/MDd"
+        buildoptions  "/MD"
         symbols "On"
 
     filter "configurations:Release"
@@ -67,3 +72,4 @@ project "Pine"
         defines "PE_DIST"
         buildoptions  "/MD"
         optimize "On"
+

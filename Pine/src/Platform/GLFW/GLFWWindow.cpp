@@ -1,6 +1,7 @@
 #include "pinepch.h"
 #include "GLFWWindow.h"
 #include "Pine/Core/Application.h"
+#include "Pine/Core/Assert.h"
 #include "Pine/Events/ApplicationEvent.h"
 #include "Pine/Events/KeyEvent.h"
 #include "Pine/Events/MouseEvent.h"

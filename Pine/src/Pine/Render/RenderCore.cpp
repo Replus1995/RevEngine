@@ -1,6 +1,6 @@
 #include "pinepch.h"
 #include "Pine/Render/RenderCore.h"
-#include "Pine/Core/Base.h"
+#include "Pine/Core/Assert.h"
 
 namespace Pine
 {

@@ -1,5 +1,6 @@
 #include "pinepch.h"
 #include "OpenGLVertexBuffer.h"
+#include "Pine/Core/Assert.h"
 
 #include <glad/glad.h>
 

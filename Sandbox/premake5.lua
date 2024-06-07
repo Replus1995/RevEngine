@@ -35,7 +35,7 @@ project "Sandbox"
 
     filter "configurations:Debug"
         defines { "PE_DEBUG", "PE_ENABLE_ASSERTS" }
-        buildoptions  "/MDd"
+        buildoptions  "/MD"
         symbols "On"
 
     filter "configurations:Release"

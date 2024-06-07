@@ -1,6 +1,6 @@
 #include "pinepch.h"
 #include "Pine/Render/VertexBuffer.h"
-#include "Pine/Core/Base.h"
+#include "Pine/Core/Assert.h"
 
 #include "Platform/OpenGL/OpenGLVertexBuffer.h"
 
@@ -29,48 +29,48 @@ uint32_t BufferElement::GetComponentCount() const
 	return 0;
 }
 
-std::shared_ptr<VertexBuffer> VertexBuffer::Create(uint32_t size)
+Ref<VertexBuffer> VertexBuffer::Create(uint32_t size)
 {
 	switch (GetRenderAPI())
 	{
 	case ERenderAPI::None:    PE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
-	case ERenderAPI::OpenGL:  return std::make_shared<OpenGLVertexBuffer>(size);
+	case ERenderAPI::OpenGL:  return CreateRef<OpenGLVertexBuffer>(size);
 	}
 
 	PE_CORE_ASSERT(false, "Unknown RenderAPI!");
 	return nullptr;
 }
 
-std::shared_ptr<VertexBuffer> VertexBuffer::Create(float* vertices, uint32_t size)
+Ref<VertexBuffer> VertexBuffer::Create(float* vertices, uint32_t size)
 {
 	switch (GetRenderAPI())
 	{
 	case ERenderAPI::None:    PE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
-	case ERenderAPI::OpenGL:  return std::make_shared<OpenGLVertexBuffer>(vertices, size);
+	case ERenderAPI::OpenGL:  return CreateRef<OpenGLVertexBuffer>(vertices, size);
 	}
 
 	PE_CORE_ASSERT(false, "Unknown RenderAPI!");
 	return nullptr;
 }
 
-std::shared_ptr<IndexBuffer> IndexBuffer::Create(uint32_t* indices, uint32_t size)
+Ref<IndexBuffer> IndexBuffer::Create(uint32_t* indices, uint32_t size)
 {
 	switch (GetRenderAPI())
 	{
 	case ERenderAPI::None:    PE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
-	case ERenderAPI::OpenGL:  return std::make_shared<OpenGLIndexBuffer>(indices, size);
+	case ERenderAPI::OpenGL:  return CreateRef<OpenGLIndexBuffer>(indices, size);
 	}
 
 	PE_CORE_ASSERT(false, "Unknown RenderAPI!");
 	return nullptr;
 }
 
-std::shared_ptr<VertexArray> Pine::VertexArray::Create()
+Ref<VertexArray> Pine::VertexArray::Create()
 {
 	switch (GetRenderAPI())
 	{
 	case ERenderAPI::None:    PE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
-	case ERenderAPI::OpenGL:  return std::make_shared<OpenGLVertexArray>();
+	case ERenderAPI::OpenGL:  return CreateRef<OpenGLVertexArray>();
 	}
 
 	PE_CORE_ASSERT(false, "Unknown RenderAPI!");

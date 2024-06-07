@@ -1,5 +1,7 @@
 #pragma once
 #include "Pine/Render/Shader.h"
+#include <map>
+#include <glad/glad.h>
 
 namespace Pine
 {
@@ -36,20 +38,24 @@ public:
 	void UploadUniformMat4(const std::string& name, const glm::mat4& matrix);
 private:
 	std::string ReadFile(const std::string& filepath);
-	std::unordered_map<GLenum, std::string> PreProcess(const std::string& source);
-
-	void CompileOrGetVulkanBinaries(const std::unordered_map<GLenum, std::string>& shaderSources);
-	void CompileOrGetOpenGLBinaries();
+	std::map<GLenum, std::string> PreProcess(const std::string& source);
+	void CompileOrGetOpenGLBinaries(const std::map<GLenum, std::string>& shaderSources);
 	void CreateProgram();
 	void Reflect(GLenum stage, const std::vector<uint32_t>& shaderData);
+
 private:
-	uint32_t mHandle;
+	static GLenum StageFromStr(const std::string& type);
+	static const char* StageToStr(GLenum stage);
+
+	static const char* GetCacheDirectory();
+	static void CreateCacheDirectoryIfNeeded();
+	static const char* GetCachedFileExtension(uint32_t stage);
+
+private:
+	uint32_t mHandle = 0;
 	std::string mFilePath;
 	std::string mName;
-
-	std::unordered_map<GLenum, std::vector<uint32_t>> m_VulkanSPIRV;
-	std::unordered_map<GLenum, std::vector<uint32_t>> m_OpenGLSPIRV;
-	std::unordered_map<GLenum, std::string> m_OpenGLSourceCode;
+	std::unordered_map<GLenum, std::vector<uint32_t>> mOpenGLSPIRV;
 };
 
 }

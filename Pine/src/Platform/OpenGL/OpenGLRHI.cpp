@@ -1,7 +1,7 @@
 #include "pinepch.h"
 #include "OpenGLRHI.h"
 #include "Pine/Core/Base.h"
-#include "Pine/Core/Log.h"
+#include "Pine/Core/Assert.h"
 #include "Pine/Core/Application.h"
 #include "Pine/Core/Window.h"
 

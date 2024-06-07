@@ -5,9 +5,9 @@
 namespace Pine
 {
 
-Window* Window::Create(const WindowProps& props)
+Scope<Window> Window::Create(const WindowProps& props)
 {
-	return new GLFWWindow(props);
+	return CreateScope<GLFWWindow>(props);
 }
 
 }

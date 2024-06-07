@@ -1,10 +1,11 @@
 #include "pinepch.h"
 #include "Pine/Core/Application.h"
-#include "Pine/Core/Log.h"
+#include "Pine/Core/Assert.h"
 #include "Pine/Core/Window.h"
+#include "Pine/Core/Clock.h"
+#include "Pine/Render/RenderCore.h"
 #include "Pine/Render/Renderer.h"
 #include "Pine/Render/RenderCmd.h"
-#include "Pine/Core/Clock.h"
 
 namespace Pine
 {
