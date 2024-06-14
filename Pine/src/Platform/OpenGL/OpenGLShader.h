@@ -16,27 +16,19 @@ public:
 	virtual void Bind() const override;
 	virtual void Unbind() const override;
 
-	virtual void SetUniform(const std::string& name, int value) override;
-	virtual void SetUniform(const std::string& name, float value) override;
-	virtual void SetUniform(const std::string& name, const glm::vec2& value) override;
-	virtual void SetUniform(const std::string& name, const glm::vec3& value) override;
-	virtual void SetUniform(const std::string& name, const glm::vec4& value) override;
-	virtual void SetUniform(const std::string& name, const glm::mat4& value) override;
+	virtual ShaderUniformLocation GetUniformLocation(std::string_view name) override;
 
-	virtual void SetUniformArray(const std::string& name, int* values, uint32_t count) override;
+	virtual void SetUniform(ShaderUniformLocation location, int value) override;
+	virtual void SetUniform(ShaderUniformLocation location, float value) override;
+	virtual void SetUniform(ShaderUniformLocation location, const glm::vec2& value) override;
+	virtual void SetUniform(ShaderUniformLocation location, const glm::vec3& value) override;
+	virtual void SetUniform(ShaderUniformLocation location, const glm::vec4& value) override;
+	virtual void SetUniform(ShaderUniformLocation location, const glm::mat3& value) override;
+	virtual void SetUniform(ShaderUniformLocation location, const glm::mat4& value) override;
+
+	virtual void SetUniformArray(ShaderUniformLocation location, int* values, uint32_t count) override;
 
 	virtual const std::string& GetName() const override { return mName; }
-
-	void UploadUniformInt(const std::string& name, int value);
-	void UploadUniformIntArray(const std::string& name, int* values, uint32_t count);
-
-	void UploadUniformFloat(const std::string& name, float value);
-	void UploadUniformFloat2(const std::string& name, const glm::vec2& value);
-	void UploadUniformFloat3(const std::string& name, const glm::vec3& value);
-	void UploadUniformFloat4(const std::string& name, const glm::vec4& value);
-
-	void UploadUniformMat3(const std::string& name, const glm::mat3& matrix);
-	void UploadUniformMat4(const std::string& name, const glm::mat4& matrix);
 private:
 	std::string ReadFile(const std::string& filepath);
 	std::map<GLenum, std::string> PreProcess(const std::string& source);

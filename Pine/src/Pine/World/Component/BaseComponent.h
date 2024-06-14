@@ -63,5 +63,14 @@ struct CameraComponent
 	CameraComponent(const CameraComponent&) = default;
 };
 
+struct StaticMeshComponent
+{
+	Ref<class StaticMesh> StaticMesh;
+
+	StaticMeshComponent() = default;
+	StaticMeshComponent(const StaticMeshComponent& other){ this->StaticMesh = other.StaticMesh; }
+
+};
+
 
 }

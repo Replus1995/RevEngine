@@ -6,6 +6,9 @@ namespace Pine
 
 struct MaterialParamBase
 {
+public:
+	virtual ~MaterialParamBase() = default;
+
 	template<typename T>
 	bool SetValue(const T& value)
 	{
@@ -21,10 +24,14 @@ struct MaterialParamBase
 	virtual void Upload(Shader* pProgram) = 0;
 
 protected:
+	MaterialParamBase(std::string_view name, Shader* pProgram);
+	MaterialParamBase(std::string_view name, uint16_t location);
+
 	virtual bool SetValue(const void* data, size_t size) = 0;
 	virtual bool GetValue(void* data, size_t size) = 0;
 
 	std::string mName;
+	ShaderUniformLocation mLocation;
 };
 
 template<typename T>

@@ -7,28 +7,26 @@
 
 namespace Pine {
 
-class World;
+class Scene;
 class Entity
 {
 public:
 	Entity() = default;
-	Entity(entt::entity handle, World* world);
+	Entity(entt::entity handle, Scene* scene);
 	Entity(const Entity& other) = default;
 
 	template<typename T, typename... Args>
 	T& AddComponent(Args&&... args)
 	{
 		PE_CORE_ASSERT(!HasComponent<T>(), "Entity already has component!");
-		T& component = mWorld->mRegistry.emplace<T>(mHandle, std::forward<Args>(args)...);
-		//mWorld->OnComponentAdded<T>(*this, component);
+		T& component = mScene->mRegistry.emplace<T>(mHandle, std::forward<Args>(args)...);
 		return component;
 	}
 
 	template<typename T, typename... Args>
 	T& AddOrReplaceComponent(Args&&... args)
 	{
-		T& component = mWorld->mRegistry.emplace_or_replace<T>(mHandle, std::forward<Args>(args)...);
-		//mWorld->OnComponentAdded<T>(*this, component);
+		T& component = mScene->mRegistry.emplace_or_replace<T>(mHandle, std::forward<Args>(args)...);
 		return component;
 	}
 
@@ -36,20 +34,20 @@ public:
 	T& GetComponent()
 	{
 		PE_CORE_ASSERT(HasComponent<T>(), "Entity does not have component!");
-		return mWorld->mRegistry.get<T>(mHandle);
+		return mScene->mRegistry.get<T>(mHandle);
 	}
 
 	template<typename T>
 	bool HasComponent()
 	{
-		return mWorld->mRegistry.any_of<T>(mHandle);
+		return mScene->mRegistry.any_of<T>(mHandle);
 	}
 
 	template<typename T>
 	void RemoveComponent()
 	{
 		PE_CORE_ASSERT(HasComponent<T>(), "Entity does not have component!");
-		mWorld->mRegistry.remove<T>(mHandle);
+		mScene->mRegistry.remove<T>(mHandle);
 	}
 
 	operator bool() const { return mHandle != entt::null; }
@@ -61,7 +59,7 @@ public:
 
 	bool operator==(const Entity& other) const
 	{
-		return mHandle == other.mHandle && mWorld == other.mWorld;
+		return mHandle == other.mHandle && mScene == other.mScene;
 	}
 
 	bool operator!=(const Entity& other) const
@@ -70,7 +68,7 @@ public:
 	}
 private:
 	entt::entity mHandle{ entt::null };
-	World* mWorld = nullptr;
+	Scene* mScene = nullptr;
 
 public:
 	template<typename... Component>

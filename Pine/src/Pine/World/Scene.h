@@ -10,11 +10,11 @@ namespace Pine
 
 class Camera;
 class Entity;
-class World
+class Scene
 {
 public:
-	World();
-	~World();
+	Scene();
+	~Scene();
 
 	void OnRuntimeStart();
 	void OnRuntimeStop();

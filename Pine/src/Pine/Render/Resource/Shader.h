@@ -6,6 +6,17 @@
 
 namespace Pine
 {
+class ShaderUniformLocation
+{
+public:
+    ShaderUniformLocation(uint16_t location) : mLocation(location) {};
+    ~ShaderUniformLocation() = default;
+
+    operator uint16_t() { return mLocation; }
+private:
+    uint16_t mLocation;
+};
+
 class Shader
 {
 public:
@@ -14,14 +25,30 @@ public:
     virtual void Bind() const = 0;
     virtual void Unbind() const = 0;
 
-    virtual void SetUniform(const std::string& name, int value) = 0;
-    virtual void SetUniform(const std::string& name, float value) = 0;
-    virtual void SetUniform(const std::string& name, const glm::vec2& value) = 0;
-    virtual void SetUniform(const std::string& name, const glm::vec3& value) = 0;
-    virtual void SetUniform(const std::string& name, const glm::vec4& value) = 0;
-    virtual void SetUniform(const std::string& name, const glm::mat4& value) = 0;
+    virtual ShaderUniformLocation GetUniformLocation(std::string_view name) = 0;
 
-    virtual void SetUniformArray(const std::string& name, int* values, uint32_t count) = 0;
+    virtual void SetUniform(ShaderUniformLocation location, int value) = 0;
+    virtual void SetUniform(ShaderUniformLocation location, float value) = 0;
+    virtual void SetUniform(ShaderUniformLocation location, const glm::vec2& value) = 0;
+    virtual void SetUniform(ShaderUniformLocation location, const glm::vec3& value) = 0;
+    virtual void SetUniform(ShaderUniformLocation location, const glm::vec4& value) = 0;
+    virtual void SetUniform(ShaderUniformLocation location, const glm::mat3& value) = 0;
+    virtual void SetUniform(ShaderUniformLocation location, const glm::mat4& value) = 0;
+
+    template<typename T>
+    void SetUniform(const std::string& name, const T& value)
+    {
+        this->SetUniform(GetUniformLocation(name), value);
+    }
+
+    virtual void SetUniformArray(ShaderUniformLocation location, int* values, uint32_t count) = 0;
+
+    template<typename T>
+    void SetUniformArray(const std::string& name, const T& value)
+    {
+        this->SetUniformArray(GetUniformLocation(name), value);
+    }
+
 
     virtual const std::string& GetName() const = 0;
 

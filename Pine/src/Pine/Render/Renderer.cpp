@@ -35,9 +35,9 @@ void Renderer::DrawStaticMesh(const Ref<StaticMesh>& mesh, const glm::mat4& tran
 	auto& pUnitMeshes = mesh->GetUnitMeshes();
 	for (auto& pUnitMesh : pUnitMeshes)
 	{
-		Material* pMat = mesh->GetMaterial(pUnitMesh->mMaterialIndex);
+		Material* pMat = mesh->GetMaterial(pUnitMesh->MaterialIndex);
 		pMat->Bind();
-		RenderCmd::DrawIndexed(pUnitMesh->mVertexData);
+		RenderCmd::DrawIndexed(pUnitMesh->VertexData);
 	}
 }
 

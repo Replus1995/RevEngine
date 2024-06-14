@@ -1,30 +1,30 @@
 #include "pinepch.h"
-#include "World.h"
+#include "Scene.h"
 
 namespace Pine
 {
 
-World::World()
+Scene::Scene()
 {
 }
 
-World::~World()
+Scene::~Scene()
 {
 }
 
-void World::OnRuntimeStart()
+void Scene::OnRuntimeStart()
 {
 	mIsRunning = true;
 	//OnPhysics2DStart();
 }
 
-void World::OnRuntimeStop()
+void Scene::OnRuntimeStop()
 {
 	mIsRunning = false;
 	//OnPhysics2DStop();
 }
 
-void World::OnUpdateRuntime(float dt)
+void Scene::OnUpdateRuntime(float dt)
 {
 	if (!mIsPaused)
 	{
@@ -32,12 +32,12 @@ void World::OnUpdateRuntime(float dt)
 	}
 }
 
-Entity World::CreateEntity(const std::string& name)
+Entity Scene::CreateEntity(const std::string& name)
 {
 	return CreateEntityWithUUID(UUID(), name);
 }
 
-Entity World::CreateEntityWithUUID(UUID uuid, const std::string& name)
+Entity Scene::CreateEntityWithUUID(UUID uuid, const std::string& name)
 {
 	Entity entity(mRegistry.create(), this);
 	entity.AddComponent<IDComponent>(uuid);
@@ -50,13 +50,13 @@ Entity World::CreateEntityWithUUID(UUID uuid, const std::string& name)
 	return entity;
 }
 
-void World::DestroyEntity(Entity entity)
+void Scene::DestroyEntity(Entity entity)
 {
 	mEntityMap.erase(entity.GetUUID());
 	mRegistry.destroy(entity);
 }
 
-Entity World::DuplicateEntity(Entity entity)
+Entity Scene::DuplicateEntity(Entity entity)
 {
 	std::string name = entity.GetName();
 	Entity newEntity = CreateEntity(name);
@@ -64,7 +64,7 @@ Entity World::DuplicateEntity(Entity entity)
 	return newEntity;
 }
 
-Entity World::FindEntityByName(std::string_view name)
+Entity Scene::FindEntityByName(std::string_view name)
 {
 	auto view = mRegistry.view<TagComponent>();
 	for (auto entity : view)
@@ -76,7 +76,7 @@ Entity World::FindEntityByName(std::string_view name)
 	return {};
 }
 
-Entity World::FindEntityByUUID(UUID uuid)
+Entity Scene::FindEntityByUUID(UUID uuid)
 {
 	if (mEntityMap.find(uuid) != mEntityMap.end())
 		return { mEntityMap.at(uuid), this };

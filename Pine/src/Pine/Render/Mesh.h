@@ -7,8 +7,8 @@ namespace Pine
 
 struct UnitMesh
 {
-	uint32_t mMaterialIndex = 0;
-	Ref<VertexArray> mVertexData = nullptr;
+	uint32_t MaterialIndex = 0;
+	Ref<VertexArray> VertexData = nullptr;
 };
 
 class Material;

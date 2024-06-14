@@ -1,13 +1,13 @@
 #include "pinepch.h"
 #include "Entity.h"
-#include "Pine/World/World.h"
+#include "Pine/World/Scene.h"
 
 namespace Pine
 {
 
-Entity::Entity(entt::entity handle, World* world)
+Entity::Entity(entt::entity handle, Scene* scene)
 	: mHandle(handle)
-	, mWorld(world)
+	, mScene(scene)
 {
 }
 
