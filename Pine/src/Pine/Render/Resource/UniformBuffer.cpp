@@ -1,5 +1,5 @@
 #include "pinepch.h"
-#include "Pine/Render/UniformBuffer.h"
+#include "UniformBuffer.h"
 #include "Pine/Render/RenderCore.h"
 #include "Pine/Core/Assert.h"
 

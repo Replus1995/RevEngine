@@ -25,6 +25,7 @@ public:
 	SandBox() 
 	{
 		PushLayer(new ExampleLayer());
+		PushLayer(new Pine::RenderLayer());
 		PushLayer(new Pine::ImGuiLayer());
 	};
 	~SandBox() {};

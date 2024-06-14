@@ -12,6 +12,7 @@ public:
 	static void OnWindowResize(uint32_t width, uint32_t height);
 
 	static void Submit(const Ref<class Shader>& shader, const Ref<class VertexArray>& vertexArray, const glm::mat4& transform = glm::mat4(1.0f));
+	static void DrawStaticMesh(const Ref<class StaticMesh>& mesh, const glm::mat4& transform = glm::mat4(1.0f));
 	//static void Draw(class View* view);
 	
 	//static void BeginScene(OrthographicCamera& camera);

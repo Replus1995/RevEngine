@@ -12,8 +12,14 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include <Pine/Core/Log.h>
+#include "Pine/Core/Base.h"
+#include "Pine/Core/Log.h"
 
 #ifdef PE_PLATFORM_WINDOWS
+	#ifndef NOMINMAX
+		#define NOMINMAX
+	#endif
 	#include <Windows.h>
+	#undef near
+	#undef far
 #endif

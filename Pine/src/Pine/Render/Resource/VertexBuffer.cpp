@@ -1,5 +1,5 @@
 #include "pinepch.h"
-#include "Pine/Render/VertexBuffer.h"
+#include "VertexBuffer.h"
 #include "Pine/Core/Assert.h"
 
 #include "Platform/OpenGL/OpenGLVertexBuffer.h"

@@ -1,5 +1,5 @@
 #pragma once
-#include "Pine/Render/UniformBuffer.h"
+#include "Pine/Render/Resource/UniformBuffer.h"
 
 namespace Pine
 {

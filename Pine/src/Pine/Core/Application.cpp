@@ -44,8 +44,8 @@ namespace Pine
 			float dt = time - mLastFrameTime;
 			mLastFrameTime = time;
 
-			RenderCmd::SetClearColor(glm::vec4{ .3f, .3f, .8f, 1.0f });
-			RenderCmd::Clear();
+			//RenderCmd::SetClearColor(glm::vec4{ .3f, .3f, .8f, 1.0f });
+			//RenderCmd::Clear();
 
 			for (Layer* layer : mLayerStack)
 				layer->OnUpdate(dt);

@@ -1,5 +1,5 @@
 #pragma once
-#include "Pine/Render/FrameBuffer.h"
+#include "Pine/Render/Resource/FrameBuffer.h"
 #include <glad/glad.h>
 
 namespace Pine

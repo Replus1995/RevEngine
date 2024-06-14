@@ -170,6 +170,8 @@ namespace Pine
 
 	void ImGuiLayer::OnDetach()
 	{
+        ImGui_ImplOpenGL3_Shutdown();
+        ImGui::DestroyContext();
 	}
 
 	void ImGuiLayer::OnUpdate(float dt)

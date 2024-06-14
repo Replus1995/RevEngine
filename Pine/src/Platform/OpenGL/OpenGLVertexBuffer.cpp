@@ -131,14 +131,14 @@ void OpenGLVertexArray::AddVertexBuffer(const std::shared_ptr<VertexBuffer>& ver
 		case EShaderDataType::Float3:
 		case EShaderDataType::Float4:
 		{
-			glEnableVertexAttribArray(m_VertexBufferIndex);
-			glVertexAttribPointer(m_VertexBufferIndex,
+			glEnableVertexAttribArray(mVertexBufferIndex);
+			glVertexAttribPointer(mVertexBufferIndex,
 				element.GetComponentCount(),
 				ConvertToOpenGLDataType(element.Type),
 				element.Normalized ? GL_TRUE : GL_FALSE,
 				layout.GetStride(),
 				(const void*)element.Offset);
-			m_VertexBufferIndex++;
+			mVertexBufferIndex++;
 			break;
 		}
 		case EShaderDataType::Int:
@@ -147,13 +147,13 @@ void OpenGLVertexArray::AddVertexBuffer(const std::shared_ptr<VertexBuffer>& ver
 		case EShaderDataType::Int4:
 		case EShaderDataType::Bool:
 		{
-			glEnableVertexAttribArray(m_VertexBufferIndex);
-			glVertexAttribIPointer(m_VertexBufferIndex,
+			glEnableVertexAttribArray(mVertexBufferIndex);
+			glVertexAttribIPointer(mVertexBufferIndex,
 				element.GetComponentCount(),
 				ConvertToOpenGLDataType(element.Type),
 				layout.GetStride(),
 				(const void*)element.Offset);
-			m_VertexBufferIndex++;
+			mVertexBufferIndex++;
 			break;
 		}
 		case EShaderDataType::Mat3:
@@ -162,15 +162,15 @@ void OpenGLVertexArray::AddVertexBuffer(const std::shared_ptr<VertexBuffer>& ver
 			uint8_t count = element.GetComponentCount();
 			for (uint8_t i = 0; i < count; i++)
 			{
-				glEnableVertexAttribArray(m_VertexBufferIndex);
-				glVertexAttribPointer(m_VertexBufferIndex,
+				glEnableVertexAttribArray(mVertexBufferIndex);
+				glVertexAttribPointer(mVertexBufferIndex,
 					count,
 					ConvertToOpenGLDataType(element.Type),
 					element.Normalized ? GL_TRUE : GL_FALSE,
 					layout.GetStride(),
 					(const void*)(element.Offset + sizeof(float) * count * i));
-				glVertexAttribDivisor(m_VertexBufferIndex, 1);
-				m_VertexBufferIndex++;
+				glVertexAttribDivisor(mVertexBufferIndex, 1);
+				mVertexBufferIndex++;
 			}
 			break;
 		}
@@ -179,14 +179,14 @@ void OpenGLVertexArray::AddVertexBuffer(const std::shared_ptr<VertexBuffer>& ver
 		}
 	}
 
-	m_VertexBuffers.push_back(vertexBuffer);
+	mVertexBuffers.push_back(vertexBuffer);
 }
 
 void OpenGLVertexArray::SetIndexBuffer(const std::shared_ptr<IndexBuffer>& indexBuffer)
 {
 	glBindVertexArray(mHandle);
 	indexBuffer->Bind();
-	m_IndexBuffer = indexBuffer;
+	mIndexBuffer = indexBuffer;
 }
 
 }

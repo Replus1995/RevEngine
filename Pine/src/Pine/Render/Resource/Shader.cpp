@@ -1,5 +1,5 @@
 #include "pinepch.h"
-#include "Pine/Render/Shader.h"
+#include "Shader.h"
 #include "Pine/Render/RenderCore.h"
 #include "Pine/Core/Assert.h"
 

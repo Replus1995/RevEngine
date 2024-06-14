@@ -1,5 +1,5 @@
 #pragma once
-#include "Pine/Render/Texture.h"
+#include "Pine/Render/Resource/Texture.h"
 #include <glad/glad.h>
 
 namespace Pine
