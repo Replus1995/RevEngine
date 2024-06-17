@@ -1,13 +1,15 @@
 #pragma once
+#include "Pine/Core/Base.h"
+#include "Pine/Core/Assert.h"
 #include "Pine/Render/Resource/Shader.h"
 
 namespace Pine
 {
 
-struct MaterialParamBase
+class MaterialUniform
 {
 public:
-	virtual ~MaterialParamBase() = default;
+	virtual ~MaterialUniform() = default;
 
 	template<typename T>
 	bool SetValue(const T& value)
@@ -24,8 +26,17 @@ public:
 	virtual void Upload(Shader* pProgram) = 0;
 
 protected:
-	MaterialParamBase(std::string_view name, Shader* pProgram);
-	MaterialParamBase(std::string_view name, uint16_t location);
+	MaterialUniform(std::string_view name, Shader* program)
+		: mName(name)
+	{
+		PE_CORE_ASSERT(program)
+		mLocation = program->GetUniformLocation(name);
+	}
+	MaterialUniform(std::string_view name, uint16_t location)
+		: mName(name)
+		, mLocation(location)
+	{
+	}
 
 	virtual bool SetValue(const void* data, size_t size) = 0;
 	virtual bool GetValue(void* data, size_t size) = 0;
@@ -35,14 +46,25 @@ protected:
 };
 
 template<typename T>
-struct MaterialParam : public MaterialParamBase
+class TMaterialUniform : public MaterialUniform
 {
+public:
+	TMaterialUniform(std::string_view name, const T& value, Shader* program)
+		: MaterialUniform(name, program)
+		, mValue(value)
+	{
+	}
+
+	TMaterialUniform(std::string_view name, const T& value, uint16_t location)
+		: MaterialUniform(name, location)
+		, mValue(value)
+	{
+	}
+
 	virtual void Upload(Shader* pProgram)
 	{
 		pProgram->SetUniform(mName, mValue);
 	}
-
-	T mValue;
 
 protected:
 	virtual bool SetValue(const void* data, size_t size)
@@ -59,17 +81,31 @@ protected:
 		*(T*)data = mValue;
 		return true;
 	}
+
+private:
+	T mValue;
 };
 
 template<typename T, size_t N>
-struct MaterialParam<std::array<T, N>> : public MaterialParamBase
+class TMaterialUniform<std::array<T, N>> : public MaterialUniform
 {
+public:
+	TMaterialUniform(std::string_view name, const std::array<T, N>& value, Shader* program)
+		: MaterialUniform(name, program)
+		, mValue(value)
+	{
+	}
+
+	TMaterialUniform(std::string_view name, const std::array<T, N>& value, uint16_t location)
+		: MaterialUniform(name, location)
+		, mValue(value)
+	{
+	}
+
 	virtual void Upload(Shader* pProgram)
 	{
 		pProgram->SetUniformArray(mName, mValueArr.data(), N);
 	}
-
-	std::array<T, N> mValueArr;
 
 protected:
 	virtual bool SetValue(const void* data, size_t size)
@@ -95,6 +131,9 @@ protected:
 		}
 		return true;
 	}
+
+private:
+	std::array<T, N> mValueArr;
 };
 
 

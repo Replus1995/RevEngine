@@ -9,12 +9,13 @@ namespace Pine
 class ShaderUniformLocation
 {
 public:
-    ShaderUniformLocation(uint16_t location) : mLocation(location) {};
+    ShaderUniformLocation() : mLocation(0) {};
+    ShaderUniformLocation(uint16 location) : mLocation(location) {};
     ~ShaderUniformLocation() = default;
 
-    operator uint16_t() { return mLocation; }
+    operator uint16() { return mLocation; }
 private:
-    uint16_t mLocation;
+    uint16 mLocation;
 };
 
 class Shader

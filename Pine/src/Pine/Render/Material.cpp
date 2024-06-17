@@ -12,11 +12,6 @@ Material::Material(const Ref<Shader>& program)
 
 Material::~Material()
 {
-	for (auto iter = mParamMap.begin(); iter != mParamMap.end(); iter++)
-	{
-		delete iter->second;
-		iter->second = nullptr;
-	}
 }
 
 void Material::Bind()
@@ -33,11 +28,11 @@ void Material::Unbind()
 	mProgram->Unbind();
 }
 
-MaterialParamBase* Material::FindParam(std::string_view name)
+MaterialUniform* Material::FindParam(std::string_view name)
 {
 	if (auto iter = mParamMap.find(name); iter != mParamMap.end())
 	{
-		return iter->second;
+		return iter->second.get();
 	}
 	return nullptr;
 }
