@@ -1,48 +1,24 @@
 #pragma once
-#include "Pine/Render/Resource/VertexBuffer.h"
+#include "Pine/Core/Base.h"
 #include <vector>
 
 namespace Pine
 {
-
-struct UnitMesh
-{
-	uint32_t MaterialIndex = 0;
-	Ref<VertexArray> VertexData = nullptr;
-};
-
+class VertexArray;
 class Material;
 class PINE_API Mesh
 {
 public:
-	virtual ~Mesh();
+	virtual ~Mesh() = default;
 
-	Material* GetMaterial(uint32_t index) const;
-	const std::vector<Ref<Material>>& GetMaterials() const
-	{
-		return mMaterials;
-	}
-	const std::vector<Ref<UnitMesh>> GetUnitMeshes() const
-	{
-		return mUnitMeshes;
-	}
+	virtual const Ref<Material>& GetMaterial(uint32 index) const = 0;
+	virtual uint32 GetMaterialCount() const = 0;
+	virtual std::vector<const Ref<VertexArray>&> GetVertexArrayByIndex(uint32 index) const = 0;
 
 protected:
-	Mesh();
-	Mesh(const std::vector<Ref<Material>>& pMaterials, const std::vector<Ref<UnitMesh>>& pUnitMeshes);
-
-protected:
-	std::vector<Ref<Material>> mMaterials;
-	std::vector<Ref<UnitMesh>> mUnitMeshes;
+	Mesh() = default;
 };
 
-//mMaterials & mUnitMeshes should be the same size in StaticMesh
-class PINE_API StaticMesh : public Mesh
-{
-public:
-	StaticMesh(const std::vector<Ref<Material>>& pMaterials, const std::vector<Ref<UnitMesh>>& pUnitMeshes);
-	virtual ~StaticMesh();
 
-};
 
 }

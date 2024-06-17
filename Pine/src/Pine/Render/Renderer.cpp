@@ -3,7 +3,7 @@
 #include "Pine/Render/RenderCmd.h"
 #include "Pine/Render/Resource/VertexBuffer.h"
 #include "Pine/Render/Resource/Shader.h"
-#include "Pine/Render/Mesh.h"
+#include "Pine/Render/StaticMesh.h"
 #include "Pine/Render/Material.h"
 
 namespace Pine
@@ -32,12 +32,18 @@ void Renderer::Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertexA
 
 void Renderer::DrawStaticMesh(const Ref<StaticMesh>& mesh, const glm::mat4& transform)
 {
-	auto& pUnitMeshes = mesh->GetUnitMeshes();
-	for (auto& pUnitMesh : pUnitMeshes)
+	for (uint32 i = 0; i < mesh->GetMaterialCount(); i++)
 	{
-		Material* pMat = mesh->GetMaterial(pUnitMesh->MaterialIndex);
-		pMat->Bind();
-		RenderCmd::DrawIndexed(pUnitMesh->VertexData);
+		auto& material = mesh->GetMaterial(i);
+		auto vertexData = mesh->GetVertexArrayByIndex(i);
+		if (material && !vertexData.empty())
+		{
+			material->Bind();
+			for (auto& vertexArr : vertexData)
+			{
+				RenderCmd::DrawIndexed(vertexArr);
+			}
+		}
 	}
 }
 
