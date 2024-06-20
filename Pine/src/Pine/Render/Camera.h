@@ -19,6 +19,8 @@ public:
 
 	ProjectionType GetProjectionType() const { return mProjectionType; }
 	void SetProjectionType(ProjectionType type);
+	glm::mat4 GetProjectionMatrix() const { return mProjection; }
+
 private:
 	void RecalculateProjection();
 private:

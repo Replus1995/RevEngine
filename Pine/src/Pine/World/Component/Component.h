@@ -10,7 +10,7 @@ template<typename... Component>
 struct ComponentGroup
 {
 };
-using AllComponents = ComponentGroup<TransformComponent,  CameraComponent>;
+using AllComponents = ComponentGroup<TransformComponent,  CameraComponent, StaticMeshComponent>;
 
 class ComponentUtils
 {

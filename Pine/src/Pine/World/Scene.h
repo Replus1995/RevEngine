@@ -28,6 +28,10 @@ public:
 
 	//void OnViewportResize(uint32_t width, uint32_t height);
 
+	bool IsRunning() const { return mIsRunning; }
+	bool IsPaused() const { return mIsPaused; }
+	void SetPaused(bool paused) { mIsPaused = paused; }
+
 	Entity CreateEntity(const std::string& name = std::string());
 	Entity CreateEntityWithUUID(UUID uuid, const std::string& name = std::string());
 	void DestroyEntity(Entity entity);
@@ -42,9 +46,7 @@ public:
 		return mRegistry.view<Components...>();
 	}
 
-	bool IsRunning() const { return mIsRunning; }
-	bool IsPaused() const { return mIsPaused; }
-	void SetPaused(bool paused) { mIsPaused = paused; }
+	Entity GetPrimaryCamera();
 
 	//static Ref<World> Copy(Ref<World> other);
 private:
@@ -66,6 +68,7 @@ private:
 	std::unordered_map<UUID, entt::entity> mEntityMap;
 
 	friend class Entity;
+	friend class SceneRenderProxy;
 	//friend class SceneSerializer;
 	//friend class SceneHierarchyPanel;
 };

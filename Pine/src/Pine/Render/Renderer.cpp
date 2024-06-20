@@ -29,24 +29,4 @@ void Renderer::Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertexA
 	shader->Bind();
 	RenderCmd::DrawIndexed(vertexArray);
 }
-
-void Renderer::DrawStaticMesh(const Ref<StaticMesh>& mesh, const glm::mat4& transform)
-{
-	for (uint32 i = 0; i < mesh->GetMaterialCount(); i++)
-	{
-		auto& material = mesh->GetMaterial(i);
-		auto vertexData = mesh->GetVertexArrayByIndex(i);
-		if (material && !vertexData.empty())
-		{
-			material->Bind();
-			for (auto& vertexArr : vertexData)
-			{
-				RenderCmd::DrawIndexed(vertexArr);
-			}
-		}
-	}
-}
-
-
-
 }

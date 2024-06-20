@@ -17,10 +17,7 @@ Material::~Material()
 void Material::Bind()
 {
 	mProgram->Bind();
-	for (auto iter = mParamMap.begin(); iter != mParamMap.end(); iter++)
-	{
-		iter->second->Upload(mProgram.get());
-	}
+	UploadUniform();
 }
 
 void Material::Unbind()
@@ -28,13 +25,21 @@ void Material::Unbind()
 	mProgram->Unbind();
 }
 
-MaterialUniform* Material::FindParam(std::string_view name)
+MaterialUniform* Material::FindUIniform(std::string_view name)
 {
-	if (auto iter = mParamMap.find(name); iter != mParamMap.end())
+	if (auto iter = mUniformMap.find(name); iter != mUniformMap.end())
 	{
 		return iter->second.get();
 	}
 	return nullptr;
+}
+
+void Material::UploadUniform()
+{
+	for (auto iter = mUniformMap.begin(); iter != mUniformMap.end(); iter++)
+	{
+		iter->second->Upload(mProgram.get());
+	}
 }
 
 }

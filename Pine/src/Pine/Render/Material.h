@@ -4,17 +4,39 @@
 
 namespace Pine
 {
+enum class EMaterialDomain
+{
+	Opaque,
+	Transparent,
+	Unlit
+};
+
 class MaterialUniform;
 class Material
 {
 public:
 	Material(const Ref<Shader>& program);
 	virtual ~Material();
+	
+	/*const Ref<Shader>& GetShader() const
+	{
+		return mProgram;
+	}*/
+
+	void SetDomain(EMaterialDomain domain)
+	{
+		mDomain = domain;
+	}
+
+	EMaterialDomain GetDomain() const
+	{
+		return mDomain;
+	}
 
 	template<typename T>
 	bool SetUniform(std::string_view name, const T& value)
 	{
-		if (MaterialUniform* pParam = FindParam(name); pParam)
+		if (MaterialUniform* pParam = FindUIniform(name); pParam)
 		{
 			return pParam->SetValue(value);
 		}
@@ -24,7 +46,7 @@ public:
 	template<typename T>
 	bool GetUniform(std::string_view name, T& value)
 	{
-		if (MaterialUniform* pParam = FindParam(name); pParam)
+		if (MaterialUniform* pParam = FindUIniform(name); pParam)
 		{
 			return pParam->GetValue(value);
 		}
@@ -35,11 +57,13 @@ public:
 	void Unbind();
 
 protected:
-	MaterialUniform* FindParam(std::string_view name);
+	MaterialUniform* FindUIniform(std::string_view name);
+	virtual void UploadUniform();
 
 protected:
 	Ref<Shader> mProgram = nullptr;
-	std::unordered_map<std::string_view, std::unique_ptr<MaterialUniform>> mParamMap;
+	EMaterialDomain mDomain = EMaterialDomain::Opaque;
+	std::unordered_map<std::string_view, std::unique_ptr<MaterialUniform>> mUniformMap;
 };
 
 }
