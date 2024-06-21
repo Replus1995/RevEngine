@@ -16,6 +16,8 @@ public:
 	~SceneRenderProxy() = default;
 
 	void Init();
+	void Release();
+
 	void Prepare(const Ref<Scene>& scene);
 	void Draw();
 

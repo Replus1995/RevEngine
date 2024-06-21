@@ -13,7 +13,7 @@ public:
 
 	virtual const Ref<Material>& GetMaterial(uint32 index) const = 0;
 	virtual uint32 GetMaterialCount() const = 0;
-	virtual std::vector<const Ref<VertexArray>&> GetVertexArrayByIndex(uint32 index) const = 0;
+	virtual std::vector<const VertexArray*> GetVertexArrayByIndex(uint32 index) const = 0;
 
 protected:
 	Mesh() = default;

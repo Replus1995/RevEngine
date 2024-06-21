@@ -34,7 +34,7 @@ void RenderCmd::Clear()
 	sRHI->Clear();
 }
 
-void RenderCmd::DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount)
+void RenderCmd::DrawIndexed(const VertexArray* vertexArray, uint32_t indexCount)
 {
 	sRHI->DrawIndexed(vertexArray, indexCount);
 }

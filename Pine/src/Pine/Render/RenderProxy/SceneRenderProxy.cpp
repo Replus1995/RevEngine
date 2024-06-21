@@ -1,6 +1,8 @@
 #include "pinepch.h"
 #include "SceneRenderProxy.h" 
 #include "Pine/World/Scene.h"
+#include "Pine/World/System/PlayerCameraSystem.h"
+#include "Pine/Render/RenderCmd.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -13,14 +15,22 @@ void SceneRenderProxy::Init()
 	mSceneBuffer = UniformBuffer::Create(sizeof(SceneRenderData), 0);
 }
 
+void SceneRenderProxy::Release()
+{
+	mSceneBuffer.reset();
+}
+
 void SceneRenderProxy::Prepare(const Ref<Scene>& scene)
 {
+	if(!scene) return;
+
 	{
 		//Update Scene Uniform
-		Entity primCamEntity = scene->GetPrimaryCamera();
-		auto [transformComp, cameraComp] = scene->mRegistry.get<TransformComponent, CameraComponent>(primCamEntity);
-		mSceneData.ProjMatrix = cameraComp.Camera.GetProjectionMatrix();
-		mSceneData.ViewMatrix = glm::inverse(transformComp.GetTransform());
+		PlayerCameraSystem* pSystem = scene->GetSystem<PlayerCameraSystem>();
+		if (pSystem)
+		{
+			pSystem->GetCameraMatrix(mSceneData.ProjMatrix, mSceneData.ViewMatrix);
+		}
 	}
 	{
 		//Collect static meshes
@@ -39,6 +49,9 @@ void SceneRenderProxy::Prepare(const Ref<Scene>& scene)
 
 void SceneRenderProxy::Draw()
 {
+	RenderCmd::SetClearColor(glm::vec4{ .3f, .3f, .8f, 1.0f });
+	RenderCmd::Clear();
+
 	mSceneBuffer->SetData(&mSceneData, sizeof(SceneRenderData));
 
 	DrawDomain(EMaterialDomain::Opaque);

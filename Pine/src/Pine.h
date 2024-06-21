@@ -9,7 +9,7 @@
 //World
 #include "Pine/World/Component/Component.h"
 #include "Pine/World/Entity.h"
-#include "Pine/World/World.h"
+#include "Pine/World/Scene.h"
 
 //Imgui
 #include "Pine/ImGui/ImGuiLayer.h"

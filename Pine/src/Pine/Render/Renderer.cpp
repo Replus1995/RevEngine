@@ -24,9 +24,15 @@ void Renderer::OnWindowResize(uint32_t width, uint32_t height)
 	RenderCmd::SetViewport(0, 0, width, height);
 }
 
-void Renderer::Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertexArray, const glm::mat4& transform)
+void Renderer::Clear(const glm::vec4& color)
 {
-	shader->Bind();
+	RenderCmd::SetClearColor(color);
+	RenderCmd::Clear();
+}
+
+void Renderer::DrawIndexed(const class VertexArray* vertexArray)
+{
 	RenderCmd::DrawIndexed(vertexArray);
 }
+
 }

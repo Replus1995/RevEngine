@@ -6,7 +6,7 @@ namespace Pine
 
 struct SceneRenderData
 {
-	glm::mat4 ViewMatrix;
 	glm::mat4 ProjMatrix;
+	glm::mat4 ViewMatrix;
 };
 }

@@ -38,14 +38,14 @@ uint32 StaticMesh::GetMaterialCount() const
 	return mMaterials.size();
 }
 
-std::vector<const Ref<VertexArray>&> StaticMesh::GetVertexArrayByIndex(uint32 index) const
+std::vector<const VertexArray*> StaticMesh::GetVertexArrayByIndex(uint32 index) const
 {
-	std::vector<const Ref<VertexArray>&> outArr;
+	std::vector<const VertexArray*> outArr;
 	for (auto res : mResources)
 	{
 		if (res.MaterialIndex == index)
 		{
-			outArr.push_back(res.VertexData);
+			outArr.push_back(res.VertexData.get());
 		}
 	}
 	return outArr;

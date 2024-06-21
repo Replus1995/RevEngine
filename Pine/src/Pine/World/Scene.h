@@ -2,6 +2,7 @@
 #include "Pine/Core/Base.h"
 #include "Pine/Core/UUID.h"
 #include "Pine/World/Entity.h"
+#include "Pine/World/System/System.h"
 
 #include <entt/entt.hpp>
 
@@ -46,7 +47,42 @@ public:
 		return mRegistry.view<Components...>();
 	}
 
-	Entity GetPrimaryCamera();
+	template<class TSystem>
+	bool AddSystem()
+	{
+		size_t hash = typeid(TSystem).hash_code();
+		if (auto iter = mSystemMap.find(hash); iter == mSystemMap.end())
+		{
+			mSystemMap.emplace(hash, std::make_unique<TSystem>(mRegistry));
+			return true;
+		}
+		return false;
+	}
+
+
+	template<class TSystem>
+	bool RemoveSystem()
+	{
+		size_t hash = typeid(TSystem).hash_code();
+		if (auto iter = mSystemMap.find(hash); iter != mSystemMap.end())
+		{
+			mSystemMap.erase(iter);
+			return true;
+		}
+		return false;
+	}
+
+	template<class TSystem>
+	TSystem* GetSystem()
+	{
+		size_t hash = typeid(TSystem).hash_code();
+		if (auto iter = mSystemMap.find(hash); iter != mSystemMap.end())
+		{
+			return (TSystem*)iter->second.get();
+		}
+		return nullptr;
+	}
+
 
 	//static Ref<World> Copy(Ref<World> other);
 private:
@@ -66,6 +102,7 @@ private:
 	//b2World* m_PhysicsWorld = nullptr;
 
 	std::unordered_map<UUID, entt::entity> mEntityMap;
+	std::map<size_t, Scope<class ISystem>> mSystemMap;
 
 	friend class Entity;
 	friend class SceneRenderProxy;

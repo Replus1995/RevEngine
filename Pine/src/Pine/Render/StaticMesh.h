@@ -19,7 +19,7 @@ public:
 
 	virtual const Ref<Material>& GetMaterial(uint32 index) const override;
 	virtual uint32 GetMaterialCount() const override;
-	virtual std::vector<const Ref<VertexArray>&> GetVertexArrayByIndex(uint32 index) const override;
+	virtual std::vector<const VertexArray*> GetVertexArrayByIndex(uint32 index) const override;
 
 private:
 	std::vector<Ref<Material>> mMaterials;

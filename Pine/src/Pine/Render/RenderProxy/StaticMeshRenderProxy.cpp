@@ -4,6 +4,7 @@
 #include "Pine/Render/Material.h"
 #include "Pine/Render/RenderProxy/SceneRenderProxy.h"
 #include "Pine/Render/RenderCmd.h"
+#include "Pine/Render/Renderer.h"
 
 namespace Pine
 {

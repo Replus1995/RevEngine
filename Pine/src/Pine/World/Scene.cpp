@@ -1,11 +1,13 @@
 #include "pinepch.h"
 #include "Scene.h"
+#include "Pine/World/System/PlayerCameraSystem.h"
 
 namespace Pine
 {
 
 Scene::Scene()
 {
+	AddSystem<PlayerCameraSystem>();
 }
 
 Scene::~Scene()
