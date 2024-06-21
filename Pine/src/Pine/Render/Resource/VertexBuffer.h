@@ -9,8 +9,8 @@ struct BufferElement
 {
 	std::string Name;
 	EShaderDataType Type;
-	uint32_t Size;
-	size_t Offset;
+	uint32 Size;
+	uint32 Offset;
 	bool Normalized;
 
 	BufferElement() = default;
@@ -20,7 +20,7 @@ struct BufferElement
 	{
 	}
 
-	uint32_t GetComponentCount() const;
+	uint32 GetComponentCount() const;
 };
 
 class BufferLayout
@@ -34,7 +34,7 @@ public:
 		CalculateOffsetsAndStride();
 	}
 
-	uint32_t GetStride() const { return mStride; }
+	uint32 GetStride() const { return mStride; }
 	const std::vector<BufferElement>& GetElements() const { return mElements; }
 
 	std::vector<BufferElement>::iterator begin() { return mElements.begin(); }
@@ -44,18 +44,16 @@ public:
 private:
 	void CalculateOffsetsAndStride()
 	{
-		size_t offset = 0;
 		mStride = 0;
 		for (auto& element : mElements)
 		{
-			element.Offset = offset;
-			offset += element.Size;
+			element.Offset = mStride;
 			mStride += element.Size;
 		}
 	}
 private:
 	std::vector<BufferElement> mElements;
-	uint32_t mStride = 0;
+	uint32 mStride = 0;
 };
 
 class VertexBuffer
@@ -65,14 +63,13 @@ public:
 
 	virtual void Bind() const = 0;
 	virtual void Unbind() const = 0;
-
-	virtual void SetData(const void* data, uint32_t size) = 0;
+	virtual void SetData(const void* data, uint32 size) = 0;
 
 	virtual const BufferLayout& GetLayout() const = 0;
 	virtual void SetLayout(const BufferLayout& layout) = 0;
 
-	static Ref<VertexBuffer> Create(uint32_t size); //Dynamic Data
-	static Ref<VertexBuffer> Create(float* vertices, uint32_t size); //Static Data
+	static Ref<VertexBuffer> Create(uint32 size); //Dynamic Data
+	static Ref<VertexBuffer> Create(const float* vertices, uint32 size); //Static Data
 };
 
 class IndexBuffer
@@ -82,10 +79,9 @@ public:
 
 	virtual void Bind() const = 0;
 	virtual void Unbind() const = 0;
+	virtual uint32 GetCount() const = 0;
 
-	virtual uint32_t GetCount() const = 0;
-
-	static Ref<IndexBuffer> Create(uint32_t* indices, uint32_t count);
+	static Ref<IndexBuffer> Create(const uint32* indices, uint32 count);
 };
 
 class VertexArray

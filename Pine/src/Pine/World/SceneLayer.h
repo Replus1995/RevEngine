@@ -21,7 +21,7 @@ public:
 private:
 	bool OnWindowResize(WindowResizeEvent& e);
 
-private:
+protected:
 	Ref<Scene> mScene;
 	SceneRenderProxy mSceneProxy;
 	//Ref<Framebuffer> mFrameBuffer;

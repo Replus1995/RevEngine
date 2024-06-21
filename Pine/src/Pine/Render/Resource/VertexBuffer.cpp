@@ -8,7 +8,7 @@
 namespace Pine
 {
 
-uint32_t BufferElement::GetComponentCount() const
+uint32 BufferElement::GetComponentCount() const
 {
 	switch (Type)
 	{
@@ -29,7 +29,7 @@ uint32_t BufferElement::GetComponentCount() const
 	return 0;
 }
 
-Ref<VertexBuffer> VertexBuffer::Create(uint32_t size)
+Ref<VertexBuffer> VertexBuffer::Create(uint32 size)
 {
 	switch (GetRenderAPI())
 	{
@@ -41,7 +41,7 @@ Ref<VertexBuffer> VertexBuffer::Create(uint32_t size)
 	return nullptr;
 }
 
-Ref<VertexBuffer> VertexBuffer::Create(float* vertices, uint32_t size)
+Ref<VertexBuffer> VertexBuffer::Create(const float* vertices, uint32 size)
 {
 	switch (GetRenderAPI())
 	{
@@ -53,7 +53,7 @@ Ref<VertexBuffer> VertexBuffer::Create(float* vertices, uint32_t size)
 	return nullptr;
 }
 
-Ref<IndexBuffer> IndexBuffer::Create(uint32_t* indices, uint32_t size)
+Ref<IndexBuffer> IndexBuffer::Create(const uint32* indices, uint32 size)
 {
 	switch (GetRenderAPI())
 	{

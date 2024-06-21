@@ -8,14 +8,14 @@ namespace Pine
 {
 /*Vertex Buffer*/
 
-OpenGLVertexBuffer::OpenGLVertexBuffer(uint32_t size)
+OpenGLVertexBuffer::OpenGLVertexBuffer(uint32 size)
 {
 	glCreateBuffers(1, &mHandle);
 	glBindBuffer(GL_ARRAY_BUFFER, mHandle);
 	glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
 }
 
-OpenGLVertexBuffer::OpenGLVertexBuffer(float* vertices, uint32_t size)
+OpenGLVertexBuffer::OpenGLVertexBuffer(const float* vertices, uint32 size)
 {
 	glCreateBuffers(1, &mHandle);
 	glBindBuffer(GL_ARRAY_BUFFER, mHandle);
@@ -37,7 +37,7 @@ void OpenGLVertexBuffer::Unbind() const
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void OpenGLVertexBuffer::SetData(const void* data, uint32_t size)
+void OpenGLVertexBuffer::SetData(const void* data, uint32 size)
 {
 	glBindBuffer(GL_ARRAY_BUFFER, mHandle);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, size, data);
@@ -45,7 +45,7 @@ void OpenGLVertexBuffer::SetData(const void* data, uint32_t size)
 
 /*Index Buffer*/
 
-OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t* indices, uint32_t count)
+OpenGLIndexBuffer::OpenGLIndexBuffer(const uint32* indices, uint32 count)
 	: mCount(count)
 {
 	glCreateBuffers(1, &mHandle);
@@ -53,7 +53,7 @@ OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t* indices, uint32_t count)
 	// GL_ELEMENT_ARRAY_BUFFER is not valid without an actively bound VAO
 	// Binding with GL_ARRAY_BUFFER allows the data to be loaded regardless of VAO state. 
 	glBindBuffer(GL_ARRAY_BUFFER, mHandle);
-	glBufferData(GL_ARRAY_BUFFER, count * sizeof(uint32_t), indices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, count * sizeof(uint32), indices, GL_STATIC_DRAW);
 }
 
 OpenGLIndexBuffer::~OpenGLIndexBuffer()
