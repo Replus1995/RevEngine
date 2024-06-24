@@ -9,52 +9,31 @@ namespace Pine
 class PINE_API FileSystem
 {
 public:
-	static void Init();
+	static void MountDir(const std::string& virtualDir, const std::string& nativeDir);
 
 private:
 	friend class Path;
-	static std::string ToAbsolutePath(std::string_view strpath);
-	static std::string ToProtocolPath(std::string_view strpath);
+	static std::string ToNative(const std::string& strpath);
+	static std::string ToVirtual(const std::string& strpath);
 
-private:
-	struct Protocol
-	{
-		std::string mProtocol;
-		std::string mAbsPath;
-	};
-	static std::map<std::string, std::string>& GetProtocolMap();
-	static void AddProtocol(std::string&& protocol, std::string&& abspath);
+	static std::map<std::string, std::string>& GetDirMap();
 };
 
 class PINE_API Path
 {
 public:
-	Path() = default;
-	Path(std::string_view path)
-	{
-		InnerSetPath(path);
-	}
-	~Path() = default;
+	Path(const std::string& path = "");
+	~Path();
 
-	Path& operator=(std::string_view path)
-	{
-		InnerSetPath(path);
-		return *this;
-	}
+	std::string ToNative();
 
-	const std::string& operator()()
-	{
-		return mStrPath;
-	}
-
-	std::string ToAbsPath()
-	{
-		return FileSystem::ToAbsolutePath(mStrPath);
-	}
+	Path& operator=(const std::string& path);
+	const std::string& operator()() const;
+private:
+	void InnerSetPath(const std::string& path);
 
 private:
-	void InnerSetPath(std::string_view path);
-	std::string mStrPath;
+	std::string mPathStr;
 };
 
 

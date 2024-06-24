@@ -9,6 +9,9 @@ namespace Pine
 class MaterialUniform
 {
 public:
+	MaterialUniform(std::string_view name)
+		: mName(name)
+	{}
 	virtual ~MaterialUniform() = default;
 
 	template<typename T>
@@ -23,21 +26,9 @@ public:
 		return GetValue(&T, sizeof(T));
 	}
 
-	virtual void Upload(Shader* pProgram) = 0;
+	virtual void Upload(const Ref<Shader>& program) = 0;
 
 protected:
-	MaterialUniform(std::string_view name, Shader* program)
-		: mName(name)
-	{
-		PE_CORE_ASSERT(program)
-		mLocation = program->GetUniformLocation(name);
-	}
-	MaterialUniform(std::string_view name, uint16_t location)
-		: mName(name)
-		, mLocation(location)
-	{
-	}
-
 	virtual bool SetValue(const void* data, size_t size) = 0;
 	virtual bool GetValue(void* data, size_t size) = 0;
 
@@ -49,22 +40,32 @@ template<typename T>
 class TMaterialUniform : public MaterialUniform
 {
 public:
-	TMaterialUniform(std::string_view name, const T& value, Shader* program)
-		: MaterialUniform(name, program)
+	TMaterialUniform(std::string_view name, const T& value)
+		: MaterialUniform(name)
+		, mValue(value)
+	{}
+
+	TMaterialUniform(std::string_view name, ShaderUniformLocation location, const T& value)
+		: MaterialUniform(name)
 		, mValue(value)
 	{
+		mLocation = location;
 	}
 
-	TMaterialUniform(std::string_view name, const T& value, uint16_t location)
-		: MaterialUniform(name, location)
-		, mValue(value)
+	virtual void Upload(const Ref<Shader>& program)
 	{
+		PE_CORE_ASSERT(program);
+		if(!mLocation.IsValid())
+			mLocation = program->GetUniformLocation(mName);
+		program->SetUniform(mLocation, mValue);
 	}
 
-	virtual void Upload(Shader* pProgram)
+	TMaterialUniform<T>& operator=(const T& value)
 	{
-		pProgram->SetUniform(mName, mValue);
+		mValue = value;
+		return *this;
 	}
+	
 
 protected:
 	virtual bool SetValue(const void* data, size_t size)
@@ -90,21 +91,31 @@ template<typename T, size_t N>
 class TMaterialUniform<std::array<T, N>> : public MaterialUniform
 {
 public:
-	TMaterialUniform(std::string_view name, const std::array<T, N>& value, Shader* program)
-		: MaterialUniform(name, program)
+	TMaterialUniform(std::string_view name, const std::array<T, N>& value)
+		: MaterialUniform(name)
 		, mValue(value)
 	{
 	}
 
-	TMaterialUniform(std::string_view name, const std::array<T, N>& value, uint16_t location)
-		: MaterialUniform(name, location)
+	TMaterialUniform(std::string_view name, ShaderUniformLocation location, const std::array<T, N>& value)
+		: MaterialUniform(name)
 		, mValue(value)
 	{
+		mLocation = location;
 	}
 
-	virtual void Upload(Shader* pProgram)
+	virtual void Upload(const Ref<Shader>& program)
 	{
-		pProgram->SetUniformArray(mName, mValueArr.data(), N);
+		PE_CORE_ASSERT(program);
+		if (!mLocation.IsValid())
+			mLocation = program->GetUniformLocation(mName);
+		program->SetUniformArray(mLocation, mValueArr.data(), N);
+	}
+
+	TMaterialUniform<std::array<T, N>>& operator=(const std::array<T, N>& value)
+	{
+		mValue = value;
+		return *this;
 	}
 
 protected:

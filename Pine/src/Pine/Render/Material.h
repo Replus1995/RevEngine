@@ -12,7 +12,7 @@ enum class EMaterialDomain
 };
 
 class MaterialUniform;
-class Material
+class PINE_API Material
 {
 public:
 	Material(const Ref<Shader>& program);
@@ -33,37 +33,18 @@ public:
 		return mDomain;
 	}
 
-	template<typename T>
-	bool SetUniform(std::string_view name, const T& value)
-	{
-		if (MaterialUniform* pParam = FindUIniform(name); pParam)
-		{
-			return pParam->SetValue(value);
-		}
-		return false;
-	}
-
-	template<typename T>
-	bool GetUniform(std::string_view name, T& value)
-	{
-		if (MaterialUniform* pParam = FindUIniform(name); pParam)
-		{
-			return pParam->GetValue(value);
-		}
-		return false;
-	}
-
 	void Bind();
 	void Unbind();
 
 protected:
-	MaterialUniform* FindUIniform(std::string_view name);
 	virtual void UploadUniform();
-
+	friend class StaticMeshRenderProxy;
 protected:
 	Ref<Shader> mProgram = nullptr;
 	EMaterialDomain mDomain = EMaterialDomain::Opaque;
-	std::unordered_map<std::string_view, std::unique_ptr<MaterialUniform>> mUniformMap;
+
+	//Uniform
+	TMaterialUniform<glm::mat4> uTransform = { "u_Transform", glm::mat4(1) };
 };
 
 }

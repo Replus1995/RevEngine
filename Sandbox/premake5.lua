@@ -29,6 +29,7 @@ project "Sandbox"
         cppdialect "C++17"
         staticruntime "On"
         systemversion "latest"
+        debugdir "."
 
         defines
         {

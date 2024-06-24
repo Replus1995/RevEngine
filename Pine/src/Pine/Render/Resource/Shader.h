@@ -6,19 +6,21 @@
 
 namespace Pine
 {
-class ShaderUniformLocation
+class PINE_API ShaderUniformLocation
 {
 public:
-    ShaderUniformLocation() : mLocation(0) {};
+    ShaderUniformLocation() : mLocation(uint16(-1)) {};
     ShaderUniformLocation(uint16 location) : mLocation(location) {};
     ~ShaderUniformLocation() = default;
 
     operator uint16() { return mLocation; }
+    bool IsValid() const { return mLocation != uint16(-1); }
+
 private:
     uint16 mLocation;
 };
 
-class Shader
+class PINE_API Shader
 {
 public:
     virtual ~Shader() = default;
@@ -57,7 +59,7 @@ public:
     static Ref<Shader> Create(const std::string& name, const std::string& vertSrc, const std::string& fragSrc);
 };
 
-class ShaderLibrary
+class PINE_API ShaderLibrary
 {
 public:
     void Add(const std::string& name, const Ref<Shader>& shader);

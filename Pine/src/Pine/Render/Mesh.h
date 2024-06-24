@@ -19,6 +19,16 @@ protected:
 	Mesh() = default;
 };
 
+class StaticMesh;
+class PINE_API MeshUtils
+{
+public:
+	static void SetDefaultMaterial(const Ref<Material>& mat);
+
+	static Ref<StaticMesh> CreateBox();
+private:
+	static Ref<Material>& GetDefaultMaterial();
+};
 
 
 }

@@ -16,8 +16,8 @@ workspace "Pine"
 outputdir = "%{cfg.buildcfg}"
 
 group "Dependencies"
-    include "Vendor/Glad"
-    include "Vendor/imgui"
+    include "vendor/Glad"
+    include "vendor/imgui"
 group ""
 
 group "Core"

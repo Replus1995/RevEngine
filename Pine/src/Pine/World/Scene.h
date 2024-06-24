@@ -11,7 +11,7 @@ namespace Pine
 
 class Camera;
 class Entity;
-class Scene
+class PINE_API Scene
 {
 public:
 	Scene();

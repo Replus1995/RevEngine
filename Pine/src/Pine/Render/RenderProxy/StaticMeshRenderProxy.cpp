@@ -26,6 +26,7 @@ void StaticMeshRenderProxy::Draw(EMaterialDomain domain)
 		auto pVertexArrs = mStaticMesh->GetVertexArrayByIndex(i);
 		if (!pVertexArrs.empty())
 		{
+			pMat->uTransform = mTransform;
 			pMat->Bind();
 
 			for (auto& pVertexArr : pVertexArrs)

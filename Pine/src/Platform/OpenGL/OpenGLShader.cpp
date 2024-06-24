@@ -334,8 +334,8 @@ const char* OpenGLShader::GetCachedFileExtension(uint32_t stage)
 {
 	switch (stage)
 	{
-	case GL_VERTEX_SHADER:    return ".cached_gl.vert";
-	case GL_FRAGMENT_SHADER:  return ".cached_gl.frag";
+	case GL_VERTEX_SHADER:    return ".cached.vert";
+	case GL_FRAGMENT_SHADER:  return ".cached.frag";
 	}
 	PE_CORE_ASSERT(false);
 	return "";

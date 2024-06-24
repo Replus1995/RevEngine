@@ -1,37 +1,82 @@
 #include "pinepch.h"
 #include "FileSystem.h"
 
+#include <filesystem>
+
+
 namespace Pine
 {
 
-void FileSystem::Init()
+void FileSystem::MountDir(const std::string& virtualDir, const std::string& nativeDir)
+{
+	auto res = GetDirMap().emplace(virtualDir, nativeDir);
+	if (!res.second)
+	{
+		PE_CORE_ERROR("VirtualDir \"{0}\" has already been mounted as \"{1}\"", virtualDir.c_str(), res.first->second.c_str());
+	}
+}
+
+std::string FileSystem::ToNative(const std::string& strpath)
+{
+	auto& dirMap = GetDirMap();
+	for (auto iter = dirMap.begin(); iter != dirMap.end(); iter++)
+	{
+		if (strpath._Starts_with(iter->first))
+		{
+			return  iter->second + strpath.substr(iter->first.size());
+		}
+	}
+	return strpath;
+}
+
+std::string FileSystem::ToVirtual(const std::string& strpath)
+{
+	auto& dirMap = GetDirMap();
+	for (auto iter = dirMap.begin(); iter != dirMap.end(); iter++)
+	{
+		if (strpath._Starts_with(iter->second))
+		{
+			return  iter->first + strpath.substr(iter->second.size());
+		}
+	}
+	return strpath;
+}
+
+std::map<std::string, std::string>& FileSystem::GetDirMap()
+{
+	static std::map<std::string, std::string> sDirMap;
+	return sDirMap;
+}
+
+Path::Path(const std::string& path)
+{
+	InnerSetPath(path);
+}
+
+Path::~Path()
 {
 }
 
-std::string FileSystem::ToAbsolutePath(std::string_view strpath)
+std::string Path::ToNative()
 {
-	return std::string();
+	return FileSystem::ToNative(mPathStr);
 }
 
-std::string FileSystem::ToProtocolPath(std::string_view strpath)
+Path& Path::operator=(const std::string& path)
 {
-	return std::string();
+	InnerSetPath(path);
+	return *this;
 }
 
-std::map<std::string, std::string>& FileSystem::GetProtocolMap()
+const std::string& Path::operator()() const
 {
-	static std::map<std::string, std::string> sProtocolMap;
-	return sProtocolMap;
+	return mPathStr;
 }
 
-void FileSystem::AddProtocol(std::string&& protocol, std::string&& abspath)
+void Path::InnerSetPath(const std::string& path)
 {
-	GetProtocolMap().emplace(std::move(protocol), std::move(abspath));
-}
-
-void Path::InnerSetPath(std::string_view path)
-{
-	mStrPath = FileSystem::ToProtocolPath(path);
+	std::filesystem::path tPath(path);
+	mPathStr = tPath.lexically_normal().generic_u8string();
 }
 
 }

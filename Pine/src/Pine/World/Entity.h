@@ -8,7 +8,7 @@
 namespace Pine {
 
 class Scene;
-class Entity
+class PINE_API Entity
 {
 public:
 	Entity() = default;

@@ -24,3 +24,4 @@ bin-int
 Sandbox/imgui.ini
 /build
 /.vscode
+/Sandbox/assets/cache

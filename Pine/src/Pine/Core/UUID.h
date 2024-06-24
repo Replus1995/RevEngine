@@ -1,10 +1,11 @@
 #pragma once
+#include "Pine/Core/Base.h"
 #include <memory>
 
 namespace Pine
 {
 
-class UUID
+class PINE_API UUID
 {
 public:
 	UUID();

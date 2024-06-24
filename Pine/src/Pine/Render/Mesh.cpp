@@ -1,11 +1,14 @@
 #include "pinepch.h"
-#include "StaticMeshAsset.h"
+#include "Mesh.h"
+#include "Pine/Render/StaticMesh.h"
 #include "Pine/Render/Resource/VertexBuffer.h"
 
 namespace Pine
 {
+namespace SimpleGeo
+{
 
-static constexpr float sSimpleBoxPositons[] = {
+static constexpr float sBoxVertices[] = {
     -0.5, -0.5, -0.5,
     -0.5, 0.5, -0.5,
     0.5, 0.5, -0.5,
@@ -16,7 +19,7 @@ static constexpr float sSimpleBoxPositons[] = {
     0.5, -0.5, 0.5
 };
 
-static constexpr uint32 sSimpleBoxIndices[] = {
+static constexpr uint32 sBoxIndices[] = {
     4, 7, 5,
     6, 5, 7,
     7, 4, 3,
@@ -31,27 +34,29 @@ static constexpr uint32 sSimpleBoxIndices[] = {
     2, 3, 1
 };
 
-void StaticMeshAsset::SetDefaultMaterial(const Ref<Material>& mat)
-{
-    GetDefaultMaterial() = mat;
 }
 
-Ref<StaticMesh> StaticMeshAsset::CreateBox()
+void MeshUtils::SetDefaultMaterial(const Ref<Material>& mat)
+{
+	GetDefaultMaterial() = mat;
+}
+
+Ref<StaticMesh> MeshUtils::CreateBox()
 {
     std::vector<Ref<Material>> boxMatArr = { GetDefaultMaterial() };
     std::vector<StaticMeshResource> boxResArr;
     {
-        constexpr uint32 boxVerticesSize = sizeof(sSimpleBoxPositons);
-        Ref<VertexBuffer> boxVertices= VertexBuffer::Create(boxVerticesSize);
+        constexpr uint32 boxVerticesSize = sizeof(SimpleGeo::sBoxVertices);
+        Ref<VertexBuffer> boxVertices = VertexBuffer::Create(boxVerticesSize);
         boxVertices->SetLayout({
             {EShaderDataType::Float3, "a_Position"},
             //{EShaderDataType::Float3, "a_Normal"},
             //{EShaderDataType::Float2, "a_TexCoord"}
-         });
-        boxVertices->SetData(sSimpleBoxPositons, boxVerticesSize);
+            });
+        boxVertices->SetData(SimpleGeo::sBoxVertices, boxVerticesSize);
 
-        constexpr uint32 boxIndicesCount = sizeof(sSimpleBoxIndices) / sizeof(uint32);
-        Ref<IndexBuffer> boxIndices =  IndexBuffer::Create(sSimpleBoxIndices, boxIndicesCount);
+        constexpr uint32 boxIndicesCount = sizeof(SimpleGeo::sBoxIndices) / sizeof(uint32);
+        Ref<IndexBuffer> boxIndices = IndexBuffer::Create(SimpleGeo::sBoxIndices, boxIndicesCount);
 
         StaticMeshResource boxMeshRes;
         boxMeshRes.VertexData = VertexArray::Create();
@@ -64,10 +69,10 @@ Ref<StaticMesh> StaticMeshAsset::CreateBox()
     return CreateRef<StaticMesh>(boxMatArr, boxResArr);
 }
 
-Ref<Material>& Pine::StaticMeshAsset::GetDefaultMaterial()
+Ref<Material>& MeshUtils::GetDefaultMaterial()
 {
-    static Ref<Material> sStaticMeshDefaultMaterial = nullptr;
-    return sStaticMeshDefaultMaterial;
+	static Ref<Material> sMeshDefaultMaterial = nullptr;
+	return sMeshDefaultMaterial;
 }
 
 }
