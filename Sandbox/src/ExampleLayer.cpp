@@ -2,6 +2,7 @@
 #include <Pine/Core/Base.h>
 #include <Pine/World/Scene.h>
 #include <Pine/World/Component/Component.h>
+#include <Pine/Render/Renderer.h>
 #include <Pine/Render/StaticMesh.h>
 #include <Pine/Core/FileSystem.h>
 
@@ -18,7 +19,9 @@ ExampleLayer::ExampleLayer()
 
 	FileSystem::MountDir("/SandBox", std::filesystem::current_path().generic_u8string());
 
-	auto pMat = CreateRef<ExampleMaterial>(mShaderLib.Load("ExampleShader", Path("/SandBox/assets/shaders/example.glsl").ToNative()));
+	Renderer::GetShaderLibrary()->Load("ExampleShader", Path("/SandBox/assets/shaders/example.glsl").ToNative());
+
+	auto pMat = CreateRef<ExampleMaterial>();
 	pMat->SetColor(glm::vec4(1,0,0,1));
 	MeshUtils::SetDefaultMaterial(pMat);
 

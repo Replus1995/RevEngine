@@ -1,10 +1,11 @@
 #include <Pine/Render/Material.h>
+#include <Pine/Render/Renderer.h>
 
 class ExampleMaterial : public Pine::Material
 {
 public:
-    ExampleMaterial(const Pine::Ref<Pine::Shader>& program)
-        : Pine::Material(program)
+    ExampleMaterial()
+        : Pine::Material(Pine::Renderer::GetShaderLibrary()->Get("ExampleShader"))
     {}
     virtual ~ExampleMaterial() {};
 

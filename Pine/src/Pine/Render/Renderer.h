@@ -3,15 +3,20 @@
 #include "Pine/Math/Math.h"
 
 
-namespace Pine {
-class Renderer
+namespace Pine
+{
+class ShaderLibrary;
+class PINE_API Renderer
 {
 public:
 	static void Init();
 	static void Shutdown();
 	static void OnWindowResize(uint32_t width, uint32_t height);
-	static void Clear(const glm::vec4& color = glm::vec4(0,0,0,1));
 
+	static ShaderLibrary* GetShaderLibrary();
+
+	static void Clear(const glm::vec4& color = glm::vec4(0,0,0,1));
 	static void DrawIndexed(const class VertexArray* vertexArray);
 };
+
 }
