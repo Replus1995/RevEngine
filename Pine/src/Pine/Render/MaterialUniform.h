@@ -6,7 +6,7 @@
 namespace Pine
 {
 
-class MaterialUniform
+class PINE_API MaterialUniform
 {
 public:
 	MaterialUniform(std::string_view name)
@@ -31,6 +31,7 @@ public:
 protected:
 	virtual bool SetValue(const void* data, size_t size) = 0;
 	virtual bool GetValue(void* data, size_t size) = 0;
+	static std::string GetProgramName(const std::string& name);
 
 	std::string mName;
 	ShaderUniformLocation mLocation;
@@ -56,7 +57,7 @@ public:
 	{
 		PE_CORE_ASSERT(program);
 		if(!mLocation.IsValid())
-			mLocation = program->GetUniformLocation(mName);
+			mLocation = program->GetUniformLocation(GetProgramName(mName));
 		program->SetUniform(mLocation, mValue);
 	}
 
@@ -108,7 +109,7 @@ public:
 	{
 		PE_CORE_ASSERT(program);
 		if (!mLocation.IsValid())
-			mLocation = program->GetUniformLocation(mName);
+			mLocation = program->GetUniformLocation(GetProgramName(mName));
 		program->SetUniformArray(mLocation, mValueArr.data(), N);
 	}
 

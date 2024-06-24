@@ -1,6 +1,8 @@
 #include "pinepch.h"
 #include "PlayerCameraSystem.h"
 #include "Pine/World/Component/Component.h"
+#include "Pine/Core/Application.h"
+#include "Pine/Core/Window.h"
 
 namespace Pine
 {
@@ -17,7 +19,9 @@ void PlayerCameraSystem::GetCameraMatrix(glm::mat4& projMat, glm::mat4& viewMat)
 	}
 	else
 	{
-		projMat = glm::perspective(glm::radians(45.0f), 1.0f, 0.01f, 1000.0f);
+		auto window = Application::GetApp().GetWindow();
+		float asp = float(window->GetWidth()) / float(window->GetHeight());
+		projMat = glm::perspective(glm::radians(45.0f), asp, 0.01f, 1000.0f);
 		viewMat = glm::mat4(1.0f);
 	}
 }

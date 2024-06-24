@@ -4,6 +4,12 @@
 namespace Pine
 {
 
+std::string MaterialUniform::GetProgramName(const std::string& name)
+{
+	static constexpr std::string_view sProgramNamePrefix = "u_";
+	return std::string(sProgramNamePrefix) + name;
+}
+
 Material::Material(const Ref<Shader>& program)
 	:mProgram(program)
 {

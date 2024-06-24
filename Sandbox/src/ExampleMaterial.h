@@ -22,5 +22,5 @@ protected:
     }
 
 protected:
-    Pine::TMaterialUniform<glm::vec4> uColor = { "u_Color", glm::vec4(1) };
+    Pine::TMaterialUniform<glm::vec4> uColor = { "Color", glm::vec4(1) };
 };

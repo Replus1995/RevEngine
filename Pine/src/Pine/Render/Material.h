@@ -44,7 +44,7 @@ protected:
 	EMaterialDomain mDomain = EMaterialDomain::Opaque;
 
 	//Uniform
-	TMaterialUniform<glm::mat4> uTransform = { "u_Transform", glm::mat4(1) };
+	TMaterialUniform<glm::mat4> uTransform = { "Transform", glm::mat4(1) };
 };
 
 }
