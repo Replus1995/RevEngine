@@ -3,6 +3,7 @@
 #include "Pine/Core/Assert.h"
 #include "Pine/Core/Window.h"
 #include "Pine/Core/Clock.h"
+#include "Pine/Core/Input.h"
 #include "Pine/Render/RenderCore.h"
 #include "Pine/Render/Renderer.h"
 #include "Pine/Render/RenderCmd.h"
@@ -22,6 +23,8 @@ namespace Pine
 		sInstance = this;
 
 		sRenderAPI = ERenderAPI::OpenGL;
+
+		Input::InitState();
 
 		mWindow = std::unique_ptr<Window>(Window::Create());
 		mWindow->SetEventCallback(PE_BIND_EVENT_FN(Application::OnEvent, this));
@@ -65,6 +68,8 @@ namespace Pine
 		dispatcher.Dispatch<WindowCloseEvent>(PE_BIND_EVENT_FN(Application::OnWindowClose, this));
 		dispatcher.Dispatch<WindowResizeEvent>(PE_BIND_EVENT_FN(Application::OnWindowResize, this));
 		//PINE_CORE_TRACE("{0}", e);
+
+		Input::UpdateState(e);
 
 		for (auto iter = mLayerStack.rbegin(); iter != mLayerStack.rend(); ++iter)
 		{

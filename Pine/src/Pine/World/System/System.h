@@ -20,6 +20,11 @@ class ISystem
 public:
 	virtual ~ISystem() = default;
 	virtual Scope<ISystem> Duplicate(entt::registry& reg) = 0;
+
+	virtual void OnInit(){};
+	virtual void OnUpdate(float dt){};
+	virtual void OnDestroy(){};
+
 protected:
 	ISystem(entt::registry& reg) : mRegistry(reg) {}
 	entt::registry& mRegistry;

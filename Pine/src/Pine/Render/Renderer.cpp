@@ -34,7 +34,7 @@ ShaderLibrary* Renderer::GetShaderLibrary()
 	return sShaderLib;
 }
 
-void Renderer::Clear(const glm::vec4& color)
+void Renderer::Clear(const FVector4& color)
 {
 	RenderCmd::SetClearColor(color);
 	RenderCmd::Clear();

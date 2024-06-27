@@ -3,6 +3,7 @@
 #include "Pine/World/Scene.h"
 #include "Pine/Render/RenderCmd.h"
 #include "Pine/Render/Renderer.h"
+#include "Pine/Core/Application.h"
 
 namespace Pine
 {
@@ -26,10 +27,18 @@ SceneLayer::~SceneLayer()
 void SceneLayer::OnAttach()
 {
 	mSceneProxy.Init();
+	if (mScene)
+	{
+		mScene->OnRuntimeStart();
+	}
 }
 
 void SceneLayer::OnDetach()
 {
+	if (mScene)
+	{
+		mScene->OnRuntimeStop();
+	}
 	mSceneProxy.Release();
 }
 
@@ -39,6 +48,9 @@ void SceneLayer::OnUpdate(float dt)
 	{
 		mScene->OnUpdateRuntime(dt);
 	}
+
+	if(Application::GetApp().Minimized())
+		return;
 
 	//Render Scene
 	mSceneProxy.Prepare(mScene);

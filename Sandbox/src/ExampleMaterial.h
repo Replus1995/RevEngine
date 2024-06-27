@@ -1,5 +1,6 @@
 #include <Pine/Render/Material.h>
 #include <Pine/Render/Renderer.h>
+#include <Pine/Math/Math.h>
 
 class ExampleMaterial : public Pine::Material
 {
@@ -9,7 +10,7 @@ public:
     {}
     virtual ~ExampleMaterial() {};
 
-    void SetColor(const glm::vec4& color)
+    void SetColor(const Pine::FVector4& color)
     {
         uColor = color;
     }
@@ -22,5 +23,5 @@ protected:
     }
 
 protected:
-    Pine::TMaterialUniform<glm::vec4> uColor = { "Color", glm::vec4(1) };
+    Pine::TMaterialUniform<Pine::FVector4> uColor = { "Color", Pine::FVector4(1) };
 };

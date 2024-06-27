@@ -1,13 +1,56 @@
 #include "pinepch.h"
 #include "Pine/Math/Math.h"
-
-#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/matrix_decompose.hpp>
 
-namespace Pine::Math
+namespace Pine
 {
+//Current euler angle rotate order is x->y->z, to be changed into roll->pitch->yaw in future
 
-bool Decompose(const glm::mat4& transform, glm::vec3& translation, glm::vec3& rotation, glm::vec3& scale)
+
+float FMaths::Radians(float degree)
+{
+    return glm::radians(degree);
+}
+
+float FMaths::Degrees(float radian)
+{
+    return glm::degrees(radian);
+}
+
+FRotator FMaths::MakeRotator(const FQuaternion& q)
+{
+    float pitch = glm::degrees(glm::pitch(q));
+    float yaw = glm::degrees(glm::yaw(q));
+    float roll = glm::degrees(glm::roll(q));
+    return FRotator(pitch, yaw, roll);
+}
+
+FQuaternion FMaths::MakeQuaternion(const FRotator& r)
+{
+    return glm::quat(glm::radians(glm::vec3(r.pitch, r.yaw, r.roll)));
+}
+
+FMatrix4 FMaths::MakeMatrix(const FRotator& r)
+{
+    return glm::eulerAngleXYZ(glm::radians(r.pitch), glm::radians(r.yaw), glm::radians(r.roll));
+}
+
+FMatrix4 FMaths::MakeMatrix(const FQuaternion& q)
+{
+    return glm::toMat4(q);
+}
+
+FMatrix4 FMaths::MakeMatrix(const FVector3& t, const FRotator& r, const FVector3& s)
+{
+    return glm::translate(glm::mat4(1.0f), t) * MakeMatrix(r)  * glm::scale(glm::mat4(1.0f), s);
+}
+
+FMatrix4 FMaths::MakeMatrix(const FVector3& t, const FQuaternion& q, const FVector3& s)
+{
+    return glm::translate(glm::mat4(1.0f), t) * MakeMatrix(q) * glm::scale(glm::mat4(1.0f), s);
+}
+
+bool FMaths::Decompose(const FMatrix4& transform, FVector3& translation, FRotator& rotator, FVector3& scale)
 {
     // From glm::decompose in matrix_decompose.inl
 
@@ -65,6 +108,8 @@ bool Decompose(const glm::mat4& transform, glm::vec3& translation, glm::vec3& ro
     }
 #endif
 
+    glm::vec3 rotation;
+
     rotation.y = asin(-Row[0][2]);
     if (cos(rotation.y) != 0) {
         rotation.x = atan2(Row[1][2], Row[2][2]);
@@ -75,8 +120,31 @@ bool Decompose(const glm::mat4& transform, glm::vec3& translation, glm::vec3& ro
         rotation.z = 0;
     }
 
+    rotator.pitch = glm::degrees(rotation.x);
+    rotator.yaw = glm::degrees(rotation.y);
+    rotator.roll = glm::degrees(rotation.z);
 
     return true;
+}
+
+FVector3 FMaths::Right(const FRotator& r)
+{
+    return glm::rotate(MakeQuaternion(r), FVector3(1.0f, 0.0f, 0.0f));
+}
+
+FVector3 FMaths::Up(const FRotator& r)
+{
+    return glm::rotate(MakeQuaternion(r), FVector3(0.0f, 1.0f, 0.0f));
+}
+
+FVector3 FMaths::Forward(const FRotator& r)
+{
+    return glm::rotate(MakeQuaternion(r), FVector3(0.0f, 0.0f, -1.0f));
+}
+
+float FMaths::Clamp(float val, float minVal, float maxVal)
+{
+    return val < minVal ? minVal : (val > maxVal ? maxVal : val);
 }
 
 }

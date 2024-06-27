@@ -22,6 +22,7 @@ namespace Pine
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* overlay);
 
+		inline bool Minimized() const { return mMinimized; }
 		inline Window* GetWindow() { return mWindow.get(); }
 		static Application& GetApp() { return *sInstance; }
 	private:

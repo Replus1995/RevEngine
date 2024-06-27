@@ -40,7 +40,7 @@ void SceneRenderProxy::Prepare(const Ref<Scene>& scene)
 		{
 			auto [transformComp, meshComp] = group.get<TransformComponent, StaticMeshComponent>(entity);
 			StaticMeshRenderProxy proxy;
-			proxy.Prepare(meshComp.StaticMesh, transformComp.GetTransform());
+			proxy.Prepare(meshComp.StaticMesh, transformComp.GetMatrix());
 			mStaticMeshProxies.emplace_back(std::move(proxy));
 		}
 		//ToDo: sort static meshes by depth

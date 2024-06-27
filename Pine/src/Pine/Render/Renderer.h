@@ -15,7 +15,7 @@ public:
 
 	static ShaderLibrary* GetShaderLibrary();
 
-	static void Clear(const glm::vec4& color = glm::vec4(0,0,0,1));
+	static void Clear(const FVector4& color = FVector4(0,0,0,1));
 	static void DrawIndexed(const class VertexArray* vertexArray);
 };
 

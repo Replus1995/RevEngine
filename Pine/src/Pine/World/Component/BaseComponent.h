@@ -1,15 +1,9 @@
 #pragma once
 #include "Pine/Core/Base.h"
 #include "Pine/Core/UUID.h"
+#include "Pine/Math/Math.h"
+#include "Pine/Math/Transform.h"
 #include "Pine/Render/Camera.h"
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
-#ifndef GLM_ENABLE_EXPERIMENTAL
-#define GLM_ENABLE_EXPERIMENTAL
-#endif // !GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/quaternion.hpp>
 
 #include <string>
 
@@ -35,28 +29,27 @@ struct TagComponent
 
 struct TransformComponent
 {
-	glm::vec3 Location = { 0.0f, 0.0f, 0.0f };
-	glm::vec3 Rotation = { 0.0f, 0.0f, 0.0f };
-	glm::vec3 Scale = { 1.0f, 1.0f, 1.0f };
+	FTransform Transform;
 
 	TransformComponent() = default;
 	TransformComponent(const TransformComponent&) = default;
-	TransformComponent(const glm::vec3& location) : Location(location) {}
 
-	glm::mat4 GetTransform() const
-	{
-		glm::mat4 rotation = glm::toMat4(glm::quat(Rotation));
+	FMatrix4 GetMatrix() const { return Transform.ToMatrix(); }
 
-		return glm::translate(glm::mat4(1.0f), Location)
-			* rotation
-			* glm::scale(glm::mat4(1.0f), Scale);
-	}
+	FVector3 Location() const { return Transform.Location; }
+	FRotator Rotation() const { return Transform.Rotation; }
+	FVector3 Scale() const { return Transform.Scale; }
+
+	void SetLocation(const FVector3& t) { Transform.Location = t; }
+	void SetRotation(const FRotator& r) { Transform.Rotation = r; }
+	void SetScale(const FVector3& s) { Transform.Scale = s; }
+
 };
 
 struct CameraComponent
 {
 	Camera Camera;
-	bool Primary = true; // TODO: think about moving to Scene
+	//bool Primary = true; // TODO: think about moving to Scene
 	bool AutoAspectRatio = true;
 
 	CameraComponent() = default;

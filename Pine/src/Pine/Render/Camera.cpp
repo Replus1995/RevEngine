@@ -2,8 +2,6 @@
 #include "Camera.h"
 #include "Pine/Core/Assert.h"
 
-#include <glm/gtc/matrix_transform.hpp>
-
 namespace Pine
 {
 
@@ -12,19 +10,19 @@ Camera::Camera()
 	RecalculateProjection();
 }
 
-void Camera::SetPerspective(float fov, float near, float far)
+void Camera::SetPerspective(float fov, float dnear, float dfar)
 {
 	mPerspectiveFOV = fov;
-	mPerspectiveNear = near;
-	mPerspectiveFar = far;
+	mPerspectiveNear = dnear;
+	mPerspectiveFar = dfar;
 	SetProjectionType(ProjectionType::Perspective);
 }
 
-void Camera::SetOrthographic(float size, float near, float far)
+void Camera::SetOrthographic(float size, float dnear, float dfar)
 {
 	mOrthographicSize = size;
-	mOrthographicNear = near;
-	mOrthographicFar = far;
+	mOrthographicNear = dnear;
+	mOrthographicFar = dfar;
 	SetProjectionType(ProjectionType::Orthographic);
 }
 

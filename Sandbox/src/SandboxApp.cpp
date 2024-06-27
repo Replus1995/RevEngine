@@ -17,3 +17,8 @@ Pine::Application* Pine::CreateApplication()
 {
 	return new SandBox();
 }
+
+int main(int argc, char** argv)
+{
+	return Pine::RunApp(argc, argv);
+}

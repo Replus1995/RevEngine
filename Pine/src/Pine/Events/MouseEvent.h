@@ -1,6 +1,6 @@
 #pragma once
-
-#include "Event.h"
+#include "Pine/Events/Event.h"
+#include "Pine/Core/Input.h"
 
 namespace Pine
 {
@@ -51,20 +51,20 @@ namespace Pine
 	class PINE_API MouseButtonEvent : public Event
 	{
 	public:
-		inline int GetMouseButton() const { return mButton; }
+		inline MouseCode GetMouseButton() const { return mButton; }
 
 		EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
 	protected:
-		MouseButtonEvent(int button)
+		MouseButtonEvent(MouseCode button)
 			: mButton(button) {}
 
-		int mButton;
+		MouseCode mButton;
 	};
 
 	class PINE_API MouseButtonPressedEvent : public MouseButtonEvent
 	{
 	public:
-		MouseButtonPressedEvent(int button)
+		MouseButtonPressedEvent(MouseCode button)
 			: MouseButtonEvent(button) {}
 
 		std::string ToString() const override
@@ -80,7 +80,7 @@ namespace Pine
 	class PINE_API MouseButtonReleasedEvent : public MouseButtonEvent
 	{
 	public:
-		MouseButtonReleasedEvent(int button)
+		MouseButtonReleasedEvent(MouseCode button)
 			: MouseButtonEvent(button) {}
 
 		std::string ToString() const override

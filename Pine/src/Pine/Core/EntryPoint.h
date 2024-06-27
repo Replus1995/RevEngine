@@ -5,18 +5,20 @@
 
 #ifdef PE_PLATFORM_WINDOWS
 
-extern Pine::Application* Pine::CreateApplication();
-
-int main(int argc, char** argv)
+namespace Pine
 {
-	Pine::Log::Init();
-	PE_CORE_WARN("Initialized Log!");
+	extern Application* CreateApplication();
 
-	auto app = Pine::CreateApplication();
-	app->Run();
-	delete app;
+	inline int RunApp(int argc, char** argv)
+	{
+		Log::Init();
+		PE_CORE_WARN("Initialized Log!");
 
-	return 0;
+		auto app = Pine::CreateApplication();
+		app->Run();
+		delete app;
+
+		return 0;
+	}
 }
-
 #endif

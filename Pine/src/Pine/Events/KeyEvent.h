@@ -1,26 +1,26 @@
 #pragma once
-
-#include "Event.h"
+#include "Pine/Events/Event.h"
+#include "Pine/Core/Input.h"
 
 namespace Pine
 {
 	class PINE_API KeyEvent : public Event
 	{
 	public:
-		inline int GetKeyCode() const { return mKeyCode; }
+		inline KeyCode GetKeyCode() const { return mKeyCode; }
 
 		EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryInput)
 	protected:
-		KeyEvent(int keycode)
+		KeyEvent(KeyCode keycode)
 			: mKeyCode(keycode) {}
 
-		int mKeyCode;
+		KeyCode mKeyCode;
 	};
 
 	class PINE_API KeyPressedEvent : public KeyEvent
 	{
 	public:
-		KeyPressedEvent(int keycode, int repeatCount)
+		KeyPressedEvent(KeyCode keycode, int repeatCount)
 			: KeyEvent(keycode)
 			, mRepeatCount(repeatCount) {}
 
@@ -41,7 +41,7 @@ namespace Pine
 	class PINE_API KeyReleasedEvent : public KeyEvent
 	{
 	public:
-		KeyReleasedEvent(int keycode)
+		KeyReleasedEvent(KeyCode keycode)
 			: KeyEvent(keycode) {}
 
 		std::string ToString() const override
@@ -57,7 +57,7 @@ namespace Pine
 	class PINE_API KeyTypedEvent : public KeyEvent
 	{
 	public:
-		KeyTypedEvent(int keycode)
+		KeyTypedEvent(KeyCode keycode)
 			: KeyEvent(keycode) {}
 
 		std::string ToString() const override

@@ -11,6 +11,7 @@ namespace Pine
 
 class Camera;
 class Entity;
+class ISystem;
 class PINE_API Scene
 {
 public:
@@ -51,12 +52,7 @@ public:
 	bool AddSystem()
 	{
 		size_t hash = typeid(TSystem).hash_code();
-		if (auto iter = mSystemMap.find(hash); iter == mSystemMap.end())
-		{
-			mSystemMap.emplace(hash, std::make_unique<TSystem>(mRegistry));
-			return true;
-		}
-		return false;
+		return AddSystem(hash, std::move(std::make_unique<TSystem>(mRegistry)));
 	}
 
 
@@ -64,23 +60,14 @@ public:
 	bool RemoveSystem()
 	{
 		size_t hash = typeid(TSystem).hash_code();
-		if (auto iter = mSystemMap.find(hash); iter != mSystemMap.end())
-		{
-			mSystemMap.erase(iter);
-			return true;
-		}
-		return false;
+		return RemoveSystem(hash);
 	}
 
 	template<class TSystem>
 	TSystem* GetSystem()
 	{
 		size_t hash = typeid(TSystem).hash_code();
-		if (auto iter = mSystemMap.find(hash); iter != mSystemMap.end())
-		{
-			return (TSystem*)iter->second.get();
-		}
-		return nullptr;
+		return (TSystem*)GetSystem(hash);
 	}
 
 
@@ -93,6 +80,12 @@ private:
 	//void OnPhysics2DStop();
 
 	//void RenderScene(Camera& camera);
+
+	bool AddSystem(size_t hash, Scope<ISystem>&& pSystem);
+	bool RemoveSystem(size_t hash);
+	ISystem* GetSystem(size_t hash);
+
+
 private:
 	entt::registry mRegistry;
 	uint32_t mViewWidth = 0, mViewHeight = 0;
@@ -102,7 +95,7 @@ private:
 	//b2World* m_PhysicsWorld = nullptr;
 
 	std::unordered_map<UUID, entt::entity> mEntityMap;
-	std::map<size_t, Scope<class ISystem>> mSystemMap;
+	std::map<size_t, Scope<ISystem>> mSystemMap;
 
 	friend class Entity;
 	friend class SceneRenderProxy;
