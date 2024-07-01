@@ -49,7 +49,7 @@ void SceneRenderProxy::Prepare(const Ref<Scene>& scene)
 
 void SceneRenderProxy::Draw()
 {
-	RenderCmd::SetClearColor(glm::vec4{ .3f, .3f, .8f, 1.0f });
+	RenderCmd::SetClearColor(FVector4{ .3f, .3f, .8f, 1.0f });
 	RenderCmd::Clear();
 
 	mSceneBuffer->SetData(&mSceneData, sizeof(SceneRenderData));

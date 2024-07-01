@@ -1,20 +1,19 @@
 #include "Pine/Core/Base.h"
-#include <glm/glm.hpp>
+#include "Pine/Math/Maths.h"
 
 namespace Pine
 {
 
-
 struct SceneRenderData
 {
-	glm::mat4 ProjMatrix;
-	glm::mat4 ViewMatrix;
+	FMatrix4 ProjMatrix;
+	FMatrix4 ViewMatrix;
 };
 
 class StaticMesh;
 struct StaticMeshRenderData
 {
 	Ref<StaticMesh> StaticMesh;
-	glm::mat4 Transform;
+	FMatrix4 Transform;
 };
 }

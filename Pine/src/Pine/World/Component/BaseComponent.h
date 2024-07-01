@@ -1,7 +1,7 @@
 #pragma once
 #include "Pine/Core/Base.h"
 #include "Pine/Core/UUID.h"
-#include "Pine/Math/Math.h"
+#include "Pine/Math/Maths.h"
 #include "Pine/Math/Transform.h"
 #include "Pine/Render/Camera.h"
 

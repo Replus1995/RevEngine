@@ -1,7 +1,7 @@
 #pragma once
 #include "Pine/Core/Base.h"
 #include "Pine/Events/Event.h"
-#include "Pine/Math/Vector.h"
+#include "Pine/Math/Vector2.h"
 
 namespace Pine
 {

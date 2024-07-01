@@ -4,8 +4,6 @@
 #include "Pine/Core/Clock.h"
 
 #include <fstream>
-#include <glm/gtc/type_ptr.hpp>
-
 #include <shaderc/shaderc.hpp>
 #include <spirv_cross/spirv_cross.hpp>
 #include <spirv_cross/spirv_glsl.hpp>
@@ -266,29 +264,29 @@ void OpenGLShader::SetUniform(ShaderUniformLocation location, float value)
 	glUniform1f(location, value);
 }
 
-void OpenGLShader::SetUniform(ShaderUniformLocation location, const glm::vec2& value)
+void OpenGLShader::SetUniform(ShaderUniformLocation location, const FVector2& value)
 {
-	glUniform2f(location, value.x, value.y);
+	glUniform2f(location, value.X, value.Y);
 }
 
-void OpenGLShader::SetUniform(ShaderUniformLocation location, const glm::vec3& value)
+void OpenGLShader::SetUniform(ShaderUniformLocation location, const FVector3& value)
 {
-	glUniform3f(location, value.x, value.y, value.z);
+	glUniform3f(location, value.X, value.Y, value.Y);
 }
 
-void OpenGLShader::SetUniform(ShaderUniformLocation location, const glm::vec4& value)
+void OpenGLShader::SetUniform(ShaderUniformLocation location, const FVector4& value)
 {
-	glUniform4f(location, value.x, value.y, value.z, value.w);
+	glUniform4f(location, value.X, value.Y, value.Z, value.W);
 }
 
-void OpenGLShader::SetUniform(ShaderUniformLocation location, const glm::mat3& value)
+void OpenGLShader::SetUniform(ShaderUniformLocation location, const FMatrix3& value)
 {
-	glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(value));
+	glUniformMatrix3fv(location, 1, GL_FALSE, value.DataPtr());
 }
 
-void OpenGLShader::SetUniform(ShaderUniformLocation location, const glm::mat4& value)
+void OpenGLShader::SetUniform(ShaderUniformLocation location, const FMatrix4& value)
 {
-	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
+	glUniformMatrix4fv(location, 1, GL_FALSE, value.DataPtr());
 }
 
 void OpenGLShader::SetUniformArray(ShaderUniformLocation location, int* values, uint32_t count)

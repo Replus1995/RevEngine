@@ -1,101 +1,39 @@
 #pragma once
-#include "Pine/Core/Base.h"
-#include "Pine/Math/Vector.h"
-#include "Pine/Math/Quaternion.h"
-#include <glm/glm.hpp>
-#include <glm/gtx/euler_angles.hpp>
+#include "Vector3.h"
 
 namespace Pine
 {
-
-struct FRotator
+//Rotate order is Roll->Pitch->Yaw(glm::YXZ)
+template<typename T>
+struct TRotator
 {
 public:
-	float pitch; //InDegree
-	float yaw; //InDegree
-	float roll; //InDegree
+	T Pitch;
+	T Yaw;
+	T Roll;
 
-	FRotator()
-		: pitch(0.0f)
-		, yaw(0.0f)
-		, roll(0.0f)
-	{}
+	TRotator() noexcept;
+	TRotator(T InScale) noexcept;
+	TRotator(T InPitch, T InYaw, T InRoll) noexcept;
+	TRotator(const TRotator<T>& InRot) noexcept;
 
-	FRotator(float a)
-		: pitch(a)
-		, yaw(a)
-		, roll(a)
-	{}
+	bool operator==(const TRotator<T>& InRot) const;
+	bool operator!=(const TRotator<T>& InRot) const;
+	TRotator<T>& operator=(const TRotator<T>& InRot) noexcept;
 
-	FRotator(float _pitch, float _yaw, float _roll)
-		: pitch(_pitch)
-		, yaw(_yaw)
-		, roll(_roll)
-	{}
+	TRotator<T> operator+(const TRotator<T>& InRot) const;
+	TRotator<T>& operator+=(const TRotator<T>& InRot);
+	TRotator<T> operator-(const TRotator<T>& InRot) const;
+	TRotator<T>& operator-=(const TRotator<T>& InRot);
 
-	FRotator(const FRotator& r)
-		: pitch(r.pitch)
-		, yaw(r.yaw)
-		, roll(r.roll)
-	{}
-
-	FRotator(FRotator&& r) noexcept
-		: pitch(std::move(r.pitch))
-		, yaw(std::move(r.yaw))
-		, roll(std::move(r.roll))
-	{}
-
-	inline FRotator& operator=(const FRotator& r)
-	{
-		pitch = r.pitch;
-		yaw = r.yaw;
-		roll = r.roll;
-		return *this;
-	}
-
-	inline FRotator& operator=(FRotator&& r) noexcept
-	{
-		pitch = std::move(r.pitch);
-		yaw = std::move(r.yaw);
-		roll = std::move(r.roll);
-		return *this;
-	}
-
-	inline FRotator operator+(const FRotator& r) const
-	{
-		return FRotator(pitch + r.pitch, yaw + r.yaw, roll + r.roll);
-	}
-
-	inline FRotator& operator+=(const FRotator& r)
-	{
-		pitch += r.pitch;
-		yaw += r.yaw;
-		roll += r.roll;
-		return *this;
-	}
-
-	inline FRotator operator-(const FRotator& r) const
-	{
-		return FRotator(pitch - r.pitch, yaw - r.yaw, roll - r.roll);
-	}
-
-	inline FRotator& operator-=(const FRotator& r)
-	{
-		pitch -= r.pitch;
-		yaw -= r.yaw;
-		roll -= r.roll;
-		return *this;
-	}
-
-	inline bool operator==(const FRotator& r) const
-	{
-		return pitch==r.pitch && yaw==r.yaw && roll==r.roll;
-	}
-
-	inline bool operator!=(const FRotator& r) const
-	{
-		return pitch != r.pitch || yaw != r.yaw || roll != r.roll;
-	}
+	TVector3<T> Right() const;
+	TVector3<T> Up() const;
+	TVector3<T> Forward() const;
 };
 
+template class PINE_API TRotator<float>;
+template class PINE_API TRotator<double>;
+using FRotator = TRotator<float>;
 }
+
+

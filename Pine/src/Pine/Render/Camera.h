@@ -1,5 +1,5 @@
 #pragma once
-#include "Pine/Math/Math.h"
+#include "Pine/Math/Maths.h"
 
 namespace Pine
 {

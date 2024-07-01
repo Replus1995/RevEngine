@@ -1,6 +1,6 @@
 #pragma once
 #include "Pine/Render/RenderCore.h"
-#include "Pine/Math/Math.h"
+#include "Pine/Math/Maths.h"
 
 
 namespace Pine

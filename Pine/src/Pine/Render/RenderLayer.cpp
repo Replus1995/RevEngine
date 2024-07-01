@@ -28,7 +28,7 @@ void RenderLayer::OnDetach()
 
 void RenderLayer::OnUpdate(float dt)
 {
-	RenderCmd::SetClearColor(glm::vec4{ .3f, .3f, .8f, 1.0f });
+	RenderCmd::SetClearColor(FVector4{ .3f, .3f, .8f, 1.0f });
 	RenderCmd::Clear();
 }
 

@@ -14,7 +14,7 @@
 
 #include "Pine/Core/Base.h"
 #include "Pine/Core/Log.h"
-#include "Pine/Math/Math.h"
+#include "Pine/Math/Maths.h"
 
 #ifdef PE_PLATFORM_WINDOWS
 	#ifndef NOMINMAX

@@ -9,7 +9,7 @@
 namespace Pine
 {
 
-void StaticMeshRenderProxy::Prepare(const Ref<StaticMesh>& mesh, const glm::mat4& transform)
+void StaticMeshRenderProxy::Prepare(const Ref<StaticMesh>& mesh, const FMatrix4& transform)
 {
 	mStaticMesh = mesh;
 	mTransform = transform;

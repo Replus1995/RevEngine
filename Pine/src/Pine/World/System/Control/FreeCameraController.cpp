@@ -22,13 +22,13 @@ void FreeCameraController::OnUpdate(float dt, Camera& camera, FTransform& transf
 		{
 			FVector2 deltaPan(0.0f, 0.0f);
 			if(Input::KeyDown(Key::W))
-				deltaPan.y += dt;
+				deltaPan.Y += dt;
 			if (Input::KeyDown(Key::S))
-				deltaPan.y += -dt;
+				deltaPan.Y += -dt;
 			if (Input::KeyDown(Key::A))
-				deltaPan.x += -dt;
+				deltaPan.X += -dt;
 			if (Input::KeyDown(Key::D))
-				deltaPan.x += dt;
+				deltaPan.X += dt;
 			deltaPan *= sPanSpeed;
 			MousePan(transform, deltaPan);
 
@@ -56,17 +56,17 @@ void FreeCameraController::OnEvent(Event& e, Camera& camera, FTransform& transfo
 
 void FreeCameraController::MousePan(FTransform& transform, const FVector2& delta)
 {
-	FVector3 dRight = transform.Right() * delta.x;
-	FVector3 dForward = transform.Forward() * delta.y;
+	FVector3 dRight = transform.Right() * delta.X;
+	FVector3 dForward = transform.Forward() * delta.Y;
 	transform.Location += dRight + dForward;
 }
 
 void FreeCameraController::MouseRotate(FTransform& transform, const FVector2& delta)
 {
-	float yaw = transform.Rotation.yaw + delta.x;
-	float pitch = FMaths::Clamp(transform.Rotation.pitch + delta.y, -90.0f, 90.0f);
-	transform.Rotation.yaw = yaw;
-	transform.Rotation.pitch = pitch;
+	float yaw = transform.Rotation.Yaw + delta.X;
+	float pitch = FMaths::Clamp(transform.Rotation.Pitch + delta.Y, -90.0f, 90.0f);
+	transform.Rotation.Yaw = yaw;
+	transform.Rotation.Pitch = pitch;
 }
 
 }

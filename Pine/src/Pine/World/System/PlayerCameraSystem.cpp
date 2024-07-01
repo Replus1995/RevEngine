@@ -31,7 +31,7 @@ void PlayerCameraSystem::OnDestroy()
 {
 }
 
-void PlayerCameraSystem::GetCameraMatrix(glm::mat4& projMat, glm::mat4& viewMat) const
+void PlayerCameraSystem::GetCameraMatrix(FMatrix4& projMat, FMatrix4& viewMat) const
 {
 	if (mCamEntity)
 	{
@@ -43,14 +43,14 @@ void PlayerCameraSystem::GetCameraMatrix(glm::mat4& projMat, glm::mat4& viewMat)
 			cameraComp.Camera.SetAspectRatio(asp);
 		}
 		projMat = cameraComp.Camera.GetProjectionMatrix();
-		viewMat = glm::inverse(transformComp.GetMatrix());
+		viewMat = (FMatrix4)glm::inverse(transformComp.GetMatrix());
 	}
 	else
 	{
 		auto window = Application::GetApp().GetWindow();
 		float asp = float(window->GetWidth()) / float(window->GetHeight());
-		projMat = glm::perspective(glm::radians(45.0f), asp, 0.01f, 1000.0f);
-		viewMat = glm::mat4(1.0f);
+		projMat = glm::perspective(FMaths::Radians(45.0f), asp, 0.01f, 1000.0f);
+		viewMat = FMatrix4(1.0f);
 	}
 }
 

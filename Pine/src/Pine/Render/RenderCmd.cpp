@@ -24,7 +24,7 @@ void RenderCmd::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t hei
 	sRHI->SetViewport(x, y, width, height);
 }
 
-void RenderCmd::SetClearColor(const glm::vec4& color)
+void RenderCmd::SetClearColor(const FVector4& color)
 {
 	sRHI->SetClearColor(color);
 }

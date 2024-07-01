@@ -14,7 +14,7 @@ public:
 	virtual void OnUpdate(float dt) override;
 	virtual void OnDestroy() override;
 
-	void GetCameraMatrix(glm::mat4& projMat, glm::mat4& viewMat) const;
+	void GetCameraMatrix(FMatrix4& projMat, FMatrix4& viewMat) const;
 	bool SetPlayerCamera(Entity e);
 	void SetPlayerCameraController(const Ref<CameraController>& c);
 	

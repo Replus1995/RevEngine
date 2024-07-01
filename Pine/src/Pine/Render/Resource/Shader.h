@@ -1,8 +1,8 @@
 #pragma once
 #include "Pine/Core/Base.h"
+#include "Pine/Math/Maths.h"
 #include <string>
 #include <unordered_map>
-#include <glm/glm.hpp>
 
 namespace Pine
 {
@@ -32,11 +32,11 @@ public:
 
     virtual void SetUniform(ShaderUniformLocation location, int value) = 0;
     virtual void SetUniform(ShaderUniformLocation location, float value) = 0;
-    virtual void SetUniform(ShaderUniformLocation location, const glm::vec2& value) = 0;
-    virtual void SetUniform(ShaderUniformLocation location, const glm::vec3& value) = 0;
-    virtual void SetUniform(ShaderUniformLocation location, const glm::vec4& value) = 0;
-    virtual void SetUniform(ShaderUniformLocation location, const glm::mat3& value) = 0;
-    virtual void SetUniform(ShaderUniformLocation location, const glm::mat4& value) = 0;
+    virtual void SetUniform(ShaderUniformLocation location, const FVector2& value) = 0;
+    virtual void SetUniform(ShaderUniformLocation location, const FVector3& value) = 0;
+    virtual void SetUniform(ShaderUniformLocation location, const FVector4& value) = 0;
+    virtual void SetUniform(ShaderUniformLocation location, const FMatrix3& value) = 0;
+    virtual void SetUniform(ShaderUniformLocation location, const FMatrix4& value) = 0;
 
     template<typename T>
     void SetUniform(const std::string& name, const T& value)

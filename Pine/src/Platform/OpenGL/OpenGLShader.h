@@ -20,11 +20,11 @@ public:
 
 	virtual void SetUniform(ShaderUniformLocation location, int value) override;
 	virtual void SetUniform(ShaderUniformLocation location, float value) override;
-	virtual void SetUniform(ShaderUniformLocation location, const glm::vec2& value) override;
-	virtual void SetUniform(ShaderUniformLocation location, const glm::vec3& value) override;
-	virtual void SetUniform(ShaderUniformLocation location, const glm::vec4& value) override;
-	virtual void SetUniform(ShaderUniformLocation location, const glm::mat3& value) override;
-	virtual void SetUniform(ShaderUniformLocation location, const glm::mat4& value) override;
+	virtual void SetUniform(ShaderUniformLocation location, const FVector2& value) override;
+	virtual void SetUniform(ShaderUniformLocation location, const FVector3& value) override;
+	virtual void SetUniform(ShaderUniformLocation location, const FVector4& value) override;
+	virtual void SetUniform(ShaderUniformLocation location, const FMatrix3& value) override;
+	virtual void SetUniform(ShaderUniformLocation location, const FMatrix4& value) override;
 
 	virtual void SetUniformArray(ShaderUniformLocation location, int* values, uint32_t count) override;
 
