@@ -1,9 +1,7 @@
-#include "pinepch.h"
 #include "Log.h"
-
 #include "spdlog/sinks/stdout_color_sinks.h"
 
-namespace Pine
+namespace Rev
 {
 	std::shared_ptr<spdlog::logger> Log::sCoreLogger{ nullptr };
 	std::shared_ptr<spdlog::logger> Log::sClientLogger{ nullptr };

@@ -1,14 +1,13 @@
-#include "pinepch.h"
 #include "FreeCameraController.h"
-#include "Pine/Core/Input.h"
+#include "Rev/Core/Input.h"
 
-namespace Pine
+namespace Rev
 {
 static constexpr float sPanFactor = 2.4f;
 static constexpr float sPanSpeed = 1.0f;//0.0366f * (sPanFactor * sPanFactor) - 0.1778f * sPanFactor + 0.3021f;
 static constexpr float sRotateSpeed = 0.1f;
 
-void FreeCameraController::OnUpdate(float dt, Camera& camera, FTransform& transform)
+void FreeCameraController::OnUpdate(float dt, Camera& camera, Math::FTransform& transform)
 {
 	bool bMouseRightDown = Input::MouseButtonDown(Mouse::ButtonRight);
 	if (bMouseRightDown)
@@ -20,7 +19,7 @@ void FreeCameraController::OnUpdate(float dt, Camera& camera, FTransform& transf
 		}
 		else
 		{
-			FVector2 deltaPan(0.0f, 0.0f);
+			Math::FVector2 deltaPan(0.0f, 0.0f);
 			if(Input::KeyDown(Key::W))
 				deltaPan.Y += dt;
 			if (Input::KeyDown(Key::S))
@@ -32,8 +31,8 @@ void FreeCameraController::OnUpdate(float dt, Camera& camera, FTransform& transf
 			deltaPan *= sPanSpeed;
 			MousePan(transform, deltaPan);
 
-			FVector2 curMousePos = Input::GetMousePosition();
-			FVector2 deltaRotate= curMousePos - mLastMousePos;
+			Math::FVector2 curMousePos = Input::GetMousePosition();
+			Math::FVector2 deltaRotate= curMousePos - mLastMousePos;
 			deltaRotate *= sRotateSpeed * -1.0f;
 			mLastMousePos = curMousePos;
 			MouseRotate(transform, deltaRotate);
@@ -45,7 +44,7 @@ void FreeCameraController::OnUpdate(float dt, Camera& camera, FTransform& transf
 	}
 }
 
-void FreeCameraController::OnEvent(Event& e, Camera& camera, FTransform& transform)
+void FreeCameraController::OnEvent(Event& e, Camera& camera, Math::FTransform& transform)
 {
 	/*if (e.GetEventType() == EventType::MouseScrolled)
 	{
@@ -54,17 +53,17 @@ void FreeCameraController::OnEvent(Event& e, Camera& camera, FTransform& transfo
 	}*/
 }
 
-void FreeCameraController::MousePan(FTransform& transform, const FVector2& delta)
+void FreeCameraController::MousePan(Math::FTransform& transform, const Math::FVector2& delta)
 {
-	FVector3 dRight = transform.Right() * delta.X;
-	FVector3 dForward = transform.Forward() * delta.Y;
+	Math::FVector3 dRight = transform.Right() * delta.X;
+	Math::FVector3 dForward = transform.Forward() * delta.Y;
 	transform.Location += dRight + dForward;
 }
 
-void FreeCameraController::MouseRotate(FTransform& transform, const FVector2& delta)
+void FreeCameraController::MouseRotate(Math::FTransform& transform, const Math::FVector2& delta)
 {
 	float yaw = transform.Rotation.Yaw + delta.X;
-	float pitch = FMaths::Clamp(transform.Rotation.Pitch + delta.Y, -90.0f, 90.0f);
+	float pitch = Math::Clamp(transform.Rotation.Pitch + delta.Y, -90.0f, 90.0f);
 	transform.Rotation.Yaw = yaw;
 	transform.Rotation.Pitch = pitch;
 }

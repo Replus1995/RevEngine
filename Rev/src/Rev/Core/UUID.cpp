@@ -1,10 +1,8 @@
-#include "pinepch.h"
 #include "UUID.h"
-
 #include <random>
 #include <unordered_map>
 
-namespace Pine
+namespace Rev
 {
 
 static std::random_device sRandomDevice;

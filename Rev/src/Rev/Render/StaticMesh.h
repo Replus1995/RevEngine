@@ -1,7 +1,7 @@
 #pragma once
-#include "Pine/Render/Mesh.h"
+#include "Rev/Render/Mesh.h"
 
-namespace Pine
+namespace Rev
 {
 
 class VertexArray;
@@ -11,7 +11,7 @@ struct StaticMeshResource
 	Ref<VertexArray> VertexData;
 };
 
-class PINE_API StaticMesh : public Mesh
+class REV_API StaticMesh : public Mesh
 {
 public:
 	StaticMesh(const std::vector<Ref<Material>>& pMaterials, const std::vector<StaticMeshResource>& pResources);

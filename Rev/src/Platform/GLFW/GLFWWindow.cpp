@@ -1,18 +1,17 @@
-#include "pinepch.h"
 #include "GLFWWindow.h"
-#include "Pine/Core/Application.h"
-#include "Pine/Core/Assert.h"
-#include "Pine/Events/ApplicationEvent.h"
-#include "Pine/Events/KeyEvent.h"
-#include "Pine/Events/MouseEvent.h"
+#include "Rev/Core/Application.h"
+#include "Rev/Core/Assert.h"
+#include "Rev/Events/ApplicationEvent.h"
+#include "Rev/Events/KeyEvent.h"
+#include "Rev/Events/MouseEvent.h"
 
-namespace Pine
+namespace Rev
 {
 static bool sGLFWInitialized = false;
 
 static void GLFWErrorCallback(int error, const char* description)
 {
-	PE_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
+	RE_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
 }
 
 GLFWWindow::GLFWWindow(const WindowProps& props)
@@ -64,12 +63,12 @@ void GLFWWindow::Init(const WindowProps& props)
 	mData.Height = props.Height;
 	mData.VSync = true;
 
-	PE_CORE_INFO("Create Window {0} ({1}, {2})", props.Title, props.Width, props.Height);
+	RE_CORE_INFO("Create Window {0} ({1}, {2})", props.Title, props.Width, props.Height);
 
 	if (!sGLFWInitialized)
 	{
 		int success = glfwInit();
-		PE_CORE_ASSERT(success, "Could not initialze GLFW!");
+		RE_CORE_ASSERT(success, "Could not initialze GLFW!");
 
 		switch (GetRenderAPI())
 		{

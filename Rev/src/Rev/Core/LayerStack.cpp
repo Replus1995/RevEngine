@@ -1,7 +1,6 @@
-#include "pinepch.h"
-#include "Pine/Core/LayerStack.h"
+#include "Rev/Core/LayerStack.h"
 
-namespace Pine
+namespace Rev
 {
 	LayerStack::LayerStack()
 	{

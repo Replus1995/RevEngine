@@ -1,8 +1,8 @@
 #pragma once
-#include "Pine/Render/Resource/Texture.h"
+#include "Rev/Render/Resource/Texture.h"
 #include <glad/glad.h>
 
-namespace Pine
+namespace Rev
 {
 
 class OpenGLTexture2D : public Texture2D

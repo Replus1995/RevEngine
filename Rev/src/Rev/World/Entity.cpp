@@ -1,8 +1,7 @@
-#include "pinepch.h"
 #include "Entity.h"
-#include "Pine/World/Scene.h"
+#include "Rev/World/Scene.h"
 
-namespace Pine
+namespace Rev
 {
 
 Entity::Entity(entt::entity handle, Scene* scene)

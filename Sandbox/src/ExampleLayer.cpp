@@ -1,17 +1,17 @@
 #include "ExampleLayer.h"
-#include <Pine/Core/Base.h>
-#include <Pine/World/Scene.h>
-#include <Pine/World/Component/Component.h>
-#include <Pine/World/System/PlayerCameraSystem.h>
-#include <Pine/Render/Renderer.h>
-#include <Pine/Render/StaticMesh.h>
-#include <Pine/Core/FileSystem.h>
+#include <Rev/Core/Base.h>
+#include <Rev/World/Scene.h>
+#include <Rev/World/Component/Component.h>
+#include <Rev/World/System/PlayerCameraSystem.h>
+#include <Rev/Render/Renderer.h>
+#include <Rev/Render/StaticMesh.h>
+#include <Rev/Core/FileSystem.h>
 
 #include <filesystem>
 
 #include "ExampleMaterial.h"
 
-using namespace Pine;
+using namespace Rev;
 
 ExampleLayer::ExampleLayer()
 	: SceneLayer("ExampleLayer")
@@ -23,18 +23,18 @@ ExampleLayer::ExampleLayer()
 	Renderer::GetShaderLibrary()->Load("ExampleShader", Path("/SandBox/assets/shaders/example.glsl").ToNative());
 
 	auto pMat = CreateRef<ExampleMaterial>();
-	pMat->SetColor(FVector4(1,0,0,1));
+	pMat->SetColor(Math::FVector4(1,0,0,1));
 	MeshUtils::SetDefaultMaterial(pMat);
 
 	//Create Sandbox Scene
-	mScene = CreateRef<Pine::Scene>();
+	mScene = CreateRef<Rev::Scene>();
 
 	{
 		auto meshEntity = mScene->CreateEntity();
 		auto& meshComp = meshEntity.AddComponent<StaticMeshComponent>();
 		meshComp.StaticMesh = MeshUtils::CreateBox();
 		auto& transformComp = meshEntity.GetComponent<TransformComponent>();
-		transformComp.SetLocation(FVector3(0, 0, -5));
+		transformComp.SetLocation(Math::FVector3(0, 0, -5));
 	}
 
 	{
@@ -42,7 +42,7 @@ ExampleLayer::ExampleLayer()
 		auto& camComp = camEntity.AddComponent<CameraComponent>();
 		camComp.AutoAspectRatio = true;
 		auto& transformComp = camEntity.GetComponent<TransformComponent>();
-		transformComp.SetLocation(FVector3(0, 0, 0));
+		transformComp.SetLocation(Math::FVector3(0, 0, 0));
 		//transformComp.SetRotation(FRotator(0, 180, 0));
 
 		auto camSys = mScene->GetSystem<PlayerCameraSystem>();

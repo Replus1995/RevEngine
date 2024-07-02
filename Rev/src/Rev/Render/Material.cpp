@@ -1,7 +1,6 @@
-#include "pinepch.h"
 #include "Material.h"
 
-namespace Pine
+namespace Rev
 {
 
 std::string MaterialUniform::GetProgramName(const std::string& name)

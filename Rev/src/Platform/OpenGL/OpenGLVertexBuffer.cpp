@@ -1,10 +1,9 @@
-#include "pinepch.h"
 #include "OpenGLVertexBuffer.h"
-#include "Pine/Core/Assert.h"
+#include "Rev/Core/Assert.h"
 
 #include <glad/glad.h>
 
-namespace Pine
+namespace Rev
 {
 /*Vertex Buffer*/
 
@@ -90,7 +89,7 @@ static GLenum ConvertToOpenGLDataType(EShaderDataType type)
 	case EShaderDataType::Bool:     return GL_BOOL;
 	}
 
-	PE_CORE_ASSERT(false, "Unknown ShaderDataType!");
+	RE_CORE_ASSERT(false, "Unknown ShaderDataType!");
 	return 0;
 }
 
@@ -116,7 +115,7 @@ void OpenGLVertexArray::Unbind() const
 
 void OpenGLVertexArray::AddVertexBuffer(const std::shared_ptr<VertexBuffer>& vertexBuffer)
 {
-	PE_CORE_ASSERT(vertexBuffer->GetLayout().GetElements().size(), "Unknown vertex buffer layout!");
+	RE_CORE_ASSERT(vertexBuffer->GetLayout().GetElements().size(), "Unknown vertex buffer layout!");
 
 	glBindVertexArray(mHandle);
 	vertexBuffer->Bind();
@@ -175,7 +174,7 @@ void OpenGLVertexArray::AddVertexBuffer(const std::shared_ptr<VertexBuffer>& ver
 			break;
 		}
 		default:
-			PE_CORE_ASSERT(false, "Unknown ShaderDataType!");
+			RE_CORE_ASSERT(false, "Unknown ShaderDataType!");
 		}
 	}
 

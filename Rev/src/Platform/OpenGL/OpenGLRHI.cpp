@@ -1,9 +1,8 @@
-#include "pinepch.h"
 #include "OpenGLRHI.h"
-#include "Pine/Core/Base.h"
-#include "Pine/Core/Assert.h"
-#include "Pine/Core/Application.h"
-#include "Pine/Core/Window.h"
+#include "Rev/Core/Base.h"
+#include "Rev/Core/Assert.h"
+#include "Rev/Core/Application.h"
+#include "Rev/Core/Window.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -14,7 +13,7 @@
 #include "OpenGLTexture.h"
 #include "OpenGLFrameBuffer.h"
 
-namespace Pine
+namespace Rev
 {
 
 void OpenGLMessageCallback(
@@ -28,33 +27,33 @@ void OpenGLMessageCallback(
 {
 	switch (severity)
 	{
-	case GL_DEBUG_SEVERITY_HIGH:         PE_CORE_CRITICAL(message); return;
-	case GL_DEBUG_SEVERITY_MEDIUM:		 PE_CORE_ERROR(message); return;
-	case GL_DEBUG_SEVERITY_LOW:          PE_CORE_WARN(message); return;
-	case GL_DEBUG_SEVERITY_NOTIFICATION: PE_CORE_TRACE(message); return;
+	case GL_DEBUG_SEVERITY_HIGH:         RE_CORE_CRITICAL(message); return;
+	case GL_DEBUG_SEVERITY_MEDIUM:		 RE_CORE_ERROR(message); return;
+	case GL_DEBUG_SEVERITY_LOW:          RE_CORE_WARN(message); return;
+	case GL_DEBUG_SEVERITY_NOTIFICATION: RE_CORE_TRACE(message); return;
 	}
 
-	PE_CORE_ASSERT(false, "[OpenGLRHI] Unknown severity level!");
+	RE_CORE_ASSERT(false, "[OpenGLRHI] Unknown severity level!");
 }
 
 void OpenGLRHI::Init()
 {
 	Window* pWnd = Application::GetApp().GetWindow();
-	PE_CORE_ASSERT(pWnd, "[OpenGLRHI] Invalid window!");
+	RE_CORE_ASSERT(pWnd, "[OpenGLRHI] Invalid window!");
 
 	switch (pWnd->GetType())
 	{
 	case EWindowType::GLFW:
 	{
 		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-		PE_CORE_ASSERT(status, "[OpenGLRHI] Failed to initialize Glad.");
+		RE_CORE_ASSERT(status, "[OpenGLRHI] Failed to initialize Glad.");
 		break;
 	}
 	default:
-		PE_CORE_ASSERT(false, "[OpenGLRHI] Unknown window type!");
+		RE_CORE_ASSERT(false, "[OpenGLRHI] Unknown window type!");
 	}
 
-#ifdef PE_DEBUG
+#ifdef RE_DEBUG
 	glEnable(GL_DEBUG_OUTPUT);
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 	glDebugMessageCallback(OpenGLMessageCallback, nullptr);
@@ -73,7 +72,7 @@ void OpenGLRHI::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t hei
 	glViewport(x, y, width, height);
 }
 
-void OpenGLRHI::SetClearColor(const FVector4& color)
+void OpenGLRHI::SetClearColor(const Math::FVector4& color)
 {
 	glClearColor(color.X, color.Y, color.Z, color.W);
 }

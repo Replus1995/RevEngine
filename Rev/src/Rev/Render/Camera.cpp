@@ -1,8 +1,7 @@
-#include "pinepch.h"
 #include "Camera.h"
-#include "Pine/Core/Assert.h"
+#include "Rev/Core/Assert.h"
 
-namespace Pine
+namespace Rev
 {
 
 Camera::Camera()
@@ -42,7 +41,7 @@ void Camera::RecalculateProjection()
 {
 	if (mProjectionType == ProjectionType::Perspective)
 	{
-		mProjection = FMaths::Perspective(mPerspectiveFOV, mAspectRatio, mPerspectiveNear, mPerspectiveFar);
+		mProjection = Math::FMatrix4::Perspective(mPerspectiveFOV, mAspectRatio, mPerspectiveNear, mPerspectiveFar);
 	}
 	else
 	{
@@ -51,7 +50,7 @@ void Camera::RecalculateProjection()
 		float orthoBottom = -mOrthographicSize * 0.5f;
 		float orthoTop = mOrthographicSize * 0.5f;
 
-		mProjection = FMaths::Othographic(orthoLeft, orthoRight, orthoBottom, orthoTop, mOrthographicNear, mOrthographicFar);
+		mProjection = Math::FMatrix4::Othographic(orthoLeft, orthoRight, orthoBottom, orthoTop, mOrthographicNear, mOrthographicFar);
 	}
 }
 

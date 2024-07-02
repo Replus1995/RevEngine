@@ -1,18 +1,18 @@
 #pragma once
-#include "Pine/Core/Base.h"
-#include "Pine/Core/UUID.h"
-#include "Pine/World/Entity.h"
-#include "Pine/World/System/System.h"
+#include "Rev/Core/Base.h"
+#include "Rev/Core/UUID.h"
+#include "Rev/World/Entity.h"
+#include "Rev/World/System/System.h"
 
 #include <entt/entt.hpp>
 
-namespace Pine
+namespace Rev
 {
 
 class Camera;
 class Entity;
 class ISystem;
-class PINE_API Scene
+class REV_API Scene
 {
 public:
 	Scene();

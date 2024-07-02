@@ -1,10 +1,11 @@
 #pragma once
-#include "Pine/Events/Event.h"
-#include "Pine/Core/Input.h"
+#include "Rev/Events/Event.h"
+#include "Rev/Core/Input.h"
+#include <sstream>
 
-namespace Pine
+namespace Rev
 {
-	class PINE_API KeyEvent : public Event
+	class REV_API KeyEvent : public Event
 	{
 	public:
 		inline KeyCode GetKeyCode() const { return mKeyCode; }
@@ -17,7 +18,7 @@ namespace Pine
 		KeyCode mKeyCode;
 	};
 
-	class PINE_API KeyPressedEvent : public KeyEvent
+	class REV_API KeyPressedEvent : public KeyEvent
 	{
 	public:
 		KeyPressedEvent(KeyCode keycode, int repeatCount)
@@ -38,7 +39,7 @@ namespace Pine
 		int mRepeatCount;
 	};
 
-	class PINE_API KeyReleasedEvent : public KeyEvent
+	class REV_API KeyReleasedEvent : public KeyEvent
 	{
 	public:
 		KeyReleasedEvent(KeyCode keycode)
@@ -54,7 +55,7 @@ namespace Pine
 		EVENT_CLASS_TYPE(KeyReleased)
 	};
 
-	class PINE_API KeyTypedEvent : public KeyEvent
+	class REV_API KeyTypedEvent : public KeyEvent
 	{
 	public:
 		KeyTypedEvent(KeyCode keycode)

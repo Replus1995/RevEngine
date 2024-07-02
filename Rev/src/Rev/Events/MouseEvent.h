@@ -1,10 +1,11 @@
 #pragma once
-#include "Pine/Events/Event.h"
-#include "Pine/Core/Input.h"
+#include "Rev/Events/Event.h"
+#include "Rev/Core/Input.h"
+#include <sstream>
 
-namespace Pine
+namespace Rev
 {
-	class PINE_API MouseMovedEvent : public Event
+	class REV_API MouseMovedEvent : public Event
 	{
 	public:
 		MouseMovedEvent(float x, float y)
@@ -26,7 +27,7 @@ namespace Pine
 		float mMouseX, mMouseY;
 	};
 
-	class PINE_API MouseScrolledEvent : public Event
+	class REV_API MouseScrolledEvent : public Event
 	{
 	public:
 		MouseScrolledEvent(float xOffset, float yOffset)
@@ -48,7 +49,7 @@ namespace Pine
 		float mXOffset, mYOffset;
 	};
 
-	class PINE_API MouseButtonEvent : public Event
+	class REV_API MouseButtonEvent : public Event
 	{
 	public:
 		inline MouseCode GetMouseButton() const { return mButton; }
@@ -61,7 +62,7 @@ namespace Pine
 		MouseCode mButton;
 	};
 
-	class PINE_API MouseButtonPressedEvent : public MouseButtonEvent
+	class REV_API MouseButtonPressedEvent : public MouseButtonEvent
 	{
 	public:
 		MouseButtonPressedEvent(MouseCode button)
@@ -77,7 +78,7 @@ namespace Pine
 		EVENT_CLASS_TYPE(MouseButtonPressed)
 	};
 
-	class PINE_API MouseButtonReleasedEvent : public MouseButtonEvent
+	class REV_API MouseButtonReleasedEvent : public MouseButtonEvent
 	{
 	public:
 		MouseButtonReleasedEvent(MouseCode button)

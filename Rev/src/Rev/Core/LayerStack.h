@@ -1,11 +1,10 @@
 #pragma once
+#include "Rev/Core/Base.h"
+#include "Rev/Core/Layer.h"
 
-#include "Pine/Core/Base.h"
-#include "Pine/Core/Layer.h"
-
-namespace Pine
+namespace Rev
 {
-	class PINE_API LayerStack
+	class REV_API LayerStack
 	{
 	public:
 		LayerStack();

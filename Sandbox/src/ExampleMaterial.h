@@ -1,16 +1,16 @@
-#include <Pine/Render/Material.h>
-#include <Pine/Render/Renderer.h>
-#include <Pine/Math/Math.h>
+#include <Rev/Render/Material.h>
+#include <Rev/Render/Renderer.h>
+#include <Rev/Math/Maths.h>
 
-class ExampleMaterial : public Pine::Material
+class ExampleMaterial : public Rev::Material
 {
 public:
     ExampleMaterial()
-        : Pine::Material(Pine::Renderer::GetShaderLibrary()->Get("ExampleShader"))
+        : Rev::Material(Rev::Renderer::GetShaderLibrary()->Get("ExampleShader"))
     {}
     virtual ~ExampleMaterial() {};
 
-    void SetColor(const Pine::FVector4& color)
+    void SetColor(const Rev::Math::FVector4& color)
     {
         uColor = color;
     }
@@ -18,10 +18,10 @@ public:
 protected:
     virtual void UploadUniform() override
     {
-        Pine::Material::UploadUniform();
+        Rev::Material::UploadUniform();
         uColor.Upload(mProgram);
     }
 
 protected:
-    Pine::TMaterialUniform<Pine::FVector4> uColor = { "Color", Pine::FVector4(1) };
+    Rev::TMaterialUniform<Rev::Math::FVector4> uColor = { "Color", Rev::Math::FVector4(1) };
 };

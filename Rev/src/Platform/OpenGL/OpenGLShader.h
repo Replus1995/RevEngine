@@ -1,9 +1,9 @@
 #pragma once
-#include "Pine/Render/Resource/Shader.h"
+#include "Rev/Render/Resource/Shader.h"
 #include <map>
 #include <glad/glad.h>
 
-namespace Pine
+namespace Rev
 {
 
 class OpenGLShader : public Shader
@@ -20,11 +20,11 @@ public:
 
 	virtual void SetUniform(ShaderUniformLocation location, int value) override;
 	virtual void SetUniform(ShaderUniformLocation location, float value) override;
-	virtual void SetUniform(ShaderUniformLocation location, const FVector2& value) override;
-	virtual void SetUniform(ShaderUniformLocation location, const FVector3& value) override;
-	virtual void SetUniform(ShaderUniformLocation location, const FVector4& value) override;
-	virtual void SetUniform(ShaderUniformLocation location, const FMatrix3& value) override;
-	virtual void SetUniform(ShaderUniformLocation location, const FMatrix4& value) override;
+	virtual void SetUniform(ShaderUniformLocation location, const Math::FVector2& value) override;
+	virtual void SetUniform(ShaderUniformLocation location, const Math::FVector3& value) override;
+	virtual void SetUniform(ShaderUniformLocation location, const Math::FVector4& value) override;
+	virtual void SetUniform(ShaderUniformLocation location, const Math::FMatrix3& value) override;
+	virtual void SetUniform(ShaderUniformLocation location, const Math::FMatrix4& value) override;
 
 	virtual void SetUniformArray(ShaderUniformLocation location, int* values, uint32_t count) override;
 

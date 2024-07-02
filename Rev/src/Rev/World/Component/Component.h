@@ -1,9 +1,8 @@
 #pragma once
-#include "Pine/World/Component/BaseComponent.h"
-
+#include "Rev/World/Component/BaseComponent.h"
 #include <entt/entt.hpp>
 
-namespace Pine
+namespace Rev
 {
 
 template<typename... Component>

@@ -1,13 +1,12 @@
 #pragma once
-#include "Pine/Core/Base.h"
-#include "Pine/Core/UUID.h"
-#include "Pine/Math/Maths.h"
-#include "Pine/Math/Transform.h"
-#include "Pine/Render/Camera.h"
+#include "Rev/Core/Base.h"
+#include "Rev/Core/UUID.h"
+#include "Rev/Math/Maths.h"
+#include "Rev/Render/Camera.h"
 
 #include <string>
 
-namespace Pine
+namespace Rev
 {
 
 struct IDComponent
@@ -29,20 +28,20 @@ struct TagComponent
 
 struct TransformComponent
 {
-	FTransform Transform;
+	Math::FTransform Transform;
 
 	TransformComponent() = default;
 	TransformComponent(const TransformComponent&) = default;
 
-	FMatrix4 GetMatrix() const { return Transform.ToMatrix(); }
+	Math::FMatrix4 GetMatrix() const { return Transform.ToMatrix(); }
 
-	FVector3 Location() const { return Transform.Location; }
-	FRotator Rotation() const { return Transform.Rotation; }
-	FVector3 Scale() const { return Transform.Scale; }
+	Math::FVector3 Location() const { return Transform.Location; }
+	Math::FRotator Rotation() const { return Transform.Rotation; }
+	Math::FVector3 Scale() const { return Transform.Scale; }
 
-	void SetLocation(const FVector3& t) { Transform.Location = t; }
-	void SetRotation(const FRotator& r) { Transform.Rotation = r; }
-	void SetScale(const FVector3& s) { Transform.Scale = s; }
+	void SetLocation(const Math::FVector3& t) { Transform.Location = t; }
+	void SetRotation(const Math::FRotator& r) { Transform.Rotation = r; }
+	void SetScale(const Math::FVector3& s) { Transform.Scale = s; }
 
 };
 

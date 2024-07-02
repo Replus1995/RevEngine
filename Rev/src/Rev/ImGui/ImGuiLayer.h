@@ -1,13 +1,13 @@
 #pragma once
 
-#include "Pine/Core/Layer.h"
-#include "Pine/Events/KeyEvent.h"
-#include "Pine/Events/MouseEvent.h"
-#include "Pine/Events/ApplicationEvent.h"
+#include "Rev/Core/Layer.h"
+#include "Rev/Events/KeyEvent.h"
+#include "Rev/Events/MouseEvent.h"
+#include "Rev/Events/ApplicationEvent.h"
 
-namespace Pine
+namespace Rev
 {
-	class PINE_API ImGuiLayer : public Layer
+	class REV_API ImGuiLayer : public Layer
 	{
 	public:
 		ImGuiLayer();

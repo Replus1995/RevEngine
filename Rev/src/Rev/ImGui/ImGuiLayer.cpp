@@ -1,7 +1,6 @@
-#include "pinepch.h"
-#include "Pine/ImGui/ImGuiLayer.h"
-#include "Pine/Core/Application.h"
-#include "Pine/Core/Window.h"
+#include "Rev/ImGui/ImGuiLayer.h"
+#include "Rev/Core/Application.h"
+#include "Rev/Core/Window.h"
 
 #include <imgui.h>
 #include <backends/imgui_impl_opengl3.h>
@@ -123,7 +122,7 @@ static ImGuiKey GlfwKeyToImGuiKey(int key)
     }
 }
 
-namespace Pine
+namespace Rev
 {
     static void ImGuiLayer_UpdateKeyModifiers()
     {
@@ -195,14 +194,14 @@ namespace Pine
 	void ImGuiLayer::OnEvent(Event& event)
 	{
 		EventDispatcher dispatcher(event);
-		dispatcher.Dispatch<KeyPressedEvent>(PE_BIND_EVENT_FN(ImGuiLayer::OnKeyPressed, this));
-		dispatcher.Dispatch<KeyReleasedEvent>(PE_BIND_EVENT_FN(ImGuiLayer::OnKeyReleased, this));
-		dispatcher.Dispatch<KeyTypedEvent>(PE_BIND_EVENT_FN(ImGuiLayer::OnKeyTyped, this));
-		dispatcher.Dispatch<MouseButtonPressedEvent>(PE_BIND_EVENT_FN(ImGuiLayer::OnMouseButtonPressed, this));
-		dispatcher.Dispatch<MouseButtonReleasedEvent>(PE_BIND_EVENT_FN(ImGuiLayer::OnMouseButtonReleased, this));
-		dispatcher.Dispatch<MouseScrolledEvent>(PE_BIND_EVENT_FN(ImGuiLayer::OnMouseScrolled, this));
-		dispatcher.Dispatch<MouseMovedEvent>(PE_BIND_EVENT_FN(ImGuiLayer::OnMouseMoved, this));
-		dispatcher.Dispatch<WindowResizeEvent>(PE_BIND_EVENT_FN(ImGuiLayer::OnWindowResize, this));
+		dispatcher.Dispatch<KeyPressedEvent>(RE_BIND_EVENT_FN(ImGuiLayer::OnKeyPressed, this));
+		dispatcher.Dispatch<KeyReleasedEvent>(RE_BIND_EVENT_FN(ImGuiLayer::OnKeyReleased, this));
+		dispatcher.Dispatch<KeyTypedEvent>(RE_BIND_EVENT_FN(ImGuiLayer::OnKeyTyped, this));
+		dispatcher.Dispatch<MouseButtonPressedEvent>(RE_BIND_EVENT_FN(ImGuiLayer::OnMouseButtonPressed, this));
+		dispatcher.Dispatch<MouseButtonReleasedEvent>(RE_BIND_EVENT_FN(ImGuiLayer::OnMouseButtonReleased, this));
+		dispatcher.Dispatch<MouseScrolledEvent>(RE_BIND_EVENT_FN(ImGuiLayer::OnMouseScrolled, this));
+		dispatcher.Dispatch<MouseMovedEvent>(RE_BIND_EVENT_FN(ImGuiLayer::OnMouseMoved, this));
+		dispatcher.Dispatch<WindowResizeEvent>(RE_BIND_EVENT_FN(ImGuiLayer::OnWindowResize, this));
 	}
 
 	bool ImGuiLayer::OnKeyPressed(KeyPressedEvent& e)

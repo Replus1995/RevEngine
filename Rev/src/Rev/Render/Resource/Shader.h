@@ -1,12 +1,12 @@
 #pragma once
-#include "Pine/Core/Base.h"
-#include "Pine/Math/Maths.h"
+#include "Rev/Core/Base.h"
+#include "Rev/Math/Maths.h"
 #include <string>
 #include <unordered_map>
 
-namespace Pine
+namespace Rev
 {
-class PINE_API ShaderUniformLocation
+class REV_API ShaderUniformLocation
 {
 public:
     ShaderUniformLocation() : mLocation(uint16(-1)) {};
@@ -20,7 +20,7 @@ private:
     uint16 mLocation;
 };
 
-class PINE_API Shader
+class REV_API Shader
 {
 public:
     virtual ~Shader() = default;
@@ -32,11 +32,11 @@ public:
 
     virtual void SetUniform(ShaderUniformLocation location, int value) = 0;
     virtual void SetUniform(ShaderUniformLocation location, float value) = 0;
-    virtual void SetUniform(ShaderUniformLocation location, const FVector2& value) = 0;
-    virtual void SetUniform(ShaderUniformLocation location, const FVector3& value) = 0;
-    virtual void SetUniform(ShaderUniformLocation location, const FVector4& value) = 0;
-    virtual void SetUniform(ShaderUniformLocation location, const FMatrix3& value) = 0;
-    virtual void SetUniform(ShaderUniformLocation location, const FMatrix4& value) = 0;
+    virtual void SetUniform(ShaderUniformLocation location, const Math::FVector2& value) = 0;
+    virtual void SetUniform(ShaderUniformLocation location, const Math::FVector3& value) = 0;
+    virtual void SetUniform(ShaderUniformLocation location, const Math::FVector4& value) = 0;
+    virtual void SetUniform(ShaderUniformLocation location, const Math::FMatrix3& value) = 0;
+    virtual void SetUniform(ShaderUniformLocation location, const Math::FMatrix4& value) = 0;
 
     template<typename T>
     void SetUniform(const std::string& name, const T& value)
@@ -59,7 +59,7 @@ public:
     static Ref<Shader> Create(const std::string& name, const std::string& vertSrc, const std::string& fragSrc);
 };
 
-class PINE_API ShaderLibrary
+class REV_API ShaderLibrary
 {
 public:
     void Add(const std::string& name, const Ref<Shader>& shader);

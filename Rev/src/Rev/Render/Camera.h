@@ -1,10 +1,11 @@
 #pragma once
-#include "Pine/Math/Maths.h"
+#include "Rev/Core/Base.h"
+#include "Rev/Math/Maths.h"
 
-namespace Pine
+namespace Rev
 {
 
-class PINE_API Camera
+class REV_API Camera
 {
 public:
 	enum class ProjectionType { Perspective = 0, Orthographic = 1 };
@@ -18,14 +19,14 @@ public:
 
 	ProjectionType GetProjectionType() const { return mProjectionType; }
 	void SetProjectionType(ProjectionType type);
-	FMatrix4 GetProjectionMatrix() const { return mProjection; }
+	Math::FMatrix4 GetProjectionMatrix() const { return mProjection; }
 
 private:
 	void RecalculateProjection();
 private:
 	ProjectionType mProjectionType = ProjectionType::Perspective;
 
-	float mPerspectiveFOV = FMaths::Radians(45.0f);
+	float mPerspectiveFOV = Math::Radians(45.0f);
 	float mPerspectiveNear = 0.01f, mPerspectiveFar = 1000.0f;
 
 	float mOrthographicSize = 10.0f;
@@ -33,7 +34,7 @@ private:
 
 	float mAspectRatio = 1.0f;
 
-	FMatrix4 mProjection = FMatrix4(1.0f);
+	Math::FMatrix4 mProjection = Math::FMatrix4(1.0f);
 };
 
 }

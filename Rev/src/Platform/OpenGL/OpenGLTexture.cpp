@@ -1,10 +1,9 @@
-#include "pinepch.h"
 #include "OpenGLTexture.h"
-#include "Pine/Core/Assert.h"
+#include "Rev/Core/Assert.h"
 
 #include <stb_image.h>
 
-namespace Pine
+namespace Rev
 {
 
 OpenGLTexture2D::OpenGLTexture2D(const TextureDescription& desc)
@@ -48,7 +47,7 @@ OpenGLTexture2D::OpenGLTexture2D(const std::string& path)
 		mDataFormat = dataFormat;
 		mDataType = GL_UNSIGNED_BYTE; //do not support float format
 
-		PE_CORE_ASSERT(internalFormat & dataFormat, "Format not supported!");
+		RE_CORE_ASSERT(internalFormat & dataFormat, "Format not supported!");
 
 		CreateTexture();
 		glTextureSubImage2D(mHandle, 0, 0, 0, mWidth, mHeight, dataFormat, GL_UNSIGNED_BYTE, data);
@@ -65,7 +64,7 @@ OpenGLTexture2D::~OpenGLTexture2D()
 void OpenGLTexture2D::SetData(void* data, uint32_t size)
 {
 	uint32_t bpp = GetGLPixelSize(mInternalFormat);
-	PE_CORE_ASSERT(size == mWidth * mHeight * bpp, "Data must be entire texture!");
+	RE_CORE_ASSERT(size == mWidth * mHeight * bpp, "Data must be entire texture!");
 	glTextureSubImage2D(mHandle, 0, 0, 0, mWidth, mHeight, mDataFormat, mDataType, data);
 }
 
@@ -83,7 +82,7 @@ uint32_t OpenGLTexture2D::GetGLPixelSize(GLenum internalFormat)
 	case GL_RGBA8: return 4;
 	case GL_RGB32F: return 4 * 4;
 	}
-	PE_CORE_ASSERT(false);
+	RE_CORE_ASSERT(false);
 	return 0;
 }
 
@@ -112,7 +111,7 @@ void OpenGLTexture2D::InitFormatInfo(ImageFormat format)
 		mDataType = GL_FLOAT;
 		break;
 	default:
-		PE_CORE_ASSERT(false);
+		RE_CORE_ASSERT(false);
 	}
 }
 

@@ -1,7 +1,7 @@
 #pragma once
-#include "Pine/Render/Resource/UniformBuffer.h"
+#include "Rev/Render/Resource/UniformBuffer.h"
 
-namespace Pine
+namespace Rev
 {
 
 class OpenGLUniformBuffer : public UniformBuffer

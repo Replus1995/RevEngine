@@ -1,8 +1,8 @@
 #pragma once
-#include "Pine/Core/Base.h"
-#include "Pine/Render/Material.h"
+#include "Rev/Core/Base.h"
+#include "Rev/Render/Material.h"
 
-namespace Pine
+namespace Rev
 {
 class StaticMesh;
 class StaticMeshRenderProxy
@@ -11,12 +11,12 @@ public:
 	StaticMeshRenderProxy() = default;
 	~StaticMeshRenderProxy() = default;
 
-	void Prepare(const Ref<StaticMesh>& mesh, const FMatrix4& transform);
+	void Prepare(const Ref<StaticMesh>& mesh, const Math::FMatrix4& transform);
 	void Draw(EMaterialDomain domain);
 
 private:
 	Ref<StaticMesh> mStaticMesh;
-	FMatrix4 mTransform;
+	Math::FMatrix4 mTransform;
 };
 
 }

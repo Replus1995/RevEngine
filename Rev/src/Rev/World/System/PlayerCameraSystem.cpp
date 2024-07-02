@@ -1,13 +1,12 @@
-#include "pinepch.h"
 #include "PlayerCameraSystem.h"
-#include "Pine/Core/Application.h"
-#include "Pine/Core/Window.h"
-#include "Pine/World/Scene.h"
-#include "Pine/World/Component/Component.h"
-#include "Pine/World/System/Control/CameraController.h"
-#include "Pine/World/System/Control/FreeCameraController.h"
+#include "Rev/Core/Application.h"
+#include "Rev/Core/Window.h"
+#include "Rev/World/Scene.h"
+#include "Rev/World/Component/Component.h"
+#include "Rev/World/System/Control/CameraController.h"
+#include "Rev/World/System/Control/FreeCameraController.h"
 
-namespace Pine
+namespace Rev
 {
 
 void PlayerCameraSystem::OnInit()
@@ -31,7 +30,7 @@ void PlayerCameraSystem::OnDestroy()
 {
 }
 
-void PlayerCameraSystem::GetCameraMatrix(FMatrix4& projMat, FMatrix4& viewMat) const
+void PlayerCameraSystem::GetCameraMatrix(Math::FMatrix4& projMat, Math::FMatrix4& viewMat) const
 {
 	if (mCamEntity)
 	{
@@ -49,8 +48,8 @@ void PlayerCameraSystem::GetCameraMatrix(FMatrix4& projMat, FMatrix4& viewMat) c
 	{
 		auto window = Application::GetApp().GetWindow();
 		float asp = float(window->GetWidth()) / float(window->GetHeight());
-		projMat = FMaths::Perspective(FMaths::Radians(45.0f), asp, 0.01f, 1000.0f);
-		viewMat = FMatrix4(1.0f);
+		projMat = Math::FMatrix4::Perspective(Math::Radians(45.0f), asp, 0.01f, 1000.0f);
+		viewMat = Math::FMatrix4(1.0f);
 	}
 }
 

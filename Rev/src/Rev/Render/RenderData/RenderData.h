@@ -1,19 +1,19 @@
-#include "Pine/Core/Base.h"
-#include "Pine/Math/Maths.h"
+#include "Rev/Core/Base.h"
+#include "Rev/Math/Maths.h"
 
-namespace Pine
+namespace Rev
 {
 
 struct SceneRenderData
 {
-	FMatrix4 ProjMatrix;
-	FMatrix4 ViewMatrix;
+	Math::FMatrix4 ProjMatrix;
+	Math::FMatrix4 ViewMatrix;
 };
 
 class StaticMesh;
 struct StaticMeshRenderData
 {
 	Ref<StaticMesh> StaticMesh;
-	FMatrix4 Transform;
+	Math::FMatrix4 Transform;
 };
 }

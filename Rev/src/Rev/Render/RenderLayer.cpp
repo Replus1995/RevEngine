@@ -1,8 +1,7 @@
-#include "pinepch.h"
 #include "RenderLayer.h"
-#include "Pine/Render/RenderCmd.h"
+#include "Rev/Render/RenderCmd.h"
 
-namespace Pine
+namespace Rev
 {
 
 RenderLayer::RenderLayer()
@@ -28,14 +27,14 @@ void RenderLayer::OnDetach()
 
 void RenderLayer::OnUpdate(float dt)
 {
-	RenderCmd::SetClearColor(FVector4{ .3f, .3f, .8f, 1.0f });
+	RenderCmd::SetClearColor(Math::FVector4{.3f, .3f, .8f, 1.0f});
 	RenderCmd::Clear();
 }
 
 void RenderLayer::OnEvent(Event& event)
 {
 	EventDispatcher dispatcher(event);
-	dispatcher.Dispatch<WindowResizeEvent>(PE_BIND_EVENT_FN(RenderLayer::OnWindowResize, this));
+	dispatcher.Dispatch<WindowResizeEvent>(RE_BIND_EVENT_FN(RenderLayer::OnWindowResize, this));
 }
 
 bool RenderLayer::OnWindowResize(WindowResizeEvent& e)

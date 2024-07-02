@@ -1,8 +1,8 @@
 #pragma once
-#include "Pine/Core/Base.h"
+#include "Rev/Core/Base.h"
 #include <string>
 
-namespace Pine
+namespace Rev
 {
 
 enum class ImageFormat

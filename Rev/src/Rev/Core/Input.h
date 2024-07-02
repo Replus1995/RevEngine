@@ -1,9 +1,9 @@
 #pragma once
-#include "Pine/Core/Base.h"
-#include "Pine/Events/Event.h"
-#include "Pine/Math/Vector2.h"
+#include "Rev/Core/Base.h"
+#include "Rev/Events/Event.h"
+#include "Rev/Math/Vector2.h"
 
-namespace Pine
+namespace Rev
 {
 using MouseCode = uint16;
 namespace Mouse
@@ -179,7 +179,7 @@ public:
 	static bool KeyDown(KeyCode key);
 	static bool MouseButtonDown(MouseCode button);
 
-	static FVector2 GetMousePosition();
+	static Math::FVector2 GetMousePosition();
 	static float GetMouseX();
 	static float GetMouseY();
 

@@ -1,8 +1,8 @@
 #pragma once
-#include "Pine/Core/Base.h"
-#include "Pine/Events/Event.h"
+#include "Rev/Core/Base.h"
+#include "Rev/Events/Event.h"
 
-namespace Pine
+namespace Rev
 {
 
 struct WindowProps
@@ -11,7 +11,7 @@ struct WindowProps
 	unsigned int Width;
 	unsigned int Height;
 
-	WindowProps(const std::string& title = "Pine Engine",
+	WindowProps(const std::string& title = "Rev Engine",
 				unsigned int width = 1280,
 				unsigned int height = 720)
 		: Title(title), Width(width), Height(height)
@@ -26,7 +26,7 @@ enum class EWindowType : uint8_t
 };
 
 
-class PINE_API Window
+class REV_API Window
 {
 public:
 	using EventCallbackFn = std::function<void(Event&)>;

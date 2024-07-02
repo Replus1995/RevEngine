@@ -1,7 +1,8 @@
 #pragma once
+#include "Rev/Core/Base.h"
 #include <memory>
 
-namespace Pine
+namespace Rev
 {
 
 enum class ERenderAPI : uint8_t

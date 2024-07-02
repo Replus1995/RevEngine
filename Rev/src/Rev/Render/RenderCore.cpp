@@ -1,8 +1,7 @@
-#include "pinepch.h"
-#include "Pine/Render/RenderCore.h"
-#include "Pine/Core/Assert.h"
+#include "Rev/Render/RenderCore.h"
+#include "Rev/Core/Assert.h"
 
-namespace Pine
+namespace Rev
 {
 
 uint32_t ShaderDataTypeSize(EShaderDataType type)
@@ -22,7 +21,7 @@ uint32_t ShaderDataTypeSize(EShaderDataType type)
 	case EShaderDataType::Bool:     return 1;
 	}
 
-	PE_CORE_ASSERT(false, "Unknown ShaderDataType!");
+	RE_CORE_ASSERT(false, "Unknown ShaderDataType!");
 	return 0;
 }
 

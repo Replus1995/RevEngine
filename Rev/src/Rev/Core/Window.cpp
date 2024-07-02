@@ -1,8 +1,7 @@
-#include "pinepch.h"
-#include "Pine/Core/Window.h"
+#include "Rev/Core/Window.h"
 #include "Platform/GLFW/GLFWWindow.h"
 
-namespace Pine
+namespace Rev
 {
 
 Scope<Window> Window::Create(const WindowProps& props)

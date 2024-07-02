@@ -1,19 +1,19 @@
 #pragma once
-#include "Pine/Core/Base.h"
-#include "Pine/Math/Maths.h"
+#include "Rev/Core/Base.h"
+#include "Rev/Math/Maths.h"
 
-namespace Pine
+namespace Rev
 {
 class BaseRHI;
 class VertexArray;
-class PINE_API RenderCmd
+class REV_API RenderCmd
 {
 public:
 	static void Init();
 	static void Shutdown();
 
 	static void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height);
-	static void SetClearColor(const FVector4& color);
+	static void SetClearColor(const Math::FVector4& color);
 	static void Clear();
 
 	static void DrawIndexed(const VertexArray* vertexArray, uint32_t indexCount = 0);

@@ -1,9 +1,8 @@
-#include "pinepch.h"
 #include "Mesh.h"
-#include "Pine/Render/StaticMesh.h"
-#include "Pine/Render/Resource/VertexBuffer.h"
+#include "Rev/Render/StaticMesh.h"
+#include "Rev/Render/Resource/VertexBuffer.h"
 
-namespace Pine
+namespace Rev
 {
 namespace SimpleGeo
 {

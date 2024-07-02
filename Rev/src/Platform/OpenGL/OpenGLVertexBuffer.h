@@ -1,7 +1,7 @@
 #pragma once
-#include "Pine/Render/Resource/VertexBuffer.h"
+#include "Rev/Render/Resource/VertexBuffer.h"
 
-namespace Pine
+namespace Rev
 {
 
 class OpenGLVertexBuffer : public VertexBuffer

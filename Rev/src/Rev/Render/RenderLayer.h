@@ -1,12 +1,12 @@
 #pragma once
-#include "Pine/Core/Layer.h"
-#include "Pine/Events/ApplicationEvent.h"
-//#include "Pine/Render/Resource/FrameBuffer.h"
+#include "Rev/Core/Layer.h"
+#include "Rev/Events/ApplicationEvent.h"
+//#include "Rev/Render/Resource/FrameBuffer.h"
 
-namespace Pine
+namespace Rev
 {
 
-class PINE_API RenderLayer : public Layer
+class REV_API RenderLayer : public Layer
 {
 public:
 	RenderLayer();

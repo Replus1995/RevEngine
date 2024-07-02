@@ -1,14 +1,14 @@
 #pragma once
-#include "Pine/Core/UUID.h"
-#include "Pine/Core/Assert.h"
-#include "Pine/World/Component/Component.h"
+#include "Rev/Core/UUID.h"
+#include "Rev/Core/Assert.h"
+#include "Rev/World/Component/Component.h"
 
 #include <entt/entt.hpp>
 
-namespace Pine {
+namespace Rev {
 
 class Scene;
-class PINE_API Entity
+class REV_API Entity
 {
 public:
 	Entity() = default;
@@ -18,7 +18,7 @@ public:
 	template<typename T, typename... Args>
 	T& AddComponent(Args&&... args)
 	{
-		PE_CORE_ASSERT(!HasComponent<T>(), "Entity already has component!");
+		RE_CORE_ASSERT(!HasComponent<T>(), "Entity already has component!");
 		T& component = mScene->mRegistry.emplace<T>(mHandle, std::forward<Args>(args)...);
 		return component;
 	}
@@ -33,7 +33,7 @@ public:
 	template<typename T>
 	T& GetComponent()
 	{
-		PE_CORE_ASSERT(HasComponent<T>(), "Entity does not have component!");
+		RE_CORE_ASSERT(HasComponent<T>(), "Entity does not have component!");
 		return mScene->mRegistry.get<T>(mHandle);
 	}
 
@@ -46,7 +46,7 @@ public:
 	template<typename T>
 	void RemoveComponent()
 	{
-		PE_CORE_ASSERT(HasComponent<T>(), "Entity does not have component!");
+		RE_CORE_ASSERT(HasComponent<T>(), "Entity does not have component!");
 		mScene->mRegistry.remove<T>(mHandle);
 	}
 

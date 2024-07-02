@@ -1,11 +1,11 @@
 #pragma once
-#include "Pine/Core/Base.h"
+#include "Rev/Core/Base.h"
 #include <memory>
 
-namespace Pine
+namespace Rev
 {
 
-class PINE_API UUID
+class REV_API UUID
 {
 public:
 	UUID();
@@ -24,9 +24,9 @@ namespace std
 
 template <typename T> struct hash;
 template<>
-struct hash<Pine::UUID>
+struct hash<Rev::UUID>
 {
-	std::size_t operator()(const Pine::UUID& uuid) const
+	std::size_t operator()(const Rev::UUID& uuid) const
 	{
 		return (uint64_t)uuid;
 	}

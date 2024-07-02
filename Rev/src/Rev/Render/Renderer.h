@@ -1,12 +1,11 @@
 #pragma once
-#include "Pine/Render/RenderCore.h"
-#include "Pine/Math/Maths.h"
+#include "Rev/Render/RenderCore.h"
+#include "Rev/Math/Maths.h"
 
-
-namespace Pine
+namespace Rev
 {
 class ShaderLibrary;
-class PINE_API Renderer
+class REV_API Renderer
 {
 public:
 	static void Init();
@@ -15,7 +14,7 @@ public:
 
 	static ShaderLibrary* GetShaderLibrary();
 
-	static void Clear(const FVector4& color = FVector4(0,0,0,1));
+	static void Clear(const Math::FVector4& color = Math::FVector4(0,0,0,1));
 	static void DrawIndexed(const class VertexArray* vertexArray);
 };
 

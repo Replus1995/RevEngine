@@ -1,10 +1,8 @@
 #pragma once
-
-#include "Pine/Core/Window.h"
-
+#include "Rev/Core/Window.h"
 #include <GLFW/glfw3.h>
 
-namespace Pine
+namespace Rev
 {
 	class GLFWWindow : public Window
 	{

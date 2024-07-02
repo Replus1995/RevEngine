@@ -1,10 +1,9 @@
 #pragma once
-#include "Pine/Core/Base.h"
-#include "Pine/Events/Event.h"
-#include "Pine/Render/Camera.h"
-#include "Pine/Math/Transform.h"
+#include "Rev/Core/Base.h"
+#include "Rev/Events/Event.h"
+#include "Rev/Render/Camera.h"
 
-namespace Pine
+namespace Rev
 {
 
 class CameraController
@@ -13,8 +12,8 @@ public:
 	CameraController() = default;
 	virtual ~CameraController() = default;
 
-	virtual void OnUpdate(float dt, Camera& camera, FTransform& transform) = 0;
-	virtual void OnEvent(Event& e, Camera& camera, FTransform& transform) = 0;
+	virtual void OnUpdate(float dt, Camera& camera, Math::FTransform& transform) = 0;
+	virtual void OnEvent(Event& e, Camera& camera, Math::FTransform& transform) = 0;
 };
 
 }

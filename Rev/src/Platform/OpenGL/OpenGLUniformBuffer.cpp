@@ -1,9 +1,7 @@
-#include "pinepch.h"
 #include "OpenGLUniformBuffer.h"
-
 #include <glad/glad.h>
 
-namespace Pine
+namespace Rev
 {
 
 OpenGLUniformBuffer::OpenGLUniformBuffer(uint32_t size, uint32_t binding)

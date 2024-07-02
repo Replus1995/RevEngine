@@ -1,11 +1,10 @@
-#include "pinepch.h"
 #include "SceneLayer.h"
-#include "Pine/World/Scene.h"
-#include "Pine/Render/RenderCmd.h"
-#include "Pine/Render/Renderer.h"
-#include "Pine/Core/Application.h"
+#include "Rev/World/Scene.h"
+#include "Rev/Render/RenderCmd.h"
+#include "Rev/Render/Renderer.h"
+#include "Rev/Core/Application.h"
 
-namespace Pine
+namespace Rev
 {
 SceneLayer::SceneLayer(const std::string& name)
 	: Layer(name)
@@ -60,7 +59,7 @@ void SceneLayer::OnUpdate(float dt)
 void SceneLayer::OnEvent(Event& event)
 {
 	EventDispatcher dispatcher(event);
-	dispatcher.Dispatch<WindowResizeEvent>(PE_BIND_EVENT_FN(SceneLayer::OnWindowResize, this));
+	dispatcher.Dispatch<WindowResizeEvent>(RE_BIND_EVENT_FN(SceneLayer::OnWindowResize, this));
 }
 
 bool SceneLayer::OnWindowResize(WindowResizeEvent& e)

@@ -1,7 +1,7 @@
 #pragma once
-#include <Pine/World/SceneLayer.h>
+#include <Rev/World/SceneLayer.h>
 
-class ExampleLayer : public Pine::SceneLayer
+class ExampleLayer : public Rev::SceneLayer
 {
 public:
 	ExampleLayer();

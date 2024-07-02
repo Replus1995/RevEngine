@@ -1,12 +1,12 @@
 #pragma once
-#include "Pine/Core/Layer.h"
-#include "Pine/Events/ApplicationEvent.h"
-//#include "Pine/Render/Resource/FrameBuffer.h"
-#include "Pine/Render/RenderProxy/SceneRenderProxy.h"
+#include "Rev/Core/Layer.h"
+#include "Rev/Events/ApplicationEvent.h"
+//#include "Rev/Render/Resource/FrameBuffer.h"
+#include "Rev/Render/RenderProxy/SceneRenderProxy.h"
 
-namespace Pine
+namespace Rev
 {
-class PINE_API SceneLayer : public Layer
+class REV_API SceneLayer : public Layer
 {
 public:
 	SceneLayer(const std::string& name = "SceneLayer");

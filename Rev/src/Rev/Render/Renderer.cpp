@@ -1,12 +1,11 @@
-#include "pinepch.h"
-#include "Pine/Render/Renderer.h"
-#include "Pine/Render/RenderCmd.h"
-#include "Pine/Render/Resource/VertexBuffer.h"
-#include "Pine/Render/Resource/Shader.h"
-#include "Pine/Render/StaticMesh.h"
-#include "Pine/Render/Material.h"
+#include "Rev/Render/Renderer.h"
+#include "Rev/Render/RenderCmd.h"
+#include "Rev/Render/Resource/VertexBuffer.h"
+#include "Rev/Render/Resource/Shader.h"
+#include "Rev/Render/StaticMesh.h"
+#include "Rev/Render/Material.h"
 
-namespace Pine
+namespace Rev
 {
 
 static ShaderLibrary* sShaderLib = nullptr;
@@ -34,7 +33,7 @@ ShaderLibrary* Renderer::GetShaderLibrary()
 	return sShaderLib;
 }
 
-void Renderer::Clear(const FVector4& color)
+void Renderer::Clear(const Math::FVector4& color)
 {
 	RenderCmd::SetClearColor(color);
 	RenderCmd::Clear();

@@ -1,9 +1,8 @@
-#include "pinepch.h"
 #include "Input.h"
-#include "Pine/Events/KeyEvent.h"
-#include "Pine/Events/MouseEvent.h"
+#include "Rev/Events/KeyEvent.h"
+#include "Rev/Events/MouseEvent.h"
 
-namespace Pine
+namespace Rev
 {
 
 static float sMousePositon[2] = {};
@@ -21,9 +20,9 @@ bool Input::MouseButtonDown(MouseCode button)
 	return sMouseButtonState[button];
 }
 
-FVector2 Input::GetMousePosition()
+Math::FVector2 Input::GetMousePosition()
 {
-	return FVector2(sMousePositon[0], sMousePositon[1]);
+	return Math::FVector2(sMousePositon[0], sMousePositon[1]);
 }
 
 float Input::GetMouseX()

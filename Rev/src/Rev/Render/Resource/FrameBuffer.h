@@ -1,8 +1,8 @@
 #pragma once
-#include "Pine/Core/Base.h"
+#include "Rev/Core/Base.h"
 #include <vector>
 
-namespace Pine {
+namespace Rev {
 
 	enum class FramebufferTextureFormat
 	{

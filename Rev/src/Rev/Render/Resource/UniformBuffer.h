@@ -1,10 +1,10 @@
 #pragma once
-#include "Pine/Core/Base.h"
+#include "Rev/Core/Base.h"
 
-namespace Pine
+namespace Rev
 {
 
-class PINE_API UniformBuffer
+class REV_API UniformBuffer
 {
 public:
 	virtual ~UniformBuffer() {}

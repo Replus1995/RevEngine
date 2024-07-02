@@ -1,12 +1,12 @@
 #pragma once
-#include "Pine/Core/Base.h"
-#include "Pine/Core/Assert.h"
-#include "Pine/Render/Resource/Shader.h"
+#include "Rev/Core/Base.h"
+#include "Rev/Core/Assert.h"
+#include "Rev/Render/Resource/Shader.h"
 
-namespace Pine
+namespace Rev
 {
 
-class PINE_API MaterialUniform
+class REV_API MaterialUniform
 {
 public:
 	MaterialUniform(std::string_view name)
@@ -55,7 +55,7 @@ public:
 
 	virtual void Upload(const Ref<Shader>& program)
 	{
-		PE_CORE_ASSERT(program);
+		RE_CORE_ASSERT(program);
 		if(!mLocation.IsValid())
 			mLocation = program->GetUniformLocation(GetProgramName(mName));
 		program->SetUniform(mLocation, mValue);

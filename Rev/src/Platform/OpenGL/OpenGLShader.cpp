@@ -1,7 +1,6 @@
-#include "pinepch.h"
 #include "OpenGLShader.h"
-#include "Pine/Core/Assert.h"
-#include "Pine/Core/Clock.h"
+#include "Rev/Core/Assert.h"
+#include "Rev/Core/Clock.h"
 
 #include <fstream>
 #include <shaderc/shaderc.hpp>
@@ -10,7 +9,7 @@
 
 namespace fs = std::filesystem;
 
-namespace Pine
+namespace Rev
 {
 
 namespace
@@ -22,7 +21,7 @@ namespace
 		case GL_VERTEX_SHADER:   return shaderc_glsl_vertex_shader;
 		case GL_FRAGMENT_SHADER: return shaderc_glsl_fragment_shader;
 		}
-		PE_CORE_ASSERT(false);
+		RE_CORE_ASSERT(false);
 		return (shaderc_shader_kind)0;
 	}
 }
@@ -38,7 +37,7 @@ OpenGLShader::OpenGLShader(const std::string& filepath)
 		Clock timer;
 		CompileOrGetOpenGLBinaries(sources);
 		CreateProgram();
-		PE_CORE_WARN("Shader creation took {0} ms", timer.ElapsedMillis());
+		RE_CORE_WARN("Shader creation took {0} ms", timer.ElapsedMillis());
 	}
 
 	mName = fs::path(filepath).stem().generic_u8string();
@@ -57,7 +56,7 @@ OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertSrc, 
 		Clock timer;
 		CompileOrGetOpenGLBinaries(sources);
 		CreateProgram();
-		PE_CORE_WARN("Shader creation took {0} ms", timer.ElapsedMillis());
+		RE_CORE_WARN("Shader creation took {0} ms", timer.ElapsedMillis());
 	}
 }
 
@@ -82,12 +81,12 @@ std::string OpenGLShader::ReadFile(const std::string& filepath)
 		}
 		else
 		{
-			PE_CORE_ERROR("Could not read from file '{0}'", filepath);
+			RE_CORE_ERROR("Could not read from file '{0}'", filepath);
 		}
 	}
 	else
 	{
-		PE_CORE_ERROR("Could not open file '{0}'", filepath);
+		RE_CORE_ERROR("Could not open file '{0}'", filepath);
 	}
 
 	return result;
@@ -103,13 +102,13 @@ std::map<GLenum, std::string> OpenGLShader::PreProcess(const std::string& source
 	while (pos != std::string::npos)
 	{
 		size_t eol = source.find_first_of("\r\n", pos); //End of shader type declaration line
-		PE_CORE_ASSERT(eol != std::string::npos, "Syntax error");
+		RE_CORE_ASSERT(eol != std::string::npos, "Syntax error");
 		size_t begin = pos + typeTokenLength + 1; //Start of shader type name (after "#type " keyword)
 		std::string type = source.substr(begin, eol - begin);
-		PE_CORE_ASSERT(StageFromStr(type), "Invalid shader type specified");
+		RE_CORE_ASSERT(StageFromStr(type), "Invalid shader type specified");
 
 		size_t nextLinePos = source.find_first_not_of("\r\n", eol); //Start of shader code after shader type declaration line
-		PE_CORE_ASSERT(nextLinePos != std::string::npos, "Syntax error");
+		RE_CORE_ASSERT(nextLinePos != std::string::npos, "Syntax error");
 		pos = source.find(typeToken, nextLinePos); //Start of next shader type declaration line
 
 		shaderSources[StageFromStr(type)] = (pos == std::string::npos) ? source.substr(nextLinePos) : source.substr(nextLinePos, pos - nextLinePos);
@@ -153,8 +152,8 @@ void OpenGLShader::CompileOrGetOpenGLBinaries(const std::map<GLenum, std::string
 			shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source, StageToShaderC(stage), mFilePath.c_str(), options);
 			if (module.GetCompilationStatus() != shaderc_compilation_status_success)
 			{
-				PE_CORE_ERROR(module.GetErrorMessage());
-				PE_CORE_ASSERT(false, "");
+				RE_CORE_ERROR(module.GetErrorMessage());
+				RE_CORE_ASSERT(false, "");
 			}
 
 			shaderData[stage] = std::vector<uint32_t>(module.cbegin(), module.cend());
@@ -198,7 +197,7 @@ void OpenGLShader::CreateProgram()
 
 		std::vector<GLchar> infoLog(maxLength);
 		glGetProgramInfoLog(program, maxLength, &maxLength, infoLog.data());
-		PE_CORE_ERROR("Shader linking failed ({0}):\n{1}", mFilePath, infoLog.data());
+		RE_CORE_ERROR("Shader linking failed ({0}):\n{1}", mFilePath, infoLog.data());
 
 		glDeleteProgram(program);
 
@@ -220,11 +219,11 @@ void OpenGLShader::Reflect(GLenum stage, const std::vector<uint32_t>& shaderData
 	spirv_cross::Compiler compiler(shaderData);
 	spirv_cross::ShaderResources resources = compiler.get_shader_resources();
 
-	PE_CORE_TRACE("OpenGLShader::Reflect - {0} {1}", StageToStr(stage), mFilePath);
-	PE_CORE_TRACE("    {0} uniform buffers", resources.uniform_buffers.size());
-	PE_CORE_TRACE("    {0} resources", resources.sampled_images.size());
+	RE_CORE_TRACE("OpenGLShader::Reflect - {0} {1}", StageToStr(stage), mFilePath);
+	RE_CORE_TRACE("    {0} uniform buffers", resources.uniform_buffers.size());
+	RE_CORE_TRACE("    {0} resources", resources.sampled_images.size());
 
-	PE_CORE_TRACE("Uniform buffers:");
+	RE_CORE_TRACE("Uniform buffers:");
 	for (const auto& resource : resources.uniform_buffers)
 	{
 		const auto& bufferType = compiler.get_type(resource.base_type_id);
@@ -232,10 +231,10 @@ void OpenGLShader::Reflect(GLenum stage, const std::vector<uint32_t>& shaderData
 		uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
 		int memberCount = bufferType.member_types.size();
 
-		PE_CORE_TRACE("  {0}", resource.name);
-		PE_CORE_TRACE("    Size = {0}", bufferSize);
-		PE_CORE_TRACE("    Binding = {0}", binding);
-		PE_CORE_TRACE("    Members = {0}", memberCount);
+		RE_CORE_TRACE("  {0}", resource.name);
+		RE_CORE_TRACE("    Size = {0}", bufferSize);
+		RE_CORE_TRACE("    Binding = {0}", binding);
+		RE_CORE_TRACE("    Members = {0}", memberCount);
 	}
 }
 
@@ -264,27 +263,27 @@ void OpenGLShader::SetUniform(ShaderUniformLocation location, float value)
 	glUniform1f(location, value);
 }
 
-void OpenGLShader::SetUniform(ShaderUniformLocation location, const FVector2& value)
+void OpenGLShader::SetUniform(ShaderUniformLocation location, const Math::FVector2& value)
 {
 	glUniform2f(location, value.X, value.Y);
 }
 
-void OpenGLShader::SetUniform(ShaderUniformLocation location, const FVector3& value)
+void OpenGLShader::SetUniform(ShaderUniformLocation location, const Math::FVector3& value)
 {
 	glUniform3f(location, value.X, value.Y, value.Y);
 }
 
-void OpenGLShader::SetUniform(ShaderUniformLocation location, const FVector4& value)
+void OpenGLShader::SetUniform(ShaderUniformLocation location, const Math::FVector4& value)
 {
 	glUniform4f(location, value.X, value.Y, value.Z, value.W);
 }
 
-void OpenGLShader::SetUniform(ShaderUniformLocation location, const FMatrix3& value)
+void OpenGLShader::SetUniform(ShaderUniformLocation location, const Math::FMatrix3& value)
 {
 	glUniformMatrix3fv(location, 1, GL_FALSE, value.DataPtr());
 }
 
-void OpenGLShader::SetUniform(ShaderUniformLocation location, const FMatrix4& value)
+void OpenGLShader::SetUniform(ShaderUniformLocation location, const Math::FMatrix4& value)
 {
 	glUniformMatrix4fv(location, 1, GL_FALSE, value.DataPtr());
 }
@@ -301,7 +300,7 @@ GLenum OpenGLShader::StageFromStr(const std::string& type)
 	if (type == "fragment" || type == "pixel")
 		return GL_FRAGMENT_SHADER;
 
-	PE_CORE_ASSERT(false, "Unknown shader type!");
+	RE_CORE_ASSERT(false, "Unknown shader type!");
 	return 0;
 }
 
@@ -312,7 +311,7 @@ const char* OpenGLShader::StageToStr(GLenum stage)
 	case GL_VERTEX_SHADER:   return "GL_VERTEX_SHADER";
 	case GL_FRAGMENT_SHADER: return "GL_FRAGMENT_SHADER";
 	}
-	PE_CORE_ASSERT(false);
+	RE_CORE_ASSERT(false);
 	return nullptr;
 }
 
@@ -335,7 +334,7 @@ const char* OpenGLShader::GetCachedFileExtension(uint32_t stage)
 	case GL_VERTEX_SHADER:    return ".cached.vert";
 	case GL_FRAGMENT_SHADER:  return ".cached.frag";
 	}
-	PE_CORE_ASSERT(false);
+	RE_CORE_ASSERT(false);
 	return "";
 }
 

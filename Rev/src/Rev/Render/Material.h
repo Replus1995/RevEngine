@@ -1,9 +1,11 @@
 #pragma once
-#include "Pine/Render/MaterialUniform.h"
+#include "Rev/Render/MaterialUniform.h"
+#include "Rev/Math/Maths.h"
 #include <unordered_map>
 
-namespace Pine
+namespace Rev
 {
+
 enum class EMaterialDomain
 {
 	Opaque,
@@ -12,7 +14,7 @@ enum class EMaterialDomain
 };
 
 class MaterialUniform;
-class PINE_API Material
+class REV_API Material
 {
 public:
 	Material(const Ref<Shader>& program);
@@ -44,7 +46,7 @@ protected:
 	EMaterialDomain mDomain = EMaterialDomain::Opaque;
 
 	//Uniform
-	TMaterialUniform<FMatrix4> uTransform = { "Transform", FMatrix4(1) };
+	TMaterialUniform<Math::FMatrix4> uTransform = { "Transform", Math::FMatrix4(1) };
 };
 
 }

@@ -1,9 +1,9 @@
 #pragma once
-#include "Pine/Core/Base.h"
-#include "Pine/Render/RenderCore.h"
+#include "Rev/Core/Base.h"
+#include "Rev/Render/RenderCore.h"
 #include <string>
 
-namespace Pine
+namespace Rev
 {
 struct BufferElement
 {

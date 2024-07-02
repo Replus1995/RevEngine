@@ -1,8 +1,7 @@
-#include "pinepch.h"
 #include "OpenGLFramebuffer.h"
-#include "Pine/Core/Assert.h"
+#include "Rev/Core/Assert.h"
 
-namespace Pine {
+namespace Rev {
 
 static const uint32_t sMaxFramebufferSize = 8192;
 
@@ -79,7 +78,7 @@ void OpenGLFramebuffer::Invalidate()
 
 	if (mColorAttachmentHandles.size() > 1)
 	{
-		PE_CORE_ASSERT(mColorAttachmentHandles.size() <= 4);
+		RE_CORE_ASSERT(mColorAttachmentHandles.size() <= 4);
 		GLenum buffers[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
 		glDrawBuffers(mColorAttachmentHandles.size(), buffers);
 	}
@@ -89,7 +88,7 @@ void OpenGLFramebuffer::Invalidate()
 		glDrawBuffer(GL_NONE);
 	}
 
-	PE_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer is incomplete!");
+	RE_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer is incomplete!");
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -109,7 +108,7 @@ void OpenGLFramebuffer::Resize(uint32_t width, uint32_t height)
 {
 	if (width == 0 || height == 0 || width > sMaxFramebufferSize || height > sMaxFramebufferSize)
 	{
-		PE_CORE_WARN("Attempted to rezize framebuffer to {0}, {1}", width, height);
+		RE_CORE_WARN("Attempted to rezize framebuffer to {0}, {1}", width, height);
 		return;
 	}
 	mDesc.Width = width;
@@ -120,7 +119,7 @@ void OpenGLFramebuffer::Resize(uint32_t width, uint32_t height)
 
 int OpenGLFramebuffer::ReadPixel(uint32_t attachmentIndex, int x, int y)
 {
-	PE_CORE_ASSERT(attachmentIndex < mColorAttachmentHandles.size());
+	RE_CORE_ASSERT(attachmentIndex < mColorAttachmentHandles.size());
 
 	glReadBuffer(GL_COLOR_ATTACHMENT0 + attachmentIndex);
 	int pixelData = 0;
@@ -131,7 +130,7 @@ int OpenGLFramebuffer::ReadPixel(uint32_t attachmentIndex, int x, int y)
 
 void OpenGLFramebuffer::ClearAttachment(uint32_t attachmentIndex, int value)
 {
-	PE_CORE_ASSERT(attachmentIndex < mColorAttachmentHandles.size());
+	RE_CORE_ASSERT(attachmentIndex < mColorAttachmentHandles.size());
 
 	auto& desc = mColorAttachmentDescs[attachmentIndex];
 	glClearTexImage(mColorAttachmentHandles[attachmentIndex], 0, GetGLFormat(desc.TextureFormat), GL_INT, &value);
@@ -139,7 +138,7 @@ void OpenGLFramebuffer::ClearAttachment(uint32_t attachmentIndex, int value)
 
 uint32_t OpenGLFramebuffer::GetAttachmentHandle(uint32_t index) const
 {
-	PE_CORE_ASSERT(index < mColorAttachmentHandles.size());
+	RE_CORE_ASSERT(index < mColorAttachmentHandles.size());
 	return mColorAttachmentHandles[index];
 }
 
@@ -152,7 +151,7 @@ GLenum OpenGLFramebuffer::GetGLFormat(FramebufferTextureFormat format)
 	case FramebufferTextureFormat::DEPTH24STENCIL8: return GL_DEPTH_STENCIL;
 	}
 
-	PE_CORE_ASSERT(false);
+	RE_CORE_ASSERT(false);
 	return 0;
 }
 

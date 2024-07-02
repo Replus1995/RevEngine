@@ -1,5 +1,5 @@
 #pragma once
-#include "Pine/Core/Base.h"
+#include "Rev/Core/Base.h"
 #include <entt/entt.hpp>
 
 #define DECLARE_SYSTEM(sysClass)									\
@@ -12,7 +12,7 @@ public:																\
 private:
 	
 
-namespace Pine
+namespace Rev
 {
 
 class ISystem

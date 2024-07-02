@@ -1,5 +1,3 @@
-#include "pinepch.h"
-
 #include <misc/cpp/imgui_stdlib.cpp>
 
 #define IMGUI_IMPL_OPENGL_LOADER_GLAD

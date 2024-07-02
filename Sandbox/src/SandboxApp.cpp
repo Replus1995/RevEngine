@@ -1,24 +1,24 @@
-#include <Pine.h>
+#include <Rev.h>
 #include "ExampleLayer.h"
 
 
-class SandBox : public Pine::Application
+class SandBox : public Rev::Application
 {
 public:
 	SandBox() 
 	{
 		PushLayer(new ExampleLayer());
-		PushLayer(new Pine::ImGuiLayer());
+		PushLayer(new Rev::ImGuiLayer());
 	};
 	~SandBox() {};
 };
 
-Pine::Application* Pine::CreateApplication()
+Rev::Application* Rev::CreateApplication()
 {
 	return new SandBox();
 }
 
 int main(int argc, char** argv)
 {
-	return Pine::RunApp(argc, argv);
+	return Rev::RunApp(argc, argv);
 }

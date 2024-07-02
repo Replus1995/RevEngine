@@ -1,8 +1,8 @@
 #pragma once
-#include "Pine/Render/Resource/FrameBuffer.h"
+#include "Rev/Render/Resource/FrameBuffer.h"
 #include <glad/glad.h>
 
-namespace Pine
+namespace Rev
 {
 
 class OpenGLFramebuffer : public Framebuffer

@@ -1,7 +1,6 @@
-#include "pinepch.h"
-#include "Pine/Core/Layer.h"
+#include "Layer.h"
 
-namespace Pine
+namespace Rev
 {
 	Layer::Layer(const std::string& name)
 		:mDebugName(name)

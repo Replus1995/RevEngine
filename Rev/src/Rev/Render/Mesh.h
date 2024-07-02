@@ -1,12 +1,12 @@
 #pragma once
-#include "Pine/Core/Base.h"
+#include "Rev/Core/Base.h"
 #include <vector>
 
-namespace Pine
+namespace Rev
 {
 class VertexArray;
 class Material;
-class PINE_API Mesh
+class REV_API Mesh
 {
 public:
 	virtual ~Mesh() = default;
@@ -20,7 +20,7 @@ protected:
 };
 
 class StaticMesh;
-class PINE_API MeshUtils
+class REV_API MeshUtils
 {
 public:
 	static void SetDefaultMaterial(const Ref<Material>& mat);

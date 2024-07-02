@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Pine/Core/Base.h"
-#include "Pine/Events/Event.h"
+#include "Rev/Core/Base.h"
+#include "Rev/Events/Event.h"
 
-namespace Pine
+namespace Rev
 {
-	class PINE_API Layer
+	class REV_API Layer
 	{
 	public:
 		Layer(const std::string& name = "Layer");

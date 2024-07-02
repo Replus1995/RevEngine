@@ -1,9 +1,8 @@
-#include "pinepch.h"
 #include "StaticMesh.h"
-#include "Pine/Render/Material.h"
-#include "Pine/Render/Resource/VertexBuffer.h"
+#include "Rev/Render/Material.h"
+#include "Rev/Render/Resource/VertexBuffer.h"
 
-namespace Pine
+namespace Rev
 {
 
 StaticMesh::StaticMesh(const std::vector<Ref<Material>>& pMaterials, const std::vector<StaticMeshResource>& pResources)

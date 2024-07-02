@@ -1,11 +1,10 @@
-#include "pinepch.h"
 #include "VertexBuffer.h"
-#include "Pine/Core/Assert.h"
+#include "Rev/Core/Assert.h"
 
 #include "Platform/OpenGL/OpenGLVertexBuffer.h"
 
 
-namespace Pine
+namespace Rev
 {
 
 uint32 BufferElement::GetComponentCount() const
@@ -25,7 +24,7 @@ uint32 BufferElement::GetComponentCount() const
 	case EShaderDataType::Bool:    return 1;
 	}
 
-	PE_CORE_ASSERT(false, "Unknown ShaderDataType!");
+	RE_CORE_ASSERT(false, "Unknown ShaderDataType!");
 	return 0;
 }
 
@@ -33,11 +32,11 @@ Ref<VertexBuffer> VertexBuffer::Create(uint32 size)
 {
 	switch (GetRenderAPI())
 	{
-	case ERenderAPI::None:    PE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
+	case ERenderAPI::None:    RE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
 	case ERenderAPI::OpenGL:  return CreateRef<OpenGLVertexBuffer>(size);
 	}
 
-	PE_CORE_ASSERT(false, "Unknown RenderAPI!");
+	RE_CORE_ASSERT(false, "Unknown RenderAPI!");
 	return nullptr;
 }
 
@@ -45,11 +44,11 @@ Ref<VertexBuffer> VertexBuffer::Create(const float* vertices, uint32 size)
 {
 	switch (GetRenderAPI())
 	{
-	case ERenderAPI::None:    PE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
+	case ERenderAPI::None:    RE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
 	case ERenderAPI::OpenGL:  return CreateRef<OpenGLVertexBuffer>(vertices, size);
 	}
 
-	PE_CORE_ASSERT(false, "Unknown RenderAPI!");
+	RE_CORE_ASSERT(false, "Unknown RenderAPI!");
 	return nullptr;
 }
 
@@ -57,23 +56,23 @@ Ref<IndexBuffer> IndexBuffer::Create(const uint32* indices, uint32 size)
 {
 	switch (GetRenderAPI())
 	{
-	case ERenderAPI::None:    PE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
+	case ERenderAPI::None:    RE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
 	case ERenderAPI::OpenGL:  return CreateRef<OpenGLIndexBuffer>(indices, size);
 	}
 
-	PE_CORE_ASSERT(false, "Unknown RenderAPI!");
+	RE_CORE_ASSERT(false, "Unknown RenderAPI!");
 	return nullptr;
 }
 
-Ref<VertexArray> Pine::VertexArray::Create()
+Ref<VertexArray> Rev::VertexArray::Create()
 {
 	switch (GetRenderAPI())
 	{
-	case ERenderAPI::None:    PE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
+	case ERenderAPI::None:    RE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
 	case ERenderAPI::OpenGL:  return CreateRef<OpenGLVertexArray>();
 	}
 
-	PE_CORE_ASSERT(false, "Unknown RenderAPI!");
+	RE_CORE_ASSERT(false, "Unknown RenderAPI!");
 	return nullptr;
 }
 

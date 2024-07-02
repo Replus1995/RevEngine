@@ -1,15 +1,14 @@
-#include "pinepch.h"
-#include "Pine/Render/RenderCmd.h"
-#include "Pine/Render/BaseRHI.h"
-#include "Pine/Core/Assert.h"
+#include "Rev/Render/RenderCmd.h"
+#include "Rev/Render/BaseRHI.h"
+#include "Rev/Core/Assert.h"
 
-namespace Pine
+namespace Rev
 {
 Scope<BaseRHI> RenderCmd::sRHI;
 
 void RenderCmd::Init()
 {
-	PE_CORE_ASSERT(!sRHI, "RenderCmd already initialized!");
+	RE_CORE_ASSERT(!sRHI, "RenderCmd already initialized!");
 	sRHI = BaseRHI::Create();
 	sRHI->Init();
 }
@@ -24,7 +23,7 @@ void RenderCmd::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t hei
 	sRHI->SetViewport(x, y, width, height);
 }
 
-void RenderCmd::SetClearColor(const FVector4& color)
+void RenderCmd::SetClearColor(const Math::FVector4& color)
 {
 	sRHI->SetClearColor(color);
 }
