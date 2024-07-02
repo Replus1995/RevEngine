@@ -1,14 +1,14 @@
 #pragma once
 
-#include "Pine/Core/Base.h"
-#include "Pine/Core/LayerStack.h"
-#include "Pine/Events/ApplicationEvent.h"
-#include "Pine/Render/RenderCore.h"
+#include "Rev/Core/Base.h"
+#include "Rev/Core/LayerStack.h"
+#include "Rev/Events/ApplicationEvent.h"
+#include "Rev/Render/RenderCore.h"
 
-namespace Pine
+namespace Rev
 {
 	class Window;
-	class PINE_API Application
+	class REV_API Application
 	{
 	public:
 		Application();

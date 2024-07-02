@@ -1,10 +1,9 @@
-#include "pinepch.h"
 #include "FileSystem.h"
-
+#include "Rev/Core/Log.h"
 #include <filesystem>
 
 
-namespace Pine
+namespace Rev
 {
 
 void FileSystem::MountDir(const std::string& virtualDir, const std::string& nativeDir)
@@ -12,7 +11,7 @@ void FileSystem::MountDir(const std::string& virtualDir, const std::string& nati
 	auto res = GetDirMap().emplace(virtualDir, nativeDir);
 	if (!res.second)
 	{
-		PE_CORE_ERROR("VirtualDir \"{0}\" has already been mounted as \"{1}\"", virtualDir.c_str(), res.first->second.c_str());
+		RE_CORE_ERROR("VirtualDir \"{0}\" has already been mounted as \"{1}\"", virtualDir.c_str(), res.first->second.c_str());
 	}
 }
 

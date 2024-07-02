@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <cstring>
 
-namespace Pine
+namespace Rev
 {
 
 struct Buffer

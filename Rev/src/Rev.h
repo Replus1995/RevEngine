@@ -1,25 +1,25 @@
 #pragma once
 
-//For Pine applications
+//For Rev applications
 
-#include "Pine/Core/Application.h"
-#include "Pine/Core/Layer.h"
-#include "Pine/Core/Log.h"
+#include "Rev/Core/Application.h"
+#include "Rev/Core/Layer.h"
+#include "Rev/Core/Log.h"
 
 //World
-#include "Pine/World/Component/Component.h"
-#include "Pine/World/Entity.h"
-#include "Pine/World/Scene.h"
+#include "Rev/World/Component/Component.h"
+#include "Rev/World/Entity.h"
+#include "Rev/World/Scene.h"
 
 //Imgui
-#include "Pine/ImGui/ImGuiLayer.h"
+#include "Rev/ImGui/ImGuiLayer.h"
 
 
 //Render
-#include "Pine/Render/RenderCore.h"
-#include "Pine/Render/Renderer.h"
-#include "Pine/Render/RenderLayer.h"
+#include "Rev/Render/RenderCore.h"
+#include "Rev/Render/Renderer.h"
+#include "Rev/Render/RenderLayer.h"
 
 //-------------EntryPoint-------------//
-#include "Pine/Core/EntryPoint.h"
+#include "Rev/Core/EntryPoint.h"
 //------------------------------------//

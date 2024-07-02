@@ -1,14 +1,13 @@
-#include "pinepch.h"
-#include "Pine/Core/Application.h"
-#include "Pine/Core/Assert.h"
-#include "Pine/Core/Window.h"
-#include "Pine/Core/Clock.h"
-#include "Pine/Core/Input.h"
-#include "Pine/Render/RenderCore.h"
-#include "Pine/Render/Renderer.h"
-#include "Pine/Render/RenderCmd.h"
+#include "Rev/Core/Application.h"
+#include "Rev/Core/Assert.h"
+#include "Rev/Core/Window.h"
+#include "Rev/Core/Clock.h"
+#include "Rev/Core/Input.h"
+#include "Rev/Render/RenderCore.h"
+#include "Rev/Render/Renderer.h"
+#include "Rev/Render/RenderCmd.h"
 
-namespace Pine
+namespace Rev
 {
 	static ERenderAPI sRenderAPI = ERenderAPI::None;
 	ERenderAPI GetRenderAPI()
@@ -19,7 +18,7 @@ namespace Pine
 	Application* Application::sInstance = nullptr;
 	Application::Application()
 	{
-		PE_CORE_ASSERT(!sInstance, "Application already exists!");
+		RE_CORE_ASSERT(!sInstance, "Application already exists!");
 		sInstance = this;
 
 		sRenderAPI = ERenderAPI::OpenGL;
@@ -27,7 +26,7 @@ namespace Pine
 		Input::InitState();
 
 		mWindow = std::unique_ptr<Window>(Window::Create());
-		mWindow->SetEventCallback(PE_BIND_EVENT_FN(Application::OnEvent, this));
+		mWindow->SetEventCallback(RE_BIND_EVENT_FN(Application::OnEvent, this));
 
 		Renderer::Init();
 	}
@@ -65,8 +64,8 @@ namespace Pine
 	void Application::OnEvent(Event& e)
 	{
 		EventDispatcher dispatcher(e);
-		dispatcher.Dispatch<WindowCloseEvent>(PE_BIND_EVENT_FN(Application::OnWindowClose, this));
-		dispatcher.Dispatch<WindowResizeEvent>(PE_BIND_EVENT_FN(Application::OnWindowResize, this));
+		dispatcher.Dispatch<WindowCloseEvent>(RE_BIND_EVENT_FN(Application::OnWindowClose, this));
+		dispatcher.Dispatch<WindowResizeEvent>(RE_BIND_EVENT_FN(Application::OnWindowResize, this));
 		//PINE_CORE_TRACE("{0}", e);
 
 		Input::UpdateState(e);

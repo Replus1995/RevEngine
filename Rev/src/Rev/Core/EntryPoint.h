@@ -1,20 +1,20 @@
 #pragma once
-#include "Pine/Core/Base.h"
-#include "Pine/Core/Application.h"
-#include "Pine/Core/Log.h"
+#include "Rev/Core/Base.h"
+#include "Rev/Core/Application.h"
+#include "Rev/Core/Log.h"
 
-#ifdef PE_PLATFORM_WINDOWS
+#ifdef RE_PLATFORM_WINDOWS
 
-namespace Pine
+namespace Rev
 {
 	extern Application* CreateApplication();
 
 	inline int RunApp(int argc, char** argv)
 	{
 		Log::Init();
-		PE_CORE_WARN("Initialized Log!");
+		RE_CORE_WARN("Initialized Log!");
 
-		auto app = Pine::CreateApplication();
+		auto app = Rev::CreateApplication();
 		app->Run();
 		delete app;
 

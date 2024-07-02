@@ -1,33 +1,33 @@
 #pragma once
 #include <memory>
 
-#ifdef PE_PLATFORM_WINDOWS
-	#ifdef PE_BUILD_DLL
-		#define PINE_API __declspec(dllexport)
+#ifdef RE_PLATFORM_WINDOWS
+	#ifdef RE_BUILD_DLL
+		#define REV_API __declspec(dllexport)
 	#else
-		#define PINE_API __declspec(dllimport)
+		#define REV_API __declspec(dllimport)
 	#endif
 #else
-	#error Pine only supprt windows!
+	#error Rev only supprt windows!
 #endif
 
-#ifdef PE_DEBUG
-	#if defined(PE_PLATFORM_WINDOWS)
-		#define PE_DEBUGBREAK() __debugbreak()
+#ifdef RE_DEBUG
+	#if defined(RE_PLATFORM_WINDOWS)
+		#define RE_DEBUGBREAK() __debugbreak()
 	#else
 		#error "Platform doesn't support debugbreak yet!"
 	#endif
-		#define PE_ENABLE_ASSERTS
+		#define RE_ENABLE_ASSERTS
 #else
-	#define PE_DEBUGBREAK()
+	#define RE_DEBUGBREAK()
 #endif
 
 #define BIT(x) (1 << x)
-#define PE_BIND_EVENT_FN(fn, owner) std::bind(&fn, owner, std::placeholders::_1)
-#define PE_EXPAND_MACRO(x) x
-#define PE_STRINGIFY_MACRO(x) #x
+#define RE_BIND_EVENT_FN(fn, owner) std::bind(&fn, owner, std::placeholders::_1)
+#define RE_EXPAND_MACRO(x) x
+#define RE_STRINGIFY_MACRO(x) #x
 
-namespace Pine
+namespace Rev
 {
 
 template<typename T>
@@ -57,6 +57,6 @@ using uint16 = uint16_t;
 using uint32 = uint32_t;
 using uint64 = uint64_t;
 
-#ifndef GLM_ENABLE_EXPERIMENTAL
-	#define GLM_ENABLE_EXPERIMENTAL
-#endif // !GLM_ENABLE_EXPERIMENTAL
+//#ifndef GLM_ENABLE_EXPERIMENTAL
+//	#define GLM_ENABLE_EXPERIMENTAL
+//#endif // !GLM_ENABLE_EXPERIMENTAL

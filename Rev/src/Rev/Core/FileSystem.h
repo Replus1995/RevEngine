@@ -1,12 +1,12 @@
 #pragma once
-#include "Pine/Core/Base.h"
+#include "Rev/Core/Base.h"
 #include <string_view>
 #include <map>
 
-namespace Pine
+namespace Rev
 {
 
-class PINE_API FileSystem
+class REV_API FileSystem
 {
 public:
 	static void MountDir(const std::string& virtualDir, const std::string& nativeDir);
@@ -19,7 +19,7 @@ private:
 	static std::map<std::string, std::string>& GetDirMap();
 };
 
-class PINE_API Path
+class REV_API Path
 {
 public:
 	Path(const std::string& path = "");

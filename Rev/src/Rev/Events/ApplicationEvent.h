@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Pine/Events/Event.h"
+#include "Rev/Events/Event.h"
 #include <sstream>
 
-namespace Pine
+namespace Rev
 {
-	class PINE_API WindowResizeEvent : public Event
+	class REV_API WindowResizeEvent : public Event
 	{
 	public:
 		WindowResizeEvent(unsigned int width, unsigned int height)
@@ -27,7 +27,7 @@ namespace Pine
 		unsigned int mWidth, mHeight;
 	};
 
-	class PINE_API WindowCloseEvent : public Event
+	class REV_API WindowCloseEvent : public Event
 	{
 	public:
 		WindowCloseEvent() {}
@@ -36,7 +36,7 @@ namespace Pine
 		EVENT_CLASS_CATEGORY(EventCategoryApplication)
 	};
 
-	class PINE_API AppTickEvent : public Event
+	class REV_API AppTickEvent : public Event
 	{
 	public:
 		AppTickEvent() {}
@@ -45,7 +45,7 @@ namespace Pine
 		EVENT_CLASS_CATEGORY(EventCategoryApplication)
 	};
 
-	class PINE_API AppUpdateEvent : public Event
+	class REV_API AppUpdateEvent : public Event
 	{
 	public:
 		AppUpdateEvent() {}
@@ -54,7 +54,7 @@ namespace Pine
 		EVENT_CLASS_CATEGORY(EventCategoryApplication)
 	};
 
-	class PINE_API AppRenderEvent : public Event
+	class REV_API AppRenderEvent : public Event
 	{
 	public:
 		AppRenderEvent() {}

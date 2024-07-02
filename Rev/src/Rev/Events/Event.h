@@ -1,11 +1,10 @@
 #pragma once
 
-#include "Pine/Core/Base.h"
-
+#include "Rev/Core/Base.h"
 #include <string>
 #include <functional>
 
-namespace Pine
+namespace Rev
 {
 	//Naive blocking events
 
@@ -34,7 +33,7 @@ namespace Pine
 
 #define EVENT_CLASS_CATEGORY(category) virtual int GetCategoryFlags() const override { return category; }
 
-	class PINE_API Event
+	class REV_API Event
 	{
 		friend class EventDispatcher;
 		friend class Application;
