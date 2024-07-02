@@ -1,13 +1,11 @@
-project "Pine"
-    location "%{wks.location}/Pine"
+project "Rev"
+    location "%{wks.location}/Rev"
     kind "SharedLib"
     language "C++"
+    dounitybuild "true"
 
     targetdir ("%{wks.location}/bin/" .. outputdir)
     objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
-
-    pchheader "pinepch.h"
-    pchsource "src/pinepch.cpp"
 
     files
     {
@@ -54,23 +52,22 @@ project "Pine"
 
         defines
         {
-            "PE_PLATFORM_WINDOWS",
-            "PE_BUILD_DLL",
+            "RE_PLATFORM_WINDOWS",
+            "RE_BUILD_DLL",
             "GLFW_INCLUDE_NONE"
         }
 
     filter "configurations:Debug"
-        defines { "PE_DEBUG", "PE_ENABLE_ASSERTS" }
+        defines { "RE_DEBUG", "RE_ENABLE_ASSERTS" }
         buildoptions  "/MD"
         symbols "On"
 
     filter "configurations:Release"
-        defines { "PE_RELEASE", "PE_ENABLE_ASSERTS" }
+        defines { "RE_RELEASE", "RE_ENABLE_ASSERTS" }
         buildoptions  "/MD"
         optimize "On"
 
     filter "configurations:Dist"
-        defines "PE_DIST"
+        defines "RE_DIST"
         buildoptions  "/MD"
         optimize "On"
-

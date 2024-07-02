@@ -17,12 +17,12 @@ project "Sandbox"
         "%{IncludeDir.spdlog}",
         "%{IncludeDir.glm}",
         "%{IncludeDir.entt}",
-        "%{wks.location}/../Pine/src"
+        "%{wks.location}/../Rev/src"
     }
 
     links
     {
-        "Pine"
+        "Rev"
     }
 
     filter "system:windows"
@@ -33,20 +33,20 @@ project "Sandbox"
 
         defines
         {
-            "PE_PLATFORM_WINDOWS"
+            "RE_PLATFORM_WINDOWS"
         }
 
     filter "configurations:Debug"
-        defines { "PE_DEBUG", "PE_ENABLE_ASSERTS" }
+        defines { "RE_DEBUG", "RE_ENABLE_ASSERTS" }
         buildoptions  "/MD"
         symbols "On"
 
     filter "configurations:Release"
-        defines { "PE_RELEASE", "PE_ENABLE_ASSERTS" }
+        defines { "RE_RELEASE", "RE_ENABLE_ASSERTS" }
         buildoptions  "/MD"
         optimize "On"
 
     filter "configurations:Dist"
-        defines "PE_DIST"
+        defines "RE_DIST"
         buildoptions  "/MD"
         optimize "On"

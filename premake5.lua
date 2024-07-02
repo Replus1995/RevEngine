@@ -1,6 +1,6 @@
+include "custom_init.lua"
 include "dependencies.lua"
-
-workspace "Pine"
+workspace "RevEngine"
     location "build"
     architecture "x64"
 
@@ -21,7 +21,7 @@ group "Dependencies"
 group ""
 
 group "Core"
-    include "Pine"
+    include "Rev"
 group ""
 
 group "Misc"
