@@ -1,25 +1,25 @@
 require('vstudio')
 
+-- Enable Visual Studio Unity Build Support
+-- Don't know why the official option 'enableunitybuild' does not take effect
 local p = premake
 local m = p.vstudio.vc2010
 
-premake.api.register {
-    name = "dounitybuild",
+p.api.register {
+    name = "unitybuild",
     scope = "config",
     kind = "boolean",
     default = false
 }
 
-local function doUnityBuild(cfg)
-    if cfg.dounitybuild then
-        premake.w('<EnableUnitySupport>true</EnableUnitySupport>')
-    else
-        premake.w('<EnableUnitySupport>false</EnableUnitySupport>')
+local function vsUnityBuild(cfg)
+    if _ACTION >= "vs2017" and cfg.unitybuild then
+        m.element("EnableUnitySupport", nil, iif(cfg.unitybuild, "true", "false"))
     end
 end
 
-premake.override(m.elements, "configurationProperties", function(base, cfg)
+p.override(m.elements, "configurationProperties", function(base, cfg)
     local calls = base(cfg)
-    table.insert(calls, doUnityBuild)
+    table.insert(calls, vsUnityBuild)
     return calls
 end)

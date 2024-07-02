@@ -2,7 +2,7 @@ project "Rev"
     location "%{wks.location}/Rev"
     kind "SharedLib"
     language "C++"
-    dounitybuild "true"
+    unitybuild "true"
 
     targetdir ("%{wks.location}/bin/" .. outputdir)
     objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
