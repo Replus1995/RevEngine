@@ -1,41 +1,47 @@
-#include "pinepch.h"
-#include "Matrix3.h"
-#include "Maths.h"
+#pragma once
+#include "MathUtils.h"
 #include <cmath>
 #include <cassert>
 
-namespace Pine
+namespace Rev::Math
 {
 
-FMatrix3::FMatrix3()
+inline FMatrix3::FMatrix3()
 {
 }
 
-FMatrix3::FMatrix3(float InScalar)
+inline FMatrix3::FMatrix3(float InScalar)
 {
-	Columns[0] = TVector3(InScalar, 0.0F, 0.0F);
-	Columns[1] = TVector3(0.0F, InScalar, 0.0F);
-	Columns[2] = TVector3(0.0F, 0.0F, InScalar);
+	Columns[0] = FVector3(InScalar, 0.0F, 0.0F);
+	Columns[1] = FVector3(0.0F, InScalar, 0.0F);
+	Columns[2] = FVector3(0.0F, 0.0F, InScalar);
 }
 
-FVector3& FMatrix3::operator[](int Index)
+inline FMatrix3::FMatrix3(FVector3 InCol0, FVector3 InCol1, FVector3 InCol2)
+{
+	Columns[0] = InCol0;
+	Columns[1] = InCol1;
+	Columns[2] = InCol2;
+}
+
+inline FVector3& FMatrix3::operator[](int Index)
 {
 	assert((Index >= 0 && Index < 3) && "Matrix3 index out of range");
 	return Columns[Index];
 }
 
-FVector3 const& FMatrix3::operator[](int Index) const
+inline FVector3 const& FMatrix3::operator[](int Index) const
 {
 	assert((Index >= 0 && Index < 3) && "Matrix3 index out of range");
 	return Columns[Index];
 }
 
-float const* FMatrix3::DataPtr() const
+inline float const* FMatrix3::DataPtr() const
 {
 	return &(Columns[0].X);
 }
 
-FMatrix3 FMatrix3::operator*(const FMatrix3& InMat) const
+inline FMatrix3 FMatrix3::operator*(const FMatrix3& InMat) const
 {
 	const FMatrix3& m1 = *this;
 	const FMatrix3& m2 = InMat;
@@ -75,16 +81,39 @@ FMatrix3 FMatrix3::operator*(const FMatrix3& InMat) const
 	return Result;
 }
 
-FMatrix3& FMatrix3::operator*=(const FMatrix3& InMat)
+inline FMatrix3& FMatrix3::operator*=(const FMatrix3& InMat)
 {
 	return (*this = *this * InMat);
 }
 
-FMatrix3 FMatrix3::FromEuler(const FRotator& InRot)
+inline FMatrix3 FMatrix3::Inverse() const
 {
-	float rPitch = FMaths::Radians(InRot.Pitch);
-	float rYaw = FMaths::Radians(InRot.Yaw);
-	float rRoll = FMaths::Radians(InRot.Roll);
+	//From GLM
+	using T = float;
+	T OneOverDeterminant = static_cast<T>(1) / (
+		+ Columns[0][0] * (Columns[1][1] * Columns[2][2] - Columns[2][1] * Columns[1][2])
+		- Columns[1][0] * (Columns[0][1] * Columns[2][2] - Columns[2][1] * Columns[0][2])
+		+ Columns[2][0] * (Columns[0][1] * Columns[1][2] - Columns[1][1] * Columns[0][2]));
+
+	FMatrix3 Inverse;
+	Inverse[0][0] = +(Columns[1][1] * Columns[2][2] - Columns[2][1] * Columns[1][2]) * OneOverDeterminant;
+	Inverse[1][0] = -(Columns[1][0] * Columns[2][2] - Columns[2][0] * Columns[1][2]) * OneOverDeterminant;
+	Inverse[2][0] = +(Columns[1][0] * Columns[2][1] - Columns[2][0] * Columns[1][1]) * OneOverDeterminant;
+	Inverse[0][1] = -(Columns[0][1] * Columns[2][2] - Columns[2][1] * Columns[0][2]) * OneOverDeterminant;
+	Inverse[1][1] = +(Columns[0][0] * Columns[2][2] - Columns[2][0] * Columns[0][2]) * OneOverDeterminant;
+	Inverse[2][1] = -(Columns[0][0] * Columns[2][1] - Columns[2][0] * Columns[0][1]) * OneOverDeterminant;
+	Inverse[0][2] = +(Columns[0][1] * Columns[1][2] - Columns[1][1] * Columns[0][2]) * OneOverDeterminant;
+	Inverse[1][2] = -(Columns[0][0] * Columns[1][2] - Columns[1][0] * Columns[0][2]) * OneOverDeterminant;
+	Inverse[2][2] = +(Columns[0][0] * Columns[1][1] - Columns[1][0] * Columns[0][1]) * OneOverDeterminant;
+
+	return Inverse;
+}
+
+inline FMatrix3 FMatrix3::FromEuler(const FRotator& InRot)
+{
+	float rPitch = Radians(InRot.Pitch);
+	float rYaw = Radians(InRot.Yaw);
+	float rRoll = Radians(InRot.Roll);
 
 	//From GLM
 	using T = float;
@@ -110,7 +139,7 @@ FMatrix3 FMatrix3::FromEuler(const FRotator& InRot)
 	return Result;
 }
 
-FMatrix3 FMatrix3::FromQuat(const FQuaternion& InQuat)
+inline FMatrix3 FMatrix3::FromQuat(const FQuaternion& InQuat)
 {
 	//From GLM
 	using T = float;
@@ -139,7 +168,7 @@ FMatrix3 FMatrix3::FromQuat(const FQuaternion& InQuat)
 	return Result;
 }
 
-FMatrix3 FMatrix3::FromScale(const FVector3& InScale)
+inline FMatrix3 FMatrix3::FromScale(const FVector3& InScale)
 {
 	FMatrix3 Result;
 	Result[0][0] = InScale.X;

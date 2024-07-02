@@ -1,7 +1,7 @@
 #pragma once
 #include "Vector3.h"
 
-namespace Pine
+namespace Rev::Math
 {
 //Rotate order is Roll->Pitch->Yaw(glm::YXZ)
 template<typename T>
@@ -31,9 +31,8 @@ public:
 	TVector3<T> Forward() const;
 };
 
-template class PINE_API TRotator<float>;
-template class PINE_API TRotator<double>;
 using FRotator = TRotator<float>;
 }
 
+#include "Rotator.inl"
 

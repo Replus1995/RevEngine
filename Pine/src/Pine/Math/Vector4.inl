@@ -1,9 +1,8 @@
-#include "pinepch.h"
-#include "Vector4.h"
+#pragma once
 #include <cassert>
 #include <cmath>
 
-namespace Pine
+namespace Rev::Math
 {
 
 template<typename T>

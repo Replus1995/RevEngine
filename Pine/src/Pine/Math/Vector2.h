@@ -1,7 +1,6 @@
 #pragma once
-#include "Pine/Core/Base.h"
 
-namespace Pine
+namespace Rev::Math
 {
 
 template<typename T>
@@ -49,8 +48,8 @@ public:
 	TVector2<T> Normalized() const;
 };
 
-template class PINE_API TVector2<float>;
-template class PINE_API TVector2<double>;
 using FVector2 = TVector2<float>;
 
 }
+
+#include "Vector2.inl"

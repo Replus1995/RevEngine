@@ -3,7 +3,7 @@
 #include "Vector3.h"
 #include <utility>
 
-namespace Pine
+namespace Rev::Math
 {
 
 template<typename T>
@@ -53,11 +53,10 @@ public:
 	static TQuaternion<T> Slerp(const TQuaternion<T>& InQuatA, const TQuaternion<T>& InQuatB, float By);
 };
 
-template class PINE_API TQuaternion<float>;
-template class PINE_API TQuaternion<double>;
 using FQuaternion = TQuaternion<float>;
 
 }
 
+#include "Quaternion.inl"
 
 

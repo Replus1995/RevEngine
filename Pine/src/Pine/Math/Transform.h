@@ -1,10 +1,12 @@
 #pragma once
-#include "Maths.h"
+#include "Vector3.h"
+#include "Rotator.h"
+#include "Matrix4.h"
 
-namespace Pine
+namespace Rev::Math
 {
 
-struct PINE_API FTransform
+struct FTransform
 {
 public:
 	FVector3 Location = FVector3(0.0F);

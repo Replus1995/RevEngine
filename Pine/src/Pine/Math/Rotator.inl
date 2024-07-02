@@ -1,9 +1,8 @@
-#include "pinepch.h"
-#include "Rotator.h"
-#include "Maths.h"
+#pragma once
+#include "MathUtils.h"
 #include <cmath>
 
-namespace Pine
+namespace Rev::Math
 {
 
 template<typename T>
@@ -93,9 +92,9 @@ TRotator<T>& TRotator<T>::operator-=(const TRotator<T>& InRot)
 template<typename T>
 TVector3<T> TRotator<T>::Right() const
 {
-	T rPitch = FMaths::Radians(Pitch);
-	T rYaw = FMaths::Radians(Yaw);
-	T rRoll = FMaths::Radians(Roll);
+	T rPitch = Radians(Pitch);
+	T rYaw = Radians(Yaw);
+	T rRoll = Radians(Roll);
 
 	T tmp_ch = std::cos(rYaw);
 	T tmp_sh = std::sin(rYaw);
@@ -115,9 +114,9 @@ TVector3<T> TRotator<T>::Right() const
 template<typename T>
 TVector3<T> TRotator<T>::Up() const
 {
-	T rPitch = FMaths::Radians(Pitch);
-	T rYaw = FMaths::Radians(Yaw);
-	T rRoll = FMaths::Radians(Roll);
+	T rPitch = Radians(Pitch);
+	T rYaw = Radians(Yaw);
+	T rRoll = Radians(Roll);
 
 	T tmp_ch = std::cos(rYaw);
 	T tmp_sh = std::sin(rYaw);
@@ -137,8 +136,8 @@ TVector3<T> TRotator<T>::Up() const
 template<typename T>
 TVector3<T> TRotator<T>::Forward() const
 {
-	T rPitch = FMaths::Radians(Pitch);
-	T rYaw = FMaths::Radians(Yaw);
+	T rPitch = Radians(Pitch);
+	T rYaw = Radians(Yaw);
 
 	T tmp_ch = std::cos(rYaw);
 	T tmp_sh = std::sin(rYaw);

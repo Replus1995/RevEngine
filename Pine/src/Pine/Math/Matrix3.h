@@ -3,23 +3,26 @@
 #include "Rotator.h"
 #include "Quaternion.h"
 
-namespace Pine
+namespace Rev::Math
 {
 
-struct PINE_API FMatrix3
+struct FMatrix3
 {
 public:
 	FVector3 Columns[3];
 
 	FMatrix3();
 	FMatrix3(float InScalar);
+	FMatrix3(FVector3 InCol0, FVector3 InCol1, FVector3 InCol2);
 
 	FVector3& operator[](int Index);
 	FVector3 const& operator[](int Index) const;
 	float const* DataPtr() const;
 
-	FMatrix3 operator*(const FMatrix3& InMat) const;
+	 FMatrix3 operator*(const FMatrix3& InMat) const;
 	FMatrix3& operator*=(const FMatrix3& InMat);
+
+	FMatrix3 Inverse() const;
 
 	static FMatrix3 FromEuler(const FRotator& InRot);
 	static FMatrix3 FromQuat(const FQuaternion& InQuat);
@@ -27,3 +30,5 @@ public:
 };
 
 }
+
+#include "Matrix3.inl"

@@ -228,7 +228,7 @@ void OpenGLShader::Reflect(GLenum stage, const std::vector<uint32_t>& shaderData
 	for (const auto& resource : resources.uniform_buffers)
 	{
 		const auto& bufferType = compiler.get_type(resource.base_type_id);
-		uint32_t bufferSize = compiler.get_declared_struct_size(bufferType);
+		size_t bufferSize = compiler.get_declared_struct_size(bufferType);
 		uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
 		int memberCount = bufferType.member_types.size();
 

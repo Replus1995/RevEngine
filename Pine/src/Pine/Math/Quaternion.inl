@@ -1,9 +1,8 @@
-#include "pinepch.h"
-#include "Quaternion.h"
-#include "Maths.h"
+#pragma once
+#include "MathUtils.h"
 #include <cmath>
 
-namespace Pine
+namespace Rev::Math
 {
 
 template<typename T>
@@ -194,7 +193,7 @@ TVector3<T> TQuaternion<T>::Forward() const
 template<typename T>
 TQuaternion<T> TQuaternion<T>::FromAxisAngle(const TVector3<T>& InAxis, float InDegree)
 {
-	T ra = FMaths::Radians(InDegree);
+	T ra = Radians(InDegree);
 	T sa = std::sin(ra / 2.0F);
 	T ca = std::cos(ra / 2.0F);
 
@@ -204,7 +203,7 @@ TQuaternion<T> TQuaternion<T>::FromAxisAngle(const TVector3<T>& InAxis, float In
 template<typename T>
 std::pair<const TVector3<T>, float> TQuaternion<T>::ToAxisAngle(const TQuaternion<T>& InQuat)
 {
-	float degree = FMaths::Degrees(std::acos(InQuat.W) * 2.0F);
+	float degree = Degrees(std::acos(InQuat.W) * 2.0F);
 	T sa = std::sqrt(1.0F - InQuat.W * InQuat.W);
 	TVector3<T> axis(InQuat.X / sa, InQuat.Y / sa, InQuat.Z / sa);
 	return std::pair<const TVector3<T>, float>(axis, degree);
@@ -213,9 +212,9 @@ std::pair<const TVector3<T>, float> TQuaternion<T>::ToAxisAngle(const TQuaternio
 template<typename T>
 TQuaternion<T> TQuaternion<T>::FromEuler(const TRotator<T>& InRot)
 {
-	T rPitch = FMaths::Radians(InRot.Pitch);
-	T rYaw = FMaths::Radians(InRot.Yaw);
-	T rRoll = FMaths::Radians(InRot.Roll);
+	T rPitch = Radians(InRot.Pitch);
+	T rYaw = Radians(InRot.Yaw);
+	T rRoll = Radians(InRot.Roll);
 
 	T cp = std::cos(rPitch / 2);
 	T sp = std::sin(rPitch / 2);
@@ -243,9 +242,9 @@ TRotator<T> TQuaternion<T>::ToEuler(const TQuaternion<T>& InQuat)
 	T r32 = InQuat.W * InQuat.W - InQuat.X * InQuat.X + InQuat.Y * InQuat.Y - InQuat.Z * InQuat.Z;
 
 	TRotator<T> Result;
-	Result.Yaw = FMaths::Degrees(std::atan2(r11, r12));
-	Result.Pitch = FMaths::Degrees(std::asin(r21));
-	Result.Roll = FMaths::Degrees(std::atan2(r31, r32));
+	Result.Yaw = Degrees(std::atan2(r11, r12));
+	Result.Pitch = Degrees(std::asin(r21));
+	Result.Roll = Degrees(std::atan2(r31, r32));
 
 	return Result;
 }
@@ -259,7 +258,7 @@ T TQuaternion<T>::DotProduct(const TQuaternion<T>& InQuatA, const TQuaternion<T>
 template<typename T>
 TQuaternion<T> TQuaternion<T>::Lerp(const TQuaternion<T>& InQuatA, const TQuaternion<T>& InQuatB, float By)
 {
-	By = FMaths::Clamp(By, 0.0F, 1.0F);
+	By = Clamp(By, 0.0F, 1.0F);
 	float dot = DotProduct(InQuatA, InQuatB);
 	if (dot < 0.0f)
 	{
@@ -274,8 +273,8 @@ TQuaternion<T> TQuaternion<T>::Lerp(const TQuaternion<T>& InQuatA, const TQuater
 template<typename T>
 TQuaternion<T> TQuaternion<T>::Slerp(const TQuaternion<T>& InQuatA, const TQuaternion<T>& InQuatB, float By)
 {
-	By = FMaths::Clamp(By, 0.0F, 1.0F);
-	float cBy = std::cos(By * FMaths::PI());
+	By = Clamp(By, 0.0F, 1.0F);
+	float cBy = std::cos(By * PI());
 	float dot = DotProduct(InQuatA, InQuatB);
 	if (dot < 0.0f)
 	{
@@ -288,5 +287,3 @@ TQuaternion<T> TQuaternion<T>::Slerp(const TQuaternion<T>& InQuatA, const TQuate
 }
 
 }
-
-

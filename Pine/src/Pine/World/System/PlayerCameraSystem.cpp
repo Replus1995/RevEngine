@@ -43,13 +43,13 @@ void PlayerCameraSystem::GetCameraMatrix(FMatrix4& projMat, FMatrix4& viewMat) c
 			cameraComp.Camera.SetAspectRatio(asp);
 		}
 		projMat = cameraComp.Camera.GetProjectionMatrix();
-		viewMat = (FMatrix4)glm::inverse(transformComp.GetMatrix());
+		viewMat = transformComp.GetMatrix().Inverse();
 	}
 	else
 	{
 		auto window = Application::GetApp().GetWindow();
 		float asp = float(window->GetWidth()) / float(window->GetHeight());
-		projMat = glm::perspective(FMaths::Radians(45.0f), asp, 0.01f, 1000.0f);
+		projMat = FMaths::Perspective(FMaths::Radians(45.0f), asp, 0.01f, 1000.0f);
 		viewMat = FMatrix4(1.0f);
 	}
 }

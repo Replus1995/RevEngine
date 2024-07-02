@@ -1,40 +1,40 @@
-#include "pinepch.h"
-#include "Vector2.h"
+#pragma once
 #include <cassert>
 #include <cmath>
 
-namespace Pine
+namespace Rev::Math
 {
+
 template<typename T>
-TVector2<T>::TVector2()
+inline TVector2<T>::TVector2()
 	: X(0.0F)
 	, Y(0.0F)
 {
 }
 
 template<typename T>
-TVector2<T>::TVector2(T InScalar)
+inline TVector2<T>::TVector2(T InScalar)
 	: X(InScalar)
 	, Y(InScalar)
 {
 }
 
 template<typename T>
-TVector2<T>::TVector2(T InX, T InY)
+inline TVector2<T>::TVector2(T InX, T InY)
 	: X(InX)
 	, Y(InY)
 {
 }
 
 template<typename T>
-TVector2<T>::TVector2(const TVector2<T>& InVec)
+inline TVector2<T>::TVector2(const TVector2<T>& InVec)
 	: X(InVec.X)
 	, Y(InVec.Y)
 {
 }
 
 template<typename T>
-T& TVector2<T>::operator[](int Index)
+inline T& TVector2<T>::operator[](int Index)
 {
 	assert((Index >= 0 && Index < 2) && "Vector2 index out of range");
 	switch (Index)
@@ -48,7 +48,7 @@ T& TVector2<T>::operator[](int Index)
 }
 
 template<typename T>
-T const& TVector2<T>::operator[](int Index) const
+inline T const& TVector2<T>::operator[](int Index) const
 {
 	assert((Index >= 0 && Index < 2) && "Vector2 index out of range");
 	switch (Index)
@@ -62,25 +62,25 @@ T const& TVector2<T>::operator[](int Index) const
 }
 
 template<typename T>
-bool TVector2<T>::operator==(const TVector2<T>& InVec) const
+inline bool TVector2<T>::operator==(const TVector2<T>& InVec) const
 {
 	return X == InVec.X && Y == InVec.Y;
 }
 
 template<typename T>
-bool TVector2<T>::operator!=(const TVector2<T>& InVec) const
+inline bool TVector2<T>::operator!=(const TVector2<T>& InVec) const
 {
 	return X != InVec.X || Y != InVec.Y;
 }
 
 template<typename T>
-TVector2<T> TVector2<T>::operator-() const
+inline TVector2<T> TVector2<T>::operator-() const
 {
 	return TVector2<T>(-X, -Y);
 }
 
 template<typename T>
-TVector2<T>& TVector2<T>::operator=(const TVector2<T>& InVec)
+inline TVector2<T>& TVector2<T>::operator=(const TVector2<T>& InVec)
 {
 	X = InVec.X;
 	Y = InVec.Y;
@@ -88,13 +88,13 @@ TVector2<T>& TVector2<T>::operator=(const TVector2<T>& InVec)
 }
 
 template<typename T>
-TVector2<T> TVector2<T>::operator+(const TVector2<T>& InVec) const
+inline TVector2<T> TVector2<T>::operator+(const TVector2<T>& InVec) const
 {
 	return TVector2<T>(X + InVec.X, Y + InVec.Y);
 }
 
 template<typename T>
-TVector2<T>& TVector2<T>::operator+=(const TVector2<T>& InVec)
+inline TVector2<T>& TVector2<T>::operator+=(const TVector2<T>& InVec)
 {
 	X += InVec.X;
 	Y += InVec.Y;
@@ -102,13 +102,13 @@ TVector2<T>& TVector2<T>::operator+=(const TVector2<T>& InVec)
 }
 
 template<typename T>
-TVector2<T> TVector2<T>::operator-(const TVector2<T>& InVec) const
+inline TVector2<T> TVector2<T>::operator-(const TVector2<T>& InVec) const
 {
 	return TVector2<T>(X - InVec.X, Y - InVec.Y);
 }
 
 template<typename T>
-TVector2<T>& TVector2<T>::operator-=(const TVector2<T>& InVec)
+inline TVector2<T>& TVector2<T>::operator-=(const TVector2<T>& InVec)
 {
 	X -= InVec.X;
 	Y -= InVec.Y;
@@ -116,13 +116,13 @@ TVector2<T>& TVector2<T>::operator-=(const TVector2<T>& InVec)
 }
 
 template<typename T>
-TVector2<T> TVector2<T>::operator*(const TVector2<T>& InVec) const
+inline TVector2<T> TVector2<T>::operator*(const TVector2<T>& InVec) const
 {
 	return TVector2<T>(X * InVec.X, Y * InVec.Y);
 }
 
 template<typename T>
-TVector2<T>& TVector2<T>::operator*=(const TVector2<T>& InVec)
+inline TVector2<T>& TVector2<T>::operator*=(const TVector2<T>& InVec)
 {
 	X *= InVec.X;
 	Y *= InVec.Y;
@@ -130,13 +130,13 @@ TVector2<T>& TVector2<T>::operator*=(const TVector2<T>& InVec)
 }
 
 template<typename T>
-TVector2<T> TVector2<T>::operator/(const TVector2<T>& InVec) const
+inline TVector2<T> TVector2<T>::operator/(const TVector2<T>& InVec) const
 {
 	return TVector2<T>(X / InVec.X, Y / InVec.Y);
 }
 
 template<typename T>
-TVector2<T>& TVector2<T>::operator/=(const TVector2<T>& InVec)
+inline TVector2<T>& TVector2<T>::operator/=(const TVector2<T>& InVec)
 {
 	X /= InVec.X;
 	Y /= InVec.Y;
@@ -144,13 +144,13 @@ TVector2<T>& TVector2<T>::operator/=(const TVector2<T>& InVec)
 }
 
 template<typename T>
-TVector2<T> TVector2<T>::operator+(T InScalar) const
+inline TVector2<T> TVector2<T>::operator+(T InScalar) const
 {
 	return TVector2<T>(X + InScalar, Y + InScalar);
 }
 
 template<typename T>
-TVector2<T>& TVector2<T>::operator+=(T InScalar)
+inline TVector2<T>& TVector2<T>::operator+=(T InScalar)
 {
 	X += InScalar;
 	Y += InScalar;
@@ -158,13 +158,13 @@ TVector2<T>& TVector2<T>::operator+=(T InScalar)
 }
 
 template<typename T>
-TVector2<T> TVector2<T>::operator-(T InScalar) const
+inline TVector2<T> TVector2<T>::operator-(T InScalar) const
 {
 	return TVector2<T>(X - InScalar, Y - InScalar);
 }
 
 template<typename T>
-TVector2<T>& TVector2<T>::operator-=(T InScalar)
+inline TVector2<T>& TVector2<T>::operator-=(T InScalar)
 {
 	X -= InScalar;
 	Y -= InScalar;
@@ -172,13 +172,13 @@ TVector2<T>& TVector2<T>::operator-=(T InScalar)
 }
 
 template<typename T>
-TVector2<T> TVector2<T>::operator*(T InScalar) const
+inline TVector2<T> TVector2<T>::operator*(T InScalar) const
 {
 	return TVector2<T>(X * InScalar, Y * InScalar);
 }
 
 template<typename T>
-TVector2<T>& TVector2<T>::operator*=(T InScalar)
+inline TVector2<T>& TVector2<T>::operator*=(T InScalar)
 {
 	X *= InScalar;
 	Y *= InScalar;
@@ -186,13 +186,13 @@ TVector2<T>& TVector2<T>::operator*=(T InScalar)
 }
 
 template<typename T>
-TVector2<T> TVector2<T>::operator/(T InScalar) const
+inline TVector2<T> TVector2<T>::operator/(T InScalar) const
 {
 	return TVector2<T>(X / InScalar, Y / InScalar);
 }
 
 template<typename T>
-TVector2<T>& TVector2<T>::operator/=(T InScalar)
+inline TVector2<T>& TVector2<T>::operator/=(T InScalar)
 {
 	X /= InScalar;
 	Y /= InScalar;
@@ -200,19 +200,19 @@ TVector2<T>& TVector2<T>::operator/=(T InScalar)
 }
 
 template<typename T>
-TVector2<T> TVector2<T>::Cross(const TVector2<T>& InVecA, const TVector2<T>& InVecB)
+inline TVector2<T> TVector2<T>::Cross(const TVector2<T>& InVecA, const TVector2<T>& InVecB)
 {
 	return TVector2<T>(InVecA.X * InVecB.Y, InVecA.Y * InVecB.X);
 }
 
 template<typename T>
-T TVector2<T>::Length() const
+inline T TVector2<T>::Length() const
 {
 	return std::sqrt(X * X + Y * Y);
 }
 
 template<typename T>
-void TVector2<T>::Normalize()
+inline void TVector2<T>::Normalize()
 {
 	T length = Length();
 	if (length != 0.0F) {
@@ -223,7 +223,7 @@ void TVector2<T>::Normalize()
 }
 
 template<typename T>
-TVector2<T> TVector2<T>::Normalized() const
+inline TVector2<T> TVector2<T>::Normalized() const
 {
 	TVector2<T> Result = *this;
 	Result.Normalize();

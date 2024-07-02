@@ -1,7 +1,7 @@
 #pragma once
 #include "Vector2.h"
 
-namespace Pine
+namespace Rev::Math
 {
 
 template<typename T>
@@ -51,10 +51,10 @@ public:
 	TVector3<T> Normalized() const;
 };
 
-template class PINE_API TVector3<float>;
-template class PINE_API TVector3<double>;
 using FVector3 = TVector3<float>;
 
 }
+
+#include "Vector3.inl"
 
 
