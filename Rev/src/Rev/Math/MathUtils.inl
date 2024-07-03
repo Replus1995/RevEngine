@@ -1,4 +1,3 @@
-#include "MathUtils.h"
 #pragma once
 
 namespace Rev

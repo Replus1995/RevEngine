@@ -3,22 +3,27 @@
 #include <cassert>
 #include <cmath>
 
-namespace Rev::Math
+namespace Rev
+{
+namespace Math
 {
 
-inline FMatrix4::FMatrix4()
+template<typename T>
+inline TMatrix4<T>::TMatrix4()
 {
 }
 
-inline FMatrix4::FMatrix4(float InScalar)
+template<typename T>
+inline TMatrix4<T>::TMatrix4(T InScalar)
 {
-	Columns[0] = FVector4(InScalar, 0.0F, 0.0F, 0.0F);
-	Columns[1] = FVector4(0.0F, InScalar, 0.0F, 0.0F);
-	Columns[2] = FVector4(0.0F, 0.0F, InScalar, 0.0F);
-	Columns[3] = FVector4(0.0F, 0.0F, 0.0F, InScalar);
+	Columns[0] = TVector4<T>(InScalar, 0.0F, 0.0F, 0.0F);
+	Columns[1] = TVector4<T>(0.0F, InScalar, 0.0F, 0.0F);
+	Columns[2] = TVector4<T>(0.0F, 0.0F, InScalar, 0.0F);
+	Columns[3] = TVector4<T>(0.0F, 0.0F, 0.0F, InScalar);
 }
 
-inline FMatrix4::FMatrix4(FVector4 InCol0, FVector4 InCol1, FVector4 InCol2, FVector4 InCol3)
+template<typename T>
+inline TMatrix4<T>::TMatrix4(TVector4<T> InCol0, TVector4<T> InCol1, TVector4<T> InCol2, TVector4<T> InCol3)
 {
 	Columns[0] = InCol0;
 	Columns[1] = InCol1;
@@ -26,45 +31,92 @@ inline FMatrix4::FMatrix4(FVector4 InCol0, FVector4 InCol1, FVector4 InCol2, FVe
 	Columns[3] = InCol3;
 }
 
-inline FMatrix4::FMatrix4(FMatrix3 InMat)
+template<typename T>
+inline TMatrix4<T>::TMatrix4(TMatrix3<T> InMat)
 {
 	Columns[0] = InMat[0];
 	Columns[1] = InMat[1];
 	Columns[2] = InMat[2];
-	Columns[3] = FVector4(0.0F, 0.0F, 0.0F, 1.0F);
+	Columns[3] = TVector4<T>(0.0F, 0.0F, 0.0F, 1.0F);
 }
 
-inline FVector4& FMatrix4::operator[](int Index)
+template<typename T>
+inline TVector4<T>& TMatrix4<T>::operator[](int Index)
 {
 	assert((Index >= 0 && Index < 4) && "Matrix4 index out of range");
 	return Columns[Index];
 }
 
-inline FVector4 const& FMatrix4::operator[](int Index) const
+template<typename T>
+inline TVector4<T> const& TMatrix4<T>::operator[](int Index) const
 {
 	assert((Index >= 0 && Index < 4) && "Matrix4 index out of range");
 	return Columns[Index];
 }
 
-inline float const* FMatrix4::DataPtr() const
+template<typename T>
+inline T const* TMatrix4<T>::Data() const
 {
 	return &(Columns[0].X);
 }
 
-inline FMatrix4 FMatrix4::operator*(const FMatrix4& InMat) const
+template<typename T>
+inline TMatrix4<T>& TMatrix4<T>::operator=(const TMatrix4<T>& InMat)
+{
+	Columns[0] = InMat[0];
+	Columns[1] = InMat[1];
+	Columns[2] = InMat[2];
+	Columns[3] = InMat[3];
+	return *this;
+}
+
+template<typename T>
+inline TMatrix4<T> TMatrix4<T>::operator+(const TMatrix4<T>& InMat) const
+{
+	return TMatrix4<T>(Columns[0] + InMat[0], Columns[1] + InMat[1], Columns[2] + InMat[2], Columns[3] + InMat[3]);
+}
+
+template<typename T>
+inline TMatrix4<T>& TMatrix4<T>::operator+=(const TMatrix4<T>& InMat)
+{
+	Columns[0] += InMat[0];
+	Columns[1] += InMat[1];
+	Columns[2] += InMat[2];
+	Columns[3] += InMat[3];
+	return *this;
+}
+
+template<typename T>
+inline TMatrix4<T> TMatrix4<T>::operator-(const TMatrix4<T>& InMat) const
+{
+	return TMatrix4<T>(Columns[0] - InMat[0], Columns[1] - InMat[1], Columns[2] - InMat[2], Columns[3] - InMat[3]);
+}
+
+template<typename T>
+inline TMatrix4<T>& TMatrix4<T>::operator-=(const TMatrix4<T>& InMat)
+{
+	Columns[0] -= InMat[0];
+	Columns[1] -= InMat[1];
+	Columns[2] -= InMat[2];
+	Columns[3] -= InMat[3];
+	return *this;
+}
+
+template<typename T>
+inline TMatrix4<T> TMatrix4<T>::operator*(const TMatrix4<T>& InMat) const
 {
 	//From GLM
-	FVector4 const SrcA0 = Columns[0];
-	FVector4 const SrcA1 = Columns[1];
-	FVector4 const SrcA2 = Columns[2];
-	FVector4 const SrcA3 = Columns[3];
+	TVector4<T> const SrcA0 = Columns[0];
+	TVector4<T> const SrcA1 = Columns[1];
+	TVector4<T> const SrcA2 = Columns[2];
+	TVector4<T> const SrcA3 = Columns[3];
 
-	FVector4 const SrcB0 = InMat[0];
-	FVector4 const SrcB1 = InMat[1];
-	FVector4 const SrcB2 = InMat[2];
-	FVector4 const SrcB3 = InMat[3];
+	TVector4<T> const SrcB0 = InMat[0];
+	TVector4<T> const SrcB1 = InMat[1];
+	TVector4<T> const SrcB2 = InMat[2];
+	TVector4<T> const SrcB3 = InMat[3];
 
-	FMatrix4 Result;
+	TMatrix4<T> Result;
 	Result[0] = SrcA0 * SrcB0[0] + SrcA1 * SrcB0[1] + SrcA2 * SrcB0[2] + SrcA3 * SrcB0[3];
 	Result[1] = SrcA0 * SrcB1[0] + SrcA1 * SrcB1[1] + SrcA2 * SrcB1[2] + SrcA3 * SrcB1[3];
 	Result[2] = SrcA0 * SrcB2[0] + SrcA1 * SrcB2[1] + SrcA2 * SrcB2[2] + SrcA3 * SrcB2[3];
@@ -72,15 +124,49 @@ inline FMatrix4 FMatrix4::operator*(const FMatrix4& InMat) const
 	return Result;
 }
 
-inline FMatrix4& FMatrix4::operator*=(const FMatrix4& InMat)
+template<typename T>
+inline TMatrix4<T>& TMatrix4<T>::operator*=(const TMatrix4<T>& InMat)
 {
 	return (*this = *this * InMat);
 }
 
-inline FMatrix4 FMatrix4::Inverse() const
+template<typename T>
+inline TMatrix4<T> TMatrix4<T>::operator*(T InScalar) const
+{
+	return TMatrix4<T>(Columns[0] * InScalar, Columns[1] * InScalar, Columns[2] * InScalar, Columns[3] * InScalar);
+}
+
+template<typename T>
+inline TMatrix4<T>& TMatrix4<T>::operator*=(T InScalar)
+{
+	Columns[0] *= InScalar;
+	Columns[1] *= InScalar;
+	Columns[2] *= InScalar;
+	Columns[3] *= InScalar;
+	return *this;
+}
+
+template<typename T>
+inline TVector4<T> TMatrix4<T>::operator*(const TVector4<T>& InVec) const
+{
+	TVector4<T> Result;
+	Result[0] = Columns[0][0] * InVec[0] + Columns[0][1] * InVec[1] + Columns[0][2] * InVec[2] + Columns[0][3] * InVec[3];
+	Result[1] = Columns[1][0] * InVec[0] + Columns[1][1] * InVec[1] + Columns[1][2] * InVec[2] + Columns[1][3] * InVec[3];
+	Result[2] = Columns[2][0] * InVec[0] + Columns[2][1] * InVec[1] + Columns[2][2] * InVec[2] + Columns[2][3] * InVec[3];
+	Result[3] = Columns[3][0] * InVec[0] + Columns[3][1] * InVec[1] + Columns[3][2] * InVec[2] + Columns[3][3] * InVec[3];
+	return Result;
+}
+
+template<typename T>
+inline void TMatrix4<T>::Invert()
+{
+	*this = Inverse();
+}
+
+template<typename T>
+inline TMatrix4<T> TMatrix4<T>::Inverse() const
 {
 	//From GLM
-	using T = float;
 	T Coef00 = Columns[2][2] * Columns[3][3] - Columns[3][2] * Columns[2][3];
 	T Coef02 = Columns[1][2] * Columns[3][3] - Columns[3][2] * Columns[1][3];
 	T Coef03 = Columns[1][2] * Columns[2][3] - Columns[2][2] * Columns[1][3];
@@ -105,30 +191,30 @@ inline FMatrix4 FMatrix4::Inverse() const
 	T Coef22 = Columns[1][0] * Columns[3][1] - Columns[3][0] * Columns[1][1];
 	T Coef23 = Columns[1][0] * Columns[2][1] - Columns[2][0] * Columns[1][1];
 
-	FVector4 Fac0(Coef00, Coef00, Coef02, Coef03);
-	FVector4 Fac1(Coef04, Coef04, Coef06, Coef07);
-	FVector4 Fac2(Coef08, Coef08, Coef10, Coef11);
-	FVector4 Fac3(Coef12, Coef12, Coef14, Coef15);
-	FVector4 Fac4(Coef16, Coef16, Coef18, Coef19);
-	FVector4 Fac5(Coef20, Coef20, Coef22, Coef23);
+	TVector4<T> Fac0(Coef00, Coef00, Coef02, Coef03);
+	TVector4<T> Fac1(Coef04, Coef04, Coef06, Coef07);
+	TVector4<T> Fac2(Coef08, Coef08, Coef10, Coef11);
+	TVector4<T> Fac3(Coef12, Coef12, Coef14, Coef15);
+	TVector4<T> Fac4(Coef16, Coef16, Coef18, Coef19);
+	TVector4<T> Fac5(Coef20, Coef20, Coef22, Coef23);
 
-	FVector4 Vec0(Columns[1][0], Columns[0][0], Columns[0][0], Columns[0][0]);
-	FVector4 Vec1(Columns[1][1], Columns[0][1], Columns[0][1], Columns[0][1]);
-	FVector4 Vec2(Columns[1][2], Columns[0][2], Columns[0][2], Columns[0][2]);
-	FVector4 Vec3(Columns[1][3], Columns[0][3], Columns[0][3], Columns[0][3]);
+	TVector4<T> Vec0(Columns[1][0], Columns[0][0], Columns[0][0], Columns[0][0]);
+	TVector4<T> Vec1(Columns[1][1], Columns[0][1], Columns[0][1], Columns[0][1]);
+	TVector4<T> Vec2(Columns[1][2], Columns[0][2], Columns[0][2], Columns[0][2]);
+	TVector4<T> Vec3(Columns[1][3], Columns[0][3], Columns[0][3], Columns[0][3]);
 
-	FVector4 Inv0(Vec1 * Fac0 - Vec2 * Fac1 + Vec3 * Fac2);
-	FVector4 Inv1(Vec0 * Fac0 - Vec2 * Fac3 + Vec3 * Fac4);
-	FVector4 Inv2(Vec0 * Fac1 - Vec1 * Fac3 + Vec3 * Fac5);
-	FVector4 Inv3(Vec0 * Fac2 - Vec1 * Fac4 + Vec2 * Fac5);
+	TVector4<T> Inv0(Vec1 * Fac0 - Vec2 * Fac1 + Vec3 * Fac2);
+	TVector4<T> Inv1(Vec0 * Fac0 - Vec2 * Fac3 + Vec3 * Fac4);
+	TVector4<T> Inv2(Vec0 * Fac1 - Vec1 * Fac3 + Vec3 * Fac5);
+	TVector4<T> Inv3(Vec0 * Fac2 - Vec1 * Fac4 + Vec2 * Fac5);
 
-	FVector4 SignA(+1, -1, +1, -1);
-	FVector4 SignB(-1, +1, -1, +1);
-	FMatrix4 Inverse(Inv0 * SignA, Inv1 * SignB, Inv2 * SignA, Inv3 * SignB);
+	TVector4<T> SignA(+1, -1, +1, -1);
+	TVector4<T> SignB(-1, +1, -1, +1);
+	TMatrix4<T> Inverse(Inv0 * SignA, Inv1 * SignB, Inv2 * SignA, Inv3 * SignB);
 
-	FVector4 Row0(Inverse[0][0], Inverse[1][0], Inverse[2][0], Inverse[3][0]);
+	TVector4<T> Row0(Inverse[0][0], Inverse[1][0], Inverse[2][0], Inverse[3][0]);
 
-	FVector4 Dot0(Columns[0] * Row0);
+	TVector4<T> Dot0(Columns[0] * Row0);
 	T Dot1 = (Dot0.X + Dot0.Y) + (Dot0.Z + Dot0.W);
 
 	T OneOverDeterminant = static_cast<T>(1) / Dot1;
@@ -136,24 +222,66 @@ inline FMatrix4 FMatrix4::Inverse() const
 	return Inverse * OneOverDeterminant;
 }
 
-inline FMatrix4 FMatrix4::FromTranslate(const FVector3& InTrans)
+template<typename T>
+inline void TMatrix4<T>::Transpose()
 {
-	FMatrix4 Result(1.0F);
+	*this = Transposed();
+}
+
+template<typename T>
+inline TMatrix4<T> TMatrix4<T>::Transposed() const
+{
+	TMatrix4<T> Transposed;
+	Transposed[0][0] = Columns[0][0];
+	Transposed[0][1] = Columns[1][0];
+	Transposed[0][2] = Columns[2][0];
+	Transposed[0][3] = Columns[3][0];
+	Transposed[1][0] = Columns[0][1];
+	Transposed[1][1] = Columns[1][1];
+	Transposed[1][2] = Columns[2][1];
+	Transposed[1][3] = Columns[3][1];
+	Transposed[2][0] = Columns[0][2];
+	Transposed[2][1] = Columns[1][2];
+	Transposed[2][2] = Columns[2][2];
+	Transposed[2][3] = Columns[3][2];
+	Transposed[3][0] = Columns[0][3];
+	Transposed[3][1] = Columns[1][3];
+	Transposed[3][2] = Columns[2][3];
+	Transposed[3][3] = Columns[3][3];
+	return Transposed;
+}
+
+template<typename T>
+inline TVector3<T> TMatrix4<T>::TransfromPosition(const TVector3<T>& InVec) const
+{
+	return (*this) * TVector4<T>(InVec, 1.0F);
+}
+
+template<typename T>
+inline TVector3<T> TMatrix4<T>::TransfromVector(const TVector3<T>& InVec) const
+{
+	return (*this) * TVector4<T>(InVec, 0.0F);
+}
+
+template<typename T>
+inline TMatrix4<T> TMatrix4<T>::FromTranslate(const TVector3<T>& InTrans)
+{
+	TMatrix4<T> Result(1.0F);
 	Result[3][0] = InTrans.X;
 	Result[3][1] = InTrans.Y;
 	Result[3][2] = InTrans.Z;
 	return Result;
 }
 
-inline FMatrix4 FMatrix4::FromEuler(const FRotator& InRot)
+template<typename T>
+inline TMatrix4<T> TMatrix4<T>::FromEuler(const TRotator<T>& InRot)
 {
-	float rPitch = Radians(InRot.Pitch);
-	float rYaw = Radians(InRot.Yaw);
-	float rRoll = Radians(InRot.Roll);
+	T rPitch = Radians(InRot.Pitch);
+	T rYaw = Radians(InRot.Yaw);
+	T rRoll = Radians(InRot.Roll);
 
 	//From GLM
-	using T = float;
-	FMatrix4 Result(T(1.0F));
+	TMatrix4<T> Result(T(1.0F));
 	T tmp_ch = std::cos(rYaw);
 	T tmp_sh = std::sin(rYaw);
 	T tmp_cp = std::cos(rPitch);
@@ -175,11 +303,11 @@ inline FMatrix4 FMatrix4::FromEuler(const FRotator& InRot)
 	return Result;
 }
 
-inline FMatrix4 FMatrix4::FromQuat(const FQuaternion& InQuat)
+template<typename T>
+inline TMatrix4<T> TMatrix4<T>::FromQuat(const TQuaternion<T>& InQuat)
 {
 	//From GLM
-	using T = float;
-	FMatrix4 Result(T(1.0F));
+	TMatrix4<T> Result(T(1.0F));
 	T qxx(InQuat.X * InQuat.X);
 	T qyy(InQuat.Y * InQuat.Y);
 	T qzz(InQuat.Z * InQuat.Z);
@@ -204,9 +332,10 @@ inline FMatrix4 FMatrix4::FromQuat(const FQuaternion& InQuat)
 	return Result;
 }
 
-inline FMatrix4 FMatrix4::FromScale(const FVector3& InScale)
+template<typename T>
+inline TMatrix4<T> TMatrix4<T>::FromScale(const TVector3<T>& InScale)
 {
-	FMatrix4 Result;
+	TMatrix4<T> Result;
 	Result[0][0] = InScale.X;
 	Result[1][1] = InScale.Y;
 	Result[2][2] = InScale.Z;
@@ -214,24 +343,27 @@ inline FMatrix4 FMatrix4::FromScale(const FVector3& InScale)
 	return Result;
 }
 
-inline FMatrix4 FMatrix4::FromTRS(const FVector3& InT, const FRotator& InR, const FVector3& InS)
+template<typename T>
+inline TMatrix4<T> TMatrix4<T>::FromTRS(const TVector3<T>& InT, const TRotator<T>& InR, const TVector3<T>& InS)
 {
-	return FMatrix4::FromTranslate(InT) * FMatrix4::FromEuler(InR) * FMatrix4::FromScale(InS);
+	return TMatrix4<T>::FromTranslate(InT) * TMatrix4<T>::FromEuler(InR) * TMatrix4<T>::FromScale(InS);
 }
 
-inline FMatrix4 FMatrix4::FromTRS(const FVector3& InT, const FQuaternion& InQ, const FVector3& InS)
+template<typename T>
+inline TMatrix4<T> TMatrix4<T>::FromTRS(const TVector3<T>& InT, const TQuaternion<T>& InQ, const TVector3<T>& InS)
 {
-	return FMatrix4::FromTranslate(InT) * FMatrix4::FromQuat(InQ) * FMatrix4::FromScale(InS);
+	return TMatrix4<T>::FromTranslate(InT) * TMatrix4<T>::FromQuat(InQ) * TMatrix4<T>::FromScale(InS);
 }
 
-inline FMatrix4 FMatrix4::Perspective(float InFOV, float InAspectRatio, float InNear, float InFar)
+template<typename T>
+inline TMatrix4<T> TMatrix4<T>::Perspective(float InFOV, float InAspectRatio, float InNear, float InFar)
 {
 	//From GLM
 	assert(std::abs(InAspectRatio) > 0.0F);
 
 	float const tanHalfFovy = std::tan(InFOV / 2.0F);
 
-	FMatrix4 Result;
+	TMatrix4<T> Result;
 	Result[0][0] = 1.0F / (InAspectRatio * tanHalfFovy);
 	Result[1][1] = 1.0F / (tanHalfFovy);
 	Result[2][2] = -(InFar + InNear) / (InFar - InNear);
@@ -240,10 +372,11 @@ inline FMatrix4 FMatrix4::Perspective(float InFOV, float InAspectRatio, float In
 	return Result;
 }
 
-inline FMatrix4 FMatrix4::Othographic(float InLeft, float InRight, float InBottom, float InTop, float InNear, float InFar)
+template<typename T>
+inline TMatrix4<T> TMatrix4<T>::Othographic(float InLeft, float InRight, float InBottom, float InTop, float InNear, float InFar)
 {
 	//From GLM
-	FMatrix4 Result(1.0F);
+	TMatrix4<T> Result(1.0F);
 	Result[0][0] = 2.0F / (InRight - InLeft);
 	Result[1][1] = 2.0F / (InTop - InBottom);
 	Result[2][2] = 2.0F / (InFar - InNear);
@@ -253,4 +386,5 @@ inline FMatrix4 FMatrix4::Othographic(float InLeft, float InRight, float InBotto
 	return Result;
 }
 
+}
 }

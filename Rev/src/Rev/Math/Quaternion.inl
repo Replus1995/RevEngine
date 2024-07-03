@@ -2,11 +2,13 @@
 #include "MathUtils.h"
 #include <cmath>
 
-namespace Rev::Math
+namespace Rev
+{
+namespace Math
 {
 
 template<typename T>
-TQuaternion<T>::TQuaternion()
+inline TQuaternion<T>::TQuaternion()
 	: X(0.0F)
 	, Y(0.0F)
 	, Z(0.0F)
@@ -15,7 +17,7 @@ TQuaternion<T>::TQuaternion()
 }
 
 template<typename T>
-TQuaternion<T>::TQuaternion(T InX, T InY, T InZ, T InW)
+inline TQuaternion<T>::TQuaternion(T InX, T InY, T InZ, T InW)
 	: X(InX)
 	, Y(InY)
 	, Z(InZ)
@@ -24,7 +26,7 @@ TQuaternion<T>::TQuaternion(T InX, T InY, T InZ, T InW)
 }
 
 template<typename T>
-TQuaternion<T>::TQuaternion(const TQuaternion<T>& InQuat)
+inline TQuaternion<T>::TQuaternion(const TQuaternion<T>& InQuat)
 	: X(InQuat.X)
 	, Y(InQuat.Y)
 	, Z(InQuat.Z)
@@ -33,25 +35,25 @@ TQuaternion<T>::TQuaternion(const TQuaternion<T>& InQuat)
 }
 
 template<typename T>
-bool TQuaternion<T>::operator==(const TQuaternion<T>& InQuat) const
+inline bool TQuaternion<T>::operator==(const TQuaternion<T>& InQuat) const
 {
 	return X == InQuat.X && Y == InQuat.Y && Z == InQuat.Z && W == InQuat.W;
 }
 
 template<typename T>
-bool TQuaternion<T>::operator!=(const TQuaternion<T>& InQuat) const
+inline bool TQuaternion<T>::operator!=(const TQuaternion<T>& InQuat) const
 {
 	return X != InQuat.X || Y != InQuat.Y || Z != InQuat.Z || W != InQuat.W;
 }
 
 template<typename T>
-TQuaternion<T> TQuaternion<T>::operator-() const
+inline TQuaternion<T> TQuaternion<T>::operator-() const
 {
 	return TQuaternion<T>(-X, -Y, -Z, -W);
 }
 
 template<typename T>
-TQuaternion<T>& TQuaternion<T>::operator=(const TQuaternion<T>& InQuat)
+inline TQuaternion<T>& TQuaternion<T>::operator=(const TQuaternion<T>& InQuat)
 {
 	X = InQuat.X;
 	Y = InQuat.Y;
@@ -61,13 +63,13 @@ TQuaternion<T>& TQuaternion<T>::operator=(const TQuaternion<T>& InQuat)
 }
 
 template<typename T>
-TQuaternion<T> TQuaternion<T>::operator+(const TQuaternion<T>& InQuat) const
+inline TQuaternion<T> TQuaternion<T>::operator+(const TQuaternion<T>& InQuat) const
 {
 	return TQuaternion<T>(X + InQuat.X, Y + InQuat.Y, Z + InQuat.Z, W + InQuat.W);
 }
 
 template<typename T>
-TQuaternion<T>& TQuaternion<T>::operator+=(const TQuaternion<T>& InQuat)
+inline TQuaternion<T>& TQuaternion<T>::operator+=(const TQuaternion<T>& InQuat)
 {
 	X += InQuat.X;
 	Y += InQuat.Y;
@@ -77,13 +79,13 @@ TQuaternion<T>& TQuaternion<T>::operator+=(const TQuaternion<T>& InQuat)
 }
 
 template<typename T>
-TQuaternion<T> TQuaternion<T>::operator-(const TQuaternion<T>& InQuat) const
+inline TQuaternion<T> TQuaternion<T>::operator-(const TQuaternion<T>& InQuat) const
 {
 	return TQuaternion<T>(X - InQuat.X, Y - InQuat.Y, Z - InQuat.Z, W - InQuat.W);;
 }
 
 template<typename T>
-TQuaternion<T>& TQuaternion<T>::operator-=(const TQuaternion<T>& InQuat)
+inline TQuaternion<T>& TQuaternion<T>::operator-=(const TQuaternion<T>& InQuat)
 {
 	X -= InQuat.X;
 	Y -= InQuat.Y;
@@ -93,7 +95,7 @@ TQuaternion<T>& TQuaternion<T>::operator-=(const TQuaternion<T>& InQuat)
 }
 
 template<typename T>
-TQuaternion<T> TQuaternion<T>::operator*(const TQuaternion<T>& InQuat) const
+inline TQuaternion<T> TQuaternion<T>::operator*(const TQuaternion<T>& InQuat) const
 {
 	TQuaternion<T> Result(*this);
 	Result *= InQuat;
@@ -101,7 +103,7 @@ TQuaternion<T> TQuaternion<T>::operator*(const TQuaternion<T>& InQuat) const
 }
 
 template<typename T>
-TQuaternion<T>& TQuaternion<T>::operator*=(const TQuaternion<T>& InQuat)
+inline TQuaternion<T>& TQuaternion<T>::operator*=(const TQuaternion<T>& InQuat)
 {
 	//From GLM
 	const TQuaternion<T> p(*this);
@@ -115,13 +117,13 @@ TQuaternion<T>& TQuaternion<T>::operator*=(const TQuaternion<T>& InQuat)
 }
 
 template<typename T>
-TQuaternion<T> TQuaternion<T>::operator*(T InScalar) const
+inline TQuaternion<T> TQuaternion<T>::operator*(T InScalar) const
 {
 	return TQuaternion<T>(X * InScalar, Y * InScalar, Z * InScalar, W * InScalar);
 }
 
 template<typename T>
-TQuaternion<T>& TQuaternion<T>::operator*=(T InScalar)
+inline TQuaternion<T>& TQuaternion<T>::operator*=(T InScalar)
 {
 	X *= InScalar;
 	Y *= InScalar;
@@ -131,13 +133,13 @@ TQuaternion<T>& TQuaternion<T>::operator*=(T InScalar)
 }
 
 template<typename T>
-TQuaternion<T> TQuaternion<T>::operator/(T InScalar) const
+inline TQuaternion<T> TQuaternion<T>::operator/(T InScalar) const
 {
 	return TQuaternion<T>(X / InScalar, Y / InScalar, Z / InScalar, W / InScalar);
 }
 
 template<typename T>
-TQuaternion<T>& TQuaternion<T>::operator/=(T InScalar)
+inline TQuaternion<T>& TQuaternion<T>::operator/=(T InScalar)
 {
 	X /= InScalar;
 	Y /= InScalar;
@@ -147,51 +149,57 @@ TQuaternion<T>& TQuaternion<T>::operator/=(T InScalar)
 }
 
 template<typename T>
-TVector3<T> TQuaternion<T>::operator*(const TVector3<T>& InVec) const
+inline TVector3<T> TQuaternion<T>::operator*(const TVector3<T>& InVec) const
 {
 	TQuaternion<T> Result = (*this) * TQuaternion<T>(InVec.X, InVec.Y, InVec.Z, 0.0F) * Conjugate();
 	return TVector3<T>(Result.X, Result.Y, Result.Z);
 }
 
 template<typename T>
-TQuaternion<T> TQuaternion<T>::Conjugate() const
+inline TQuaternion<T> TQuaternion<T>::Conjugate() const
 {
 	return TQuaternion<T>(-X, -Y, -Z, W);
 }
 
 template<typename T>
-void TQuaternion<T>::Normalize()
+inline void TQuaternion<T>::Normalize()
 {
-	T Mag = std::sqrt(X * X + Y * Y + Z * Z + W * W);
-	if (Mag > 0.0F) {
-		T InvMag = 1.0F / Mag;
-		X *= InvMag;
-		Y *= InvMag;
-		Z *= InvMag;
-		W *= InvMag;
+	T Scale = std::sqrt(X * X + Y * Y + Z * Z + W * W);
+	if (Scale > 0.0F) {
+		Scale = 1.0F / Scale;
+		X *= Scale;
+		Y *= Scale;
+		Z *= Scale;
+		W *= Scale;
 	}
 }
 
 template<typename T>
-TVector3<T> TQuaternion<T>::Right() const
+inline TVector3<T> TQuaternion<T>::Right() const
 {
 	return (*this) * TVector3<T>(1.0F, 0.0F, 0.0F);
 }
 
 template<typename T>
-TVector3<T> TQuaternion<T>::Up() const
+inline TVector3<T> TQuaternion<T>::Up() const
 {
 	return (*this) * TVector3<T>(0.0F, 1.0F, 0.0F);
 }
 
 template<typename T>
-TVector3<T> TQuaternion<T>::Forward() const
+inline TVector3<T> TQuaternion<T>::Forward() const
 {
 	return (*this) * TVector3<T>(0.0F, 0.0F, -1.0F);
 }
 
 template<typename T>
-TQuaternion<T> TQuaternion<T>::FromAxisAngle(const TVector3<T>& InAxis, float InDegree)
+inline TQuaternion<T> TQuaternion<T>::WXYZ(T InW, T InX, T InY, T InZ)
+{
+	return TQuaternion<T>(InX, InY, InZ, InW);
+}
+
+template<typename T>
+inline TQuaternion<T> TQuaternion<T>::FromAxisAngle(const TVector3<T>& InAxis, float InDegree)
 {
 	T ra = Radians(InDegree);
 	T sa = std::sin(ra / 2.0F);
@@ -201,7 +209,7 @@ TQuaternion<T> TQuaternion<T>::FromAxisAngle(const TVector3<T>& InAxis, float In
 }
 
 template<typename T>
-std::pair<const TVector3<T>, float> TQuaternion<T>::ToAxisAngle(const TQuaternion<T>& InQuat)
+inline std::pair<const TVector3<T>, float> TQuaternion<T>::ToAxisAngle(const TQuaternion<T>& InQuat)
 {
 	float degree = Degrees(std::acos(InQuat.W) * 2.0F);
 	T sa = std::sqrt(1.0F - InQuat.W * InQuat.W);
@@ -210,7 +218,7 @@ std::pair<const TVector3<T>, float> TQuaternion<T>::ToAxisAngle(const TQuaternio
 }
 
 template<typename T>
-TQuaternion<T> TQuaternion<T>::FromEuler(const TRotator<T>& InRot)
+inline TQuaternion<T> TQuaternion<T>::FromEuler(const TRotator<T>& InRot)
 {
 	T rPitch = Radians(InRot.Pitch);
 	T rYaw = Radians(InRot.Yaw);
@@ -233,7 +241,7 @@ TQuaternion<T> TQuaternion<T>::FromEuler(const TRotator<T>& InRot)
 }
 
 template<typename T>
-TRotator<T> TQuaternion<T>::ToEuler(const TQuaternion<T>& InQuat)
+inline TRotator<T> TQuaternion<T>::ToEuler(const TQuaternion<T>& InQuat)
 {
 	T r11 = 2 * (InQuat.X * InQuat.Z + InQuat.W * InQuat.Y);
 	T r12 = InQuat.W * InQuat.W - InQuat.X * InQuat.X - InQuat.Y * InQuat.Y + InQuat.Z * InQuat.Z;
@@ -250,13 +258,13 @@ TRotator<T> TQuaternion<T>::ToEuler(const TQuaternion<T>& InQuat)
 }
 
 template<typename T>
-T TQuaternion<T>::DotProduct(const TQuaternion<T>& InQuatA, const TQuaternion<T>& InQuatB)
+inline T TQuaternion<T>::DotProduct(const TQuaternion<T>& InQuatA, const TQuaternion<T>& InQuatB)
 {
 	return (InQuatA.X * InQuatB.X) + (InQuatA.Y * InQuatB.Y) + (InQuatA.Z * InQuatB.Z) + (InQuatA.W * InQuatB.W);
 }
 
 template<typename T>
-TQuaternion<T> TQuaternion<T>::Lerp(const TQuaternion<T>& InQuatA, const TQuaternion<T>& InQuatB, float By)
+inline TQuaternion<T> TQuaternion<T>::Lerp(const TQuaternion<T>& InQuatA, const TQuaternion<T>& InQuatB, float By)
 {
 	By = Clamp(By, 0.0F, 1.0F);
 	float dot = DotProduct(InQuatA, InQuatB);
@@ -271,7 +279,7 @@ TQuaternion<T> TQuaternion<T>::Lerp(const TQuaternion<T>& InQuatA, const TQuater
 }
 
 template<typename T>
-TQuaternion<T> TQuaternion<T>::Slerp(const TQuaternion<T>& InQuatA, const TQuaternion<T>& InQuatB, float By)
+inline TQuaternion<T> TQuaternion<T>::Slerp(const TQuaternion<T>& InQuatA, const TQuaternion<T>& InQuatB, float By)
 {
 	By = Clamp(By, 0.0F, 1.0F);
 	float cBy = std::cos(By * PI());
@@ -286,4 +294,5 @@ TQuaternion<T> TQuaternion<T>::Slerp(const TQuaternion<T>& InQuatA, const TQuate
 	}
 }
 
+}
 }

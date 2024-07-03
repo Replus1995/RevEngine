@@ -229,7 +229,7 @@ void OpenGLShader::Reflect(GLenum stage, const std::vector<uint32_t>& shaderData
 		const auto& bufferType = compiler.get_type(resource.base_type_id);
 		size_t bufferSize = compiler.get_declared_struct_size(bufferType);
 		uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
-		int memberCount = bufferType.member_types.size();
+		size_t memberCount = bufferType.member_types.size();
 
 		RE_CORE_TRACE("  {0}", resource.name);
 		RE_CORE_TRACE("    Size = {0}", bufferSize);
@@ -280,12 +280,12 @@ void OpenGLShader::SetUniform(ShaderUniformLocation location, const Math::FVecto
 
 void OpenGLShader::SetUniform(ShaderUniformLocation location, const Math::FMatrix3& value)
 {
-	glUniformMatrix3fv(location, 1, GL_FALSE, value.DataPtr());
+	glUniformMatrix3fv(location, 1, GL_FALSE, value.Data());
 }
 
 void OpenGLShader::SetUniform(ShaderUniformLocation location, const Math::FMatrix4& value)
 {
-	glUniformMatrix4fv(location, 1, GL_FALSE, value.DataPtr());
+	glUniformMatrix4fv(location, 1, GL_FALSE, value.Data());
 }
 
 void OpenGLShader::SetUniformArray(ShaderUniformLocation location, int* values, uint32_t count)

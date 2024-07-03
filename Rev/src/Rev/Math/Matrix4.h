@@ -2,40 +2,64 @@
 #include "Matrix3.h"
 #include "Vector4.h"
 
-namespace Rev::Math
+namespace Rev
+{
+namespace Math
 {
 
-struct FMatrix4
+template<typename T>
+struct TMatrix4
 {
+	static_assert(std::is_floating_point_v<T>, "T must be floating point");
 public:
-	FVector4 Columns[4];
+	TVector4<T> Columns[4];
 
-	FMatrix4();
-	FMatrix4(float InScalar);
-	FMatrix4(FVector4 InCol0, FVector4 InCol1, FVector4 InCol2, FVector4 InCol3);
-	FMatrix4(FMatrix3 InMat);
+	TMatrix4();
+	TMatrix4(T InScalar);
+	TMatrix4(TVector4<T> InCol0, TVector4<T> InCol1, TVector4<T> InCol2, TVector4<T> InCol3);
+	TMatrix4(TMatrix3<T> InMat);
 
-	FVector4& operator[](int Index);
-	FVector4 const& operator[](int Index) const;
-	float const* DataPtr() const;
+	operator TMatrix3<T>() const { return  TMatrix3<T>(Columns[0], Columns[1], Columns[2]); }
+	TVector4<T>& operator[](int Index);
+	TVector4<T> const& operator[](int Index) const;
+	T const* Data() const;
 
-	FMatrix4 operator*(const FMatrix4& InMat) const;
-	FMatrix4& operator*=(const FMatrix4& InMat);
+	TMatrix4<T>& operator=(const TMatrix4<T>& InMat);
 
-	FMatrix4 Inverse() const;
+	TMatrix4<T> operator+(const TMatrix4<T>& InMat) const;
+	TMatrix4<T>& operator+=(const TMatrix4<T>& InMat);
+	TMatrix4<T> operator-(const TMatrix4<T>& InMat) const;
+	TMatrix4<T>& operator-=(const TMatrix4<T>& InMat);
+	TMatrix4<T> operator*(const TMatrix4<T>& InMat) const;
+	TMatrix4<T>& operator*=(const TMatrix4<T>& InMat);
 
-	static FMatrix4 FromTranslate(const FVector3& InTrans);
-	static FMatrix4 FromEuler(const FRotator& InRot);
-	static FMatrix4 FromQuat(const FQuaternion& InQuat);
-	static FMatrix4 FromScale(const FVector3& InScale);
+	TMatrix4<T> operator*(T InScalar) const;
+	TMatrix4<T>& operator*=(T InScalar);
+	TVector4<T> operator*(const TVector4<T>& InVec) const;
 
-	static FMatrix4 FromTRS(const FVector3& InT, const FRotator& InR, const FVector3& InS);
-	static FMatrix4 FromTRS(const FVector3& InT, const FQuaternion& InQ, const FVector3& InS);
+	void Invert();
+	TMatrix4<T> Inverse() const;
+	void Transpose();
+	TMatrix4<T> Transposed() const;
 
-	static FMatrix4 Perspective(float InFOV, float InAspectRatio, float InNear, float InFar);
-	static FMatrix4 Othographic(float InLeft, float InRight, float InBottom, float InTop, float InNear, float InFar);
+	TVector3<T> TransfromPosition(const TVector3<T>& InVec) const;
+	TVector3<T> TransfromVector(const TVector3<T>& InVec) const; //No Translation
+
+	static TMatrix4<T> FromTranslate(const TVector3<T>& InTrans);
+	static TMatrix4<T> FromEuler(const TRotator<T>& InRot);
+	static TMatrix4<T> FromQuat(const TQuaternion<T>& InQuat);
+	static TMatrix4<T> FromScale(const TVector3<T>& InScale);
+
+	static TMatrix4<T> FromTRS(const TVector3<T>& InT, const TRotator<T>& InR, const TVector3<T>& InS);
+	static TMatrix4<T> FromTRS(const TVector3<T>& InT, const TQuaternion<T>& InQ, const TVector3<T>& InS);
+
+	static TMatrix4<T> Perspective(float InFOV, float InAspectRatio, float InNear, float InFar);
+	static TMatrix4<T> Othographic(float InLeft, float InRight, float InBottom, float InTop, float InNear, float InFar);
 };
 
+using FMatrix4 = TMatrix4<float>;
+
+}
 }
 
 #include "Matrix4.inl"

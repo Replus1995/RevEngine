@@ -1,12 +1,15 @@
 #pragma once
 #include "Vector2.h"
 
-namespace Rev::Math
+namespace Rev
+{
+namespace Math
 {
 
 template<typename T>
 struct TVector3
 {
+	static_assert(std::is_floating_point_v<T>, "T must be floating point");
 public:
 	T X;
 	T Y;
@@ -18,8 +21,10 @@ public:
 	TVector3(const TVector2<T>& InVec, T InZ = 0.0F);
 	TVector3(const TVector3<T>& InVec);
 
+	operator TVector2<T>() const { return  TVector2<T>(X, Y); }
 	T& operator[](int Index);
 	T const& operator[](int Index) const;
+	T const* Data() const;
 
 	bool operator==(const TVector3& InVec) const;
 	bool operator!=(const TVector3& InVec) const;
@@ -53,6 +58,7 @@ public:
 
 using FVector3 = TVector3<float>;
 
+}
 }
 
 #include "Vector3.inl"

@@ -1,12 +1,16 @@
 #pragma once
 #include "Vector3.h"
 
-namespace Rev::Math
+namespace Rev
 {
+namespace Math
+{
+
 //Rotate order is Roll->Pitch->Yaw(glm::YXZ)
 template<typename T>
 struct TRotator
 {
+	static_assert(std::is_floating_point_v<T>, "T must be floating point");
 public:
 	T Pitch;
 	T Yaw;
@@ -32,6 +36,8 @@ public:
 };
 
 using FRotator = TRotator<float>;
+
+}
 }
 
 #include "Rotator.inl"

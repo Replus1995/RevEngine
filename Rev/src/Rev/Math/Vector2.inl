@@ -2,7 +2,9 @@
 #include <cassert>
 #include <cmath>
 
-namespace Rev::Math
+namespace Rev
+{
+namespace Math
 {
 
 template<typename T>
@@ -59,6 +61,12 @@ inline T const& TVector2<T>::operator[](int Index) const
 	case 1:
 		return Y;
 	}
+}
+
+template<typename T>
+inline T const* TVector2<T>::Data() const
+{
+	return &X;
 }
 
 template<typename T>
@@ -188,14 +196,16 @@ inline TVector2<T>& TVector2<T>::operator*=(T InScalar)
 template<typename T>
 inline TVector2<T> TVector2<T>::operator/(T InScalar) const
 {
-	return TVector2<T>(X / InScalar, Y / InScalar);
+	const T InvScalar = 1.0F / InScalar;
+	return TVector2<T>(X * InvScalar, Y * InvScalar);
 }
 
 template<typename T>
 inline TVector2<T>& TVector2<T>::operator/=(T InScalar)
 {
-	X /= InScalar;
-	Y /= InScalar;
+	const T InvScalar = 1.0F / InScalar;
+	X *= InvScalar;
+	Y *= InvScalar;
 	return *this;
 }
 
@@ -214,11 +224,11 @@ inline T TVector2<T>::Length() const
 template<typename T>
 inline void TVector2<T>::Normalize()
 {
-	T length = Length();
-	if (length != 0.0F) {
-		length = 1.0F / length;
-		X = X * length;
-		Y = Y * length;
+	T Scale = Length();
+	if (Scale != 0.0F) {
+		Scale = 1.0F / Scale;
+		X *= Scale;
+		Y *= Scale;
 	}
 }
 
@@ -230,4 +240,5 @@ inline TVector2<T> TVector2<T>::Normalized() const
 	return Result;
 }
 
+}
 }

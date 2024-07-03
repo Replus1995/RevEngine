@@ -2,11 +2,13 @@
 #include "MathUtils.h"
 #include <cmath>
 
-namespace Rev::Math
+namespace Rev
+{
+namespace Math
 {
 
 template<typename T>
-TRotator<T>::TRotator() noexcept
+inline TRotator<T>::TRotator() noexcept
 	: Pitch(0.0F)
 	, Yaw(0.0F)
 	, Roll(0.0F)
@@ -14,7 +16,7 @@ TRotator<T>::TRotator() noexcept
 }
 
 template<typename T>
-TRotator<T>::TRotator(T InScale) noexcept
+inline TRotator<T>::TRotator(T InScale) noexcept
 	: Pitch(InScale)
 	, Yaw(InScale)
 	, Roll(InScale)
@@ -22,7 +24,7 @@ TRotator<T>::TRotator(T InScale) noexcept
 }
 
 template<typename T>
-TRotator<T>::TRotator(T InPitch, T InYaw, T InRoll) noexcept
+inline TRotator<T>::TRotator(T InPitch, T InYaw, T InRoll) noexcept
 	: Pitch(InPitch)
 	, Yaw(InYaw)
 	, Roll(InRoll)
@@ -30,7 +32,7 @@ TRotator<T>::TRotator(T InPitch, T InYaw, T InRoll) noexcept
 }
 
 template<typename T>
-TRotator<T>::TRotator(const TRotator<T>& InRot) noexcept
+inline TRotator<T>::TRotator(const TRotator<T>& InRot) noexcept
 	: Pitch(InRot.Pitch)
 	, Yaw(InRot.Yaw)
 	, Roll(InRot.Roll)
@@ -38,19 +40,19 @@ TRotator<T>::TRotator(const TRotator<T>& InRot) noexcept
 }
 
 template<typename T>
-bool TRotator<T>::operator==(const TRotator<T>& InRot) const
+inline bool TRotator<T>::operator==(const TRotator<T>& InRot) const
 {
 	return Pitch == InRot.Pitch && Yaw == InRot.Yaw && Roll == InRot.Roll;
 }
 
 template<typename T>
-bool TRotator<T>::operator!=(const TRotator<T>& InRot) const
+inline bool TRotator<T>::operator!=(const TRotator<T>& InRot) const
 {
 	return Pitch != InRot.Pitch || Yaw != InRot.Yaw || Roll != InRot.Roll;
 }
 
 template<typename T>
-TRotator<T>& TRotator<T>::operator=(const TRotator<T>& InRot) noexcept
+inline TRotator<T>& TRotator<T>::operator=(const TRotator<T>& InRot) noexcept
 {
 	Pitch = InRot.Pitch;
 	Yaw = InRot.Yaw;
@@ -59,13 +61,13 @@ TRotator<T>& TRotator<T>::operator=(const TRotator<T>& InRot) noexcept
 }
 
 template<typename T>
-TRotator<T> TRotator<T>::operator+(const TRotator<T>& InRot) const
+inline TRotator<T> TRotator<T>::operator+(const TRotator<T>& InRot) const
 {
 	return TRotator<T>(Pitch + InRot.Pitch, Yaw + InRot.Yaw, Roll + InRot.Roll);
 }
 
 template<typename T>
-TRotator<T>& TRotator<T>::operator+=(const TRotator<T>& InRot)
+inline TRotator<T>& TRotator<T>::operator+=(const TRotator<T>& InRot)
 {
 	Pitch += InRot.Pitch;
 	Yaw += InRot.Yaw;
@@ -74,14 +76,14 @@ TRotator<T>& TRotator<T>::operator+=(const TRotator<T>& InRot)
 }
 
 template<typename T>
-TRotator<T> TRotator<T>::operator-(const TRotator<T>& InRot) const
+inline TRotator<T> TRotator<T>::operator-(const TRotator<T>& InRot) const
 
 {
 	return TRotator<T>(Pitch - InRot.Pitch, Yaw - InRot.Yaw, Roll - InRot.Roll);
 }
 
 template<typename T>
-TRotator<T>& TRotator<T>::operator-=(const TRotator<T>& InRot)
+inline TRotator<T>& TRotator<T>::operator-=(const TRotator<T>& InRot)
 {
 	Pitch -= InRot.Pitch;
 	Yaw -= InRot.Yaw;
@@ -90,7 +92,7 @@ TRotator<T>& TRotator<T>::operator-=(const TRotator<T>& InRot)
 }
 
 template<typename T>
-TVector3<T> TRotator<T>::Right() const
+inline TVector3<T> TRotator<T>::Right() const
 {
 	T rPitch = Radians(Pitch);
 	T rYaw = Radians(Yaw);
@@ -112,7 +114,7 @@ TVector3<T> TRotator<T>::Right() const
 }
 
 template<typename T>
-TVector3<T> TRotator<T>::Up() const
+inline TVector3<T> TRotator<T>::Up() const
 {
 	T rPitch = Radians(Pitch);
 	T rYaw = Radians(Yaw);
@@ -134,7 +136,7 @@ TVector3<T> TRotator<T>::Up() const
 }
 
 template<typename T>
-TVector3<T> TRotator<T>::Forward() const
+inline TVector3<T> TRotator<T>::Forward() const
 {
 	T rPitch = Radians(Pitch);
 	T rYaw = Radians(Yaw);
@@ -152,4 +154,5 @@ TVector3<T> TRotator<T>::Forward() const
 	return Result;
 }
 
+}
 }

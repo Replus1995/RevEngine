@@ -1,11 +1,15 @@
 #pragma once
+#include <type_traits>
 
-namespace Rev::Math
+namespace Rev
+{
+namespace Math
 {
 
 template<typename T>
 struct TVector2
 {
+	static_assert(std::is_floating_point_v<T>, "T must be floating point");
 public:
 	T X;
 	T Y;
@@ -17,6 +21,7 @@ public:
 
 	T& operator[](int Index);
 	T const& operator[](int Index) const;
+	T const* Data() const;
 
 	bool operator==(const TVector2<T>& InVec) const;
 	bool operator!=(const TVector2<T>& InVec) const;
@@ -50,6 +55,7 @@ public:
 
 using FVector2 = TVector2<float>;
 
+}
 }
 
 #include "Vector2.inl"

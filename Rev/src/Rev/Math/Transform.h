@@ -3,7 +3,9 @@
 #include "Rotator.h"
 #include "Matrix4.h"
 
-namespace Rev::Math
+namespace Rev
+{
+namespace Math
 {
 
 struct FTransform
@@ -34,4 +36,5 @@ public:
 	}
 };
 
+}
 }

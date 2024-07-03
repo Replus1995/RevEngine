@@ -3,12 +3,15 @@
 #include "Vector3.h"
 #include <utility>
 
-namespace Rev::Math
+namespace Rev
+{
+namespace Math
 {
 
 template<typename T>
 struct TQuaternion
 {
+	static_assert(std::is_floating_point_v<T>, "T must be floating point");
 public:
 	T X;
 	T Y;
@@ -44,10 +47,14 @@ public:
 	TVector3<T> Up() const;
 	TVector3<T> Forward() const;
 
+	static TQuaternion<T> WXYZ(T InW, T InX, T InY, T InZ);
+
 	static TQuaternion<T> FromAxisAngle(const TVector3<T>& InAxis, float InDegree);
 	static std::pair<const TVector3<T>, float> ToAxisAngle(const TQuaternion<T>& InQuat);
+
 	static TQuaternion<T> FromEuler(const TRotator<T>& InRot);
 	static TRotator<T> ToEuler(const TQuaternion<T>& InQuat);
+
 	static T DotProduct(const TQuaternion<T>& InQuatA, const TQuaternion<T>& InQuatB);
 	static TQuaternion<T> Lerp(const TQuaternion<T>& InQuatA, const TQuaternion<T>& InQuatB, float By);
 	static TQuaternion<T> Slerp(const TQuaternion<T>& InQuatA, const TQuaternion<T>& InQuatB, float By);
@@ -55,6 +62,7 @@ public:
 
 using FQuaternion = TQuaternion<float>;
 
+}
 }
 
 #include "Quaternion.inl"

@@ -37,10 +37,11 @@ std::ostream& operator<<(std::ostream& os, const Rev::Math::TQuaternion<T>& vec)
 	return os;
 }
 
-inline std::ostream& operator<<(std::ostream& os, const Rev::Math::FMatrix3 mat)
+template<typename T>
+std::ostream& operator<<(std::ostream& os, const Rev::Math::TMatrix3<T> mat)
 {
 	os << "[\n";
-	for (size_t i = 0; i < 3; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		os << mat[0][i] << "," << mat[1][i] << "," << mat[2][i] << ";\n";
 	}
@@ -48,13 +49,26 @@ inline std::ostream& operator<<(std::ostream& os, const Rev::Math::FMatrix3 mat)
 	return os;
 }
 
-inline std::ostream& operator<<(std::ostream& os, const Rev::Math::FMatrix4 mat)
+template<typename T>
+inline std::ostream& operator<<(std::ostream& os, const Rev::Math::TMatrix4<T> mat)
 {
 	os << "[\n";
-	for (size_t i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		os << mat[0][i] << "," << mat[1][i] << "," << mat[2][i] << "," << mat[3][i] << ";\n";
 	}
 	os << "]";
+	return os;
+}
+
+inline std::ostream& operator<<(std::ostream& os, const Rev::Math::FColor& c)
+{
+	os << "(" << (int)c.R << ", " << (int)c.G << ", " << (int)c.B << ", " << (int)c.A << ")";
+	return os;
+}
+
+inline std::ostream& operator<<(std::ostream& os, const Rev::Math::FLinearColor& c)
+{
+	os << "(" << c.R << ", " << c.G << ", " << c.B << ", " << c.A << ")";
 	return os;
 }
