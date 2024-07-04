@@ -9,14 +9,17 @@ project "Rev"
 
     files
     {
-        "src/**.h",
-        "src/**.inl",
-        "src/**.cpp"
+        "Source/**.h",
+        "Source/**.inl",
+        "Source/**.hpp",
+        "Source/**.cpp"
     }
 
     includedirs
     {
-        "src",
+        "Source/Public",
+        "Source/Private",
+        "Source",
         "%{IncludeDir.spdlog}",
         "%{IncludeDir.glm}",
         "%{IncludeDir.glfw}",
@@ -51,7 +54,7 @@ project "Rev"
         cppdialect "C++17"
         staticruntime "On"
         systemversion "latest"
-        buildoptions { "/bigobj"}
+        buildoptions { "/bigobj" }
 
         defines
         {

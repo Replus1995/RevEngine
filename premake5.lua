@@ -15,6 +15,8 @@ workspace "RevEngine"
 --outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 outputdir = "%{cfg.buildcfg}"
 
+IncludeDir["Rev"] = "%{wks.location}/../Rev/Source/Public"
+
 group "Dependencies"
     include "vendor/Glad"
     include "vendor/imgui"

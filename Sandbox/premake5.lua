@@ -17,7 +17,7 @@ project "Sandbox"
         "%{IncludeDir.spdlog}",
         "%{IncludeDir.glm}",
         "%{IncludeDir.entt}",
-        "%{wks.location}/../Rev/src"
+        "%{IncludeDir.Rev}"
     }
 
     links
