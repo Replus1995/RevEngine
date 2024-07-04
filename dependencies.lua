@@ -7,11 +7,13 @@ IncludeDir = {}
 IncludeDir = {}
 IncludeDir["glfw"] = "%{wks.location}/../vendor/glfw/include"
 IncludeDir["glm"] = "%{wks.location}/../vendor/glm"
-IncludeDir["stb"] = "%{wks.location}/../vendor/stb"
 IncludeDir["spdlog"] = "%{wks.location}/../vendor/spdlog/include"
 IncludeDir["Glad"] = "%{wks.location}/../vendor/Glad/include"
 IncludeDir["ImGui"] = "%{wks.location}/../vendor/imgui"
 IncludeDir["entt"] = "%{wks.location}/../vendor/entt/single_include"
+IncludeDir["stb"] = "%{wks.location}/../vendor/stb"
+IncludeDir["jsonhpp"] = "%{wks.location}/../vendor/jsonhpp"
+IncludeDir["tinygltf"] = "%{wks.location}/../vendor/tinygltf"
 
 IncludeDir["VulkanSDK"] = "%{VULKAN_SDK}/Include"
 

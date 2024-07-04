@@ -1,5 +1,5 @@
 #pragma once
-#include "Rev/Render/Mesh.h"
+#include "Rev/Render/Mesh/Mesh.h"
 
 namespace Rev
 {

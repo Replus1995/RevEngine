@@ -38,6 +38,7 @@ public:
 	FLinearColor(const FColor& InColor);
 	FLinearColor(const FVector4& InVec);
 
+	operator FVector4() { return FVector4(R, G, B, A); }
 	float& operator[](int Index);
 	float const& operator[](int Index) const;
 	float const* Data() const;

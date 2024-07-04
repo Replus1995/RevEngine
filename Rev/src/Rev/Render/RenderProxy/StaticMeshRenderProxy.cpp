@@ -1,6 +1,5 @@
 #include "StaticMeshRenderProxy.h"
-#include "Rev/Render/StaticMesh.h"
-#include "Rev/Render/Material.h"
+#include "Rev/Render/Mesh/StaticMesh.h"
 #include "Rev/Render/RenderProxy/SceneRenderProxy.h"
 #include "Rev/Render/RenderCmd.h"
 #include "Rev/Render/Renderer.h"

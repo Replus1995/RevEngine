@@ -2,21 +2,40 @@
 #include "Rev/Core/Base.h"
 #include "Rev/Render/RenderCore.h"
 #include <string>
+#include <vector>
 
 namespace Rev
 {
+
+enum class EBufferElementType
+{
+	None = 0,
+	Float,
+	Float2,
+	Float3,
+	Float4,
+	Mat3,
+	Mat4,
+	Int,
+	Int2,
+	Int3,
+	Int4,
+	Bool
+};
+uint32 BufferElementTypeSize(EBufferElementType type);
+
 struct BufferElement
 {
 	std::string Name;
-	EShaderDataType Type;
+	EBufferElementType Type;
 	uint32 Size;
 	uint32 Offset;
 	bool Normalized;
 
 	BufferElement() = default;
 
-	BufferElement(EShaderDataType type, const std::string& name, bool normalized = false)
-		: Name(name), Type(type), Size(ShaderDataTypeSize(type)), Offset(0), Normalized(normalized)
+	BufferElement(EBufferElementType type, const std::string& name, bool normalized = false)
+		: Name(name), Type(type), Size(BufferElementTypeSize(type)), Offset(0), Normalized(normalized)
 	{
 	}
 

@@ -1,7 +1,7 @@
 #include "OpenGLTexture.h"
 #include "Rev/Core/Assert.h"
 
-#include <stb_image.h>
+//#include <stb_image.h>
 
 namespace Rev
 {
@@ -16,44 +16,45 @@ OpenGLTexture2D::OpenGLTexture2D(const TextureDescription& desc)
 OpenGLTexture2D::OpenGLTexture2D(const std::string& path)
 	: mFilePath(path)
 {
-	int width, height, channels;
-	stbi_set_flip_vertically_on_load(1);
-	stbi_uc* data = nullptr;
-	{
-		//PE_PROFILE_SCOPE("stbi_load - OpenGLTexture2D::OpenGLTexture2D(const std::string&)");
-		data = stbi_load(path.c_str(), &width, &height, &channels, 0);
-	}
+	assert(0);
+	//int width, height, channels;
+	//stbi_set_flip_vertically_on_load(1);
+	//stbi_uc* data = nullptr;
+	//{
+	//	//PE_PROFILE_SCOPE("stbi_load - OpenGLTexture2D::OpenGLTexture2D(const std::string&)");
+	//	data = stbi_load(path.c_str(), &width, &height, &channels, 0);
+	//}
 
-	if (data)
-	{
-		mLoaded = true;
+	//if (data)
+	//{
+	//	mLoaded = true;
 
-		mWidth = width;
-		mHeight = height;
+	//	mWidth = width;
+	//	mHeight = height;
 
-		GLenum internalFormat = 0, dataFormat = 0;
-		if (channels == 4)
-		{
-			internalFormat = GL_RGBA8;
-			dataFormat = GL_RGBA;
-		}
-		else if (channels == 3)
-		{
-			internalFormat = GL_RGB8;
-			dataFormat = GL_RGB;
-		}
+	//	GLenum internalFormat = 0, dataFormat = 0;
+	//	if (channels == 4)
+	//	{
+	//		internalFormat = GL_RGBA8;
+	//		dataFormat = GL_RGBA;
+	//	}
+	//	else if (channels == 3)
+	//	{
+	//		internalFormat = GL_RGB8;
+	//		dataFormat = GL_RGB;
+	//	}
 
-		mInternalFormat = internalFormat;
-		mDataFormat = dataFormat;
-		mDataType = GL_UNSIGNED_BYTE; //do not support float format
+	//	mInternalFormat = internalFormat;
+	//	mDataFormat = dataFormat;
+	//	mDataType = GL_UNSIGNED_BYTE; //do not support float format
 
-		RE_CORE_ASSERT(internalFormat & dataFormat, "Format not supported!");
+	//	RE_CORE_ASSERT(internalFormat & dataFormat, "Format not supported!");
 
-		CreateTexture();
-		glTextureSubImage2D(mHandle, 0, 0, 0, mWidth, mHeight, dataFormat, GL_UNSIGNED_BYTE, data);
+	//	CreateTexture();
+	//	glTextureSubImage2D(mHandle, 0, 0, 0, mWidth, mHeight, dataFormat, GL_UNSIGNED_BYTE, data);
 
-		stbi_image_free(data);
-	}
+	//	stbi_image_free(data);
+	//}
 }
 
 OpenGLTexture2D::~OpenGLTexture2D()

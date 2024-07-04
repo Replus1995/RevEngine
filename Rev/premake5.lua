@@ -23,8 +23,10 @@ project "Rev"
         "%{IncludeDir.ImGui}",
         "%{IncludeDir.Glad}",
         "%{IncludeDir.VulkanSDK}",
-        "%{IncludeDir.stb}",
         "%{IncludeDir.entt}",
+        "%{IncludeDir.stb}",
+        "%{IncludeDir.jsonhpp}",
+        "%{IncludeDir.tinygltf}",
     }
 
     libdirs
@@ -49,6 +51,7 @@ project "Rev"
         cppdialect "C++17"
         staticruntime "On"
         systemversion "latest"
+        buildoptions { "/bigobj"}
 
         defines
         {

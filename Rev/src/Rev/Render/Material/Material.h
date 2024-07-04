@@ -1,5 +1,5 @@
 #pragma once
-#include "Rev/Render/MaterialUniform.h"
+#include "Rev/Render/Material/MaterialUniform.h"
 #include "Rev/Math/Maths.h"
 #include <unordered_map>
 
@@ -14,29 +14,22 @@ enum class EMaterialDomain
 };
 
 class MaterialUniform;
-class REV_API Material
+class Material
 {
 public:
-	Material(const Ref<Shader>& program);
-	virtual ~Material();
+	REV_API Material(const Ref<Shader>& program);
+	REV_API virtual ~Material();
 	
 	/*const Ref<Shader>& GetShader() const
 	{
 		return mProgram;
 	}*/
 
-	void SetDomain(EMaterialDomain domain)
-	{
-		mDomain = domain;
-	}
+	REV_API void SetDomain(EMaterialDomain domain);
+	REV_API EMaterialDomain GetDomain() const;
 
-	EMaterialDomain GetDomain() const
-	{
-		return mDomain;
-	}
-
-	void Bind();
-	void Unbind();
+	REV_API void Bind();
+	REV_API void Unbind();
 
 protected:
 	virtual void UploadUniform();

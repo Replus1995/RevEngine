@@ -19,21 +19,22 @@ private:
 	static std::map<std::string, std::string>& GetDirMap();
 };
 
-class REV_API Path
+class Path
 {
 public:
-	Path(const std::string& path = "");
-	~Path();
-
-	std::string ToNative();
-
-	Path& operator=(const std::string& path);
-	const std::string& operator()() const;
+	REV_API Path();
+	REV_API Path(const std::string& InPath);
+	REV_API ~Path();
+	REV_API Path& operator=(const Path& InPath);
+	
+	REV_API const std::string& Name() const;
+	REV_API const std::string& Extension() const;
+	REV_API bool Empty() const;
+	REV_API std::string ToNative();
 private:
-	void InnerSetPath(const std::string& path);
-
-private:
-	std::string mPathStr;
+	std::string mFullPath;
+	std::string mFileName;
+	std::string mFileExtension;
 };
 
 

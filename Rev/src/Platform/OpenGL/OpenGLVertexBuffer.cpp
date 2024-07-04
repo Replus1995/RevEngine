@@ -72,21 +72,21 @@ void OpenGLIndexBuffer::Unbind() const
 
 /*Vertex Array*/
 
-static GLenum ConvertToOpenGLDataType(EShaderDataType type)
+static GLenum ConvertToOpenGLDataType(EBufferElementType type)
 {
 	switch (type)
 	{
-	case EShaderDataType::Float:    return GL_FLOAT;
-	case EShaderDataType::Float2:   return GL_FLOAT;
-	case EShaderDataType::Float3:   return GL_FLOAT;
-	case EShaderDataType::Float4:   return GL_FLOAT;
-	case EShaderDataType::Mat3:     return GL_FLOAT;
-	case EShaderDataType::Mat4:     return GL_FLOAT;
-	case EShaderDataType::Int:      return GL_INT;
-	case EShaderDataType::Int2:     return GL_INT;
-	case EShaderDataType::Int3:     return GL_INT;
-	case EShaderDataType::Int4:     return GL_INT;
-	case EShaderDataType::Bool:     return GL_BOOL;
+	case EBufferElementType::Float:    return GL_FLOAT;
+	case EBufferElementType::Float2:   return GL_FLOAT;
+	case EBufferElementType::Float3:   return GL_FLOAT;
+	case EBufferElementType::Float4:   return GL_FLOAT;
+	case EBufferElementType::Mat3:     return GL_FLOAT;
+	case EBufferElementType::Mat4:     return GL_FLOAT;
+	case EBufferElementType::Int:      return GL_INT;
+	case EBufferElementType::Int2:     return GL_INT;
+	case EBufferElementType::Int3:     return GL_INT;
+	case EBufferElementType::Int4:     return GL_INT;
+	case EBufferElementType::Bool:     return GL_BOOL;
 	}
 
 	RE_CORE_ASSERT(false, "Unknown ShaderDataType!");
@@ -125,10 +125,10 @@ void OpenGLVertexArray::AddVertexBuffer(const std::shared_ptr<VertexBuffer>& ver
 	{
 		switch (element.Type)
 		{
-		case EShaderDataType::Float:
-		case EShaderDataType::Float2:
-		case EShaderDataType::Float3:
-		case EShaderDataType::Float4:
+		case EBufferElementType::Float:
+		case EBufferElementType::Float2:
+		case EBufferElementType::Float3:
+		case EBufferElementType::Float4:
 		{
 			glEnableVertexAttribArray(mVertexBufferIndex);
 			glVertexAttribPointer(mVertexBufferIndex,
@@ -140,11 +140,11 @@ void OpenGLVertexArray::AddVertexBuffer(const std::shared_ptr<VertexBuffer>& ver
 			mVertexBufferIndex++;
 			break;
 		}
-		case EShaderDataType::Int:
-		case EShaderDataType::Int2:
-		case EShaderDataType::Int3:
-		case EShaderDataType::Int4:
-		case EShaderDataType::Bool:
+		case EBufferElementType::Int:
+		case EBufferElementType::Int2:
+		case EBufferElementType::Int3:
+		case EBufferElementType::Int4:
+		case EBufferElementType::Bool:
 		{
 			glEnableVertexAttribArray(mVertexBufferIndex);
 			glVertexAttribIPointer(mVertexBufferIndex,
@@ -155,8 +155,8 @@ void OpenGLVertexArray::AddVertexBuffer(const std::shared_ptr<VertexBuffer>& ver
 			mVertexBufferIndex++;
 			break;
 		}
-		case EShaderDataType::Mat3:
-		case EShaderDataType::Mat4:
+		case EBufferElementType::Mat3:
+		case EBufferElementType::Mat4:
 		{
 			uint8_t count = element.GetComponentCount();
 			for (uint8_t i = 0; i < count; i++)

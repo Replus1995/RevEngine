@@ -19,6 +19,17 @@ Material::~Material()
 {
 }
 
+void Material::SetDomain(EMaterialDomain domain)
+{
+	mDomain = domain;
+}
+
+
+EMaterialDomain Material::GetDomain() const
+{
+	return mDomain;
+}
+
 void Material::Bind()
 {
 	mProgram->Bind();

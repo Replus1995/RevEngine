@@ -2,8 +2,8 @@
 #include "Rev/Render/RenderCmd.h"
 #include "Rev/Render/Resource/VertexBuffer.h"
 #include "Rev/Render/Resource/Shader.h"
-#include "Rev/Render/StaticMesh.h"
-#include "Rev/Render/Material.h"
+#include "Rev/Render/Mesh/StaticMesh.h"
+#include "Rev/Render/Material/Material.h"
 
 namespace Rev
 {

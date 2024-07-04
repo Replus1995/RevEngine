@@ -47,35 +47,52 @@ std::map<std::string, std::string>& FileSystem::GetDirMap()
 	return sDirMap;
 }
 
-Path::Path(const std::string& path)
+Path::Path()
 {
-	InnerSetPath(path);
+}
+
+Path::Path(const std::string& InPath)
+{
+	if (!InPath.empty())
+	{
+		std::filesystem::path tPath(InPath);
+		tPath.lexically_normal();
+		mFullPath = tPath.generic_u8string();
+		mFileName = tPath.stem().generic_u8string();
+		mFileExtension = tPath.extension().generic_u8string();
+	}
 }
 
 Path::~Path()
 {
 }
 
-std::string Path::ToNative()
+Path& Path::operator=(const Path& InPath)
 {
-	return FileSystem::ToNative(mPathStr);
-}
-
-Path& Path::operator=(const std::string& path)
-{
-	InnerSetPath(path);
+	mFullPath = InPath.mFullPath;
+	mFileName = InPath.mFileName;
+	mFileExtension = InPath.mFileExtension;
 	return *this;
 }
 
-const std::string& Path::operator()() const
+const std::string& Path::Name() const
 {
-	return mPathStr;
+	return mFileName;
 }
 
-void Path::InnerSetPath(const std::string& path)
+const std::string& Path::Extension() const
 {
-	std::filesystem::path tPath(path);
-	mPathStr = tPath.lexically_normal().generic_u8string();
+	return mFileExtension;
+}
+
+bool Path::Empty() const
+{
+	return mFullPath.empty();
+}
+
+std::string Path::ToNative()
+{
+	return FileSystem::ToNative(mFullPath);
 }
 
 }

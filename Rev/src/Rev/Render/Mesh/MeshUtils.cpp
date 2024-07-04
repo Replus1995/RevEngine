@@ -1,9 +1,10 @@
-#include "Mesh.h"
-#include "Rev/Render/StaticMesh.h"
+#include "MeshUtils.h"
+#include "Rev/Render/Mesh/StaticMesh.h"
 #include "Rev/Render/Resource/VertexBuffer.h"
 
 namespace Rev
 {
+
 namespace SimpleGeo
 {
 
@@ -37,7 +38,7 @@ static constexpr uint32 sBoxIndices[] = {
 
 void MeshUtils::SetDefaultMaterial(const Ref<Material>& mat)
 {
-	GetDefaultMaterial() = mat;
+    GetDefaultMaterial() = mat;
 }
 
 Ref<StaticMesh> MeshUtils::CreateBox()
@@ -48,7 +49,7 @@ Ref<StaticMesh> MeshUtils::CreateBox()
         constexpr uint32 boxVerticesSize = sizeof(SimpleGeo::sBoxVertices);
         Ref<VertexBuffer> boxVertices = VertexBuffer::Create(boxVerticesSize);
         boxVertices->SetLayout({
-            {EShaderDataType::Float3, "a_Position"},
+            {EBufferElementType::Float3, "a_Position"},
             //{EShaderDataType::Float3, "a_Normal"},
             //{EShaderDataType::Float2, "a_TexCoord"}
             });
@@ -70,8 +71,9 @@ Ref<StaticMesh> MeshUtils::CreateBox()
 
 Ref<Material>& MeshUtils::GetDefaultMaterial()
 {
-	static Ref<Material> sMeshDefaultMaterial = nullptr;
-	return sMeshDefaultMaterial;
+    static Ref<Material> sMeshDefaultMaterial = nullptr;
+    return sMeshDefaultMaterial;
 }
+
 
 }
