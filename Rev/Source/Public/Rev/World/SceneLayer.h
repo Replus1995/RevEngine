@@ -18,9 +18,6 @@ public:
 	virtual void OnUpdate(float dt) override;
 	virtual void OnEvent(Event& event) override;
 
-private:
-	bool OnWindowResize(WindowResizeEvent& e);
-
 protected:
 	Ref<Scene> mScene;
 	SceneRenderProxy mSceneProxy;

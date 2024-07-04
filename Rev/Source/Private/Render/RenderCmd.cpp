@@ -18,12 +18,12 @@ void RenderCmd::Shutdown()
 	sRHI.reset();
 }
 
-void RenderCmd::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
+void RenderCmd::SetViewport(uint32 x, uint32 y, uint32 width, uint32 height)
 {
 	sRHI->SetViewport(x, y, width, height);
 }
 
-void RenderCmd::SetClearColor(const Math::FVector4& color)
+void RenderCmd::SetClearColor(const Math::FLinearColor& color)
 {
 	sRHI->SetClearColor(color);
 }

@@ -104,7 +104,7 @@ namespace Rev
 			return false;
 		}
 		mMinimized = false;
-		Renderer::OnWindowResize(e.GetWidth(), e.GetHeight());
+		Renderer::ResizeWindow(e.GetWidth(), e.GetHeight());
 		return false;
 	}
 }

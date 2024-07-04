@@ -2,6 +2,7 @@
 #include "Rev/World/Scene.h"
 #include "Rev/World/System/PlayerCameraSystem.h"
 #include "Rev/Render/RenderCmd.h"
+#include "Rev/Render/Renderer.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -48,7 +49,7 @@ void SceneRenderProxy::Prepare(const Ref<Scene>& scene)
 
 void SceneRenderProxy::Draw()
 {
-	RenderCmd::SetClearColor(Math:: FVector4{ .3f, .3f, .8f, 1.0f });
+	RenderCmd::SetClearColor(Renderer::sClearColor);
 	RenderCmd::Clear();
 
 	mSceneBuffer->SetData(&mSceneData, sizeof(SceneRenderData));

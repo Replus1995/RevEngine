@@ -9,6 +9,7 @@ namespace Rev
 {
 
 static ShaderLibrary* sShaderLib = nullptr;
+Math::FLinearColor Renderer::sClearColor = Math::FLinearColor(0,0,0,1);
 
 void Renderer::Init()
 {
@@ -23,9 +24,9 @@ void Renderer::Shutdown()
 	sShaderLib = nullptr;
 }
 
-void Renderer::OnWindowResize(uint32_t width, uint32_t height)
+void Renderer::ResizeWindow(uint32 InWidth, uint32 InHeight)
 {
-	RenderCmd::SetViewport(0, 0, width, height);
+	RenderCmd::SetViewport(0, 0, InWidth, InHeight);
 }
 
 ShaderLibrary* Renderer::GetShaderLibrary()
@@ -33,15 +34,5 @@ ShaderLibrary* Renderer::GetShaderLibrary()
 	return sShaderLib;
 }
 
-void Renderer::Clear(const Math::FVector4& color)
-{
-	RenderCmd::SetClearColor(color);
-	RenderCmd::Clear();
-}
-
-void Renderer::DrawIndexed(const class VertexArray* vertexArray)
-{
-	RenderCmd::DrawIndexed(vertexArray);
-}
 
 }

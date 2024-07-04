@@ -10,12 +10,9 @@ class REV_API Renderer
 public:
 	static void Init();
 	static void Shutdown();
-	static void OnWindowResize(uint32_t width, uint32_t height);
-
+	static void ResizeWindow(uint32 InWidth, uint32 InHeight);
 	static ShaderLibrary* GetShaderLibrary();
-
-	static void Clear(const Math::FVector4& color = Math::FVector4(0,0,0,1));
-	static void DrawIndexed(const class VertexArray* vertexArray);
+	static Math::FLinearColor sClearColor;
 };
 
 }

@@ -24,7 +24,7 @@ ExampleLayer::ExampleLayer()
 	Renderer::GetShaderLibrary()->Load("ExampleShader", Path("/SandBox/assets/shaders/example.glsl").ToNative());
 
 	auto pMat = CreateRef<ExampleMaterial>();
-	pMat->SetColor(Math::FVector4(1,0,0,1));
+	pMat->SetColor(Math::FLinearColor(.7,.8,.8,1));
 	MeshUtils::SetDefaultMaterial(pMat);
 
 	//Create Sandbox Scene

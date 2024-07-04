@@ -59,13 +59,6 @@ void SceneLayer::OnUpdate(float dt)
 void SceneLayer::OnEvent(Event& event)
 {
 	EventDispatcher dispatcher(event);
-	dispatcher.Dispatch<WindowResizeEvent>(RE_BIND_EVENT_FN(SceneLayer::OnWindowResize, this));
-}
-
-bool SceneLayer::OnWindowResize(WindowResizeEvent& e)
-{
-	Renderer::OnWindowResize(e.GetWidth(), e.GetHeight());
-	return false;
 }
 
 

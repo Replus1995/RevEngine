@@ -72,9 +72,9 @@ void OpenGLRHI::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t hei
 	glViewport(x, y, width, height);
 }
 
-void OpenGLRHI::SetClearColor(const Math::FVector4& color)
+void OpenGLRHI::SetClearColor(const Math::FLinearColor& color)
 {
-	glClearColor(color.X, color.Y, color.Z, color.W);
+	glClearColor(color.R, color.G, color.B, color.A);
 }
 
 void OpenGLRHI::Clear()

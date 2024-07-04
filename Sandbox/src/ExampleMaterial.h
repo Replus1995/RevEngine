@@ -23,5 +23,5 @@ protected:
     }
 
 protected:
-    Rev::TMaterialUniform<Rev::Math::FVector4> uColor = { "Color", Rev::Math::FVector4(1) };
+    Rev::TMaterialUniform<Rev::Math::FLinearColor> uColor = { "Color", Rev::Math::FLinearColor(1) };
 };
