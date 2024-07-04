@@ -5,21 +5,21 @@
 namespace Rev
 {
 
-class REV_API Camera
+class Camera
 {
 public:
 	enum class ProjectionType { Perspective = 0, Orthographic = 1 };
 public:
-	Camera();
-	virtual ~Camera() = default;
+	REV_API Camera();
+	REV_API virtual ~Camera() = default;
 
-	void SetPerspective(float fov, float dnear, float dfar); //currently use vertical fov
-	void SetOrthographic(float size, float dnear, float dfar);
-	void SetAspectRatio(float ratio);
+	REV_API void SetPerspective(float fov, float dnear, float dfar); //currently use vertical fov
+	REV_API void SetOrthographic(float size, float dnear, float dfar);
+	REV_API void SetAspectRatio(float ratio);
 
-	ProjectionType GetProjectionType() const { return mProjectionType; }
-	void SetProjectionType(ProjectionType type);
-	Math::FMatrix4 GetProjectionMatrix() const { return mProjection; }
+	REV_API ProjectionType GetProjectionType() const { return mProjectionType; }
+	REV_API void SetProjectionType(ProjectionType type);
+	REV_API Math::FMatrix4 GetProjectionMatrix() const { return mProjection; }
 
 private:
 	void RecalculateProjection();

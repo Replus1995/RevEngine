@@ -8,23 +8,23 @@
 namespace Rev
 {
 	class Window;
-	class REV_API Application
+	class Application
 	{
 	public:
-		Application();
-		virtual ~Application();
+		REV_API Application();
+		REV_API virtual ~Application();
 
-		void Run();
-		void Close();
+		REV_API void Run();
+		REV_API void Close();
 
-		void OnEvent(Event& e);
+		REV_API void OnEvent(Event& e);
 
-		void PushLayer(Layer* layer);
-		void PushOverlay(Layer* overlay);
+		REV_API void PushLayer(Layer* layer);
+		REV_API void PushOverlay(Layer* overlay);
 
-		inline bool Minimized() const { return mMinimized; }
-		inline Window* GetWindow() { return mWindow.get(); }
-		static Application& GetApp() { return *sInstance; }
+		REV_API inline bool Minimized() const { return mMinimized; }
+		REV_API inline Window* GetWindow() { return mWindow.get(); }
+		REV_API static Application& GetApp() { return *sInstance; }
 	private:
 		bool OnWindowClose(WindowCloseEvent& e);
 		bool OnWindowResize(WindowResizeEvent& e);
