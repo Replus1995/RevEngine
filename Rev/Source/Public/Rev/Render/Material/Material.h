@@ -14,22 +14,22 @@ enum class EMaterialDomain
 };
 
 class MaterialUniform;
-class Material
+class REV_API Material
 {
 public:
-	REV_API Material(const Ref<Shader>& program);
-	REV_API virtual ~Material();
+	Material(const Ref<Shader>& program);
+	virtual ~Material();
 	
 	/*const Ref<Shader>& GetShader() const
 	{
 		return mProgram;
 	}*/
 
-	REV_API void SetDomain(EMaterialDomain domain);
-	REV_API EMaterialDomain GetDomain() const;
+	void SetDomain(EMaterialDomain domain);
+	EMaterialDomain GetDomain() const;
 
-	REV_API void Bind();
-	REV_API void Unbind();
+	void Bind();
+	void Unbind();
 
 protected:
 	virtual void UploadUniform();

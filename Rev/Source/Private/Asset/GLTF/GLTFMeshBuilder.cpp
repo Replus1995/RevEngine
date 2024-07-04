@@ -4,12 +4,13 @@
 #include "Rev/Render/Resource/VertexBuffer.h"
 #include <iostream>
 
-#include "GLTFDebug.h"
+#include "GLTFDebug.hpp"
 
 #define TINYGLTF_USE_CPP14
 #define TINYGLTF_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
+#define STBI_MSC_SECURE_CRT
 #include <tiny_gltf.h>
 
 namespace Rev
@@ -95,7 +96,7 @@ const std::vector<Ref<Mesh>>& GLTFMeshBuilder::BuildMeshData(bool DumpInfo)
 
     if (DumpInfo)
     {
-        gltf::DumpModelInfo(model);
+        GLTFDebug::Dump(model);
     }
 
 }

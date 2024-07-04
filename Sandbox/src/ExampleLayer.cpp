@@ -4,7 +4,8 @@
 #include <Rev/World/Component/Component.h>
 #include <Rev/World/System/PlayerCameraSystem.h>
 #include <Rev/Render/Renderer.h>
-#include <Rev/Render/StaticMesh.h>
+#include <Rev/Render/Mesh/StaticMesh.h>
+#include <Rev/Render/Mesh/MeshUtils.h>
 #include <Rev/Core/FileSystem.h>
 
 #include <filesystem>

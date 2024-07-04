@@ -8,7 +8,7 @@ public:
 	SandBox() 
 	{
 		PushLayer(new ExampleLayer());
-		PushLayer(new Rev::ImGuiLayer());
+		//PushLayer(new Rev::ImGuiLayer());
 	};
 	~SandBox() {};
 };
