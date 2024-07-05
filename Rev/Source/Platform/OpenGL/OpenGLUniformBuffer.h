@@ -1,5 +1,5 @@
 #pragma once
-#include "Rev/Render/Resource/UniformBuffer.h"
+#include "Rev/Render/RHI/RHIUniformBuffer.h"
 
 namespace Rev
 {

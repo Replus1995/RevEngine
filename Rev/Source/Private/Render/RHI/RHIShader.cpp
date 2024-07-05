@@ -1,4 +1,4 @@
-#include "Rev/Render/Resource/Shader.h"
+#include "Rev/Render/RHI/RHIShader.h"
 #include "Rev/Render/RenderCore.h"
 #include "Rev/Core/Assert.h"
 
@@ -7,7 +7,7 @@
 namespace Rev
 {
 
-Ref<Shader> Shader::Create(const std::string& filepath)
+Ref<FRHIShader> FRHIShader::Create(const std::string& filepath)
 {
 	switch (GetRenderAPI())
 	{
@@ -19,7 +19,7 @@ Ref<Shader> Shader::Create(const std::string& filepath)
 	return nullptr;
 }
 
-Ref<Shader> Shader::Create(const std::string& name, const std::string& vertSrc, const std::string& fragSrc)
+Ref<FRHIShader> FRHIShader::Create(const std::string& name, const std::string& vertSrc, const std::string& fragSrc)
 {
 	switch (GetRenderAPI())
 	{
@@ -31,39 +31,39 @@ Ref<Shader> Shader::Create(const std::string& name, const std::string& vertSrc, 
 	return nullptr;
 }
 
-void ShaderLibrary::Add(const std::string& name, const Ref<Shader>& shader)
+void FRHIShaderLibrary::Add(const std::string& name, const Ref<FRHIShader>& shader)
 {
 	RE_CORE_ASSERT(!Exists(name), "[ShaderLibrary] Shader already exists!");
 	mShaderCache[name] = shader;
 }
 
-void ShaderLibrary::Add(const Ref<Shader>& shader)
+void FRHIShaderLibrary::Add(const Ref<FRHIShader>& shader)
 {
 	auto& name = shader->GetName();
 	Add(name, shader);
 }
 
-Ref<Shader> ShaderLibrary::Load(const std::string& filepath)
+Ref<FRHIShader> FRHIShaderLibrary::Load(const std::string& filepath)
 {
-	auto shader = Shader::Create(filepath);
+	auto shader = FRHIShader::Create(filepath);
 	Add(shader);
 	return shader;
 }
 
-Ref<Shader> ShaderLibrary::Load(const std::string& name, const std::string& filepath)
+Ref<FRHIShader> FRHIShaderLibrary::Load(const std::string& name, const std::string& filepath)
 {
-	auto shader = Shader::Create(filepath);
+	auto shader = FRHIShader::Create(filepath);
 	Add(name, shader);
 	return shader;
 }
 
-Ref<Shader> ShaderLibrary::Get(const std::string& name)
+Ref<FRHIShader> FRHIShaderLibrary::Get(const std::string& name)
 {
 	RE_CORE_ASSERT(Exists(name), "Shader not found!");
 	return mShaderCache[name];
 }
 
-bool ShaderLibrary::Exists(const std::string& name) const
+bool FRHIShaderLibrary::Exists(const std::string& name) const
 {
 	return mShaderCache.find(name) != mShaderCache.end();
 }

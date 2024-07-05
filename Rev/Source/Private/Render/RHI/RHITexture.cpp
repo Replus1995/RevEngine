@@ -1,4 +1,4 @@
-#include "Rev/Render/Resource/Texture.h"
+#include "Rev/Render/RHI/RHITexture.h"
 #include "Rev/Render/RenderCore.h"
 #include "Rev/Core/Assert.h"
 
@@ -12,18 +12,6 @@ namespace Rev {
 		{
 		case ERenderAPI::None:    RE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
 		case ERenderAPI::OpenGL:  return CreateRef<OpenGLTexture2D>(desc);
-		}
-
-		RE_CORE_ASSERT(false, "Unknown RenderAPI!");
-		return nullptr;
-	}
-
-	Ref<Texture2D> Texture2D::Create(const std::string& path)
-	{
-		switch (GetRenderAPI())
-		{
-		case ERenderAPI::None:    RE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
-		case ERenderAPI::OpenGL:  return CreateRef<OpenGLTexture2D>(path);
 		}
 
 		RE_CORE_ASSERT(false, "Unknown RenderAPI!");

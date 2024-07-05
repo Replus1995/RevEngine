@@ -1,5 +1,5 @@
 #pragma once
-#include "Rev/Render/Resource/VertexBuffer.h"
+#include "Rev/Render/RHI/RHIVertexBuffer.h"
 
 namespace Rev
 {

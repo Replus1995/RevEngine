@@ -1,5 +1,5 @@
 #pragma once
-#include "Rev/Render/Resource/FrameBuffer.h"
+#include "Rev/Render/RHI/RHIFrameBuffer.h"
 #include <glad/glad.h>
 
 namespace Rev

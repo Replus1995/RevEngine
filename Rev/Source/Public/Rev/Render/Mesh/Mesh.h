@@ -19,12 +19,8 @@ public:
 	virtual std::vector<const FMeshPrimitive*> GetPrimitive(uint32 MaterialIndex) const = 0;
 	virtual uint32 GetPrimitiveCount() const = 0;
 
-	void SetName(const std::string& InName);
-	const std::string& GetName() const;
-
 protected:
 	Mesh();
-	std::string mName;
 };
 
 }

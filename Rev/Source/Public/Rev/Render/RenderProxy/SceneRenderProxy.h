@@ -1,7 +1,7 @@
 #pragma once
 #include "Rev/Core/Base.h"
 #include "Rev/Render/Material/Material.h"
-#include "Rev/Render/Resource/UniformBuffer.h"
+#include "Rev/Render/RHI/RHIUniformBuffer.h"
 #include "Rev/Render/RenderData/RenderData.h"
 
 #include "Rev/Render/RenderProxy/StaticMeshRenderProxy.h"

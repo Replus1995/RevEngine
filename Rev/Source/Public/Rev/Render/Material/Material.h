@@ -17,7 +17,7 @@ class MaterialUniform;
 class REV_API Material
 {
 public:
-	Material(const Ref<Shader>& program);
+	Material(const Ref<FRHIShader>& program);
 	virtual ~Material();
 	
 	/*const Ref<Shader>& GetShader() const
@@ -35,7 +35,7 @@ protected:
 	virtual void UploadUniform();
 	friend class StaticMeshRenderProxy;
 protected:
-	Ref<Shader> mProgram = nullptr;
+	Ref<FRHIShader> mProgram = nullptr;
 	EMaterialDomain mDomain = EMaterialDomain::Opaque;
 
 	//Uniform

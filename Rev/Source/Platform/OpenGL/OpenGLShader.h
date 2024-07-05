@@ -1,12 +1,12 @@
 #pragma once
-#include "Rev/Render/Resource/Shader.h"
+#include "Rev/Render/RHI/RHIShader.h"
 #include <map>
 #include <glad/glad.h>
 
 namespace Rev
 {
 
-class OpenGLShader : public Shader
+class OpenGLShader : public FRHIShader
 {
 public:
 	OpenGLShader(const std::string& filepath);

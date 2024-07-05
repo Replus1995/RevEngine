@@ -1,7 +1,7 @@
 #pragma once
 #include "Rev/Core/Base.h"
 #include "Rev/Core/Assert.h"
-#include "Rev/Render/Resource/Shader.h"
+#include "Rev/Render/RHI/RHIShader.h"
 
 namespace Rev
 {
@@ -26,7 +26,7 @@ public:
 		return GetValue(&T, sizeof(T));
 	}
 
-	virtual void Upload(const Ref<Shader>& program) = 0;
+	virtual void Upload(const Ref<FRHIShader>& program) = 0;
 
 protected:
 	virtual bool SetValue(const void* data, size_t size) = 0;
@@ -53,7 +53,7 @@ public:
 		mLocation = location;
 	}
 
-	virtual void Upload(const Ref<Shader>& program)
+	virtual void Upload(const Ref<FRHIShader>& program)
 	{
 		RE_CORE_ASSERT(program);
 		if(!mLocation.IsValid())
@@ -105,7 +105,7 @@ public:
 		mLocation = location;
 	}
 
-	virtual void Upload(const Ref<Shader>& program)
+	virtual void Upload(const Ref<FRHIShader>& program)
 	{
 		PE_CORE_ASSERT(program);
 		if (!mLocation.IsValid())

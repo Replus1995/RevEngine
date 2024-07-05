@@ -1,4 +1,4 @@
-#include "OpenGLRHI.h"
+#include "OpenGLContext.h"
 #include "Rev/Core/Base.h"
 #include "Rev/Core/Assert.h"
 #include "Rev/Core/Application.h"
@@ -36,7 +36,7 @@ void OpenGLMessageCallback(
 	RE_CORE_ASSERT(false, "[OpenGLRHI] Unknown severity level!");
 }
 
-void OpenGLRHI::Init()
+void OpenGLContext::Init()
 {
 	Window* pWnd = Application::GetApp().GetWindow();
 	RE_CORE_ASSERT(pWnd, "[OpenGLRHI] Invalid window!");
@@ -67,22 +67,22 @@ void OpenGLRHI::Init()
 	glEnable(GL_LINE_SMOOTH);
 }
 
-void OpenGLRHI::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
+void OpenGLContext::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
 {
 	glViewport(x, y, width, height);
 }
 
-void OpenGLRHI::SetClearColor(const Math::FLinearColor& color)
+void OpenGLContext::SetClearColor(const Math::FLinearColor& color)
 {
 	glClearColor(color.R, color.G, color.B, color.A);
 }
 
-void OpenGLRHI::Clear()
+void OpenGLContext::Clear()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void OpenGLRHI::DrawIndexed(const FVertexArray* vertexArray, uint32_t indexCount)
+void OpenGLContext::DrawIndexed(const Ref<FVertexArray>& vertexArray, uint32_t indexCount)
 {
 	vertexArray->Bind();
 	uint32_t count = indexCount ? indexCount : vertexArray->GetIndexBuffer()->GetCount();

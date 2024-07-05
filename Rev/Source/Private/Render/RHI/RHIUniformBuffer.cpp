@@ -1,4 +1,4 @@
-#include "Rev/Render/Resource/UniformBuffer.h"
+#include "Rev/Render/RHI/RHIUniformBuffer.h"
 #include "Rev/Render/RenderCore.h"
 #include "Rev/Core/Assert.h"
 

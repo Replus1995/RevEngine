@@ -1,4 +1,4 @@
-#include "Rev/Render/Resource/Framebuffer.h"
+#include "Rev/Render/RHI/RHIFramebuffer.h"
 #include "Rev/Render/RenderCore.h"
 #include "Rev/Core/Assert.h"
 

@@ -1,6 +1,6 @@
 #include "Rev/Render/Mesh/StaticMesh.h"
 #include "Rev/Render/Material/Material.h"
-#include "Rev/Render/Resource/VertexBuffer.h"
+#include "Rev/Render/RHI/RHIVertexBuffer.h"
 
 namespace Rev
 {

@@ -1,4 +1,4 @@
-#include "Rev/Render/Resource/VertexBuffer.h"
+#include "Rev/Render/RHI/RHIVertexBuffer.h"
 #include "Rev/Core/Assert.h"
 
 #include "Platform/OpenGL/OpenGLVertexBuffer.h"

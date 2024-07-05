@@ -1,5 +1,5 @@
 #pragma once
-#include "Rev/Render/Resource/Texture.h"
+#include "Rev/Render/RHI/RHITexture.h"
 #include <glad/glad.h>
 
 namespace Rev

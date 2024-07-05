@@ -1,10 +1,10 @@
 #pragma once
-#include "Rev/Render/BaseRHI.h"
+#include "Rev/Render/RHI/RHIContext.h"
 
 namespace Rev
 {
 
-class OpenGLRHI : public BaseRHI
+class OpenGLContext : public FRHIContext
 {
 public:
 	virtual void Init() override;
@@ -12,7 +12,7 @@ public:
 	virtual void SetClearColor(const Math::FLinearColor& color) override;
 	virtual void Clear() override;
 
-	virtual void DrawIndexed(const FVertexArray* vertexArray, uint32_t indexCount) override;
+	virtual void DrawIndexed(const Ref<FVertexArray>& vertexArray, uint32_t indexCount) override;
 };
 
 }
