@@ -5,14 +5,22 @@
 namespace Rev
 {
 
-StaticMesh::StaticMesh(const std::vector<Ref<Material>>& pMaterials, const std::vector<StaticMeshResource>& pResources)
-	: mMaterials(pMaterials)
-	, mResources(pResources)
+StaticMesh::StaticMesh()
 {
 }
 
 StaticMesh::~StaticMesh()
 {
+}
+
+void StaticMesh::SetMaterials(std::vector<Ref<Material>>&& pMaterials)
+{
+	mMaterials = std::move(pMaterials);
+}
+
+void StaticMesh::SetPrimitives(std::vector<FMeshPrimitive>&& pPrimitives)
+{
+	mPrimitives = std::move(pPrimitives);
 }
 
 const Ref<Material>& StaticMesh::GetMaterial(uint32 index) const
@@ -34,20 +42,26 @@ const Ref<Material>& StaticMesh::GetMaterial(uint32 index) const
 
 uint32 StaticMesh::GetMaterialCount() const
 {
-	return mMaterials.size();
+	return (uint32)mMaterials.size();
 }
 
-std::vector<const VertexArray*> StaticMesh::GetVertexArrayByIndex(uint32 index) const
+std::vector<const FMeshPrimitive*> StaticMesh::GetPrimitive(uint32 MaterialIndex) const
 {
-	std::vector<const VertexArray*> outArr;
-	for (auto res : mResources)
+	std::vector<const FMeshPrimitive*> outArr;
+	for (auto& RefPrim : mPrimitives)
 	{
-		if (res.MaterialIndex == index)
+		if (RefPrim.MaterialIndex == MaterialIndex)
 		{
-			outArr.push_back(res.VertexData.get());
+			outArr.push_back(&RefPrim);
 		}
 	}
 	return outArr;
 }
+
+uint32 StaticMesh::GetPrimitiveCount() const
+{
+	return (uint32)mPrimitives.size();
+}
+
 
 }

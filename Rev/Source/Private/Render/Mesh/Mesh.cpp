@@ -5,7 +5,6 @@ namespace Rev
 
 Mesh::Mesh()
     : mName("")
-    , mMode(MeshDrawMode::TRIANGLES)
 {
 }
 
@@ -17,11 +16,6 @@ void Mesh::SetName(const std::string& InName)
 const std::string& Mesh::GetName() const
 {
     return mName;
-}
-
-void Mesh::SetDrawMode(MeshDrawMode InMode)
-{
-    mMode = InMode;
 }
 
 }

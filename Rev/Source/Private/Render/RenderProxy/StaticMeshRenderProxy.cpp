@@ -21,15 +21,15 @@ void StaticMeshRenderProxy::Draw(EMaterialDomain domain)
 		if(!pMat || pMat->GetDomain() != domain)
 			continue;
 
-		auto pVertexArrs = mStaticMesh->GetVertexArrayByIndex(i);
-		if (!pVertexArrs.empty())
+		auto vPrimitives = mStaticMesh->GetPrimitive(i);
+		if (!vPrimitives.empty())
 		{
 			pMat->uTransform = mTransform;
 			pMat->Bind();
 
-			for (auto& pVertexArr : pVertexArrs)
+			for (auto& pPrimitive : vPrimitives)
 			{
-				RenderCmd::DrawIndexed(pVertexArr);
+				RenderCmd::DrawPrimitive(pPrimitive);
 			}
 
 			pMat->Unbind();

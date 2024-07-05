@@ -1,6 +1,8 @@
 #include "Rev/Render/RenderCmd.h"
 #include "Rev/Render/BaseRHI.h"
+#include "Rev/Render/Mesh/MeshPrimitive.h"
 #include "Rev/Core/Assert.h"
+
 
 namespace Rev
 {
@@ -33,9 +35,12 @@ void RenderCmd::Clear()
 	sRHI->Clear();
 }
 
-void RenderCmd::DrawIndexed(const VertexArray* vertexArray, uint32_t indexCount)
+void RenderCmd::DrawPrimitive(const FMeshPrimitive* pPrimitive)
 {
-	sRHI->DrawIndexed(vertexArray, indexCount);
+	if (pPrimitive->Valid())
+	{
+		sRHI->DrawIndexed(pPrimitive->VertexData.get(), 0);
+	}
 }
 
 }

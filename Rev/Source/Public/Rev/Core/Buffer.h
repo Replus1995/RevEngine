@@ -1,87 +1,70 @@
 #pragma once
+#include "Rev/Core/Base.h" 
 #include <stdint.h>
 #include <cstring>
+
 
 namespace Rev
 {
 
-struct Buffer
+class REV_API FBuffer
 {
-	uint8_t* Data = nullptr;
-	uint64_t Size = 0;
+public:
+	FBuffer();
+	FBuffer(uint64 size);
+	~FBuffer();
 
-	Buffer() = default;
-	Buffer(uint64_t size)
-	{
-		Allocate(size);
-	}
+	FBuffer(const FBuffer&) = delete;
+	FBuffer(FBuffer&& other) noexcept;
 
-	Buffer(const Buffer&) = default;
+	FBuffer& operator=(const FBuffer&) = delete;
+	FBuffer& operator=(FBuffer&& other) noexcept;
+	operator bool() const;
 
-	static Buffer Copy(Buffer other)
-	{
-		Buffer result(other.Size);
-		memcpy(result.Data, other.Data, other.Size);
-		return result;
-	}
-
-	void Allocate(uint64_t size)
-	{
-		Release();
-
-		Data = new uint8_t[size];
-		Size = size;
-	}
-
-	void Release()
-	{
-		delete[] Data;
-		Data = nullptr;
-		Size = 0;
-	}
+	static FBuffer Copy(FBuffer other);
 
 	template<typename T>
-	T* As()
-	{
-		return (T*)Data;
-	}
+	void Allocate(uint64 count) { Allocate(count * sizeof(T)); }
+	void Allocate(uint64 size);
+	void Release();
 
-	operator bool() const
-	{
-		return (bool)Data;
-	}
+	inline uint64 Size() const { return mSize; }
+	inline uint8* Data() { return mData; }
+	inline const uint8* Data() const { return mData; }
 
+	template<typename T>
+	T* As() { return (T*)mData; }
+	template<typename T>
+	const T* As() const { return (const T*)mData; }
+
+private:
+	uint8* mData = nullptr;
+	uint64 mSize = 0;
 };
 
-struct ScopedBuffer
+template<uint64 N>
+class FScopedBuffer
 {
-	ScopedBuffer(Buffer buffer)
-		: mBuffer(buffer)
+	FScopedBuffer()
 	{
 	}
 
-	ScopedBuffer(uint64_t size)
-		: mBuffer(size)
+	~FScopedBuffer()
 	{
 	}
 
-	~ScopedBuffer()
-	{
-		mBuffer.Release();
-	}
-
-	uint8_t* Data() { return mBuffer.Data; }
-	uint64_t Size() { return mBuffer.Size; }
+	uint64 Size() const { return N; }
+	uint8* Data() { return mBuffer.mData; }
+	const uint8* Data() const { return mData; }
 
 	template<typename T>
-	T* As()
-	{
-		return mBuffer.As<T>();
-	}
+	T* As() { return (T*)mData; }
+	template<typename T>
+	const T* As() const { return (const T*)mData; }
 
 	operator bool() const { return mBuffer; }
 private:
-	Buffer mBuffer;
+	uint8 mData[N];
 };
 
 }

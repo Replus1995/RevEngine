@@ -44,29 +44,31 @@ void MeshUtils::SetDefaultMaterial(const Ref<Material>& mat)
 Ref<StaticMesh> MeshUtils::CreateBox()
 {
     std::vector<Ref<Material>> boxMatArr = { GetDefaultMaterial() };
-    std::vector<StaticMeshResource> boxResArr;
+    std::vector<FMeshPrimitive> boxPrimArr;
     {
         constexpr uint32 boxVerticesSize = sizeof(SimpleGeo::sBoxVertices);
-        Ref<VertexBuffer> boxVertices = VertexBuffer::Create(boxVerticesSize);
+        Ref<FVertexBuffer> boxVertices = FVertexBuffer::Create(SimpleGeo::sBoxVertices, boxVerticesSize);
         boxVertices->SetLayout({
-            {EBufferElementType::Float3, "a_Position"},
+            {"Position", EVertexElementType::Float3,  0}
             //{EShaderDataType::Float3, "a_Normal"},
             //{EShaderDataType::Float2, "a_TexCoord"}
             });
-        boxVertices->SetData(SimpleGeo::sBoxVertices, boxVerticesSize);
 
         constexpr uint32 boxIndicesCount = sizeof(SimpleGeo::sBoxIndices) / sizeof(uint32);
-        Ref<IndexBuffer> boxIndices = IndexBuffer::Create(SimpleGeo::sBoxIndices, boxIndicesCount);
+        Ref<FIndexBuffer> boxIndices = FIndexBuffer::Create(SimpleGeo::sBoxIndices, sizeof(uint32), boxIndicesCount);
 
-        StaticMeshResource boxMeshRes;
-        boxMeshRes.VertexData = VertexArray::Create();
-        boxMeshRes.VertexData->AddVertexBuffer(boxVertices);
-        boxMeshRes.VertexData->SetIndexBuffer(boxIndices);
+        FMeshPrimitive boxMeshPrim;
+        boxMeshPrim.VertexData = FVertexArray::Create();
+        boxMeshPrim.VertexData->AddVertexBuffer(boxVertices);
+        boxMeshPrim.VertexData->SetIndexBuffer(boxIndices);
 
-        boxResArr.emplace_back(std::move(boxMeshRes));
+        boxPrimArr.emplace_back(std::move(boxMeshPrim));
     }
 
-    return CreateRef<StaticMesh>(boxMatArr, boxResArr);
+    Ref<StaticMesh> OutMesh = CreateRef<StaticMesh>();
+    OutMesh->SetMaterials(std::move(boxMatArr));
+    OutMesh->SetPrimitives(std::move(boxPrimArr));
+    return OutMesh;
 }
 
 Ref<Material>& MeshUtils::GetDefaultMaterial()

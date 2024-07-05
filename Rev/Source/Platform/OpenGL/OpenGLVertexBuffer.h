@@ -4,59 +4,65 @@
 namespace Rev
 {
 
-class OpenGLVertexBuffer : public VertexBuffer
+class FOpenGLVertexBuffer : public FVertexBuffer
 {
 public:
-	OpenGLVertexBuffer(uint32 size);
-	OpenGLVertexBuffer(const float* vertices, uint32 size);
-	virtual ~OpenGLVertexBuffer();
+	FOpenGLVertexBuffer(uint32 size);
+	FOpenGLVertexBuffer(const float* vertices, uint32 size);
+	virtual ~FOpenGLVertexBuffer();
 
 	virtual void Bind() const override;
 	virtual void Unbind() const override;
+	virtual void SetData(const void* data, uint32 size, uint32 offset) override;
 
-	virtual void SetData(const void* data, uint32 size) override;
+	virtual const FVertexBufferLayout& GetLayout() const override { return mLayout; }
+	virtual void SetLayout(const FVertexBufferLayout& layout) override { mLayout = layout; }
+	virtual uint32 GetCapacity() const override { return mSize; };
 
-	virtual const BufferLayout& GetLayout() const override { return mLayout; }
-	virtual void SetLayout(const BufferLayout& layout) override { mLayout = layout; }
 private:
 	uint32 mHandle = 0;
-	BufferLayout mLayout;
+	uint32 mSize = 0;
+	FVertexBufferLayout mLayout;
 };
 
-class OpenGLIndexBuffer : public IndexBuffer
+class FOpenGLIndexBuffer : public FIndexBuffer
 {
 public:
-	OpenGLIndexBuffer(const uint32* indices, uint32 count);
-	virtual ~OpenGLIndexBuffer();
+	FOpenGLIndexBuffer(uint32 stride, uint32 count);
+	FOpenGLIndexBuffer(const void* indices, uint32 stride, uint32 count);
+	virtual ~FOpenGLIndexBuffer();
 
-	virtual void Bind() const;
-	virtual void Unbind() const;
+	virtual void Bind() const override;
+	virtual void Unbind() const override;
+	virtual void SetData(const void* data, uint32 count, uint32 offset) override;
 
-	virtual uint32 GetCount() const { return mCount; }
+	virtual uint32 GetStride() const override { return mStride; };
+	virtual uint32 GetCount() const override { return mCount; }
+	virtual uint32 GetCapacity() const override { return mStride * mCount; };
 private:
 	uint32 mHandle = 0;
+	uint32 mStride = 0;
 	uint32 mCount = 0;
 };
 
-class OpenGLVertexArray : public VertexArray
+class FOpenGLVertexArray : public FVertexArray
 {
 public:
-	OpenGLVertexArray();
-	virtual ~OpenGLVertexArray();
+	FOpenGLVertexArray();
+	virtual ~FOpenGLVertexArray();
 
 	virtual void Bind() const override;
 	virtual void Unbind() const override;
 
-	virtual void AddVertexBuffer(const std::shared_ptr<VertexBuffer>& vertexBuffer) override;
-	virtual void SetIndexBuffer(const std::shared_ptr<IndexBuffer>& indexBuffer) override;
+	virtual void AddVertexBuffer(const std::shared_ptr<FVertexBuffer>& vertexBuffer) override;
+	virtual void SetIndexBuffer(const std::shared_ptr<FIndexBuffer>& indexBuffer) override;
 
-	virtual const std::vector<std::shared_ptr<VertexBuffer>>& GetVertexBuffers() const { return mVertexBuffers; }
-	virtual const std::shared_ptr<IndexBuffer>& GetIndexBuffer() const { return mIndexBuffer; }
+	virtual const std::vector<std::shared_ptr<FVertexBuffer>>& GetVertexBuffers() const { return mVertexBuffers; }
+	virtual const std::shared_ptr<FIndexBuffer>& GetIndexBuffer() const { return mIndexBuffer; }
 private:
 	uint32 mHandle = 0;
-	uint32 mVertexBufferIndex = 0;
-	std::vector<std::shared_ptr<VertexBuffer>> mVertexBuffers;
-	std::shared_ptr<IndexBuffer> mIndexBuffer;
+	std::vector<std::shared_ptr<FVertexBuffer>> mVertexBuffers;
+	std::shared_ptr<FIndexBuffer> mIndexBuffer;
 };
 
 }

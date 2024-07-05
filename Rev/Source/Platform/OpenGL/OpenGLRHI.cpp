@@ -82,7 +82,7 @@ void OpenGLRHI::Clear()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void OpenGLRHI::DrawIndexed(const VertexArray* vertexArray, uint32_t indexCount)
+void OpenGLRHI::DrawIndexed(const FVertexArray* vertexArray, uint32_t indexCount)
 {
 	vertexArray->Bind();
 	uint32_t count = indexCount ? indexCount : vertexArray->GetIndexBuffer()->GetCount();

@@ -5,7 +5,7 @@
 namespace Rev
 {
 class BaseRHI;
-class VertexArray;
+class FMeshPrimitive;
 class REV_API RenderCmd
 {
 public:
@@ -16,7 +16,7 @@ public:
 	static void SetClearColor(const Math::FLinearColor& color);
 	static void Clear();
 
-	static void DrawIndexed(const VertexArray* vertexArray, uint32_t indexCount = 0);
+	static void DrawPrimitive(const class FMeshPrimitive* pPrimitive);
 	//static void DrawLines(const Ref<VertexArray>& vertexArray, uint32_t vertexCount, float lineWidth);
 
 private:

@@ -1,42 +1,30 @@
 #pragma once
 #include "Rev/Core/Base.h"
+#include "Rev/Render/Mesh/MeshPrimitive.h"
 #include <vector>
 #include <string>
 
 namespace Rev
 {
 
-//Follows tinygltf
-enum class MeshDrawMode
-{
-	POINTS = 0,
-	LINE = 1,
-	LINE_LOOP = 2,
-	LINE_STRIP = 3,
-	TRIANGLES = 4,
-	TRIANGLE_STRIP = 5,
-	TRIANGLE_FAN = 6
-};
-
 class Material;
-class VertexArray;
+class FVertexArray;
 class REV_API Mesh
 {
 public:
 	virtual ~Mesh() = default;
 
-	virtual const Ref<Material>& GetMaterial(uint32 index) const = 0;
+	virtual const Ref<Material>& GetMaterial(uint32 MaterialIndex) const = 0;
 	virtual uint32 GetMaterialCount() const = 0;
-	virtual std::vector<const VertexArray*> GetVertexArrayByIndex(uint32 index) const = 0;
+	virtual std::vector<const FMeshPrimitive*> GetPrimitive(uint32 MaterialIndex) const = 0;
+	virtual uint32 GetPrimitiveCount() const = 0;
 
 	void SetName(const std::string& InName);
 	const std::string& GetName() const;
-	void SetDrawMode(MeshDrawMode InMode);
 
 protected:
 	Mesh();
 	std::string mName;
-	MeshDrawMode mMode;
 };
 
 }

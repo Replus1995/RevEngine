@@ -4,7 +4,7 @@
 
 namespace Rev
 {
-class VertexArray;
+class FVertexArray;
 class BaseRHI
 {
 public:
@@ -15,7 +15,7 @@ public:
 	virtual void SetClearColor(const Math::FLinearColor& color) = 0;
 	virtual void Clear() = 0;
 
-	virtual void DrawIndexed(const VertexArray* vertexArray, uint32_t indexCount = 0) = 0;
+	virtual void DrawIndexed(const FVertexArray* vertexArray, uint32_t indexCount = 0) = 0;
 	//virtual void DrawLines(const Ref<VertexArray>& vertexArray, uint32_t vertexCount, float width) = 0;
 	//virtual void DrawPoints(const Ref<VertexArray>& vertexArray, uint32_t vertexCount, float d) = 0;
 

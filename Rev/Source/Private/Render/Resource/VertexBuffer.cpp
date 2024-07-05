@@ -7,90 +7,102 @@
 namespace Rev
 {
 
-uint32 BufferElementTypeSize(EBufferElementType type)
+uint32 VertexElementSize(EVertexElementType type)
 {
 	switch (type)
 	{
-	case EBufferElementType::Float:    return 4;
-	case EBufferElementType::Float2:   return 4 * 2;
-	case EBufferElementType::Float3:   return 4 * 3;
-	case EBufferElementType::Float4:   return 4 * 4;
-	case EBufferElementType::Mat3:     return 4 * 3 * 3;
-	case EBufferElementType::Mat4:     return 4 * 4 * 4;
-	case EBufferElementType::Int:      return 4;
-	case EBufferElementType::Int2:     return 4 * 2;
-	case EBufferElementType::Int3:     return 4 * 3;
-	case EBufferElementType::Int4:     return 4 * 4;
-	case EBufferElementType::Bool:     return 1;
+	case EVertexElementType::Float:    return 4;
+	case EVertexElementType::Float2:   return 4 * 2;
+	case EVertexElementType::Float3:   return 4 * 3;
+	case EVertexElementType::Float4:   return 4 * 4;
+	case EVertexElementType::Mat3:     return 4 * 3 * 3;
+	case EVertexElementType::Mat4:     return 4 * 4 * 4;
+	case EVertexElementType::Int:      return 4;
+	case EVertexElementType::Int2:     return 4 * 2;
+	case EVertexElementType::Int3:     return 4 * 3;
+	case EVertexElementType::Int4:     return 4 * 4;
+	case EVertexElementType::Bool:     return 1;
 	}
 
 	RE_CORE_ASSERT(false, "Unknown BufferElementType!");
 	return 0;
 }
 
-uint32 BufferElement::GetComponentCount() const
+uint32 FVertexBufferElement::GetComponentCount() const
 {
 	switch (Type)
 	{
-	case EBufferElementType::Float:   return 1;
-	case EBufferElementType::Float2:  return 2;
-	case EBufferElementType::Float3:  return 3;
-	case EBufferElementType::Float4:  return 4;
-	case EBufferElementType::Mat3:    return 3; // 3* float3
-	case EBufferElementType::Mat4:    return 4; // 4* float4
-	case EBufferElementType::Int:     return 1;
-	case EBufferElementType::Int2:    return 2;
-	case EBufferElementType::Int3:    return 3;
-	case EBufferElementType::Int4:    return 4;
-	case EBufferElementType::Bool:    return 1;
+	case EVertexElementType::Float:   return 1;
+	case EVertexElementType::Float2:  return 2;
+	case EVertexElementType::Float3:  return 3;
+	case EVertexElementType::Float4:  return 4;
+	case EVertexElementType::Mat3:    return 3; // 3* float3
+	case EVertexElementType::Mat4:    return 4; // 4* float4
+	case EVertexElementType::Int:     return 1;
+	case EVertexElementType::Int2:    return 2;
+	case EVertexElementType::Int3:    return 3;
+	case EVertexElementType::Int4:    return 4;
+	case EVertexElementType::Bool:    return 1;
 	}
 
 	RE_CORE_ASSERT(false, "Unknown ShaderDataType!");
 	return 0;
 }
 
-Ref<VertexBuffer> VertexBuffer::Create(uint32 size)
+Ref<FVertexBuffer> FVertexBuffer::Create(uint32 size)
 {
 	switch (GetRenderAPI())
 	{
 	case ERenderAPI::None:    RE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
-	case ERenderAPI::OpenGL:  return CreateRef<OpenGLVertexBuffer>(size);
+	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLVertexBuffer>(size);
 	}
 
 	RE_CORE_ASSERT(false, "Unknown RenderAPI!");
 	return nullptr;
 }
 
-Ref<VertexBuffer> VertexBuffer::Create(const float* vertices, uint32 size)
+Ref<FVertexBuffer> FVertexBuffer::Create(const float* vertices, uint32 size)
 {
 	switch (GetRenderAPI())
 	{
 	case ERenderAPI::None:    RE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
-	case ERenderAPI::OpenGL:  return CreateRef<OpenGLVertexBuffer>(vertices, size);
+	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLVertexBuffer>(vertices, size);
 	}
 
 	RE_CORE_ASSERT(false, "Unknown RenderAPI!");
 	return nullptr;
 }
 
-Ref<IndexBuffer> IndexBuffer::Create(const uint32* indices, uint32 size)
+Ref<FIndexBuffer> FIndexBuffer::Create(uint32 stride, uint32 count)
 {
 	switch (GetRenderAPI())
 	{
 	case ERenderAPI::None:    RE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
-	case ERenderAPI::OpenGL:  return CreateRef<OpenGLIndexBuffer>(indices, size);
+	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLIndexBuffer>(stride, count);
 	}
 
 	RE_CORE_ASSERT(false, "Unknown RenderAPI!");
 	return nullptr;
 }
 
-Ref<VertexArray> Rev::VertexArray::Create()
+Ref<FIndexBuffer> FIndexBuffer::Create(const void* indices, uint32 stride, uint32 count)
 {
 	switch (GetRenderAPI())
 	{
 	case ERenderAPI::None:    RE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
-	case ERenderAPI::OpenGL:  return CreateRef<OpenGLVertexArray>();
+	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLIndexBuffer>(indices, stride, count);
+	}
+
+	RE_CORE_ASSERT(false, "Unknown RenderAPI!");
+	return nullptr;
+}
+
+Ref<FVertexArray> Rev::FVertexArray::Create()
+{
+	switch (GetRenderAPI())
+	{
+	case ERenderAPI::None:    RE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
+	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLVertexArray>();
 	}
 
 	RE_CORE_ASSERT(false, "Unknown RenderAPI!");

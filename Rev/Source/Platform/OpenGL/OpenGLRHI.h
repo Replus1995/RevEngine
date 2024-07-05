@@ -12,7 +12,7 @@ public:
 	virtual void SetClearColor(const Math::FLinearColor& color) override;
 	virtual void Clear() override;
 
-	virtual void DrawIndexed(const VertexArray* vertexArray, uint32_t indexCount) override;
+	virtual void DrawIndexed(const FVertexArray* vertexArray, uint32_t indexCount) override;
 };
 
 }
