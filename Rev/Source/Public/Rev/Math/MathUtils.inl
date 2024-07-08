@@ -31,6 +31,18 @@ T Degrees(T InRadian)
 }
 
 template<typename T>
+T Min(T InValA, T InValB)
+{
+	return InValA < InValB ? InValA : InValB;
+}
+
+template<typename T>
+T Max(T InValA, T InValB)
+{
+	return InValA > InValB ? InValA : InValB;
+}
+
+template<typename T>
 T Clamp(T InVal, T InMin, T InMax)
 {
 	return InVal < InMin ? InMin : InVal > InMax ? InMax : InVal;

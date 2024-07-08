@@ -7,8 +7,9 @@
 
 namespace Rev
 {
-Scope<FRHIContext> RenderCmd::sContext;
-Scope<FRHIShaderLibrary> sShaderLib;
+
+static Scope<FRHIContext> sContext;
+static Scope<FRHIShaderLibrary> sShaderLib;
 
 void RenderCmd::Init()
 {
@@ -48,7 +49,7 @@ void RenderCmd::DrawPrimitive(const FMeshPrimitive* pPrimitive)
 	}
 }
 
-FRHIShaderLibrary* RenderCmd::GetShaderLibrary()
+FRHIShaderLibrary* RenderCmd::ShaderLibrary()
 {
 	return sShaderLib.get();
 }

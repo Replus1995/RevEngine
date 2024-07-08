@@ -248,47 +248,47 @@ void OpenGLShader::Unbind() const
 	glUseProgram(0);
 }
 
-ShaderUniformLocation OpenGLShader::GetUniformLocation(std::string_view name)
+uint16 OpenGLShader::GetUniformLocation(std::string_view name)
 {
-	return ShaderUniformLocation(glGetUniformLocation(mHandle, name.data()));
+	return uint16(glGetUniformLocation(mHandle, name.data()));
 }
 
-void OpenGLShader::SetUniform(ShaderUniformLocation location, int value)
+void OpenGLShader::SetUniform(uint16 location, int value)
 {
 	glUniform1i(location, value);
 }
 
-void OpenGLShader::SetUniform(ShaderUniformLocation location, float value)
+void OpenGLShader::SetUniform(uint16 location, float value)
 {
 	glUniform1f(location, value);
 }
 
-void OpenGLShader::SetUniform(ShaderUniformLocation location, const Math::FVector2& value)
+void OpenGLShader::SetUniform(uint16 location, const Math::FVector2& value)
 {
 	glUniform2f(location, value.X, value.Y);
 }
 
-void OpenGLShader::SetUniform(ShaderUniformLocation location, const Math::FVector3& value)
+void OpenGLShader::SetUniform(uint16 location, const Math::FVector3& value)
 {
 	glUniform3f(location, value.X, value.Y, value.Y);
 }
 
-void OpenGLShader::SetUniform(ShaderUniformLocation location, const Math::FVector4& value)
+void OpenGLShader::SetUniform(uint16 location, const Math::FVector4& value)
 {
 	glUniform4f(location, value.X, value.Y, value.Z, value.W);
 }
 
-void OpenGLShader::SetUniform(ShaderUniformLocation location, const Math::FMatrix3& value)
+void OpenGLShader::SetUniform(uint16 location, const Math::FMatrix3& value)
 {
 	glUniformMatrix3fv(location, 1, GL_FALSE, value.Data());
 }
 
-void OpenGLShader::SetUniform(ShaderUniformLocation location, const Math::FMatrix4& value)
+void OpenGLShader::SetUniform(uint16 location, const Math::FMatrix4& value)
 {
 	glUniformMatrix4fv(location, 1, GL_FALSE, value.Data());
 }
 
-void OpenGLShader::SetUniformArray(ShaderUniformLocation location, int* values, uint32_t count)
+void OpenGLShader::SetUniformArray(uint16 location, const int* values, uint32_t count)
 {
 	glUniform1iv(location, count, values);
 }

@@ -26,7 +26,7 @@ void Renderer::ResizeWindow(uint32 InWidth, uint32 InHeight)
 
 FRHIShaderLibrary* Renderer::GetShaderLibrary()
 {
-	return RenderCmd::GetShaderLibrary();
+	return RenderCmd::ShaderLibrary();
 }
 
 

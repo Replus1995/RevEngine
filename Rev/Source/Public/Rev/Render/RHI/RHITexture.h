@@ -1,6 +1,7 @@
 #pragma once
 #include "Rev/Core/Base.h"
 #include "Rev/Render/PixelFormat.h"
+#include "Rev/Math/Maths.h"
 #include <string>
 
 namespace Rev
@@ -15,8 +16,22 @@ enum class ETextureDimension
 	TextureCubeArray //Unsupported
 };
 
-struct TextureDescription
+struct FTextureClearColor
 {
+	union 
+	{
+		Math::FLinearColor RGBA = Math::FLinearColor(0,0,0,1);
+		struct
+		{
+			float Depth;
+			uint32 Stencil;
+		};
+	};
+};
+
+struct FRHITextureDesc
+{
+	Math::FLinearColor ClearColor;
 	uint16 Width = 1;
 	uint16 Height = 1;
 	uint16 Depth = 1; //For 3D Texture
@@ -31,25 +46,19 @@ class FRHITexture
 {
 public:
 	virtual ~FRHITexture() = default;
+	const FRHITextureDesc& GetDesc() const { return mDesc; }
+	uint32 GetWidth() const { return mDesc.Width; };
+	uint32 GetHeight() const { return mDesc.Height; };
 
-	virtual const TextureDescription& GetDesc() const = 0;
+	virtual void SetData(const void* InData, uint32 InSize) = 0;
+	virtual void Bind(uint32 InSlot = 0) const = 0;
+protected:
+	FRHITexture(const FRHITextureDesc& InDesc)
+		: mDesc(InDesc)
+	{}
 
-	virtual uint32_t GetWidth() const = 0;
-	virtual uint32_t GetHeight() const = 0;
-	virtual uint32_t GetHandle() const = 0;
-
-	virtual void SetData(void* data, uint32_t size) = 0;
-
-	virtual void Bind(uint32_t slot = 0) const = 0;
-
-
-	virtual bool operator==(const FRHITexture& other) const = 0;
-};
-
-class Texture2D : public FRHITexture
-{
-public:
-	static Ref<Texture2D>  (const TextureDescription& desc);
+protected:
+	FRHITextureDesc mDesc;
 };
 
 }

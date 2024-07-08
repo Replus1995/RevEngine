@@ -16,17 +16,17 @@ public:
 	virtual void Bind() const override;
 	virtual void Unbind() const override;
 
-	virtual ShaderUniformLocation GetUniformLocation(std::string_view name) override;
+	virtual uint16 GetUniformLocation(std::string_view name) override;
 
-	virtual void SetUniform(ShaderUniformLocation location, int value) override;
-	virtual void SetUniform(ShaderUniformLocation location, float value) override;
-	virtual void SetUniform(ShaderUniformLocation location, const Math::FVector2& value) override;
-	virtual void SetUniform(ShaderUniformLocation location, const Math::FVector3& value) override;
-	virtual void SetUniform(ShaderUniformLocation location, const Math::FVector4& value) override;
-	virtual void SetUniform(ShaderUniformLocation location, const Math::FMatrix3& value) override;
-	virtual void SetUniform(ShaderUniformLocation location, const Math::FMatrix4& value) override;
+	virtual void SetUniform(uint16 location, int value) override;
+	virtual void SetUniform(uint16 location, float value) override;
+	virtual void SetUniform(uint16 location, const Math::FVector2& value) override;
+	virtual void SetUniform(uint16 location, const Math::FVector3& value) override;
+	virtual void SetUniform(uint16 location, const Math::FVector4& value) override;
+	virtual void SetUniform(uint16 location, const Math::FMatrix3& value) override;
+	virtual void SetUniform(uint16 location, const Math::FMatrix4& value) override;
 
-	virtual void SetUniformArray(ShaderUniformLocation location, int* values, uint32_t count) override;
+	virtual void SetUniformArray(uint16 location, const int* values, uint32_t count) override;
 
 	virtual const std::string& GetName() const override { return mName; }
 private:

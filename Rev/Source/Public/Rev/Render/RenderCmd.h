@@ -4,8 +4,6 @@
 
 namespace Rev
 {
-class FRHIContext;
-class FRHIShaderLibrary;
 class FMeshPrimitive;
 class REV_API RenderCmd
 {
@@ -19,11 +17,5 @@ public:
 
 	static void DrawPrimitive(const class FMeshPrimitive* pPrimitive);
 	//static void DrawLines(const Ref<VertexArray>& vertexArray, uint32_t vertexCount, float lineWidth);
-
-	static FRHIShaderLibrary* GetShaderLibrary();
-
-private:
-	static Scope<FRHIContext> sContext;
-	static Scope<FRHIShaderLibrary> sShaderLib;
 };
 }

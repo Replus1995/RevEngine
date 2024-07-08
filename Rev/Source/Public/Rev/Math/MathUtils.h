@@ -15,6 +15,12 @@ template<typename T>
 inline T Degrees(T InRadian);
 
 template<typename T>
+inline T Min(T InValA, T InValB);
+
+template<typename T>
+inline T Max(T InValA, T InValB);
+
+template<typename T>
 inline T Clamp(T InVal, T InMin, T InMax);
 
 }
