@@ -1,6 +1,7 @@
 #include "Rev/Render/RenderCmd.h"
 #include "Rev/Render/RHI/RHIContext.h"
 #include "Rev/Render/RHI/RHIShader.h"
+#include "Rev/Render/RHI/RHIShaderLibrary.h"
 #include "Rev/Render/Mesh/MeshPrimitive.h"
 #include "Rev/Core/Assert.h"
 
@@ -9,21 +10,22 @@ namespace Rev
 {
 
 static Scope<FRHIContext> sContext;
-static Scope<FRHIShaderLibrary> sShaderLib;
 
 void RenderCmd::Init()
 {
 	RE_CORE_ASSERT(!sContext, "RenderCmd already initialized!");
-	sShaderLib = CreateScope<FRHIShaderLibrary>();
 	sContext = FRHIContext::Create();
 	sContext->Init();
+	FRHIShaderLibrary::CreateInstance();
 	
 }
 
 void RenderCmd::Shutdown()
 {
+	FRHIShaderLibrary::GetInstance().ClearShadersCache();
+	FRHIShaderLibrary::GetInstance().ClearShaderProgramsCache();
+	FRHIShaderLibrary::ReleaseInstance();
 	sContext.reset();
-	sShaderLib.reset();
 }
 
 void RenderCmd::SetViewport(uint32 x, uint32 y, uint32 width, uint32 height)
@@ -47,11 +49,6 @@ void RenderCmd::DrawPrimitive(const FMeshPrimitive* pPrimitive)
 	{
 		sContext->DrawIndexed(pPrimitive->VertexData, 0);
 	}
-}
-
-FRHIShaderLibrary* RenderCmd::ShaderLibrary()
-{
-	return sShaderLib.get();
 }
 
 }

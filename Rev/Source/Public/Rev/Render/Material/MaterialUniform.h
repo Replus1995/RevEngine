@@ -26,7 +26,7 @@ public:
 		return GetValue(&T, sizeof(T));
 	}
 
-	virtual void Upload(const Ref<FRHIShader>& program) = 0;
+	virtual void Upload(const Ref<FRHIShaderProgram>& program) = 0;
 
 protected:
 	virtual bool SetValue(const void* data, size_t size) = 0;
@@ -34,7 +34,7 @@ protected:
 	static std::string GetProgramName(const std::string& name);
 
 	std::string mName;
-	ShaderUniformLocation mLocation;
+	uint16 mLocation = uint16(-1);
 };
 
 template<typename T>
@@ -46,17 +46,17 @@ public:
 		, mValue(value)
 	{}
 
-	TMaterialUniform(std::string_view name, ShaderUniformLocation location, const T& value)
+	TMaterialUniform(std::string_view name, uint16 location, const T& value)
 		: MaterialUniform(name)
 		, mValue(value)
 	{
 		mLocation = location;
 	}
 
-	virtual void Upload(const Ref<FRHIShader>& program)
+	virtual void Upload(const Ref<FRHIShaderProgram>& program)
 	{
 		RE_CORE_ASSERT(program);
-		if(!mLocation.IsValid())
+		if(mLocation != uint16(-1))
 			mLocation = program->GetUniformLocation(GetProgramName(mName));
 		program->SetUniform(mLocation, mValue);
 	}
@@ -98,14 +98,14 @@ public:
 	{
 	}
 
-	TMaterialUniform(std::string_view name, ShaderUniformLocation location, const std::array<T, N>& value)
+	TMaterialUniform(std::string_view name, uint16 location, const std::array<T, N>& value)
 		: MaterialUniform(name)
 		, mValue(value)
 	{
 		mLocation = location;
 	}
 
-	virtual void Upload(const Ref<FRHIShader>& program)
+	virtual void Upload(const Ref<FRHIShaderProgram>& program)
 	{
 		PE_CORE_ASSERT(program);
 		if (!mLocation.IsValid())

@@ -1,30 +1,52 @@
 #pragma once
 #include "Rev/Core/Base.h"
 #include "Rev/Math/Maths.h"
+#include "Rev/Render/RHI/RHIResource.h"
 #include <string>
 #include <unordered_map>
 
 namespace Rev
 {
-class REV_API ShaderUniformLocation
+
+enum class ERHIShaderStage : uint8
 {
-public:
-    ShaderUniformLocation() : mLocation(uint16(-1)) {};
-    ShaderUniformLocation(uint16 location) : mLocation(location) {};
-    ~ShaderUniformLocation() = default;
-
-    operator uint16() { return mLocation; }
-    bool IsValid() const { return mLocation != uint16(-1); }
-
-private:
-    uint16 mLocation;
+    Unknown = 0,
+    Vertex = 1,
+    Hull = 2, //unsupported
+    Domain = 3, //unsupported
+    Pixel = 4,
+    Geometry = 5, //unsupported
+    Compute = 6, //unsupported
+    Count = 7
 };
 
-class FRHITexture;
-class REV_API FRHIShader
+class REV_API FRHIShader : public FRHIResource
 {
 public:
     virtual ~FRHIShader() = default;
+    ERHIShaderStage GetStage() const { return mStage; }
+
+protected:
+    FRHIShader(ERHIShaderStage InStage) : mStage(InStage) {}
+protected:
+    ERHIShaderStage mStage;
+};
+
+struct REV_API FRHIGraphicsShaders
+{
+    Ref<FRHIShader> VertexShader = nullptr;
+    Ref<FRHIShader> HullShader = nullptr;
+    Ref<FRHIShader> DomainShader = nullptr;
+    Ref<FRHIShader> PixelShader = nullptr;
+    Ref<FRHIShader> GeometryShader = nullptr;
+
+    const Ref<FRHIShader>& operator[](ERHIShaderStage Stage) const;
+};
+
+class REV_API FRHIShaderProgram : public FRHIResource
+{
+public:
+    virtual ~FRHIShaderProgram() = default;
 
     virtual void Bind() const = 0;
     virtual void Unbind() const = 0;
@@ -53,26 +75,11 @@ public:
         this->SetUniformArray(GetUniformLocation(name), value);
     }
 
-
-    virtual const std::string& GetName() const = 0;
-
-    static Ref<FRHIShader> Create(const std::string& filepath);
-    static Ref<FRHIShader> Create(const std::string& name, const std::string& vertSrc, const std::string& fragSrc);
-};
-
-class REV_API FRHIShaderLibrary
-{
-public:
-    void Add(const std::string& name, const Ref<FRHIShader>& shader);
-    void Add(const Ref<FRHIShader>& shader);
-    Ref<FRHIShader> Load(const std::string& filepath);
-    Ref<FRHIShader> Load(const std::string& name, const std::string& filepath);
-
-    Ref<FRHIShader> Get(const std::string& name);
-
-    bool Exists(const std::string& name) const;
-private:
-    std::unordered_map<std::string, Ref<FRHIShader>> mShaderCache;
+    const std::string& GetName() const { return mProgramName; };
+protected:
+    FRHIShaderProgram(const std::string& InName) : mProgramName(InName) {}
+protected:
+    std::string mProgramName;
 };
 
 }

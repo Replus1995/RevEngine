@@ -24,10 +24,4 @@ void Renderer::ResizeWindow(uint32 InWidth, uint32 InHeight)
 	RenderCmd::SetViewport(0, 0, InWidth, InHeight);
 }
 
-FRHIShaderLibrary* Renderer::GetShaderLibrary()
-{
-	return RenderCmd::ShaderLibrary();
-}
-
-
 }

@@ -17,7 +17,7 @@
 namespace Rev
 {
 
-GLTFMeshBuilder::GLTFMeshBuilder(const Path& InPath)
+GLTFMeshBuilder::GLTFMeshBuilder(const FPath& InPath)
 	: mFilePath(InPath)
 {
 }

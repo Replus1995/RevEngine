@@ -1,7 +1,8 @@
 #pragma once
 #include "Rev/Core/Base.h"
-#include "Rev/Render/PixelFormat.h"
 #include "Rev/Math/Maths.h"
+#include "Rev/Render/PixelFormat.h"
+#include "Rev/Render/RHI/RHIResource.h"
 #include <string>
 
 namespace Rev
@@ -42,7 +43,7 @@ struct FRHITextureDesc
 	uint8 NumSamples = 1; //For MSAA
 };
 
-class FRHITexture
+class REV_API FRHITexture : public FRHIResource
 {
 public:
 	virtual ~FRHITexture() = default;
@@ -53,10 +54,7 @@ public:
 	virtual void SetData(const void* InData, uint32 InSize) = 0;
 	virtual void Bind(uint32 InSlot = 0) const = 0;
 protected:
-	FRHITexture(const FRHITextureDesc& InDesc)
-		: mDesc(InDesc)
-	{}
-
+	FRHITexture(const FRHITextureDesc& InDesc) : mDesc(InDesc) {}
 protected:
 	FRHITextureDesc mDesc;
 };

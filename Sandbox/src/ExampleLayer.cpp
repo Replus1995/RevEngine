@@ -19,9 +19,9 @@ ExampleLayer::ExampleLayer()
 {
 	//Load shader
 
-	FileSystem::MountDir("/SandBox", std::filesystem::current_path().generic_u8string());
+	FFileSystem::MountDir("/SandBox", std::filesystem::current_path().generic_u8string());
 
-	Renderer::GetShaderLibrary()->Load("ExampleShader", Path("/SandBox/assets/shaders/example.glsl").ToNative());
+	Renderer::GetShaderLibrary()->Load("ExampleShader", FPath("/SandBox/assets/shaders/example.glsl").ToNative());
 
 	auto pMat = CreateRef<ExampleMaterial>();
 	pMat->SetColor(Math::FLinearColor(.7,.8,.8,1));

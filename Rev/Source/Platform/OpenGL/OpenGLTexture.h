@@ -9,6 +9,7 @@ class FOpenGLTexture : public FRHITexture
 {
 public:
 	virtual ~FOpenGLTexture() = default;
+	virtual void* GetNativeHandle() override { return &mHandle; }
 
 	static uint32 GetGLPixelSize(GLenum internalFormat);
 	static Ref<FOpenGLTexture> Create(const FRHITextureDesc& InDesc);

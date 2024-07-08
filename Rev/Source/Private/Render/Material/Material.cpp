@@ -9,7 +9,7 @@ std::string MaterialUniform::GetProgramName(const std::string& name)
 	return std::string(sProgramNamePrefix) + name;
 }
 
-Material::Material(const Ref<FRHIShader>& program)
+Material::Material(const Ref<FRHIShaderProgram>& program)
 	:mProgram(program)
 {
 	//Create Params

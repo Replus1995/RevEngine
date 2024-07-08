@@ -28,14 +28,15 @@ public:
 	void Allocate(uint64 size);
 	void Release();
 
+	inline bool Empty() const { return mSize == 0; }
 	inline uint64 Size() const { return mSize; }
 	inline uint8* Data() { return mData; }
 	inline const uint8* Data() const { return mData; }
 
 	template<typename T>
-	T* As() { return (T*)mData; }
+	T* DataAs() { return (T*)mData; }
 	template<typename T>
-	const T* As() const { return (const T*)mData; }
+	const T* DataAs() const { return (const T*)mData; }
 
 private:
 	uint8* mData = nullptr;

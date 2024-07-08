@@ -1,21 +1,113 @@
 #include "Rev/Core/FileSystem.h"
 #include "Rev/Core/Log.h"
 #include <filesystem>
-
+#include <iostream>
 
 namespace Rev
 {
 
-void FileSystem::MountDir(const std::string& virtualDir, const std::string& nativeDir)
+void FFileSystem::MountDir(const std::string& VirtualDir, const std::string& NativeDir)
 {
-	auto res = GetDirMap().emplace(virtualDir, nativeDir);
+	auto res = GetDirMap().emplace(VirtualDir, NativeDir);
 	if (!res.second)
 	{
-		RE_CORE_ERROR("VirtualDir \"{0}\" has already been mounted as \"{1}\"", virtualDir.c_str(), res.first->second.c_str());
+		RE_CORE_ERROR("VirtualDir \"{0}\" has already been mounted as \"{1}\"", VirtualDir.c_str(), res.first->second.c_str());
 	}
 }
 
-std::string FileSystem::ToNative(const std::string& strpath)
+FBuffer FFileSystem::LoadBinaryFile(const std::string& InNativePath)
+{
+	FBuffer OutBuffer;
+	std::ifstream InFile(InNativePath, std::ios::in | std::ios::binary);
+	if (InFile.is_open())
+	{
+		InFile.seekg(0, std::ios::end);
+		auto ContentSize = InFile.tellg();
+		InFile.seekg(0, std::ios::beg);
+
+		if (ContentSize > 0)
+		{
+			OutBuffer.Allocate(ContentSize);
+			InFile.read(OutBuffer.DataAs<char>(), ContentSize);
+		}
+	}
+	else
+	{
+		RE_CORE_ERROR("[FFileSystem] Open file failded '{0}'", InNativePath.c_str());
+	}
+	return OutBuffer;
+}
+
+FBuffer FFileSystem::LoadBinaryFile(const FPath& InPath)
+{
+	return LoadBinaryFile(InPath.ToNative());
+}
+
+bool FFileSystem::SaveBinaryFile(const std::string& InNativePath, const FBuffer& InBinary)
+{
+	std::ofstream OutFile(InNativePath, std::ios::out | std::ios::binary);
+	if (OutFile.is_open())
+	{
+		if (!InBinary.Empty())
+		{
+			OutFile.write(InBinary.DataAs<char>(), InBinary.Size());
+		}
+		return true;
+	}
+	else
+	{
+		RE_CORE_ERROR("[FFileSystem] Open file failded '{0}'", InNativePath.c_str());
+	}
+	return false;
+}
+
+bool FFileSystem::SaveBinaryFile(const FPath& InPath, const FBuffer& InBinary)
+{
+	return SaveBinaryFile(InPath.ToNative(), InBinary);
+}
+
+std::string FFileSystem::LoadStringFile(const FPath& InPath)
+{
+	std::string Result;
+	std::ifstream InFile(InPath.ToNative(), std::ios::in | std::ios::binary);
+	if (InFile.is_open())
+	{
+		InFile.seekg(0, std::ios::end);
+		auto ContentSize = InFile.tellg();
+		InFile.seekg(0, std::ios::beg);
+
+		if (ContentSize > 0)
+		{
+			Result.resize(ContentSize);
+			InFile.read(Result.data(), ContentSize);
+		}
+	}
+	else
+	{
+		RE_CORE_ERROR("[FFileSystem] Open file failded '{0}'", InPath.String().c_str());
+	}
+	return Result;
+}
+
+bool FFileSystem::SaveStringFile(const FPath& InPath, const std::string& InString)
+{
+	std::ofstream OutFile(InPath.ToNative(), std::ios::out | std::ios::binary);
+	if (OutFile.is_open())
+	{
+		if (!InString.empty())
+		{
+			OutFile.write(InString.data(), InString.size());
+		}
+		return true;
+	}
+	else
+	{
+		RE_CORE_ERROR("[FFileSystem] Open file failded '{0}'", InPath.String().c_str());
+	}
+	return false;
+}
+
+std::string FFileSystem::ToNative(const std::string& strpath)
 {
 	auto& dirMap = GetDirMap();
 	for (auto iter = dirMap.begin(); iter != dirMap.end(); iter++)
@@ -28,7 +120,7 @@ std::string FileSystem::ToNative(const std::string& strpath)
 	return strpath;
 }
 
-std::string FileSystem::ToVirtual(const std::string& strpath)
+std::string FFileSystem::ToVirtual(const std::string& strpath)
 {
 	auto& dirMap = GetDirMap();
 	for (auto iter = dirMap.begin(); iter != dirMap.end(); iter++)
@@ -41,17 +133,17 @@ std::string FileSystem::ToVirtual(const std::string& strpath)
 	return strpath;
 }
 
-std::map<std::string, std::string>& FileSystem::GetDirMap()
+std::map<std::string, std::string>& FFileSystem::GetDirMap()
 {
 	static std::map<std::string, std::string> sDirMap;
 	return sDirMap;
 }
 
-Path::Path()
+FPath::FPath()
 {
 }
 
-Path::Path(const std::string& InPath)
+FPath::FPath(const std::string& InPath)
 {
 	if (!InPath.empty())
 	{
@@ -63,11 +155,11 @@ Path::Path(const std::string& InPath)
 	}
 }
 
-Path::~Path()
+FPath::~FPath()
 {
 }
 
-Path& Path::operator=(const Path& InPath)
+FPath& FPath::operator=(const FPath& InPath)
 {
 	mFullPath = InPath.mFullPath;
 	mFileName = InPath.mFileName;
@@ -75,24 +167,29 @@ Path& Path::operator=(const Path& InPath)
 	return *this;
 }
 
-const std::string& Path::Name() const
+const std::string& FPath::String() const
+{
+	return mFullPath;
+}
+
+const std::string& FPath::Name() const
 {
 	return mFileName;
 }
 
-const std::string& Path::Extension() const
+const std::string& FPath::Extension() const
 {
 	return mFileExtension;
 }
 
-bool Path::Empty() const
+bool FPath::Empty() const
 {
 	return mFullPath.empty();
 }
 
-std::string Path::ToNative()
+std::string FPath::ToNative() const
 {
-	return FileSystem::ToNative(mFullPath);
+	return FFileSystem::ToNative(mFullPath);
 }
 
 }

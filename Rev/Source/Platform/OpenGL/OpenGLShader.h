@@ -6,12 +6,24 @@
 namespace Rev
 {
 
-class OpenGLShader : public FRHIShader
+class FOpenGLShader : public FRHIShader
 {
 public:
-	OpenGLShader(const std::string& filepath);
-	OpenGLShader(const std::string& name, const std::string& vertSrc, const std::string& fragSrc);
-	virtual ~OpenGLShader();
+	FOpenGLShader(ERHIShaderStage InStage, std::vector<uint32_t> InCompiledData);
+	virtual ~FOpenGLShader();
+	virtual void* GetNativeHandle() override { return &mHandle; }
+
+	static GLenum GetOpenGLStage(ERHIShaderStage InStage);
+protected:
+	GLuint mHandle = 0;
+};
+
+class FOpenGLShaderProgram : public FRHIShaderProgram
+{
+public:
+	FOpenGLShaderProgram(const std::string& InName, const FRHIGraphicsShaders& InShaders);
+	virtual ~FOpenGLShaderProgram();
+	virtual void* GetNativeHandle() override { return &mHandle; }
 
 	virtual void Bind() const override;
 	virtual void Unbind() const override;
@@ -28,27 +40,8 @@ public:
 
 	virtual void SetUniformArray(uint16 location, const int* values, uint32_t count) override;
 
-	virtual const std::string& GetName() const override { return mName; }
-private:
-	std::string ReadFile(const std::string& filepath);
-	std::map<GLenum, std::string> PreProcess(const std::string& source);
-	void CompileOrGetOpenGLBinaries(const std::map<GLenum, std::string>& shaderSources);
-	void CreateProgram();
-	void Reflect(GLenum stage, const std::vector<uint32_t>& shaderData);
-
-private:
-	static GLenum StageFromStr(const std::string& type);
-	static const char* StageToStr(GLenum stage);
-
-	static const char* GetCacheDirectory();
-	static void CreateCacheDirectoryIfNeeded();
-	static const char* GetCachedFileExtension(uint32_t stage);
-
 private:
 	uint32_t mHandle = 0;
-	std::string mFilePath;
-	std::string mName;
-	std::unordered_map<GLenum, std::vector<uint32_t>> mOpenGLSPIRV;
 };
 
 }

@@ -10,13 +10,13 @@ namespace Rev
 class GLTFMeshBuilder
 {
 public:
-	GLTFMeshBuilder(const Path& InPath);
+	GLTFMeshBuilder(const FPath& InPath);
 	~GLTFMeshBuilder();
 
 	//const std::vector<Ref<Mesh>>& BuildMeshData(bool DumpInfo = false);
 
 private:
-	Path mFilePath;
+	FPath mFilePath;
 	std::vector<Ref<Mesh>> mMeshVec;
 };
 
