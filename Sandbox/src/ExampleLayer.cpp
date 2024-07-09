@@ -6,6 +6,7 @@
 #include <Rev/Render/Renderer.h>
 #include <Rev/Render/Mesh/StaticMesh.h>
 #include <Rev/Render/Mesh/MeshUtils.h>
+#include <Rev/Render/RHI/RHIShaderLibrary.h>
 #include <Rev/Core/FileSystem.h>
 
 #include <filesystem>
@@ -21,7 +22,8 @@ ExampleLayer::ExampleLayer()
 
 	FFileSystem::MountDir("/SandBox", std::filesystem::current_path().generic_u8string());
 
-	Renderer::GetShaderLibrary()->Load("ExampleShader", FPath("/SandBox/assets/shaders/example.glsl").ToNative());
+	FRHIShaderLibrary::GetInstance().CompileShaderSource(FPath("/SandBox/assets/shaders/example.glsl"));
+	FRHIShaderLibrary::GetInstance().CreateGraphicsProgram("ExampleProgram", "example");
 
 	auto pMat = CreateRef<ExampleMaterial>();
 	pMat->SetColor(Math::FLinearColor(.7,.8,.8,1));

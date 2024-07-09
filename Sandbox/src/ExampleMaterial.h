@@ -1,12 +1,13 @@
 #include <Rev/Render/Material/Material.h>
 #include <Rev/Render/Renderer.h>
 #include <Rev/Math/Maths.h>
+#include <Rev/Render/RHI/RHIShaderLibrary.h>
 
 class ExampleMaterial : public Rev::Material
 {
 public:
     ExampleMaterial()
-        : Rev::Material(Rev::Renderer::GetShaderLibrary()->Get("ExampleShader"))
+        : Rev::Material(Rev::FRHIShaderLibrary::GetInstance().FindProgram("ExampleProgram"))
     {}
     virtual ~ExampleMaterial() {};
 

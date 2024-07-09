@@ -56,7 +56,7 @@ public:
 	virtual void Upload(const Ref<FRHIShaderProgram>& program)
 	{
 		RE_CORE_ASSERT(program);
-		if(mLocation != uint16(-1))
+		if(mLocation == uint16(-1))
 			mLocation = program->GetUniformLocation(GetProgramName(mName));
 		program->SetUniform(mLocation, mValue);
 	}
@@ -108,7 +108,7 @@ public:
 	virtual void Upload(const Ref<FRHIShaderProgram>& program)
 	{
 		PE_CORE_ASSERT(program);
-		if (!mLocation.IsValid())
+		if (mLocation == uint16(-1))
 			mLocation = program->GetUniformLocation(GetProgramName(mName));
 		program->SetUniformArray(mLocation, mValueArr.data(), N);
 	}

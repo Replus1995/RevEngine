@@ -13,7 +13,10 @@ public:
     void CompileShaderSource(const FPath& InPath, const std::string& InName = "");
     Ref<FRHIShader> FindShader(const std::string& InName, ERHIShaderStage InStage);
 
-    Ref<FRHIShaderProgram> CreateGraphicsProgram(const std::string& InShadersName);
+    Ref<FRHIShaderProgram> CreateGraphicsProgram(
+        const std::string& InProgramName, 
+        const std::string& InShadersName
+    );
     Ref<FRHIShaderProgram> CreateGraphicsProgram(
         const std::string& InProgramName,
         const std::string& InVertexName,

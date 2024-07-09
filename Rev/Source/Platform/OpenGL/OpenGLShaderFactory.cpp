@@ -226,9 +226,9 @@ FOpenGLCompiledShaderData FOpenGLShaderFactory::LoadAndCompile(const FPath& InPa
 				RE_CORE_ERROR(CompileResult.GetErrorMessage());
 				RE_CORE_ASSERT(false);
 			}
-			std::vector<uint32_t> CompileData(CompileResult.cend(), CompileResult.cbegin());
+			std::vector<uint32_t> CompileData(CompileResult.cbegin(), CompileResult.cend());
 			fs::path CachedPath = CachedDir / (InPath.Name() + GetCachedFileExtension(Stage));
-			SaveCompiledData(CachedPath.generic_u8string(), CompileData);
+			//SaveCompiledData(CachedPath.generic_u8string(), CompileData);
 
 			Result.CompiledDataMap.emplace(Stage, std::move(CompileData));
 		}

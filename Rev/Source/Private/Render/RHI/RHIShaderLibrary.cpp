@@ -59,9 +59,11 @@ Ref<FRHIShader> FRHIShaderLibrary::FindShader(const std::string& InName, ERHISha
 	return nullptr;
 }
 
-Ref<FRHIShaderProgram> FRHIShaderLibrary::CreateGraphicsProgram(const std::string& InShadersName)
+Ref<FRHIShaderProgram> FRHIShaderLibrary::CreateGraphicsProgram(
+	const std::string& InProgramName,
+	const std::string& InShadersName)
 {
-	Ref<FRHIShaderProgram> Program = FindProgram(InShadersName);
+	Ref<FRHIShaderProgram> Program = FindProgram(InProgramName);
 	if(Program)
 		return Program;
 
@@ -72,10 +74,10 @@ Ref<FRHIShaderProgram> FRHIShaderLibrary::CreateGraphicsProgram(const std::strin
 		{
 		case ERenderAPI::OpenGL:
 		{
-			 Program = FOpenGLShaderFactory::CreateShaderProgram(InShadersName, Shaders);
+			 Program = FOpenGLShaderFactory::CreateShaderProgram(InProgramName, Shaders);
 			if (Program)
 			{
-				mShaderProgramCache.emplace(InShadersName, Program);
+				mShaderProgramCache.emplace(InProgramName, Program);
 			}
 			return Program;
 		}
