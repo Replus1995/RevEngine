@@ -2,6 +2,7 @@
 #include "Rev/Core/Assert.h"
 #include "Rev/Render/RenderCore.h"
 
+#include "Platform/Shaderc/ShadercFactory.h"
 //OpenGL
 #include "Platform/OpenGL/OpenGLShaderFactory.h"
 
@@ -27,16 +28,16 @@ FRHIShaderLibrary& FRHIShaderLibrary::GetInstance()
 	return *sRHIShaderLibrary_Inst;
 }
 
-void FRHIShaderLibrary::CompileShaderSource(const FPath& InPath, const std::string& InName)
+void FRHIShaderLibrary::LoadOrCompileShader(const FPath& InPath)
 {
-	std::string FinalName = InName.empty() ? InPath.Name() : InName;
+	auto CompiledData = FShadercFactory::LoadAndCompile(InPath);
+
 	switch (GetRenderAPI())
 	{
 	case ERenderAPI::OpenGL:
 	{
-		FOpenGLCompiledShaderData ShaderData = FOpenGLShaderFactory::LoadAndCompile(InPath, FinalName);
-		FRHIGraphicsShaders GraphicsShaders = FOpenGLShaderFactory::CreateGraphicsShaders(ShaderData);
-		mGraphicsShaderCache.emplace(ShaderData.Name, std::move(GraphicsShaders));
+		FRHIGraphicsShaders GraphicsShaders = FOpenGLShaderFactory::CreateGraphicsShaders(CompiledData);
+		mGraphicsShaderCache.emplace(CompiledData.Name, std::move(GraphicsShaders));
 		break;
 	}
 	default:

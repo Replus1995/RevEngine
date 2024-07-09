@@ -22,7 +22,7 @@ ExampleLayer::ExampleLayer()
 
 	FFileSystem::MountDir("/SandBox", std::filesystem::current_path().generic_u8string());
 
-	FRHIShaderLibrary::GetInstance().CompileShaderSource(FPath("/SandBox/assets/shaders/example.glsl"));
+	FRHIShaderLibrary::GetInstance().LoadOrCompileShader(FPath("/SandBox/assets/shaders/example.glsl"));
 	FRHIShaderLibrary::GetInstance().CreateGraphicsProgram("ExampleProgram", "example");
 
 	auto pMat = CreateRef<ExampleMaterial>();

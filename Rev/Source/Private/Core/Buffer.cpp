@@ -1,4 +1,5 @@
 #include "Rev/Core/Buffer.h"
+#include "Rev/Core/Assert.h"
 
 namespace Rev
 {
@@ -61,5 +62,32 @@ void FBuffer::Release()
 	mSize = 0;
 }
 
+
+FBufferView::FBufferView()
+	: mData(nullptr)
+	, mOffset(0)
+	, mSize(0)
+{
+}
+
+FBufferView::FBufferView(const FBuffer& InBuffer, uint64 InOffset, uint64 InSize)
+	: mData(InBuffer.mData)
+	, mOffset(InOffset)
+	, mSize(InSize)
+{
+	RE_CORE_ASSERT(mOffset + mSize <= InBuffer.Size());
+}
+
+FBufferView::~FBufferView()
+{
+}
+
+FBufferView& FBufferView::operator=(const FBufferView& Other)
+{
+	mData = Other.mData;
+	mOffset = Other.mOffset;
+	mSize = Other.mSize;
+	return *this;
+}
 
 }

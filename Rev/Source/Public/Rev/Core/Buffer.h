@@ -39,8 +39,34 @@ public:
 	const T* DataAs() const { return (const T*)mData; }
 
 private:
+	friend class FBufferView;
 	uint8* mData = nullptr;
 	uint64 mSize = 0;
+};
+
+class REV_API FBufferView
+{
+public:
+	FBufferView();
+	FBufferView(const FBuffer& InBuffer, uint64 InOffset, uint64 InSize);
+	~FBufferView();
+
+	FBufferView& operator=(const FBufferView& Other);
+
+	inline bool Empty() const { return mSize == 0; }
+	inline uint64 Size() const { return mSize; }
+	inline uint8* Data() { return mData ? mData + mOffset : nullptr; }
+	inline const uint8* Data() const { return  mData ? mData + mOffset : nullptr; }
+
+	template<typename T>
+	T* DataAs() { return (T*)Data(); }
+	template<typename T>
+	const T* DataAs() const { return (const T*)Data(); }
+
+private:
+	uint8* mData;
+	uint64 mOffset;
+	uint64 mSize;
 };
 
 template<uint64 N>

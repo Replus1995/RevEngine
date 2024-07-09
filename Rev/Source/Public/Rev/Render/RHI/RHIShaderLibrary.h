@@ -10,7 +10,7 @@ class REV_API FRHIShaderLibrary
 {
 public:
     static FRHIShaderLibrary& GetInstance();
-    void CompileShaderSource(const FPath& InPath, const std::string& InName = "");
+    void LoadOrCompileShader(const FPath& InPath);
     Ref<FRHIShader> FindShader(const std::string& InName, ERHIShaderStage InStage);
 
     Ref<FRHIShaderProgram> CreateGraphicsProgram(
