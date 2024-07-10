@@ -1,5 +1,7 @@
 #pragma once
+#include "Rev/Render/RHI/RHIBuffer.h"
 #include "Rev/Render/RHI/RHITexture.h"
+#include "Rev/Render/RHI/RHISampler.h"
 
 namespace Rev
 {
@@ -7,7 +9,18 @@ namespace Rev
 class REV_API FRHIResourceFactory
 {
 public:
-	static Ref<FRHITexture> CreateTexture(const FRHITextureDesc& InDesc);
+	//Resource
+	static Ref<FRHIVertexBuffer> CreateVertexBuffer(uint32 InSize); //Dynamic Data
+	static Ref<FRHIVertexBuffer> CreateVertexBuffer(const float* InVertices, uint32 InSize); //Static Data
+	static Ref<FRHIIndexBuffer> CreateIndexBuffer(uint32 InStride, uint32 InCount); //Dynamic Data
+	static Ref<FRHIIndexBuffer> CreateIndexBuffer(const void* InIndices, uint32 InStride, uint32 InCount); //Static Data
+	static Ref<FRHIVertexArray> CreateVertexArray();
+
+	static Ref<FRHIUniformBuffer> CreateUniformBuffer(uint32 InSize, uint32 InBinding);
+	static Ref<FRHITexture> CreateTexture(const FTextureDesc& InDesc);
+
+	//State
+	static Ref<FRHISamplerState> CreateSampler(const FSamplerDesc& InDesc);
 
 };
 

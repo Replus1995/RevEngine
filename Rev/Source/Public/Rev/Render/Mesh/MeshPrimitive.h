@@ -14,16 +14,16 @@ enum class EMeshDrawMode : uint8
 	TRIANGLE_FAN = 6
 };
 
-class FVertexArray;
+class FRHIVertexArray;
 struct FMeshPrimitive
 {
 public:
 	uint32 MaterialIndex;
-	Ref<FVertexArray> VertexData;
+	Ref<FRHIVertexArray> VertexData;
 	EMeshDrawMode DrawMode;
 
 	FMeshPrimitive();
-	FMeshPrimitive(uint32 InMaterialIndex, const Ref<FVertexArray>& InVertexData, EMeshDrawMode InDrawMode = EMeshDrawMode::TRIANGLES);
+	FMeshPrimitive(uint32 InMaterialIndex, const Ref<FRHIVertexArray>& InVertexData, EMeshDrawMode InDrawMode = EMeshDrawMode::TRIANGLES);
 	FMeshPrimitive(const FMeshPrimitive& InPrimitive);
 	FMeshPrimitive(FMeshPrimitive&& InPrimitive) noexcept;
 

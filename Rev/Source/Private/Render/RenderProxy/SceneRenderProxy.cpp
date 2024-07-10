@@ -3,6 +3,7 @@
 #include "Rev/World/System/PlayerCameraSystem.h"
 #include "Rev/Render/RenderCmd.h"
 #include "Rev/Render/Renderer.h"
+#include "Rev/Render/RHI/RHIResourceFactory.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -12,7 +13,7 @@ namespace Rev
 {
 void SceneRenderProxy::Init()
 {
-	mSceneBuffer = UniformBuffer::Create(sizeof(SceneRenderData), 0);
+	mSceneBuffer = FRHIResourceFactory::CreateUniformBuffer(sizeof(SceneRenderData), 0);
 }
 
 void SceneRenderProxy::Release()
@@ -52,7 +53,7 @@ void SceneRenderProxy::Draw()
 	RenderCmd::SetClearColor(Renderer::sClearColor);
 	RenderCmd::Clear();
 
-	mSceneBuffer->SetData(&mSceneData, sizeof(SceneRenderData));
+	mSceneBuffer->UpdateData(&mSceneData, sizeof(SceneRenderData));
 
 	DrawDomain(EMaterialDomain::Opaque);
 	DrawDomain(EMaterialDomain::Transparent);

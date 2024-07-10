@@ -1,7 +1,8 @@
 #pragma once
 #include <tiny_gltf.h>
 #include "Rev/Core/Buffer.h"
-#include "Rev/Asset/Mesh/MeshPrimitiveStorage.h"
+#include "Rev/Asset/MeshPrimitiveStorage.h"
+#include "Rev/Asset/MeshStorage.h"
 
 namespace Rev
 {
@@ -13,6 +14,7 @@ public:
 	static EMeshDrawMode GetDrawMode(int InDrawMode);
 
 	static Ref<FMeshPrimitiveStorage> LoadMeshPrimitive(const tinygltf::Primitive& InPrimitive, const tinygltf::Model& InModel);
+	static Ref<FStaticMeshStorage> LoadStaticMesh(const tinygltf::Mesh& InMesh, const tinygltf::Model& InModel);
 
 };
 

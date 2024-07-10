@@ -30,7 +30,7 @@ struct FTextureClearColor
 	};
 };
 
-struct FRHITextureDesc
+struct FTextureDesc
 {
 	Math::FLinearColor ClearColor;
 	uint16 Width = 1;
@@ -47,16 +47,16 @@ class REV_API FRHITexture : public FRHIResource
 {
 public:
 	virtual ~FRHITexture() = default;
-	const FRHITextureDesc& GetDesc() const { return mDesc; }
+	const FTextureDesc& GetDesc() const { return mDesc; }
 	uint32 GetWidth() const { return mDesc.Width; };
 	uint32 GetHeight() const { return mDesc.Height; };
 
-	virtual void SetData(const void* InData, uint32 InSize) = 0;
-	virtual void Bind(uint32 InSlot = 0) const = 0;
+	virtual void UpdateData(const void* InData, uint32 InSize) = 0;
+	virtual void Bind(uint32 InUnit) const = 0;
 protected:
-	FRHITexture(const FRHITextureDesc& InDesc) : mDesc(InDesc) {}
+	FRHITexture(const FTextureDesc& InDesc) : mDesc(InDesc) {}
 protected:
-	FRHITextureDesc mDesc;
+	FTextureDesc mDesc;
 };
 
 }

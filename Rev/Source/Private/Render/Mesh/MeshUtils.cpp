@@ -1,6 +1,7 @@
 #include "Rev/Render/Mesh/MeshUtils.h"
 #include "Rev/Render/Mesh/StaticMesh.h"
-#include "Rev/Render/RHI/RHIVertexBuffer.h"
+#include "Rev/Render/RHI/RHIBuffer.h"
+#include "Rev/Render/RHI/RHIResourceFactory.h"
 
 namespace Rev
 {
@@ -47,7 +48,7 @@ Ref<StaticMesh> MeshUtils::CreateBox()
     std::vector<FMeshPrimitive> boxPrimArr;
     {
         constexpr uint32 boxVerticesSize = sizeof(SimpleGeo::sBoxVertices);
-        Ref<FVertexBuffer> boxVertices = FVertexBuffer::Create(SimpleGeo::sBoxVertices, boxVerticesSize);
+        Ref<FRHIVertexBuffer> boxVertices = FRHIResourceFactory::CreateVertexBuffer(SimpleGeo::sBoxVertices, boxVerticesSize);
         boxVertices->SetLayout({
             {"Position", EVertexElementType::Float3,  0}
             //{EShaderDataType::Float3, "a_Normal"},
@@ -55,10 +56,10 @@ Ref<StaticMesh> MeshUtils::CreateBox()
             });
 
         constexpr uint32 boxIndicesCount = sizeof(SimpleGeo::sBoxIndices) / sizeof(uint32);
-        Ref<FIndexBuffer> boxIndices = FIndexBuffer::Create(SimpleGeo::sBoxIndices, sizeof(uint32), boxIndicesCount);
+        Ref<FRHIIndexBuffer> boxIndices = FRHIResourceFactory::CreateIndexBuffer(SimpleGeo::sBoxIndices, sizeof(uint32), boxIndicesCount);
 
         FMeshPrimitive boxMeshPrim;
-        boxMeshPrim.VertexData = FVertexArray::Create();
+        boxMeshPrim.VertexData = FRHIResourceFactory::CreateVertexArray();
         boxMeshPrim.VertexData->AddVertexBuffer(boxVertices);
         boxMeshPrim.VertexData->SetIndexBuffer(boxIndices);
 

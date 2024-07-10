@@ -1,8 +1,5 @@
 #include "Rev/Render/Renderer.h"
 #include "Rev/Render/RenderCmd.h"
-#include "Rev/Render/RHI/RHIVertexBuffer.h"
-#include "Rev/Render/Mesh/StaticMesh.h"
-#include "Rev/Render/Material/Material.h"
 
 namespace Rev
 {

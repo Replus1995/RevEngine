@@ -20,7 +20,7 @@ uint32 FOpenGLTexture::GetGLPixelSize(GLenum internalFormat)
 	return 0;
 }
 
-Ref<FOpenGLTexture> FOpenGLTexture::Create(const FRHITextureDesc& InDesc)
+Ref<FOpenGLTexture> FOpenGLTexture::Create(const FTextureDesc& InDesc)
 {
 	switch (InDesc.Dimension)
 	{

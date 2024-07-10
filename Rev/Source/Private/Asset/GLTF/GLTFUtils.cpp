@@ -156,4 +156,18 @@ Ref<FMeshPrimitiveStorage> FGLTFUtils::LoadMeshPrimitive(const tinygltf::Primiti
 	return OutStorage;
 }
 
+Ref<FStaticMeshStorage> FGLTFUtils::LoadStaticMesh(const tinygltf::Mesh& InMesh, const tinygltf::Model& InModel)
+{
+	Ref<FStaticMeshStorage> OutStorage = CreateRef<FStaticMeshStorage>();
+	OutStorage->Name = InMesh.name;
+	for (size_t i = 0; i < InMesh.primitives.size(); i++) {
+		Ref<FMeshPrimitiveStorage> PrimitiveStorage = LoadMeshPrimitive(InMesh.primitives[i], InModel);
+		if (PrimitiveStorage)
+		{
+			OutStorage->PrimitiveData.emplace_back(std::move(PrimitiveStorage));
+		}
+	}
+	return OutStorage;
+}
+
 }

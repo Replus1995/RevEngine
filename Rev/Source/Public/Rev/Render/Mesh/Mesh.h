@@ -8,7 +8,7 @@ namespace Rev
 {
 
 class Material;
-class FVertexArray;
+class FRHIVertexArray;
 class REV_API Mesh
 {
 public:

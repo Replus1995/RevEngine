@@ -1,6 +1,7 @@
 #pragma once
 #include "Rev/Core/Base.h"
 #include "Rev/Render/RenderCore.h"
+#include "Rev/Render/RHI/RHIResource.h"
 #include <string>
 #include <vector>
 
@@ -23,6 +24,7 @@ enum class EVertexElementType
 	Bool
 };
 uint32 VertexElementSize(EVertexElementType type);
+uint32 VertexComponentCount(EVertexElementType type);
 
 struct FVertexBufferElement
 {
@@ -40,6 +42,7 @@ struct FVertexBufferElement
 	{
 	}
 
+	uint32 GetElementSize() const;
 	uint32 GetComponentCount() const;
 };
 
@@ -77,10 +80,10 @@ private:
 };
 
 
-class FVertexBuffer
+class REV_API FRHIVertexBuffer : public FRHIResource
 {
 public:
-	virtual ~FVertexBuffer() = default;
+	virtual ~FRHIVertexBuffer() = default;
 
 	virtual void Bind() const = 0;
 	virtual void Unbind() const = 0;
@@ -91,20 +94,17 @@ public:
 	* @param size : memory size in bytes
 	* @param offset : memory offset in bytes
 	*/
-	virtual void SetData(const void* data, uint32 size, uint32 offset = 0) = 0;
+	virtual void UpdateData(const void* data, uint32 size, uint32 offset = 0) = 0;
 
 	virtual const FVertexBufferLayout& GetLayout() const = 0;
 	virtual void SetLayout(const FVertexBufferLayout& layout) = 0;
 	virtual uint32 GetCapacity() const = 0;
-
-	static Ref<FVertexBuffer> Create(uint32 size); //Dynamic Data
-	static Ref<FVertexBuffer> Create(const float* vertices, uint32 size); //Static Data
 };
 
-class FIndexBuffer
+class REV_API FRHIIndexBuffer : public FRHIResource
 {
 public:
-	virtual ~FIndexBuffer() = default;
+	virtual ~FRHIIndexBuffer() = default;
 
 	virtual void Bind() const = 0;
 	virtual void Unbind() const = 0;
@@ -115,31 +115,33 @@ public:
 	* @param count : element count (size = count * stride)
 	* @param offset : element offset (byteoffset = offset * stride)
 	*/
-	virtual void SetData(const void* data, uint32 count, uint32 offset = 0) = 0;
+	virtual void UpdateData(const void* data, uint32 count, uint32 offset = 0) = 0;
 
 	virtual uint32 GetStride() const = 0;
 	virtual uint32 GetCount() const = 0;
 	virtual uint32 GetCapacity() const = 0;
-
-	static Ref<FIndexBuffer> Create(uint32 stride, uint32 count); //Dynamic Data
-	static Ref<FIndexBuffer> Create(const void* indices, uint32 stride, uint32 count); //Static Data
 };
 
-class FVertexArray
+class REV_API FRHIVertexArray : public FRHIResource
 {
 public:
-	virtual ~FVertexArray() = default;
+	virtual ~FRHIVertexArray() = default;
 
 	virtual void Bind() const = 0;
 	virtual void Unbind() const = 0;
 
-	virtual void AddVertexBuffer(const Ref<FVertexBuffer>& vertexBuffer) = 0;
-	virtual void SetIndexBuffer(const Ref<FIndexBuffer>& indexBuffer) = 0;
+	virtual void AddVertexBuffer(const Ref<FRHIVertexBuffer>& vertexBuffer) = 0;
+	virtual void SetIndexBuffer(const Ref<FRHIIndexBuffer>& indexBuffer) = 0;
 
-	virtual const std::vector<Ref<FVertexBuffer>>& GetVertexBuffers() const = 0;
-	virtual const Ref<FIndexBuffer>& GetIndexBuffer() const = 0;
+	virtual const std::vector<Ref<FRHIVertexBuffer>>& GetVertexBuffers() const = 0;
+	virtual const Ref<FRHIIndexBuffer>& GetIndexBuffer() const = 0;
+};
 
-	static Ref<FVertexArray> Create();
+class REV_API FRHIUniformBuffer : public FRHIResource
+{
+public:
+	virtual ~FRHIUniformBuffer() = default;
+	virtual void UpdateData(const void* data, uint32 size, uint32 offset = 0) = 0;
 };
 
 }

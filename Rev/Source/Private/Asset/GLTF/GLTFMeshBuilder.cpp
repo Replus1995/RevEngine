@@ -1,7 +1,7 @@
-#include "Rev/Asset/Mesh/GLTF/GLTFMeshBuilder.h"
+#include "GLTFMeshBuilder.h"
 #include "Rev/Core/Log.h"
 #include "Rev/Render/Mesh/MeshUtils.h"
-#include "Rev/Render/RHI/RHIVertexBuffer.h"
+#include "Rev/Render/RHI/RHIBuffer.h"
 #include <iostream>
 
 #include "GLTFDebug.h"

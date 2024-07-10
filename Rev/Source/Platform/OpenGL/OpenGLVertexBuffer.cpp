@@ -38,7 +38,7 @@ void FOpenGLVertexBuffer::Unbind() const
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void FOpenGLVertexBuffer::SetData(const void* data, uint32 size, uint32 offset)
+void FOpenGLVertexBuffer::UpdateData(const void* data, uint32 size, uint32 offset)
 {
 	RE_CORE_ASSERT(size + offset <= mSize);
 
@@ -83,7 +83,7 @@ void FOpenGLIndexBuffer::Unbind() const
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void FOpenGLIndexBuffer::SetData(const void* data, uint32 count, uint32 offset)
+void FOpenGLIndexBuffer::UpdateData(const void* data, uint32 count, uint32 offset)
 {
 	RE_CORE_ASSERT(count + offset <= mCount);
 
@@ -134,7 +134,7 @@ void FOpenGLVertexArray::Unbind() const
 	glBindVertexArray(0);
 }
 
-void FOpenGLVertexArray::AddVertexBuffer(const std::shared_ptr<FVertexBuffer>& vertexBuffer)
+void FOpenGLVertexArray::AddVertexBuffer(const std::shared_ptr<FRHIVertexBuffer>& vertexBuffer)
 {
 	RE_CORE_ASSERT(vertexBuffer->GetLayout().GetElements().size(), "Unknown vertex buffer layout!");
 
@@ -199,7 +199,7 @@ void FOpenGLVertexArray::AddVertexBuffer(const std::shared_ptr<FVertexBuffer>& v
 	mVertexBuffers.push_back(vertexBuffer);
 }
 
-void FOpenGLVertexArray::SetIndexBuffer(const std::shared_ptr<FIndexBuffer>& indexBuffer)
+void FOpenGLVertexArray::SetIndexBuffer(const std::shared_ptr<FRHIIndexBuffer>& indexBuffer)
 {
 	glBindVertexArray(mHandle);
 	indexBuffer->Bind();

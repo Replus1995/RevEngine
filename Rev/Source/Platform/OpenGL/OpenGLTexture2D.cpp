@@ -6,7 +6,7 @@
 namespace Rev
 {
 
-FOpenGLTexture2D::FOpenGLTexture2D(const FRHITextureDesc& InDesc)
+FOpenGLTexture2D::FOpenGLTexture2D(const FTextureDesc& InDesc)
 	: FOpenGLTexture(InDesc)
 {
 	InitFormatInfo(mDesc.Format);
@@ -58,16 +58,16 @@ FOpenGLTexture2D::~FOpenGLTexture2D()
 	glDeleteTextures(1, &mHandle);
 }
 
-void FOpenGLTexture2D::SetData(const void* InData, uint32 InSize)
+void FOpenGLTexture2D::UpdateData(const void* InData, uint32 InSize)
 {
 	uint32_t bpp = GetGLPixelSize(mInternalFormat);
 	RE_CORE_ASSERT(InSize == GetWidth() * GetHeight() * bpp, "Data must be entire texture!");
 	glTextureSubImage2D(mHandle, 0, 0, 0, GetWidth(), GetHeight(), mDataFormat, mDataType, InData);
 }
 
-void FOpenGLTexture2D::Bind(uint32 InSlot) const
+void FOpenGLTexture2D::Bind(uint32 InUnit) const
 {
-	glBindTextureUnit(InSlot, mHandle);
+	glBindTextureUnit(InUnit, mHandle);
 }
 
 void FOpenGLTexture2D::InitFormatInfo(EPixelFormat InFormat)

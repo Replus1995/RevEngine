@@ -1,4 +1,4 @@
-#include "Rev/Asset/Mesh/MeshPrimitiveStorage.h"
+#include "Rev/Asset/MeshPrimitiveStorage.h"
 
 namespace Rev
 {

@@ -1,9 +1,8 @@
 #pragma once
 #include "Rev/Core/Base.h"
+#include "Rev/Render/RHI/RHIBuffer.h"
 #include "Rev/Render/Material/Material.h"
-#include "Rev/Render/RHI/RHIUniformBuffer.h"
 #include "Rev/Render/RenderData/RenderData.h"
-
 #include "Rev/Render/RenderProxy/StaticMeshRenderProxy.h"
 
 namespace Rev
@@ -26,7 +25,7 @@ protected:
 
 protected:
 	SceneRenderData mSceneData;
-	Ref<UniformBuffer> mSceneBuffer;
+	Ref<FRHIUniformBuffer> mSceneBuffer;
 
 	std::vector<StaticMeshRenderProxy> mStaticMeshProxies;
 

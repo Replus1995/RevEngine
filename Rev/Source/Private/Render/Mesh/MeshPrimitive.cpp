@@ -10,7 +10,7 @@ FMeshPrimitive::FMeshPrimitive()
 {
 }
 
-FMeshPrimitive::FMeshPrimitive(uint32 InMaterialIndex, const Ref<FVertexArray>& InVertexData, EMeshDrawMode InDrawMode)
+FMeshPrimitive::FMeshPrimitive(uint32 InMaterialIndex, const Ref<FRHIVertexArray>& InVertexData, EMeshDrawMode InDrawMode)
 	: MaterialIndex(InMaterialIndex)
 	, VertexData(InVertexData)
 	, DrawMode(InDrawMode)

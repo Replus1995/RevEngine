@@ -8,11 +8,11 @@ namespace Rev
 class FOpenGLTexture2D : public FOpenGLTexture
 {
 public:
-	FOpenGLTexture2D(const FRHITextureDesc&  InDesc);
+	FOpenGLTexture2D(const FTextureDesc&  InDesc);
 	virtual ~FOpenGLTexture2D();
 
-	virtual void SetData(const void* InData, uint32 InSize) override;
-	virtual void Bind(uint32 InSlot = 0) const override;
+	virtual void UpdateData(const void* InData, uint32 InSize) override;
+	virtual void Bind(uint32 InUnit = 0) const override;
 
 private:
 	void InitFormatInfo(EPixelFormat InFormat);
