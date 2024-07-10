@@ -102,7 +102,7 @@ ERHIShaderStage FShadercUtils::StringToShaderStage(std::string_view InStr)
 		return ERHIShaderStage::Hull;
 	else if (InStr == "tess_evaluation" || InStr == "domain")
 		return ERHIShaderStage::Domain;
-	else if (InStr == "compute" || InStr == "domain")
+	else if (InStr == "compute")
 		return ERHIShaderStage::Domain;
 
 	return ERHIShaderStage::Unknown;

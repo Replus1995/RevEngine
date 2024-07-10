@@ -25,3 +25,4 @@ Sandbox/imgui.ini
 /build
 /.vscode
 /Sandbox/assets/cache
+/Sandbox/ShaderCache
