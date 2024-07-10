@@ -82,35 +82,4 @@ protected:
     std::string mProgramName;
 };
 
-class REV_API FRHIShaderUniformProxy
-{
-public:
-    FRHIShaderUniformProxy() : mLocation(uint16(-1)) {}
-    FRHIShaderUniformProxy(uint16 InLocation) : mLocation(InLocation) {}
-    ~FRHIShaderUniformProxy() {}
-
-    FRHIShaderUniformProxy& operator=(const FRHIShaderUniformProxy& Other)
-    {
-        mLocation = Other.mLocation;
-        return *this;
-    }
-
-    template<typename T>
-    void UpdateUniform(const Ref<FRHIShaderProgram>& InProgram, const T& InValue)
-    {
-        if(mLocation != uint16(-1) && InProgram != nullptr)
-            InProgram->SetUniform(mLocation, InValue);
-    }
-
-    template<typename T>
-    void UpdateUniformArray(const Ref<FRHIShaderProgram>& InProgram, const T* InValues, uint32 InCount)
-    {
-        if (mLocation != uint16(-1) && InProgram != nullptr)
-            InProgram->SetUniformArray(mLocation, InValues, InCount);
-    }
-
-private:
-    uint16 mLocation;
-};
-
 }

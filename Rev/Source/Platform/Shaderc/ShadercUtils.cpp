@@ -96,6 +96,14 @@ ERHIShaderStage FShadercUtils::StringToShaderStage(std::string_view InStr)
 		return ERHIShaderStage::Vertex;
 	else if (InStr == "fragment" || InStr == "pixel")
 		return ERHIShaderStage::Pixel;
+	else if (InStr == "geometry" )
+		return ERHIShaderStage::Geometry;
+	else if (InStr == "tess_control" || InStr == "hull")
+		return ERHIShaderStage::Hull;
+	else if (InStr == "tess_evaluation" || InStr == "domain")
+		return ERHIShaderStage::Domain;
+	else if (InStr == "compute" || InStr == "domain")
+		return ERHIShaderStage::Domain;
 
 	return ERHIShaderStage::Unknown;
 }

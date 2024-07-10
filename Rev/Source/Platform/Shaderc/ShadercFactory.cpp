@@ -18,7 +18,7 @@ static shaderc_shader_kind ShaderStageToShadercKind(ERHIShaderStage InStage)
 	{
 	case ERHIShaderStage::Vertex:   return shaderc_glsl_vertex_shader;
 	case ERHIShaderStage::Hull:		return shaderc_glsl_tess_control_shader;
-	case ERHIShaderStage::Domain:   return shaderc_tess_evaluation_shader;
+	case ERHIShaderStage::Domain:   return shaderc_glsl_tess_evaluation_shader;
 	case ERHIShaderStage::Pixel:	return shaderc_glsl_fragment_shader;
 	case ERHIShaderStage::Geometry: return shaderc_glsl_geometry_shader;
 	case ERHIShaderStage::Compute:	return shaderc_glsl_compute_shader;

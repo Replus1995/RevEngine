@@ -1,7 +1,7 @@
 #pragma once
 #include "Rev/Core/Base.h"
 #include "Rev/Render/Material/Material.h"
-#include "Rev/Render/RHI/RHIShader.h"
+#include "Rev/Render/RenderProxy/UniformRenderProxy.h"
 
 namespace Rev
 {
@@ -17,10 +17,7 @@ public:
 
 private:
 	Ref<StaticMesh> mStaticMesh;
-
-	Math::FMatrix4 mTransform;
-	FRHIShaderUniformProxy mTransformProxy;
-
+	FUniformRenderProxy<Math::FMatrix4, 0> mTransformProxy;
 };
 
 }
