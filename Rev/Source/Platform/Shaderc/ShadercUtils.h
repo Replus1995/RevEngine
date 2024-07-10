@@ -20,6 +20,11 @@ struct FShadercCompiledData
 {
 	std::string Name;
 	std::map<ERHIShaderStage, std::vector<uint32_t>> CompiledDataMap;
+
+	bool Empty() const
+	{
+		return CompiledDataMap.empty();
+	}
 };
 
 class FShadercUtils

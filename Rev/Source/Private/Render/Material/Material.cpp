@@ -9,10 +9,9 @@ std::string MaterialUniform::GetProgramName(const std::string& name)
 	return std::string(sProgramNamePrefix) + name;
 }
 
-Material::Material(const Ref<FRHIShaderProgram>& program)
-	:mProgram(program)
+Material::Material(const Ref<FRHIShaderProgram>& InProgram)
+	:mProgram(InProgram)
 {
-	//Create Params
 }
 
 Material::~Material()
@@ -43,7 +42,6 @@ void Material::Unbind()
 
 void Material::UploadUniform()
 {
-	uTransform.Upload(mProgram);
 }
 
 }

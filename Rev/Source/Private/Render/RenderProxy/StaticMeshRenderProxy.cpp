@@ -7,6 +7,15 @@
 namespace Rev
 {
 
+StaticMeshRenderProxy::StaticMeshRenderProxy()
+	: mTransformProxy(FRHIShaderUniformProxy(0))
+{
+}
+
+StaticMeshRenderProxy::~StaticMeshRenderProxy()
+{
+}
+
 void StaticMeshRenderProxy::Prepare(const Ref<StaticMesh>& mesh, const Math::FMatrix4& transform)
 {
 	mStaticMesh = mesh;
@@ -24,8 +33,8 @@ void StaticMeshRenderProxy::Draw(EMaterialDomain domain)
 		auto vPrimitives = mStaticMesh->GetPrimitive(i);
 		if (!vPrimitives.empty())
 		{
-			pMat->uTransform = mTransform;
 			pMat->Bind();
+			mTransformProxy.UpdateUniform(pMat->GetShaderProgram(), mTransform);
 
 			for (auto& pPrimitive : vPrimitives)
 			{

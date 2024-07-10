@@ -17,13 +17,13 @@ class MaterialUniform;
 class REV_API Material
 {
 public:
-	Material(const Ref<FRHIShaderProgram>& program);
+	Material(const Ref<FRHIShaderProgram>& InProgram);
 	virtual ~Material();
 	
-	/*const Ref<Shader>& GetShader() const
+	const Ref<FRHIShaderProgram>& GetShaderProgram() const
 	{
 		return mProgram;
-	}*/
+	}
 
 	void SetDomain(EMaterialDomain domain);
 	EMaterialDomain GetDomain() const;
@@ -33,13 +33,9 @@ public:
 
 protected:
 	virtual void UploadUniform();
-	friend class StaticMeshRenderProxy;
 protected:
 	Ref<FRHIShaderProgram> mProgram = nullptr;
 	EMaterialDomain mDomain = EMaterialDomain::Opaque;
-
-	//Uniform
-	TMaterialUniform<Math::FMatrix4> uTransform = { "Transform", Math::FMatrix4(1) };
 };
 
 }

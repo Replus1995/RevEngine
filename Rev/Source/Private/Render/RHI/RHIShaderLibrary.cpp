@@ -1,4 +1,5 @@
 #include "Rev/Render/RHI/RHIShaderLibrary.h"
+#include "Rev/Core/Log.h"
 #include "Rev/Core/Assert.h"
 #include "Rev/Render/RenderCore.h"
 
@@ -31,6 +32,11 @@ FRHIShaderLibrary& FRHIShaderLibrary::GetInstance()
 void FRHIShaderLibrary::LoadOrCompileShader(const FPath& InPath)
 {
 	auto CompiledData = FShadercFactory::LoadAndCompile(InPath);
+	if (CompiledData.Empty())
+	{
+		RE_CORE_WARN("No shader complied for {0}", InPath.String().c_str());
+		return;
+	}
 
 	switch (GetRenderAPI())
 	{
