@@ -5,13 +5,28 @@
 //OpenGL impl headers
 #include "Platform/OpenGL/OpenGLVertexBuffer.h"
 #include "Platform/OpenGL/OpenGLUniformBuffer.h"
+#include "Platform/OpenGL/OpenGLSampler.h"
 #include "Platform/OpenGL/OpenGLTexture.h"
+#include "Platform/OpenGL/OpenGLRenderTarget2D.h"
 
 namespace Rev
 {
 
-namespace OpenGLImpl
+namespace
 {
+
+template<class TRHIResource, typename... Args>
+Ref<TRHIResource> CreateRHIResource(Args&&... args)
+{
+	switch (GetRenderAPI())
+	{
+	case ERenderAPI::None:    RE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
+	case ERenderAPI::OpenGL:  return CreateRef<TRHIResource>(std::forward<Args>(args)...);
+	}
+
+	RE_CORE_ASSERT(false, "Unknown RenderAPI!");
+	return nullptr;
+}
 
 }
 
@@ -88,6 +103,19 @@ Ref<FRHIUniformBuffer> FRHIResourceFactory::CreateUniformBuffer(uint32 InSize, u
 	return nullptr;
 }
 
+Ref<FRHISampler> FRHIResourceFactory::CreateSampler(const FSamplerDesc& InDesc)
+{
+	switch (GetRenderAPI())
+	{
+	case ERenderAPI::None:    RE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
+	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLSampler>(InDesc);
+	}
+
+	RE_CORE_ASSERT(false, "Unknown RenderAPI!");
+	return nullptr;
+}
+
+
 Ref<FRHITexture> FRHIResourceFactory::CreateTexture(const FTextureDesc& InDesc)
 {
 	switch (GetRenderAPI())
@@ -100,16 +128,15 @@ Ref<FRHITexture> FRHIResourceFactory::CreateTexture(const FTextureDesc& InDesc)
 	return nullptr;
 }
 
-Ref<FRHISamplerState> FRHIResourceFactory::CreateSampler(const FSamplerDesc& InDesc)
+Ref<FRHIRenderTarget> FRHIResourceFactory::CreateRenderTarget(const FRenderTargetDesc& InDesc)
 {
 	switch (GetRenderAPI())
 	{
 	case ERenderAPI::None:    RE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
-	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLSampler>(InDesc);
+	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLRenderTarget2D>(InDesc);
 	}
 
 	RE_CORE_ASSERT(false, "Unknown RenderAPI!");
 	return nullptr;
 }
-
 }

@@ -17,6 +17,7 @@ public:
 
 	uint8_t& operator[](int Index);
 	uint8_t const& operator[](int Index) const;
+	uint8_t const* Data() const;
 
 	bool operator==(const FColor& InColor) const;
 	bool operator!=(const FColor& InColor) const;

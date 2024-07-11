@@ -64,6 +64,11 @@ inline uint8_t const& FColor::operator[](int Index) const
 	}
 }
 
+inline uint8_t const* FColor::Data() const
+{
+	return &R;
+}
+
 inline bool FColor::operator==(const FColor& InColor) const
 {
 	return R == InColor.R && G == InColor.G && B == InColor.B && A == InColor.A;

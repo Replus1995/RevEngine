@@ -12,6 +12,7 @@ public:
 	virtual ~FOpenGLTexture2D();
 
 	virtual void UpdateData(const void* InData, uint32 InSize) override;
+	virtual void ClearData() override;
 	virtual void Bind(uint32 InUnit = 0) const override;
 
 private:

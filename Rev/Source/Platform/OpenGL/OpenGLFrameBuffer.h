@@ -1,11 +1,48 @@
 #pragma once
-#include "Rev/Render/RHI/RHIFrameBuffer.h"
 #include <glad/glad.h>
 
 namespace Rev
 {
 
-class OpenGLFramebuffer : public Framebuffer
+enum class FramebufferTextureFormat
+{
+	None = 0,
+	// Color
+	R32I,
+	RGBA8,
+	// Depth/stencil
+	DEPTH24STENCIL8
+};
+
+struct FramebufferTextureDescription
+{
+	FramebufferTextureDescription() = default;
+	FramebufferTextureDescription(FramebufferTextureFormat format)
+		: TextureFormat(format) {}
+
+	FramebufferTextureFormat TextureFormat = FramebufferTextureFormat::None;
+	// TODO: filtering/wrap
+};
+
+struct FramebufferAttachmentDescription
+{
+	FramebufferAttachmentDescription() = default;
+	FramebufferAttachmentDescription(std::initializer_list<FramebufferTextureDescription> attachments)
+		: Attachments(attachments) {}
+
+	std::vector<FramebufferTextureDescription> Attachments;
+};
+
+struct FramebufferDescription
+{
+	uint32_t Width = 0, Height = 0;
+	FramebufferAttachmentDescription Attachments;
+	uint32_t Samples = 1;
+
+	bool SwapChainTarget = false;
+};
+
+class OpenGLFramebuffer
 {
 public:
 	OpenGLFramebuffer(const FramebufferDescription& desc);
@@ -13,17 +50,17 @@ public:
 
 	void Invalidate();
 
-	virtual void Bind() override;
-	virtual void Unbind() override;
+	virtual void Bind();
+	virtual void Unbind();
 
-	virtual void Resize(uint32_t width, uint32_t height) override;
-	virtual int ReadPixel(uint32_t attachmentIndex, int x, int y) override;
+	virtual void Resize(uint32_t width, uint32_t height);
+	virtual int ReadPixel(uint32_t attachmentIndex, int x, int y);
 
-	virtual void ClearAttachment(uint32_t attachmentIndex, int value) override;
+	virtual void ClearAttachment(uint32_t attachmentIndex, int value) ;
 
-	virtual uint32_t GetAttachmentHandle(uint32_t index = 0) const override;
+	virtual uint32_t GetAttachmentHandle(uint32_t index = 0) const;
 
-	virtual const FramebufferDescription& GetDesc() const override { return mDesc; }
+	virtual const FramebufferDescription& GetDesc() const { return mDesc; }
 
 public:
 	static GLenum GetGLFormat(FramebufferTextureFormat format);

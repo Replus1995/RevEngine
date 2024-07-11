@@ -1,18 +1,9 @@
 #pragma once
 #include "Rev/Render/RHI/RHITexture.h"
-#include "Rev/Render/RHI/RHISampler.h"
 #include <glad/glad.h>
 
 namespace Rev
 {
-
-class FOpenGLSampler : public FRHISamplerState
-{
-public:
-	FOpenGLSampler(const FSamplerDesc& InDesc) : FRHISamplerState(InDesc) {}
-	virtual ~FOpenGLSampler() {};
-	virtual void* GetNativeHandle() override { return nullptr; }
-};
 
 class FOpenGLTexture : public FRHITexture
 {

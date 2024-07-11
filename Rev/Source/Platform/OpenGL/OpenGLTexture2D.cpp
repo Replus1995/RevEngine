@@ -65,6 +65,50 @@ void FOpenGLTexture2D::UpdateData(const void* InData, uint32 InSize)
 	glTextureSubImage2D(mHandle, 0, 0, 0, GetWidth(), GetHeight(), mDataFormat, mDataType, InData);
 }
 
+void FOpenGLTexture2D::ClearData()
+{
+	switch (mDesc.Format)
+	{
+	case PF_R32G32B32A32F:
+	{
+		const float* ClearColor = mDesc.ClearColor.RGBA.Data();
+		glClearTexImage(mHandle, 0, mInternalFormat, mDataType, (const void*)&ClearColor);
+		break;
+	}
+	case PF_R8G8B8A8:
+	case PF_RGB8:
+	{
+		Math::FLinearColor RGBA8 = mDesc.ClearColor.RGBA * 255.0f;
+		uint8 ClearColor[4] = { RGBA8.R, RGBA8.G, RGBA8.B, RGBA8.A };
+		glClearTexImage(mHandle, 0, mInternalFormat, mDataType, (const void*)&ClearColor);
+		break;
+	}
+	case PF_R8:
+	{
+		uint8 ClearColor = mDesc.ClearColor.RGBA.R * 255.0f;
+		glClearTexImage(mHandle, 0, mInternalFormat, mDataType, (const void*)&ClearColor);
+		break;
+	}
+	case PF_R16:
+	{
+		uint16 ClearColor = mDesc.ClearColor.RGBA.R * 65535.0f;
+		glClearTexImage(mHandle, 0, mInternalFormat, mDataType, (const void*)&ClearColor);
+		break;
+	}
+	case PF_DepthStencil:
+	{
+		uint32 Depth = uint32(mDesc.ClearColor.Depth * 16777215.0f) << 8;
+		uint8 Stencil = mDesc.ClearColor.Stencil;
+		uint32 ClearColor = Depth & (uint32)Stencil;
+		glClearTexImage(mHandle, 0, mInternalFormat, mDataType, (const void*)&ClearColor);
+		break;
+	}
+	default:
+		break;
+	}
+	
+}
+
 void FOpenGLTexture2D::Bind(uint32 InUnit) const
 {
 	glBindTextureUnit(InUnit, mHandle);
@@ -99,6 +143,11 @@ void FOpenGLTexture2D::InitFormatInfo(EPixelFormat InFormat)
 		mDataFormat = GL_RGB;
 		mDataType = GL_UNSIGNED_BYTE;
 		break;
+	case PF_DepthStencil:
+		mInternalFormat = GL_DEPTH24_STENCIL8;
+		mDataFormat = GL_DEPTH_STENCIL;
+		mDataType = GL_UNSIGNED_INT_24_8;
+		break;
 	default:
 		RE_CORE_ASSERT(false);
 	}
@@ -109,11 +158,11 @@ void FOpenGLTexture2D::CreateResource()
 	glCreateTextures(GL_TEXTURE_2D, 1, &mHandle);
 	glTextureStorage2D(mHandle, 1, mInternalFormat,  GetWidth(), GetHeight());
 
-	glTextureParameteri(mHandle, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	/*glTextureParameteri(mHandle, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTextureParameteri(mHandle, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	glTextureParameteri(mHandle, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTextureParameteri(mHandle, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTextureParameteri(mHandle, GL_TEXTURE_WRAP_T, GL_REPEAT);*/
 }
 
 }
