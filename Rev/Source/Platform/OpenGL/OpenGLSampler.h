@@ -20,9 +20,6 @@ private:
 	static GLenum TranslateWarpMode(ESamplerWarpMode InMode);
 	bool UseAnisotropicFilter() const;
 	bool UseBorderWarp() const;
-
-private:
-	GLuint mTexHandle = 0;
 };
 
 }

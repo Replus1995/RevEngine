@@ -16,11 +16,7 @@ public:
 	virtual void Bind(uint32 InUnit = 0) const override;
 
 private:
-	void InitFormatInfo(EPixelFormat InFormat);
 	void CreateResource();
-
-private:
-	GLenum mInternalFormat = 0, mDataFormat = 0, mDataType = 0;
 };
 
 

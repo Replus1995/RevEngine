@@ -6,20 +6,6 @@
 namespace Rev
 {
 
-uint32 FOpenGLTexture::GetGLPixelSize(GLenum internalFormat)
-{
-	switch (internalFormat)
-	{
-	case GL_R8: return 1;
-	case GL_R16: return 2;
-	case GL_RGB8: return 3;
-	case GL_RGBA8: return 4;
-	case GL_RGB32F: return 4 * 4;
-	}
-	RE_CORE_ASSERT(false, "Unknown GL Internal Format.");
-	return 0;
-}
-
 Ref<FOpenGLTexture> FOpenGLTexture::Create(const FTextureDesc& InDesc)
 {
 	switch (InDesc.Dimension)

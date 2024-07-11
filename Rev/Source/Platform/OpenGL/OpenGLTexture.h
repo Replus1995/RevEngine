@@ -1,5 +1,6 @@
 #pragma once
 #include "Rev/Render/RHI/RHITexture.h"
+#include "OpenGLPixelFormat.h"
 #include <glad/glad.h>
 
 namespace Rev
@@ -11,14 +12,17 @@ public:
 	virtual ~FOpenGLTexture() = default;
 	virtual void* GetNativeHandle() override { return &mHandle; }
 
-	static uint32 GetGLPixelSize(GLenum internalFormat);
 	static Ref<FOpenGLTexture> Create(const FTextureDesc& InDesc);
-
 protected:
-	FOpenGLTexture(const FTextureDesc& InDesc) : FRHITexture(InDesc) {};
+	FOpenGLTexture(const FTextureDesc& InDesc) 
+		: FRHITexture(InDesc) 
+		, mFormatData(FOpenGLPixelFormat::TranslatePixelFormat(InDesc.Format))
+	{
+	}
 
 protected:
 	GLuint mHandle = 0;
+	FOpenGLFormatData mFormatData;
 };
 
 }

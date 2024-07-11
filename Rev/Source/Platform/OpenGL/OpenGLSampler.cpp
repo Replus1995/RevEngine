@@ -5,28 +5,25 @@ namespace Rev
 
 void FOpenGLSampler::SyncSampleState(GLuint InTexHandle, bool bMipMap)
 {
-	if(InTexHandle == mTexHandle)
-		return;
-	mTexHandle = InTexHandle;
-	glTextureParameteri(mTexHandle, GL_TEXTURE_MIN_FILTER, TranslateMinFilterMode(mDesc.Filter, bMipMap));
-	glTextureParameteri(mTexHandle, GL_TEXTURE_MAG_FILTER, TranslateMagFilterMode(mDesc.Filter));
+	glTextureParameteri(InTexHandle, GL_TEXTURE_MIN_FILTER, TranslateMinFilterMode(mDesc.Filter, bMipMap));
+	glTextureParameteri(InTexHandle, GL_TEXTURE_MAG_FILTER, TranslateMagFilterMode(mDesc.Filter));
 
-	glTextureParameteri(mTexHandle, GL_TEXTURE_WRAP_S, TranslateWarpMode(mDesc.WarpU));
-	glTextureParameteri(mTexHandle, GL_TEXTURE_WRAP_T, TranslateWarpMode(mDesc.WarpV));
-	glTextureParameteri(mTexHandle, GL_TEXTURE_WRAP_R, TranslateWarpMode(mDesc.WarpW));
+	glTextureParameteri(InTexHandle, GL_TEXTURE_WRAP_S, TranslateWarpMode(mDesc.WarpU));
+	glTextureParameteri(InTexHandle, GL_TEXTURE_WRAP_T, TranslateWarpMode(mDesc.WarpV));
+	glTextureParameteri(InTexHandle, GL_TEXTURE_WRAP_R, TranslateWarpMode(mDesc.WarpW));
 
 	if (UseAnisotropicFilter())
 	{
-		glTextureParameterf(mTexHandle, GL_TEXTURE_MAX_ANISOTROPY, mDesc.Anisotropic);
+		glTextureParameterf(InTexHandle, GL_TEXTURE_MAX_ANISOTROPY, mDesc.Anisotropic);
 	}
 	else
 	{
-		glTextureParameterf(mTexHandle, GL_TEXTURE_MAX_ANISOTROPY, 1.0f);
+		glTextureParameterf(InTexHandle, GL_TEXTURE_MAX_ANISOTROPY, 1.0f);
 	}
 
 	if (UseBorderWarp())
 	{
-		glTextureParameterfv(mTexHandle, GL_TEXTURE_BORDER_COLOR, mDesc.BorderColor.Data());
+		glTextureParameterfv(InTexHandle, GL_TEXTURE_BORDER_COLOR, mDesc.BorderColor.Data());
 	}
 }
 

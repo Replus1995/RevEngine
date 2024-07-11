@@ -13,8 +13,9 @@ public:
 	virtual ~FOpenGLShader();
 	virtual void* GetNativeHandle() override { return &mHandle; }
 
-	static GLenum GetOpenGLStage(ERHIShaderStage InStage);
-protected:
+private:
+	static GLenum TranslateShaderStage(ERHIShaderStage InStage);
+private:
 	GLuint mHandle = 0;
 };
 
