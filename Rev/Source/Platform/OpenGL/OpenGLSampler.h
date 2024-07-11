@@ -12,7 +12,7 @@ public:
 	virtual ~FOpenGLSampler() {};
 	virtual void* GetNativeHandle() override { return nullptr; }
 
-	void SyncSampleState(GLuint InTexHandle, bool bMipMap);
+	void UpdateSampleState(GLuint InTexHandle, bool bMipMap);
 
 private:
 	static GLenum TranslateMinFilterMode(ESamplerFilterMode InMode, bool bMipMap);

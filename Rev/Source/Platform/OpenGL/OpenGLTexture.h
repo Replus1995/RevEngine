@@ -11,6 +11,7 @@ class FOpenGLTexture : public FRHITexture
 public:
 	virtual ~FOpenGLTexture() = default;
 	virtual void* GetNativeHandle() override { return &mHandle; }
+	virtual void SetSampler(const Ref<FRHISampler>& InSampler) override;
 
 	static Ref<FOpenGLTexture> Create(const FTextureDesc& InDesc);
 protected:
@@ -23,6 +24,7 @@ protected:
 protected:
 	GLuint mHandle = 0;
 	FOpenGLFormatData mFormatData;
+	Scope<class FSamplerDesc> mSamplerDescCache;
 };
 
 }

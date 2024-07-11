@@ -103,7 +103,7 @@ EMeshDrawMode FGLTFUtils::GetDrawMode(int InDrawMode)
 	}
 }
 
-Ref<FMeshPrimitiveStorage> FGLTFUtils::LoadMeshPrimitive(const tinygltf::Primitive& InPrimitive, const tinygltf::Model& InModel)
+Ref<FMeshPrimitiveStorage> FGLTFUtils::ImportMeshPrimitive(const tinygltf::Primitive& InPrimitive, const tinygltf::Model& InModel)
 {
 	Ref<FMeshPrimitiveStorage> OutStorage = CreateRef<FMeshPrimitiveStorage>();
 	for (auto& [attrName, attrIndex] : InPrimitive.attributes)
@@ -156,18 +156,83 @@ Ref<FMeshPrimitiveStorage> FGLTFUtils::LoadMeshPrimitive(const tinygltf::Primiti
 	return OutStorage;
 }
 
-Ref<FStaticMeshStorage> FGLTFUtils::LoadStaticMesh(const tinygltf::Mesh& InMesh, const tinygltf::Model& InModel)
+Ref<FStaticMeshStorage> FGLTFUtils::ImportStaticMesh(const tinygltf::Mesh& InMesh, const tinygltf::Model& InModel)
 {
 	Ref<FStaticMeshStorage> OutStorage = CreateRef<FStaticMeshStorage>();
 	OutStorage->Name = InMesh.name;
 	for (size_t i = 0; i < InMesh.primitives.size(); i++) {
-		Ref<FMeshPrimitiveStorage> PrimitiveStorage = LoadMeshPrimitive(InMesh.primitives[i], InModel);
+		Ref<FMeshPrimitiveStorage> PrimitiveStorage = ImportMeshPrimitive(InMesh.primitives[i], InModel);
 		if (PrimitiveStorage)
 		{
 			OutStorage->PrimitiveData.emplace_back(std::move(PrimitiveStorage));
 		}
 	}
 	return OutStorage;
+}
+
+EPixelFormat FGLTFUtils::TranslateImageFormat(const tinygltf::Image& InImage)
+{
+	switch (InImage.component)
+	{
+	case 1:
+	{
+		switch (InImage.pixel_type)
+		{
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
+			return PF_R8;
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
+			return PF_R16;
+		default:
+			break;
+		}
+		break;
+	}
+	case 2:
+	{
+		break;
+	}
+	case 3:
+	{
+		switch (InImage.pixel_type)
+		{
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
+			return PF_RGB8;
+		default:
+			break;
+		}
+		break;
+	}
+	case 4:
+	{
+		switch (InImage.pixel_type)
+		{
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
+			return PF_R8G8B8A8;
+		case TINYGLTF_COMPONENT_TYPE_FLOAT:
+			return PF_R32G32B32A32F;
+		default:
+			break;
+		}
+		break;
+	}
+	default:
+		break;
+	}
+
+	RE_CORE_WARN("[GLTF] Unsupported image format.");
+	return PF_Unknown;
+}
+
+Ref<FTextureStorage> FGLTFUtils::LoadTexture(const tinygltf::Texture& InTexture, const tinygltf::Model& InModel)
+{
+	const tinygltf::Image& InImage = InModel.images[InTexture.source];
+	const tinygltf::Sampler& InSampler = InModel.samplers[InTexture.source];
+
+	FTextureDesc TexDesc = FTextureDesc::MakeTexture2D(InImage.width, InImage.height, TranslateImageFormat(InImage), Math::FLinearColor(0,0,0,1));
+
+
+
+	return Ref<FTextureStorage>();
 }
 
 }

@@ -4,22 +4,20 @@
 
 namespace Rev
 {
-class FRHISampler;
 class FRHITexture;
-class Texture2D
+class Texture
 {
 public:
-	Texture2D();
-	~Texture2D();
+	Texture();
+	~Texture();
 
 	uint16 Width() const;
 	uint16 Height() const;
 	EPixelFormat Format() const;
 
-
 private:
+	friend class FTextureStorage;
 	Ref<FRHITexture> mRHITexture;
-	Ref<FRHISampler> mRHISampler;
 };
 
 

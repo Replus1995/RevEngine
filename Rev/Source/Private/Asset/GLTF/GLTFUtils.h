@@ -3,6 +3,7 @@
 #include "Rev/Core/Buffer.h"
 #include "Rev/Asset/MeshPrimitiveStorage.h"
 #include "Rev/Asset/MeshStorage.h"
+#include "Rev/Asset/TextureStorage.h"
 
 namespace Rev
 {
@@ -13,8 +14,11 @@ public:
 	static uint32 GetComponentSize(int InComponentType);
 	static EMeshDrawMode GetDrawMode(int InDrawMode);
 
-	static Ref<FMeshPrimitiveStorage> LoadMeshPrimitive(const tinygltf::Primitive& InPrimitive, const tinygltf::Model& InModel);
-	static Ref<FStaticMeshStorage> LoadStaticMesh(const tinygltf::Mesh& InMesh, const tinygltf::Model& InModel);
+	static Ref<FMeshPrimitiveStorage> ImportMeshPrimitive(const tinygltf::Primitive& InPrimitive, const tinygltf::Model& InModel);
+	static Ref<FStaticMeshStorage> ImportStaticMesh(const tinygltf::Mesh& InMesh, const tinygltf::Model& InModel);
+
+	static EPixelFormat TranslateImageFormat(const tinygltf::Image& InImage);
+	static Ref<FTextureStorage> LoadTexture(const tinygltf::Texture& InTexture, const tinygltf::Model& InModel);
 
 };
 

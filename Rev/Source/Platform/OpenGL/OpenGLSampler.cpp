@@ -3,7 +3,7 @@
 namespace Rev
 {
 
-void FOpenGLSampler::SyncSampleState(GLuint InTexHandle, bool bMipMap)
+void FOpenGLSampler::UpdateSampleState(GLuint InTexHandle, bool bMipMap)
 {
 	glTextureParameteri(InTexHandle, GL_TEXTURE_MIN_FILTER, TranslateMinFilterMode(mDesc.Filter, bMipMap));
 	glTextureParameteri(InTexHandle, GL_TEXTURE_MAG_FILTER, TranslateMagFilterMode(mDesc.Filter));
@@ -21,10 +21,10 @@ void FOpenGLSampler::SyncSampleState(GLuint InTexHandle, bool bMipMap)
 		glTextureParameterf(InTexHandle, GL_TEXTURE_MAX_ANISOTROPY, 1.0f);
 	}
 
-	if (UseBorderWarp())
+	/*if (UseBorderWarp())
 	{
 		glTextureParameterfv(InTexHandle, GL_TEXTURE_BORDER_COLOR, mDesc.BorderColor.Data());
-	}
+	}*/
 }
 
 GLenum FOpenGLSampler::TranslateMinFilterMode(ESamplerFilterMode InMode, bool bMipMap)
