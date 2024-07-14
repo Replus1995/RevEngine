@@ -6,6 +6,7 @@
 #include "Rev/Render/RenderCore.h"
 #include "Rev/Render/Renderer.h"
 #include "Rev/Render/RenderCmd.h"
+#include "Rev/Asset/AssetLibrary.h"
 
 namespace Rev
 {
@@ -29,10 +30,12 @@ namespace Rev
 		mWindow->SetEventCallback(RE_BIND_EVENT_FN(Application::OnEvent, this));
 
 		Renderer::Init();
+		FAssetLibrary::Init();
 	}
 
 	Application::~Application()
 	{
+		FAssetLibrary::Shutdown();
 		Renderer::Shutdown();
 	}
 

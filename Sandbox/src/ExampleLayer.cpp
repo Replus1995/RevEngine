@@ -5,9 +5,9 @@
 #include <Rev/World/System/PlayerCameraSystem.h>
 #include <Rev/Render/Renderer.h>
 #include <Rev/Render/Mesh/StaticMesh.h>
-#include <Rev/Render/Mesh/MeshUtils.h>
 #include <Rev/Render/RHI/RHIShaderLibrary.h>
 #include <Rev/Core/FileSystem.h>
+#include <Rev/Asset/AssetLibrary.h>
 
 #include <filesystem>
 
@@ -20,14 +20,13 @@ ExampleLayer::ExampleLayer()
 {
 	//Load shader
 
-	FFileSystem::MountDir("/SandBox", std::filesystem::current_path().generic_u8string());
+	//FFileSystem::MountDir("/SandBox", std::filesystem::current_path().generic_u8string());
 
-	FRHIShaderLibrary::GetInstance().LoadOrCompileShader(FPath("/SandBox/assets/shaders/example.glsl"));
-	FRHIShaderLibrary::GetInstance().CreateGraphicsProgram("ExampleProgram", "example");
+	FRHIShaderLibrary::GetInstance().LoadOrCompileShader(FPath("/Game/Assets/Shaders/Example.glsl"));
+	FRHIShaderLibrary::GetInstance().CreateGraphicsProgram("ExampleProgram", "Example");
 
 	auto pMat = CreateRef<ExampleMaterial>();
 	pMat->SetColor(Math::FLinearColor(.7,.8,.8,1));
-	MeshUtils::SetDefaultMaterial(pMat);
 
 	//Create Sandbox Scene
 	mScene = CreateRef<Rev::Scene>();
@@ -35,7 +34,7 @@ ExampleLayer::ExampleLayer()
 	{
 		auto meshEntity = mScene->CreateEntity();
 		auto& meshComp = meshEntity.AddComponent<StaticMeshComponent>();
-		meshComp.StaticMesh = MeshUtils::CreateBox();
+		meshComp.StaticMesh = FAssetLibrary::CreateBasicGeometry(EBasicGeometry::Box, pMat);
 		auto& transformComp = meshEntity.GetComponent<TransformComponent>();
 		transformComp.SetLocation(Math::FVector3(0, 0, -5));
 	}

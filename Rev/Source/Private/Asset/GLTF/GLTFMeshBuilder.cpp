@@ -1,6 +1,5 @@
 #include "GLTFMeshBuilder.h"
 #include "Rev/Core/Log.h"
-#include "Rev/Render/Mesh/MeshUtils.h"
 #include "Rev/Render/RHI/RHIBuffer.h"
 #include <iostream>
 
