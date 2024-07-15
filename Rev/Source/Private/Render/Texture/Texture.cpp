@@ -6,12 +6,12 @@ namespace Rev
 {
 
 Texture::Texture()
-	: mRHITexture(nullptr)
+	: mResource(nullptr)
 {
 }
 
-Texture::Texture(const Ref<FRHITexture>& InRHITexture)
-	: mRHITexture(InRHITexture)
+Texture::Texture(const Ref<FRHITexture>& InResource)
+	: mResource(InResource)
 {
 }
 
@@ -21,17 +21,17 @@ Texture::~Texture()
 
 uint16 Texture::Width() const
 {
-	return mRHITexture ? mRHITexture->GetWidth() : 0;
+	return mResource ? mResource->GetWidth() : 0;
 }
 
 uint16 Texture::Height() const
 {
-	return mRHITexture ? mRHITexture->GetHeight() : 0;
+	return mResource ? mResource->GetHeight() : 0;
 }
 
 EPixelFormat Texture::Format() const
 {
-	return mRHITexture ? mRHITexture->GetFormat() : EPixelFormat::PF_Unknown;
+	return mResource ? mResource->GetFormat() : EPixelFormat::PF_Unknown;
 }
 
 }

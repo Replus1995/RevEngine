@@ -5,7 +5,7 @@
 namespace Rev
 {
 
-enum class ERenderAPI : uint8_t
+enum class ERenderAPI : uint8
 {
     None = 0,
     OpenGL = 1,
@@ -15,14 +15,14 @@ ERenderAPI GetRenderAPI();
 
 enum EBlendMode : uint8
 {
-    BM_Opaque = 0,
+    BM_Opaque = 1,
     BM_Transparent,
     BM_Masked
 };
 
 enum EShadingModel : uint8
 {
-    SM_Default,
+    SM_Default = 0,
     SM_Unlit
 };
 

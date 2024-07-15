@@ -21,7 +21,7 @@ public:
 	void Draw();
 
 protected:
-	void DrawDomain(EMaterialDomain domain);
+	void DrawMeshes(EMaterialDomain InDomain, EBlendMode InBlend);
 
 protected:
 	SceneRenderData mSceneData;

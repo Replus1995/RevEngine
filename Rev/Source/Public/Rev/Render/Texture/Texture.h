@@ -9,16 +9,16 @@ class Texture
 {
 public:
 	Texture();
-	Texture(const Ref<FRHITexture>& InRHITexture);
+	Texture(const Ref<FRHITexture>& InResource);
 	~Texture();
 
 	uint16 Width() const;
 	uint16 Height() const;
 	EPixelFormat Format() const;
+	const Ref<FRHITexture> GetResource() const { return mResource; }
 
 private:
-	friend class FTextureStorage;
-	Ref<FRHITexture> mRHITexture;
+	Ref<FRHITexture> mResource;
 };
 
 

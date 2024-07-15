@@ -13,7 +13,7 @@ public:
 	~StaticMeshRenderProxy();
 
 	void Prepare(const Ref<StaticMesh>& mesh, const Math::FMatrix4& transform);
-	void Draw(EMaterialDomain domain);
+	void Draw(EMaterialDomain InDomain, EBlendMode InBlend);
 
 private:
 	Ref<StaticMesh> mStaticMesh;

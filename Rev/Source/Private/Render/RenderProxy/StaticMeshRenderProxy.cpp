@@ -21,12 +21,12 @@ void StaticMeshRenderProxy::Prepare(const Ref<StaticMesh>& mesh, const Math::FMa
 	mTransformProxy = transform;
 }
 
-void StaticMeshRenderProxy::Draw(EMaterialDomain domain)
+void StaticMeshRenderProxy::Draw(EMaterialDomain InDomain, EBlendMode InBlend)
 {
 	for (uint32 i = 0; i < mStaticMesh->GetMaterialCount(); i++)
 	{
 		auto& pMat = mStaticMesh->GetMaterial(i);
-		if(!pMat || pMat->Domain != domain)
+		if(!pMat || pMat->Domain != InDomain || pMat->BlendMode != InBlend)
 			continue;
 
 		auto vPrimitives = mStaticMesh->GetPrimitive(i);

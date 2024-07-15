@@ -55,14 +55,14 @@ void SceneRenderProxy::Draw()
 
 	mSceneBuffer->UpdateData(&mSceneData, sizeof(SceneRenderData));
 
-	DrawDomain(EMaterialDomain::MD_Surface);
+	DrawMeshes(EMaterialDomain::MD_Surface, BM_Opaque);
 }
 
-void SceneRenderProxy::DrawDomain(EMaterialDomain domain)
+void SceneRenderProxy::DrawMeshes(EMaterialDomain InDomain, EBlendMode InBlend)
 {
 	for (StaticMeshRenderProxy& proxy : mStaticMeshProxies)
 	{
-		proxy.Draw(domain);
+		proxy.Draw(InDomain, InBlend);
 	}
 }
 
