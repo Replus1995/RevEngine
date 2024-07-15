@@ -6,12 +6,27 @@
 
 namespace Rev
 {
-
-struct FStaticMeshStorage
+struct FTextureStorage;
+struct FMaterialStorage;
+struct FMeshStorage
 {
 public:
 	std::string Name;
-	std::vector<Ref<FMeshPrimitiveStorage>> PrimitiveData;
+};
+
+struct FStaticMeshStorage : public FMeshStorage
+{
+public:
+	std::vector<Ref<FMaterialStorage>> Materials;
+	std::vector<Ref<FMeshPrimitiveStorage>> Primitives;
+};
+
+struct FMeshImportResult
+{
+	std::vector<Ref<FTextureStorage>> Textures;
+	std::vector<Ref<FMaterialStorage>> Materials;
+	std::vector<Ref<FStaticMeshStorage>> StaticMeshes;
+	//SkeletalMeshes
 };
 
 }

@@ -25,27 +25,43 @@ ExampleLayer::ExampleLayer()
 	FRHIShaderLibrary::GetInstance().LoadOrCompileShader(FPath("/Game/Assets/Shaders/Example.glsl"));
 	FRHIShaderLibrary::GetInstance().CreateGraphicsProgram("ExampleProgram", "Example");
 
-	auto pMat = CreateRef<ExampleMaterial>();
-	pMat->SetColor(Math::FLinearColor(.7,.8,.8,1));
+	
 
 	//Create Sandbox Scene
 	mScene = CreateRef<Rev::Scene>();
 
 	{
+		auto pBoxMat = CreateRef<ExampleMaterial>();
+		pBoxMat->SetColor(Math::FLinearColor(.7, .9, .8, 1));
+
 		auto meshEntity = mScene->CreateEntity();
 		auto& meshComp = meshEntity.AddComponent<StaticMeshComponent>();
-		meshComp.StaticMesh = FAssetLibrary::CreateBasicGeometry(EBasicGeometry::Box, pMat);
+		meshComp.StaticMesh = FAssetLibrary::CreateBasicGeometry(EBasicGeometry::Box, pBoxMat);
+		auto& transformComp = meshEntity.GetComponent<TransformComponent>();
+		transformComp.SetLocation(Math::FVector3(0, 0.6, -5));
+	}
+
+	{
+		auto pPlaneMat = CreateRef<ExampleMaterial>();
+		pPlaneMat->SetColor(Math::FLinearColor(.9, .9, .9, 1));
+
+		auto meshEntity = mScene->CreateEntity();
+		auto& meshComp = meshEntity.AddComponent<StaticMeshComponent>();
+		meshComp.StaticMesh = FAssetLibrary::CreateBasicGeometry(EBasicGeometry::Plane, pPlaneMat);
 		auto& transformComp = meshEntity.GetComponent<TransformComponent>();
 		transformComp.SetLocation(Math::FVector3(0, 0, -5));
+		transformComp.SetRotation(Math::FRotator(90.0F, 0, 0));
+		transformComp.SetScale(Math::FVector3(5, 5, 0));
 	}
+
 
 	{
 		auto camEntity = mScene->CreateEntity();
 		auto& camComp = camEntity.AddComponent<CameraComponent>();
 		camComp.AutoAspectRatio = true;
 		auto& transformComp = camEntity.GetComponent<TransformComponent>();
-		transformComp.SetLocation(Math::FVector3(0, 0, 0));
-		//transformComp.SetRotation(FRotator(0, 180, 0));
+		transformComp.SetLocation(Math::FVector3(0, 2, 0));
+		transformComp.SetRotation(Math::FRotator(-30.0f, 0, 0));
 
 		auto camSys = mScene->GetSystem<PlayerCameraSystem>();
 		if (camSys)

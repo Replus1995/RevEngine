@@ -1,5 +1,15 @@
 #include "GLTFUtils.h"
 #include "Rev/Core/Assert.h"
+#include <filesystem>
+
+#include "GLTFDebug.h"
+
+#define TINYGLTF_USE_CPP14
+#define TINYGLTF_IMPLEMENTATION
+#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#define STBI_MSC_SECURE_CRT
+#include <tiny_gltf.h>
 
 namespace Rev
 {
@@ -156,9 +166,78 @@ EPixelFormat FGLTFUtils::TranslateImageFormat(const tinygltf::Image& InImage)
 	return PF_Unknown;
 }
 
+FSamplerDesc FGLTFUtils::TranslateSampler(const tinygltf::Sampler& InSampler)
+{
+	FSamplerDesc Result;
+
+	switch (InSampler.minFilter)
+	{
+	case TINYGLTF_TEXTURE_FILTER_NEAREST:
+	case TINYGLTF_TEXTURE_FILTER_NEAREST_MIPMAP_NEAREST:
+	case TINYGLTF_TEXTURE_FILTER_NEAREST_MIPMAP_LINEAR:
+		Result.Filter = SF_Nearest;
+		break;
+	case TINYGLTF_TEXTURE_FILTER_LINEAR:
+	case TINYGLTF_TEXTURE_FILTER_LINEAR_MIPMAP_NEAREST:
+		Result.Filter = SF_Bilinear;
+		break;
+	case TINYGLTF_TEXTURE_FILTER_LINEAR_MIPMAP_LINEAR:
+		Result.Filter = SF_Trilinear;
+		break;
+	default:
+		break;
+	}
+
+	switch (InSampler.wrapS)
+	{
+	case TINYGLTF_TEXTURE_WRAP_REPEAT:
+		Result.WarpU = SW_Repeat;
+		break;
+	case TINYGLTF_TEXTURE_WRAP_CLAMP_TO_EDGE:
+		Result.WarpU = SW_Clamp;
+		break;
+	case TINYGLTF_TEXTURE_WRAP_MIRRORED_REPEAT:
+		Result.WarpU = SW_Mirror;
+		break;
+	default:
+		break;
+	}
+
+	switch (InSampler.wrapT)
+	{
+	case TINYGLTF_TEXTURE_WRAP_REPEAT:
+		Result.WarpV = SW_Repeat;
+		break;
+	case TINYGLTF_TEXTURE_WRAP_CLAMP_TO_EDGE:
+		Result.WarpV = SW_Clamp;
+		break;
+	case TINYGLTF_TEXTURE_WRAP_MIRRORED_REPEAT:
+		Result.WarpV = SW_Mirror;
+		break;
+	default:
+		break;
+	}
+
+	return Result;
+}
+
+Math::FLinearColor FGLTFUtils::TranslateColor(const std::vector<double>& InColor)
+{
+	RE_CORE_ASSERT(InColor.size() <= 4);
+	Math::FLinearColor Result(0, 0, 0, 1);
+	for (size_t i = 0; i < InColor.size(); i++)
+	{
+		Result[i] = InColor[i];
+ 	}
+	return Result;
+}
+
 Ref<FMeshPrimitiveStorage> FGLTFUtils::ImportMeshPrimitive(const tinygltf::Primitive& InPrimitive, const tinygltf::Model& InModel)
 {
 	Ref<FMeshPrimitiveStorage> OutStorage = CreateRef<FMeshPrimitiveStorage>();
+	OutStorage->MaterialIndex = InPrimitive.material;
+	OutStorage->DrawMode = TranslateDrawMode(InPrimitive.mode);
+
 	for (auto& [attrName, attrIndex] : InPrimitive.attributes)
 	{
 		RE_CORE_ASSERT(attrIndex >= 0 && attrIndex < InModel.accessors.size());
@@ -194,7 +273,7 @@ Ref<FMeshPrimitiveStorage> FGLTFUtils::ImportMeshPrimitive(const tinygltf::Primi
 			OutStorage->TangentData = LoadBufferData<float, 3>(RefAccessor, InModel);
 		}
 	}
-
+	OutStorage->VertexCount = OutStorage->PositonData.Size() / 3 / sizeof(float);
 
 	{
 		//Load Index Data
@@ -209,30 +288,169 @@ Ref<FMeshPrimitiveStorage> FGLTFUtils::ImportMeshPrimitive(const tinygltf::Primi
 	return OutStorage;
 }
 
-Ref<FStaticMeshStorage> FGLTFUtils::ImportStaticMesh(const tinygltf::Mesh& InMesh, const tinygltf::Model& InModel)
+Ref<FStaticMeshStorage> FGLTFUtils::ImportStaticMesh(const tinygltf::Mesh& InMesh, const tinygltf::Model& InModel, const std::vector<Ref<FMaterialStorage>>& InMaterials)
 {
+	std::map<int, int> MaterialIndexMap;
+
 	Ref<FStaticMeshStorage> OutStorage = CreateRef<FStaticMeshStorage>();
 	OutStorage->Name = InMesh.name;
 	for (size_t i = 0; i < InMesh.primitives.size(); i++) {
 		Ref<FMeshPrimitiveStorage> PrimitiveStorage = ImportMeshPrimitive(InMesh.primitives[i], InModel);
 		if (PrimitiveStorage)
 		{
-			OutStorage->PrimitiveData.emplace_back(std::move(PrimitiveStorage));
+			if (MaterialIndexMap.count(PrimitiveStorage->MaterialIndex) == 0)
+			{
+				Ref<FMaterialStorage> Mat = PrimitiveStorage->MaterialIndex < 0 ? CreateRef<FPBRMaterialStorage>() : InMaterials[PrimitiveStorage->MaterialIndex];
+				int MappedIndex = OutStorage->Materials.size();
+				PrimitiveStorage->MaterialIndex = MappedIndex;
+				MaterialIndexMap.emplace(PrimitiveStorage->MaterialIndex, MappedIndex);
+				OutStorage->Materials.emplace_back(std::move(Mat));
+			}
+			else
+			{
+				PrimitiveStorage->MaterialIndex = MaterialIndexMap[PrimitiveStorage->MaterialIndex];
+			}
+			OutStorage->Primitives.emplace_back(std::move(PrimitiveStorage));
 		}
 	}
 	return OutStorage;
 }
 
-Ref<FTextureStorage> FGLTFUtils::LoadTexture(const tinygltf::Texture& InTexture, const tinygltf::Model& InModel)
+Ref<FTextureStorage> FGLTFUtils::ImportTexture(const tinygltf::Texture& InTexture, const tinygltf::Model& InModel)
 {
 	const tinygltf::Image& InImage = InModel.images[InTexture.source];
-	const tinygltf::Sampler& InSampler = InModel.samplers[InTexture.source];
+	const tinygltf::Sampler& InSampler = InModel.samplers[InTexture.sampler];
 
-	FTextureDesc TexDesc = FTextureDesc::MakeTexture2D(InImage.width, InImage.height, TranslateImageFormat(InImage), Math::FLinearColor(0,0,0,1));
+	Ref<FTextureStorage> Result = CreateRef<FTextureStorage>();
+	if (InTexture.name.empty())
+	{
+		if (InImage.name.empty())
+		{
+			std::filesystem::path uri(InImage.uri);
+			Result->Name = uri.filename().generic_u8string();
+		}
+		else
+		{
+			Result->Name = InImage.name;
+		}
+	}
+	else
+	{
+		Result->Name = InTexture.name;
+	}
+	Result->TextureDesc = FTextureDesc::MakeTexture2D(InImage.width, InImage.height, TranslateImageFormat(InImage), Math::FLinearColor(0,0,0,1));
+	Result->SamplerDesc = TranslateSampler(InSampler);
+	{
+		//Decoded data
+		Result->ImageData.Allocate(InImage.image.size());
+		memcpy(Result->ImageData.Data(), InImage.image.data(), InImage.image.size());
+	}
+	//TODO: Decode image data from buffer
+	
+	return Result;
+}
 
+Ref<FMaterialStorage> FGLTFUtils::ImportMaterial(const tinygltf::Material& InMaterial, const tinygltf::Model& InModel, const std::vector<Ref<FTextureStorage>>& InTextures)
+{
+	auto& pbrInfo = InMaterial.pbrMetallicRoughness;
+	Ref<FPBRMaterialStorage> Result;
+	Result->Name = InMaterial.name;
+	
+	{
+		//Alpha Mode
+		if (InMaterial.alphaMode == "OPAQUE")
+		{
+			Result->BlendMode = BM_Opaque;
+		}
+		else if (InMaterial.alphaMode == "BLEND")
+		{
+			Result->BlendMode = BM_Transparent;
+		}
+		else if (InMaterial.alphaMode == "MASK")
+		{
+			Result->BlendMode = BM_Masked;
+		}
+	}
 
+	Result->MaskClip = InMaterial.alphaCutoff;
+	Result->TwoSided = InMaterial.doubleSided;
+	Result->BaseColor = TranslateColor(pbrInfo.baseColorFactor);
+	Result->BaseColorTexture = pbrInfo.baseColorTexture.index >= 0 ? InTextures[pbrInfo.baseColorTexture.index] : nullptr;
+	Result->Metallic = pbrInfo.metallicFactor;
+	Result->Roughness = pbrInfo.roughnessFactor;
+	Result->MetallicRoughnessTexture = pbrInfo.metallicRoughnessTexture.index >= 0 ? InTextures[pbrInfo.metallicRoughnessTexture.index] : nullptr;
+	Result->NormalScale = InMaterial.normalTexture.scale;
+	Result->NormalTexture = InMaterial.normalTexture.index >= 0 ? InTextures[InMaterial.normalTexture.index] : nullptr;
+	Result->OcclusionStrength = InMaterial.occlusionTexture.strength;
+	Result->OcclusionTexture = InMaterial.occlusionTexture.index >= 0 ? InTextures[InMaterial.occlusionTexture.index] : nullptr;
+	Result->EmissiveColor = TranslateColor(InMaterial.emissiveFactor);
+	Result->EmissiveTexture = InMaterial.emissiveTexture.index >= 0 ? InTextures[InMaterial.emissiveTexture.index] : nullptr;
 
-	return Ref<FTextureStorage>();
+	return Result;
+}
+
+Ref<FMeshImportResult> FGLTFUtils::ImportModel(const FPath& InPath, bool DumpInfo)
+{
+	tinygltf::Model InModel;
+	tinygltf::TinyGLTF ctx;
+	std::string err;
+	std::string warn;
+	
+	std::string NativePath = InPath.ToNative();
+	bool ret = false;
+	if (InPath.Extension().compare("glb") == 0) {
+	
+	    RE_CORE_INFO("Reading binary glTF {0}", NativePath);
+	    // assume binary glTF.
+	    ret = ctx.LoadBinaryFromFile(&InModel, &err, &warn, NativePath.c_str());
+	}
+	else {
+	    RE_CORE_INFO("Reading ASCII glTF {0}", NativePath);
+	    // assume ascii glTF.
+	    ret = ctx.LoadASCIIFromFile(&InModel, &err, &warn, NativePath.c_str());
+	}
+	
+	if (!warn.empty()) {
+	    RE_CORE_WARN("glTF load warning: {}", warn);
+	}
+	
+	if (!err.empty()) {
+	    RE_CORE_ERROR("glTF load error: {}", err);
+	}
+	
+	if (!ret) {
+	    RE_CORE_ERROR("glTF load failed: {}", NativePath);
+	    return nullptr;
+	}
+	
+	if (DumpInfo)
+	{
+	    FGLTFDebug::DumpModelInfo(InModel);
+	}
+
+	Ref<FMeshImportResult> Result = CreateRef<FMeshImportResult>();
+
+	for (size_t i = 0; i < InModel.textures.size(); i++)
+	{
+		Ref<FTextureStorage> TextureStorage = ImportTexture(InModel.textures[i], InModel);
+		Result->Textures.emplace_back(std::move(TextureStorage));
+	}
+
+	for (size_t i = 0; i < InModel.materials.size(); i++)
+	{
+		Ref<FMaterialStorage> MaterialStorage = ImportMaterial(InModel.materials[i], InModel, Result->Textures);
+		Result->Materials.emplace_back(std::move(MaterialStorage));
+	}
+
+	for (size_t i = 0; i < InModel.meshes.size(); i++)
+	{
+		Ref<FStaticMeshStorage> StaticMeshStorage = ImportStaticMesh(InModel.meshes[i], InModel, Result->Materials);
+		Result->StaticMeshes.emplace_back(std::move(StaticMeshStorage));
+
+		//TODO: Import skeleton mesh
+	}
+
+	return Result;
 }
 
 }

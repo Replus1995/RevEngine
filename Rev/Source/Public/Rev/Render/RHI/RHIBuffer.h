@@ -79,7 +79,6 @@ private:
 	uint32 mStride = 0;
 };
 
-
 class REV_API FRHIVertexBuffer : public FRHIResource
 {
 public:

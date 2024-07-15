@@ -15,8 +15,7 @@ public:
 	static void UpdateSampleState(const FSamplerDesc& InDesc, GLuint InTexHandle, bool bMipMap);
 
 private:
-	static GLenum TranslateMinFilterMode(ESamplerFilterMode InMode, bool bMipMap);
-	static GLenum TranslateMagFilterMode(ESamplerFilterMode InMode);
+	static GLenum TranslateFilterMode(ESamplerFilterMode InMode, bool bMipMap);
 	static GLenum TranslateWarpMode(ESamplerWarpMode InMode);
 	static bool UseAnisotropicFilter(const FSamplerDesc& InDesc);
 	static bool UseBorderWarp(const FSamplerDesc& InDesc);

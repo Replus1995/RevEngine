@@ -15,20 +15,20 @@ enum class EMeshDrawMode : uint8
 };
 
 class FRHIVertexArray;
-struct FMeshPrimitive
+struct MeshPrimitive
 {
 public:
 	uint32 MaterialIndex;
 	Ref<FRHIVertexArray> VertexData;
 	EMeshDrawMode DrawMode;
 
-	FMeshPrimitive();
-	FMeshPrimitive(uint32 InMaterialIndex, const Ref<FRHIVertexArray>& InVertexData, EMeshDrawMode InDrawMode = EMeshDrawMode::TRIANGLES);
-	FMeshPrimitive(const FMeshPrimitive& InPrimitive);
-	FMeshPrimitive(FMeshPrimitive&& InPrimitive) noexcept;
+	MeshPrimitive();
+	MeshPrimitive(uint32 InMaterialIndex, const Ref<FRHIVertexArray>& InVertexData, EMeshDrawMode InDrawMode = EMeshDrawMode::TRIANGLES);
+	MeshPrimitive(const MeshPrimitive& InPrimitive);
+	MeshPrimitive(MeshPrimitive&& InPrimitive) noexcept;
 
-	FMeshPrimitive& operator=(const FMeshPrimitive& InPrimitive);
-	FMeshPrimitive& operator=(FMeshPrimitive&& InPrimitive) noexcept;
+	MeshPrimitive& operator=(const MeshPrimitive& InPrimitive);
+	MeshPrimitive& operator=(MeshPrimitive&& InPrimitive) noexcept;
 
 	bool Valid() const;
 };

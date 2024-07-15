@@ -11,16 +11,16 @@ public:
 	virtual ~StaticMesh();
 
 	void SetMaterials(std::vector<Ref<Material>>&& pMaterials);
-	void SetPrimitives(std::vector<FMeshPrimitive>&& pPrimitives);
+	void SetPrimitives(std::vector<MeshPrimitive>&& pPrimitives);
 
 	virtual const Ref<Material>& GetMaterial(uint32 MaterialIndex) const override;
 	virtual uint32 GetMaterialCount() const override;
-	virtual std::vector<const FMeshPrimitive*> GetPrimitive(uint32 MaterialIndex) const override;
+	virtual std::vector<const MeshPrimitive*> GetPrimitive(uint32 MaterialIndex) const override;
 	virtual uint32 GetPrimitiveCount() const override;
 
 private:
 	std::vector<Ref<Material>> mMaterials;
-	std::vector<FMeshPrimitive> mPrimitives;
+	std::vector<MeshPrimitive> mPrimitives;
 
 };
 

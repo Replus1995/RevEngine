@@ -41,7 +41,7 @@ public:
     static Ref<StaticMesh> Create(const Ref<Material>& InMat)
     {
         std::vector<Ref<Material>> boxMatArr = { InMat };
-        std::vector<FMeshPrimitive> boxPrimArr;
+        std::vector<MeshPrimitive> boxPrimArr;
         {
             constexpr uint32 boxVerticesSize = sizeof(sBoxVertices);
             Ref<FRHIVertexBuffer> boxVertices = FRHIResourceFactory::CreateVertexBuffer(sBoxVertices, boxVerticesSize);
@@ -54,7 +54,7 @@ public:
             constexpr uint32 boxIndicesCount = sizeof(sBoxIndices) / sizeof(uint32);
             Ref<FRHIIndexBuffer> boxIndices = FRHIResourceFactory::CreateIndexBuffer(sBoxIndices, sizeof(uint32), boxIndicesCount);
 
-            FMeshPrimitive boxMeshPrim;
+            MeshPrimitive boxMeshPrim;
             boxMeshPrim.VertexData = FRHIResourceFactory::CreateVertexArray();
             boxMeshPrim.VertexData->AddVertexBuffer(boxVertices);
             boxMeshPrim.VertexData->SetIndexBuffer(boxIndices);

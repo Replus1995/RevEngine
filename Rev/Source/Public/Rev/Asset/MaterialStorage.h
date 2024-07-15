@@ -5,12 +5,15 @@
 
 namespace Rev
 {
-class FTextureStorage;
+struct FTextureStorage;
 struct FMaterialStorage
 {
-	EMaterialDomain Domain = EMaterialDomain::Opaque;
-	float AlphaCutoff = 0.5f;
-	bool DoubleSided = false;
+	std::string Name;
+	EMaterialDomain Domain = Rev::MD_Surface;
+	EBlendMode BlendMode = Rev::BM_Opaque;
+	EShadingModel ShadingModel = Rev::SM_Default;
+	float MaskClip = 0.5f;
+	bool TwoSided = false;
 };
 
 struct FPBRMaterialStorage : public FMaterialStorage

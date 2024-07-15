@@ -5,8 +5,8 @@ namespace Rev
 
 void FOpenGLSampler::UpdateSampleState(const FSamplerDesc& InDesc, GLuint InTexHandle, bool bMipMap)
 {
-	glTextureParameteri(InTexHandle, GL_TEXTURE_MIN_FILTER, TranslateMinFilterMode(InDesc.Filter, bMipMap));
-	glTextureParameteri(InTexHandle, GL_TEXTURE_MAG_FILTER, TranslateMagFilterMode(InDesc.Filter));
+	glTextureParameteri(InTexHandle, GL_TEXTURE_MIN_FILTER, TranslateFilterMode(InDesc.Filter, bMipMap));
+	glTextureParameteri(InTexHandle, GL_TEXTURE_MAG_FILTER, TranslateFilterMode(InDesc.Filter, false));
 
 	glTextureParameteri(InTexHandle, GL_TEXTURE_WRAP_S, TranslateWarpMode(InDesc.WarpU));
 	glTextureParameteri(InTexHandle, GL_TEXTURE_WRAP_T, TranslateWarpMode(InDesc.WarpV));
@@ -27,7 +27,7 @@ void FOpenGLSampler::UpdateSampleState(const FSamplerDesc& InDesc, GLuint InTexH
 	}*/
 }
 
-GLenum FOpenGLSampler::TranslateMinFilterMode(ESamplerFilterMode InMode, bool bMipMap)
+GLenum FOpenGLSampler::TranslateFilterMode(ESamplerFilterMode InMode, bool bMipMap)
 {
 
 	if (bMipMap)
@@ -58,21 +58,6 @@ GLenum FOpenGLSampler::TranslateMinFilterMode(ESamplerFilterMode InMode, bool bM
 		case SF_AnisotropicLinear:
 			return GL_LINEAR;
 		}
-	}
-}
-
-
-GLenum FOpenGLSampler::TranslateMagFilterMode(ESamplerFilterMode InMode)
-{
-	switch (InMode)
-	{
-	case SF_Nearest:
-		return GL_NEAREST;
-	case SF_Bilinear:
-	case SF_Trilinear:
-	case SF_AnisotropicNearest:
-	case SF_AnisotropicLinear:
-		return GL_LINEAR;
 	}
 }
 

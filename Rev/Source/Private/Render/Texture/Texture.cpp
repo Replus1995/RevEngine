@@ -10,6 +10,11 @@ Texture::Texture()
 {
 }
 
+Texture::Texture(const Ref<FRHITexture>& InRHITexture)
+	: mRHITexture(InRHITexture)
+{
+}
+
 Texture::~Texture()
 {
 }

@@ -20,6 +20,7 @@ struct FImageImport
 struct FTextureStorage
 {
 public:
+	std::string Name;
 	FSamplerDesc SamplerDesc;
 	FTextureDesc TextureDesc;
 	FBuffer ImageData;

@@ -1,16 +1,16 @@
 #pragma once
-#include "Rev/Render/Material/MaterialUniform.h"
 #include "Rev/Math/Maths.h"
+#include "Rev/Render/Material/MaterialUniform.h"
+#include "Rev/Render/RenderCore.h"
 #include <unordered_map>
 
 namespace Rev
 {
 
-enum class EMaterialDomain
+enum EMaterialDomain : uint8
 {
-	Opaque,
-	Transparent,
-	Unlit
+	MD_Surface,
+	MD_PostProcess
 };
 
 class MaterialUniform;
@@ -20,22 +20,24 @@ public:
 	Material(const Ref<FRHIShaderProgram>& InProgram);
 	virtual ~Material();
 	
-	const Ref<FRHIShaderProgram>& GetShaderProgram() const
+	const Ref<FRHIShaderProgram>& GetProgram() const
 	{
 		return mProgram;
 	}
 
-	void SetDomain(EMaterialDomain domain);
-	EMaterialDomain GetDomain() const;
-
 	void Bind();
 	void Unbind();
+
+	EMaterialDomain Domain = Rev::MD_Surface;
+	EBlendMode BlendMode = Rev::BM_Opaque;
+	EShadingModel ShadingModel = Rev::SM_Default;
+	bool TwoSided = false;
+	float MaskClip = 0.5f;
 
 protected:
 	virtual void UploadUniform();
 protected:
 	Ref<FRHIShaderProgram> mProgram = nullptr;
-	EMaterialDomain mDomain = EMaterialDomain::Opaque;
 };
 
 }

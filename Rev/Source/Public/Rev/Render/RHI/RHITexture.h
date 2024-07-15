@@ -30,8 +30,15 @@ struct FTextureClearColor
 		};
 	};
 	FTextureClearColor() {}
+	FTextureClearColor(const FTextureClearColor& Other) : RGBA(Other.RGBA) {}
 	FTextureClearColor(const Math::FLinearColor& InColor) : RGBA(InColor) {}
 	FTextureClearColor(float InDepth, uint32 InStencil) : Depth(InDepth), Stencil(InStencil) {}
+
+	FTextureClearColor& operator=(const FTextureClearColor& Other)
+	{
+		RGBA = Other.RGBA;
+		return *this;
+	}
 };
 
 struct FTextureDesc
@@ -61,6 +68,20 @@ struct FTextureDesc
 		, NumSamples(InNumSamples)
 		, ClearColor(InClearColor)
 	{
+	}
+
+	FTextureDesc& operator=(const FTextureDesc& Other)
+	{
+		Width = Other.Width;
+		Height = Other.Height;
+		Depth = Other.Depth;
+		ArraySize = Other.ArraySize;
+		Dimension = Other.Dimension;
+		Format = Other.Format;
+		NumMips = Other.NumMips;
+		NumSamples = Other.NumSamples;
+		ClearColor = Other.ClearColor;
+		return *this;
 	}
 
 	static FTextureDesc MakeTexture2D(uint16 InWidth, uint16 InHeight, EPixelFormat InFormat, const FTextureClearColor& InClearColor, uint8 InNumMips = 1, uint8 InNumSamples = 1)

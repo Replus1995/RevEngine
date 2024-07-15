@@ -9,6 +9,7 @@ class Texture
 {
 public:
 	Texture();
+	Texture(const Ref<FRHITexture>& InRHITexture);
 	~Texture();
 
 	uint16 Width() const;

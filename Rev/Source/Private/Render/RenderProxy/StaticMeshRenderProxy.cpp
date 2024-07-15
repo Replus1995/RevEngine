@@ -26,14 +26,15 @@ void StaticMeshRenderProxy::Draw(EMaterialDomain domain)
 	for (uint32 i = 0; i < mStaticMesh->GetMaterialCount(); i++)
 	{
 		auto& pMat = mStaticMesh->GetMaterial(i);
-		if(!pMat || pMat->GetDomain() != domain)
+		if(!pMat || pMat->Domain != domain)
 			continue;
 
 		auto vPrimitives = mStaticMesh->GetPrimitive(i);
 		if (!vPrimitives.empty())
 		{
+			RenderCmd::PrepareMaterial(pMat.get());
 			pMat->Bind();
-			mTransformProxy.Upload(pMat->GetShaderProgram());
+			mTransformProxy.Upload(pMat->GetProgram());
 
 			for (auto& pPrimitive : vPrimitives)
 			{

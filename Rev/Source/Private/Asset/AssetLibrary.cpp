@@ -1,15 +1,19 @@
 #include "Rev/Asset/AssetLibrary.h"
 #include <Rev/Core/FileSystem.h>
 #include "Rev/Render/RHI/RHIShaderLibrary.h"
+#include "Rev/Render/RHI/RHIResourceFactory.h"
 #include "Rev/Render/Material/Material.h"
 #include "Rev/Render/Mesh/StaticMesh.h"
+#include "Rev/Render/Texture/Texture.h"
 
+#include "./BasicGeometry/PlaneGeometry.hpp"
 #include "./BasicGeometry/BoxGeometry.hpp"
 
 namespace Rev
 {
 
 static Ref<Material> sDefaultMaterial = nullptr;
+static Ref<Texture> sWhiteTexture = nullptr;
 
 void FAssetLibrary::Init()
 {
@@ -18,7 +22,19 @@ void FAssetLibrary::Init()
 
 void FAssetLibrary::Shutdown()
 {
+	sWhiteTexture.reset();
 	sDefaultMaterial.reset();
+}
+
+const Ref<Texture>& FAssetLibrary::GetWhiteTexture()
+{
+	if (!sWhiteTexture)
+	{
+		FTextureDesc TextureDesc = FTextureDesc::MakeTexture2D(2,2, PF_R8G8B8A8, Math::FLinearColor(1,1,1,1));
+		FSamplerDesc SamplerDesc;
+		sWhiteTexture = CreateRef<Texture>(FRHIResourceFactory::CreateTexture(TextureDesc, SamplerDesc));
+	}
+	return sWhiteTexture;
 }
 
 const Ref<Material>& FAssetLibrary::GetDefaultMaterial()
@@ -38,6 +54,8 @@ const Ref<StaticMesh> FAssetLibrary::CreateBasicGeometry(EBasicGeometry InKind, 
 	const Ref<Material>& GeoMat = InMaterial ? InMaterial : GetDefaultMaterial();
 	switch (InKind)
 	{
+	case Rev::EBasicGeometry::Plane:
+		return FPlaneGeometry::Create(GeoMat);
 	case Rev::EBasicGeometry::Box:
 		return FBoxGeometry::Create(GeoMat);
 	case Rev::EBasicGeometry::Sphere:

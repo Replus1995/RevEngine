@@ -43,12 +43,14 @@ void RenderCmd::Clear()
 	sContext->Clear();
 }
 
-void RenderCmd::DrawPrimitive(const FMeshPrimitive* pPrimitive)
+void RenderCmd::PrepareMaterial(const Material* InMaterial)
 {
-	if (pPrimitive->Valid())
-	{
-		sContext->DrawIndexed(pPrimitive->VertexData, 0);
-	}
+	sContext->PrepareMaterial(InMaterial);
+}
+
+void RenderCmd::DrawPrimitive(const MeshPrimitive* InPrimitive)
+{
+	sContext->DrawPrimitive(InPrimitive);
 }
 
 }

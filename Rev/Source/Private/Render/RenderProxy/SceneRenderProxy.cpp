@@ -55,8 +55,7 @@ void SceneRenderProxy::Draw()
 
 	mSceneBuffer->UpdateData(&mSceneData, sizeof(SceneRenderData));
 
-	DrawDomain(EMaterialDomain::Opaque);
-	DrawDomain(EMaterialDomain::Transparent);
+	DrawDomain(EMaterialDomain::MD_Surface);
 }
 
 void SceneRenderProxy::DrawDomain(EMaterialDomain domain)

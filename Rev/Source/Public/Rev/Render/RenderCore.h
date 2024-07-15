@@ -13,4 +13,17 @@ enum class ERenderAPI : uint8_t
 };
 ERenderAPI GetRenderAPI();
 
+enum EBlendMode : uint8
+{
+    BM_Opaque = 0,
+    BM_Transparent,
+    BM_Masked
+};
+
+enum EShadingModel : uint8
+{
+    SM_Default,
+    SM_Unlit
+};
+
 }
