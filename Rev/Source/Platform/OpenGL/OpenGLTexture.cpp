@@ -7,26 +7,21 @@
 namespace Rev
 {
 
-void FOpenGLTexture::SetSampler(const Ref<FRHISampler>& InSampler)
+void FOpenGLTexture::SetSamplerState(const FSamplerDesc& InSamplerDesc)
 {
-	if (!InSampler) return;
-	if (!mSamplerDescCache || *mSamplerDescCache != InSampler->GetDesc())
+	if (mSamplerDesc != InSamplerDesc)
 	{
-		if(!mSamplerDescCache)
-			mSamplerDescCache = CreateScope<FSamplerDesc>();
-		*mSamplerDescCache = InSampler->GetDesc();
-
-		FOpenGLSampler* pSampler = static_cast<FOpenGLSampler*>(InSampler.get());
-		pSampler->UpdateSampleState(mHandle, mDesc.NumMips > 1);
+		mSamplerDesc = InSamplerDesc;
+		FOpenGLSampler::UpdateSampleState(mSamplerDesc, mHandle, mDesc.NumMips > 1);
 	}
 }
 
-Ref<FOpenGLTexture> FOpenGLTexture::Create(const FTextureDesc& InDesc)
+Ref<FOpenGLTexture> FOpenGLTexture::Create(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc)
 {
 	switch (InDesc.Dimension)
 	{
 	case ETextureDimension::Texture2D:
-		return CreateRef<FOpenGLTexture2D>(InDesc);
+		return CreateRef<FOpenGLTexture2D>(InDesc, InSamplerDesc);
 	case ETextureDimension::Texture2DArray:
 	case ETextureDimension::Texture3D:
 	case ETextureDimension::TextureCube:
@@ -36,6 +31,19 @@ Ref<FOpenGLTexture> FOpenGLTexture::Create(const FTextureDesc& InDesc)
 	}
 	RE_CORE_ASSERT(false, "Unsupported Texture Dimension!");
 	return nullptr;
+}
+
+FOpenGLTexture::FOpenGLTexture(const FTextureDesc& InDesc)
+	: FRHITexture(InDesc)
+	, mFormatData(FOpenGLPixelFormat::TranslatePixelFormat(InDesc.Format))
+{
+}
+
+FOpenGLTexture::FOpenGLTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc)
+	: FRHITexture(InDesc)
+	, mFormatData(FOpenGLPixelFormat::TranslatePixelFormat(InDesc.Format))
+	, mSamplerDesc(InSamplerDesc)
+{
 }
 
 }

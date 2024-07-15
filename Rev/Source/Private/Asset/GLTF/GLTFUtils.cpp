@@ -80,7 +80,7 @@ uint32 FGLTFUtils::GetComponentSize(int InComponentType)
 	}
 }
 
-EMeshDrawMode FGLTFUtils::GetDrawMode(int InDrawMode)
+EMeshDrawMode FGLTFUtils::TranslateDrawMode(int InDrawMode)
 {
 	switch (InDrawMode)
 	{
@@ -101,6 +101,59 @@ EMeshDrawMode FGLTFUtils::GetDrawMode(int InDrawMode)
 	default:
 		return EMeshDrawMode::TRIANGLES;
 	}
+}
+
+EPixelFormat FGLTFUtils::TranslateImageFormat(const tinygltf::Image& InImage)
+{
+	switch (InImage.component)
+	{
+	case 1:
+	{
+		switch (InImage.pixel_type)
+		{
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
+			return PF_R8;
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
+			return PF_R16;
+		default:
+			break;
+		}
+		break;
+	}
+	case 2:
+	{
+		break;
+	}
+	case 3:
+	{
+		switch (InImage.pixel_type)
+		{
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
+			return PF_RGB8;
+		default:
+			break;
+		}
+		break;
+	}
+	case 4:
+	{
+		switch (InImage.pixel_type)
+		{
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
+			return PF_R8G8B8A8;
+		case TINYGLTF_COMPONENT_TYPE_FLOAT:
+			return PF_R32G32B32A32F;
+		default:
+			break;
+		}
+		break;
+	}
+	default:
+		break;
+	}
+
+	RE_CORE_WARN("[GLTF] Unsupported image format.");
+	return PF_Unknown;
 }
 
 Ref<FMeshPrimitiveStorage> FGLTFUtils::ImportMeshPrimitive(const tinygltf::Primitive& InPrimitive, const tinygltf::Model& InModel)
@@ -168,59 +221,6 @@ Ref<FStaticMeshStorage> FGLTFUtils::ImportStaticMesh(const tinygltf::Mesh& InMes
 		}
 	}
 	return OutStorage;
-}
-
-EPixelFormat FGLTFUtils::TranslateImageFormat(const tinygltf::Image& InImage)
-{
-	switch (InImage.component)
-	{
-	case 1:
-	{
-		switch (InImage.pixel_type)
-		{
-		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
-			return PF_R8;
-		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
-			return PF_R16;
-		default:
-			break;
-		}
-		break;
-	}
-	case 2:
-	{
-		break;
-	}
-	case 3:
-	{
-		switch (InImage.pixel_type)
-		{
-		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
-			return PF_RGB8;
-		default:
-			break;
-		}
-		break;
-	}
-	case 4:
-	{
-		switch (InImage.pixel_type)
-		{
-		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
-			return PF_R8G8B8A8;
-		case TINYGLTF_COMPONENT_TYPE_FLOAT:
-			return PF_R32G32B32A32F;
-		default:
-			break;
-		}
-		break;
-	}
-	default:
-		break;
-	}
-
-	RE_CORE_WARN("[GLTF] Unsupported image format.");
-	return PF_Unknown;
 }
 
 Ref<FTextureStorage> FGLTFUtils::LoadTexture(const tinygltf::Texture& InTexture, const tinygltf::Model& InModel)

@@ -103,25 +103,25 @@ Ref<FRHIUniformBuffer> FRHIResourceFactory::CreateUniformBuffer(uint32 InSize, u
 	return nullptr;
 }
 
-Ref<FRHISampler> FRHIResourceFactory::CreateSampler(const FSamplerDesc& InDesc)
+//Ref<FRHISampler> FRHIResourceFactory::CreateSampler(const FSamplerDesc& InDesc)
+//{
+//	switch (GetRenderAPI())
+//	{
+//	case ERenderAPI::None:    RE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
+//	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLSampler>(InDesc);
+//	}
+//
+//	RE_CORE_ASSERT(false, "Unknown RenderAPI!");
+//	return nullptr;
+//}
+
+
+Ref<FRHITexture> FRHIResourceFactory::CreateTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc)
 {
 	switch (GetRenderAPI())
 	{
 	case ERenderAPI::None:    RE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
-	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLSampler>(InDesc);
-	}
-
-	RE_CORE_ASSERT(false, "Unknown RenderAPI!");
-	return nullptr;
-}
-
-
-Ref<FRHITexture> FRHIResourceFactory::CreateTexture(const FTextureDesc& InDesc)
-{
-	switch (GetRenderAPI())
-	{
-	case ERenderAPI::None:    RE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
-	case ERenderAPI::OpenGL:  return FOpenGLTexture::Create(InDesc);
+	case ERenderAPI::OpenGL:  return FOpenGLTexture::Create(InDesc, InSamplerDesc);
 	}
 
 	RE_CORE_ASSERT(false, "Unknown RenderAPI!");

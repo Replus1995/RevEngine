@@ -3,25 +3,25 @@
 namespace Rev
 {
 
-void FOpenGLSampler::UpdateSampleState(GLuint InTexHandle, bool bMipMap)
+void FOpenGLSampler::UpdateSampleState(const FSamplerDesc& InDesc, GLuint InTexHandle, bool bMipMap)
 {
-	glTextureParameteri(InTexHandle, GL_TEXTURE_MIN_FILTER, TranslateMinFilterMode(mDesc.Filter, bMipMap));
-	glTextureParameteri(InTexHandle, GL_TEXTURE_MAG_FILTER, TranslateMagFilterMode(mDesc.Filter));
+	glTextureParameteri(InTexHandle, GL_TEXTURE_MIN_FILTER, TranslateMinFilterMode(InDesc.Filter, bMipMap));
+	glTextureParameteri(InTexHandle, GL_TEXTURE_MAG_FILTER, TranslateMagFilterMode(InDesc.Filter));
 
-	glTextureParameteri(InTexHandle, GL_TEXTURE_WRAP_S, TranslateWarpMode(mDesc.WarpU));
-	glTextureParameteri(InTexHandle, GL_TEXTURE_WRAP_T, TranslateWarpMode(mDesc.WarpV));
-	glTextureParameteri(InTexHandle, GL_TEXTURE_WRAP_R, TranslateWarpMode(mDesc.WarpW));
+	glTextureParameteri(InTexHandle, GL_TEXTURE_WRAP_S, TranslateWarpMode(InDesc.WarpU));
+	glTextureParameteri(InTexHandle, GL_TEXTURE_WRAP_T, TranslateWarpMode(InDesc.WarpV));
+	glTextureParameteri(InTexHandle, GL_TEXTURE_WRAP_R, TranslateWarpMode(InDesc.WarpW));
 
-	if (UseAnisotropicFilter())
+	if (UseAnisotropicFilter(InDesc))
 	{
-		glTextureParameterf(InTexHandle, GL_TEXTURE_MAX_ANISOTROPY, mDesc.Anisotropic);
+		glTextureParameterf(InTexHandle, GL_TEXTURE_MAX_ANISOTROPY, InDesc.Anisotropic);
 	}
 	else
 	{
 		glTextureParameterf(InTexHandle, GL_TEXTURE_MAX_ANISOTROPY, 1.0f);
 	}
 
-	/*if (UseBorderWarp())
+	/*if (UseBorderWarp(InDesc))
 	{
 		glTextureParameterfv(InTexHandle, GL_TEXTURE_BORDER_COLOR, mDesc.BorderColor.Data());
 	}*/
@@ -95,14 +95,14 @@ GLenum FOpenGLSampler::TranslateWarpMode(ESamplerWarpMode InMode)
 	return GL_REPEAT;
 }
 
-bool FOpenGLSampler::UseAnisotropicFilter() const
+bool FOpenGLSampler::UseAnisotropicFilter(const FSamplerDesc& InDesc)
 {
-	return mDesc.Filter >= SF_AnisotropicNearest;
+	return InDesc.Filter >= SF_AnisotropicNearest;
 }
 
-bool FOpenGLSampler::UseBorderWarp() const
+bool FOpenGLSampler::UseBorderWarp(const FSamplerDesc& InDesc)
 {
-	return mDesc.WarpU == SW_Border || mDesc.WarpV == SW_Border || mDesc.WarpW == SW_Border;
+	return InDesc.WarpU == SW_Border || InDesc.WarpV == SW_Border || InDesc.WarpW == SW_Border;
 }
 
 }

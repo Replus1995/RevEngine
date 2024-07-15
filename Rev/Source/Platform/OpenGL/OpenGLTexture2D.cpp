@@ -1,15 +1,22 @@
 #include "OpenGLTexture2D.h"
 #include "Rev/Core/Assert.h"
 
+#include "OpenGLSampler.h"
 //#include <stb_image.h>
 
 namespace Rev
 {
-
 FOpenGLTexture2D::FOpenGLTexture2D(const FTextureDesc& InDesc)
 	: FOpenGLTexture(InDesc)
 {
 	CreateResource();
+}
+
+FOpenGLTexture2D::FOpenGLTexture2D(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc)
+	: FOpenGLTexture(InDesc, InSamplerDesc)
+{
+	CreateResource();
+	FOpenGLSampler::UpdateSampleState(InSamplerDesc, mHandle, mDesc.NumMips > 1);
 }
 
 
@@ -116,12 +123,6 @@ void FOpenGLTexture2D::CreateResource()
 {
 	glCreateTextures(GL_TEXTURE_2D, 1, &mHandle);
 	glTextureStorage2D(mHandle, 1, mFormatData.InternalFormat,  GetWidth(), GetHeight());
-
-	/*glTextureParameteri(mHandle, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTextureParameteri(mHandle, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	glTextureParameteri(mHandle, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTextureParameteri(mHandle, GL_TEXTURE_WRAP_T, GL_REPEAT);*/
 }
 
 }

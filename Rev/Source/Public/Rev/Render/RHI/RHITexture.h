@@ -3,6 +3,7 @@
 #include "Rev/Math/Maths.h"
 #include "Rev/Render/PixelFormat.h"
 #include "Rev/Render/RHI/RHIResource.h"
+#include "Rev/Render/RHI/RHISampler.h"
 #include <string>
 
 namespace Rev
@@ -69,7 +70,6 @@ struct FTextureDesc
 	
 };
 
-class FRHISampler;
 class REV_API FRHITexture : public FRHIResource
 {
 public:
@@ -79,7 +79,7 @@ public:
 	uint32 GetHeight() const { return mDesc.Height; }
 	EPixelFormat GetFormat() const { return mDesc.Format; }
 
-	virtual void SetSampler(const Ref<FRHISampler>& InSampler) = 0;
+	virtual void SetSamplerState(const FSamplerDesc& InSamplerDesc) = 0;
 	virtual void UpdateData(const void* InData, uint32 InSize) = 0;
 	virtual void ClearData() = 0;
 	virtual void Bind(uint32 InUnit) const = 0;

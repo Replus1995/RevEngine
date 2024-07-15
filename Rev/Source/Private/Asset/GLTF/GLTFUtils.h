@@ -12,12 +12,11 @@ class FGLTFUtils
 {
 public:
 	static uint32 GetComponentSize(int InComponentType);
-	static EMeshDrawMode GetDrawMode(int InDrawMode);
+	static EMeshDrawMode TranslateDrawMode(int InDrawMode);
+	static EPixelFormat TranslateImageFormat(const tinygltf::Image& InImage);
 
 	static Ref<FMeshPrimitiveStorage> ImportMeshPrimitive(const tinygltf::Primitive& InPrimitive, const tinygltf::Model& InModel);
 	static Ref<FStaticMeshStorage> ImportStaticMesh(const tinygltf::Mesh& InMesh, const tinygltf::Model& InModel);
-
-	static EPixelFormat TranslateImageFormat(const tinygltf::Image& InImage);
 	static Ref<FTextureStorage> LoadTexture(const tinygltf::Texture& InTexture, const tinygltf::Model& InModel);
 
 };

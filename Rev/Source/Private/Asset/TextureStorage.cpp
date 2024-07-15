@@ -7,7 +7,7 @@ namespace Rev
 Ref<Texture> FTextureStorage::CreateTexture()
 {
 	Ref<Texture> Result = CreateRef<Texture>();
-	Result->mRHITexture = FRHIResourceFactory::CreateTexture(TextureDesc);
+	Result->mRHITexture = FRHIResourceFactory::CreateTexture(TextureDesc, SamplerDesc);
 	Result->mRHITexture->UpdateData(ImageData.Data(), ImageData.Size());
 	return Result;
 }

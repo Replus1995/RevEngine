@@ -12,14 +12,14 @@ public:
 	virtual ~FOpenGLSampler() {};
 	virtual void* GetNativeHandle() override { return nullptr; }
 
-	void UpdateSampleState(GLuint InTexHandle, bool bMipMap);
+	static void UpdateSampleState(const FSamplerDesc& InDesc, GLuint InTexHandle, bool bMipMap);
 
 private:
 	static GLenum TranslateMinFilterMode(ESamplerFilterMode InMode, bool bMipMap);
 	static GLenum TranslateMagFilterMode(ESamplerFilterMode InMode);
 	static GLenum TranslateWarpMode(ESamplerWarpMode InMode);
-	bool UseAnisotropicFilter() const;
-	bool UseBorderWarp() const;
+	static bool UseAnisotropicFilter(const FSamplerDesc& InDesc);
+	static bool UseBorderWarp(const FSamplerDesc& InDesc);
 };
 
 }
