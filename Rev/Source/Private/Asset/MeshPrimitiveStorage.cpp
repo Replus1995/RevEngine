@@ -27,6 +27,15 @@ FMeshPrimitiveStorage::FMeshPrimitiveStorage(FMeshPrimitiveStorage&& InStorage) 
 	IndexData = std::move(InStorage.IndexData);
 }
 
+Ref<MeshPrimitive> FMeshPrimitiveStorage::CreateMeshPrimitive()
+{
+	if(mCache)
+		return mCache;
+
+
+	return Ref<MeshPrimitive>();
+}
+
 }
 
 

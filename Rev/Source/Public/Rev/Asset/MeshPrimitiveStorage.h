@@ -29,6 +29,11 @@ public:
 	FMeshPrimitiveStorage();
 	FMeshPrimitiveStorage(const FMeshPrimitiveStorage&) = delete;
 	FMeshPrimitiveStorage(FMeshPrimitiveStorage&& InStorage) noexcept;
+
+	Ref<MeshPrimitive> CreateMeshPrimitive();
+
+private:
+	Ref<MeshPrimitive> mCache = nullptr;
 };
 
 }

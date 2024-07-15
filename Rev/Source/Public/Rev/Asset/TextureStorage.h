@@ -27,7 +27,7 @@ public:
 
 	Ref<Texture> CreateTexture();
 private:
-	Ref<Texture> mCache;
+	Ref<Texture> mCache = nullptr;
 };
 
 }
