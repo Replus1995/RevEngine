@@ -25,7 +25,7 @@ ExampleLayer::ExampleLayer()
 	FRHIShaderLibrary::GetInstance().LoadOrCompileShader(FPath("/Game/Assets/Shaders/Example.glsl"));
 	FRHIShaderLibrary::GetInstance().CreateGraphicsProgram("ExampleProgram", "Example");
 
-	
+	FPath TestPath("/Game/Assets/Shaders/Common.vs.glsl");
 
 	//Create Sandbox Scene
 	mScene = CreateRef<Rev::Scene>();

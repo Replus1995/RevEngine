@@ -166,6 +166,18 @@ EPixelFormat FGLTFUtils::TranslateImageFormat(const tinygltf::Image& InImage)
 	return PF_Unknown;
 }
 
+bool FGLTFUtils::TranslateImageSRGB(const tinygltf::Image& InImage)
+{
+	if (InImage.pixel_type == TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE)
+	{
+		if (InImage.component == 3 || InImage.component == 4)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 FSamplerDesc FGLTFUtils::TranslateSampler(const tinygltf::Sampler& InSampler)
 {
 	FSamplerDesc Result;
@@ -338,7 +350,7 @@ Ref<FTextureStorage> FGLTFUtils::ImportTexture(const tinygltf::Texture& InTextur
 	{
 		Result->Name = InTexture.name;
 	}
-	Result->TextureDesc = FTextureDesc::MakeTexture2D(InImage.width, InImage.height, TranslateImageFormat(InImage), Math::FLinearColor(0,0,0,1));
+	Result->TextureDesc = FTextureDesc::MakeTexture2D(InImage.width, InImage.height, TranslateImageFormat(InImage), TranslateImageSRGB(InImage), Math::FLinearColor(0, 0, 0, 1));
 	Result->SamplerDesc = TranslateSampler(InSampler);
 	{
 		//Decoded data
@@ -389,7 +401,7 @@ Ref<FMaterialStorage> FGLTFUtils::ImportMaterial(const tinygltf::Material& InMat
 	return Result;
 }
 
-Ref<FMeshImportResult> FGLTFUtils::ImportModel(const FPath& InPath, bool DumpInfo)
+FMeshImportResult FGLTFUtils::ImportModel(const FPath& InPath, bool DumpInfo)
 {
 	tinygltf::Model InModel;
 	tinygltf::TinyGLTF ctx;
@@ -420,7 +432,7 @@ Ref<FMeshImportResult> FGLTFUtils::ImportModel(const FPath& InPath, bool DumpInf
 	
 	if (!ret) {
 	    RE_CORE_ERROR("glTF load failed: {}", NativePath);
-	    return nullptr;
+		return {};
 	}
 	
 	if (DumpInfo)
@@ -428,24 +440,24 @@ Ref<FMeshImportResult> FGLTFUtils::ImportModel(const FPath& InPath, bool DumpInf
 	    FGLTFDebug::DumpModelInfo(InModel);
 	}
 
-	Ref<FMeshImportResult> Result = CreateRef<FMeshImportResult>();
+	FMeshImportResult Result;
 
 	for (size_t i = 0; i < InModel.textures.size(); i++)
 	{
 		Ref<FTextureStorage> TextureStorage = ImportTexture(InModel.textures[i], InModel);
-		Result->Textures.emplace_back(std::move(TextureStorage));
+		Result.Textures.emplace_back(std::move(TextureStorage));
 	}
 
 	for (size_t i = 0; i < InModel.materials.size(); i++)
 	{
-		Ref<FMaterialStorage> MaterialStorage = ImportMaterial(InModel.materials[i], InModel, Result->Textures);
-		Result->Materials.emplace_back(std::move(MaterialStorage));
+		Ref<FMaterialStorage> MaterialStorage = ImportMaterial(InModel.materials[i], InModel, Result.Textures);
+		Result.Materials.emplace_back(std::move(MaterialStorage));
 	}
 
 	for (size_t i = 0; i < InModel.meshes.size(); i++)
 	{
-		Ref<FStaticMeshStorage> StaticMeshStorage = ImportStaticMesh(InModel.meshes[i], InModel, Result->Materials);
-		Result->StaticMeshes.emplace_back(std::move(StaticMeshStorage));
+		Ref<FStaticMeshStorage> StaticMeshStorage = ImportStaticMesh(InModel.meshes[i], InModel, Result.Materials);
+		Result.StaticMeshes.emplace_back(std::move(StaticMeshStorage));
 
 		//TODO: Import skeleton mesh
 	}

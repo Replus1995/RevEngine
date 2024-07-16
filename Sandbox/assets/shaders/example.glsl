@@ -1,4 +1,4 @@
-#type vertex
+#kind vertex
 #version 430 core
 
 layout(location = 0) in vec3 a_Position;
@@ -15,7 +15,7 @@ void main()
 	gl_Position = u_ProjMat * u_ViewMat * u_Transform * vec4(a_Position, 1.0);
 }
 
-#type fragment
+#kind fragment
 #version 430 core
 
 layout(location = 0) out vec4 color;

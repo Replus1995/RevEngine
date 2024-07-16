@@ -16,7 +16,7 @@ struct FOpenGLFormatData
 class FOpenGLPixelFormat
 {
 public:
-	static FOpenGLFormatData TranslatePixelFormat(EPixelFormat InFormat);
+	static FOpenGLFormatData TranslatePixelFormat(EPixelFormat InFormat, bool bSRGB);
 };
 
 

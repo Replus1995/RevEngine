@@ -1,5 +1,7 @@
 #pragma once
 #include "Rev/Core/Base.h"
+#include "Rev/Core/FileSystem.h"
+#include "Rev/Asset/MeshStorage.h"
 
 namespace Rev
 {
@@ -22,7 +24,9 @@ class REV_API FAssetLibrary
 public:
 	static const Ref<Texture>& GetWhiteTexture();
 	static const Ref<Material>& GetDefaultMaterial();
-	static const Ref<StaticMesh> CreateBasicGeometry(EBasicGeometry InKind, const Ref<Material>& InMaterial = nullptr);
+	static Ref<StaticMesh> CreateBasicGeometry(EBasicGeometry InKind, const Ref<Material>& InMaterial = nullptr);
+
+	static FMeshImportResult ImportMesh(const FPath& InPath);
 
 private:
 	friend class Application;

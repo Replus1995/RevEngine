@@ -82,7 +82,7 @@ void FOpenGLRenderTarget2D::CreateResource()
 	for (uint32 i = 0; i < mDesc.NumColorTargets; i++)
 	{
 		const FColorTargetDesc& SrcDesc = mDesc.ColorTargets[i];
-		FTextureDesc DstDesc = FTextureDesc::MakeTexture2D(mDesc.Width, mDesc.Height, SrcDesc.Format, SrcDesc.ClearColor, 1, mDesc.NumSamples);
+		FTextureDesc DstDesc = FTextureDesc::MakeTexture2D(mDesc.Width, mDesc.Height, SrcDesc.Format, false, SrcDesc.ClearColor, 1, mDesc.NumSamples);
 		Ref<FOpenGLTexture2D> ColorTexture = CreateRef<FOpenGLTexture2D>(DstDesc);
 
 		GLuint TexHandle = *(GLuint*)ColorTexture->GetNativeHandle();
@@ -95,7 +95,7 @@ void FOpenGLRenderTarget2D::CreateResource()
 	if (mDesc.DepthStencilTarget.Format == PF_DepthStencil)
 	{
 		const FDepthStencilTargetDesc& SrcDesc = mDesc.DepthStencilTarget;
-		FTextureDesc DstDesc = FTextureDesc::MakeTexture2D(mDesc.Width, mDesc.Height, SrcDesc.Format, { SrcDesc.ClearDepth, SrcDesc.ClearStencil }, 1, mDesc.NumSamples);
+		FTextureDesc DstDesc = FTextureDesc::MakeTexture2D(mDesc.Width, mDesc.Height, SrcDesc.Format, false, { SrcDesc.ClearDepth, SrcDesc.ClearStencil }, 1, mDesc.NumSamples);
 		mDepthTexture = CreateRef<FOpenGLTexture2D>(DstDesc);
 
 		GLuint TexHandle = *(GLuint*)mDepthTexture->GetNativeHandle();

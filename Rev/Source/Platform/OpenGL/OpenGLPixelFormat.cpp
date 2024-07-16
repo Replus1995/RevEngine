@@ -22,10 +22,27 @@ constexpr FOpenGLFormatMapping sOpenGLFormatMappings[] = {
 
 
 
-FOpenGLFormatData FOpenGLPixelFormat::TranslatePixelFormat(EPixelFormat InFormat)
+FOpenGLFormatData FOpenGLPixelFormat::TranslatePixelFormat(EPixelFormat InFormat, bool bSRGB)
 {
 	RE_CORE_ASSERT(InFormat != EPixelFormat::PF_Unknown);
-	return sOpenGLFormatMappings[(uint8)InFormat].OpenGLFormatData;
+	if (!bSRGB)
+	{
+		return sOpenGLFormatMappings[(uint8)InFormat].OpenGLFormatData;
+	}
+	else
+	{
+		switch (InFormat)
+		{
+		case Rev::PF_R8G8B8A8:
+			return { GL_SRGB8_ALPHA8, GL_SRGB_ALPHA, GL_UNSIGNED_BYTE, 4 };
+		case Rev::PF_RGB8:
+			return { GL_SRGB8, GL_SRGB, GL_UNSIGNED_BYTE, 3 };
+		default:
+			break;
+		}
+		RE_CORE_ASSERT(false, "Unknown SRGB format");
+		return { 0, 0, 0, 0 };
+	}
 }
 
 }

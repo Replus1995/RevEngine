@@ -49,12 +49,13 @@ struct FTextureDesc
 	uint16 ArraySize = 1; //For Texture Array
 	ETextureDimension Dimension = ETextureDimension::Texture2D;
 	EPixelFormat Format = PF_R8G8B8A8;
+	bool bSRGB = false;
 	uint8 NumMips = 1;
 	uint8 NumSamples = 1; //For MSAA
 	FTextureClearColor ClearColor;
 
 	FTextureDesc() {}
-	FTextureDesc(ETextureDimension InDimension, EPixelFormat InFormat,
+	FTextureDesc(ETextureDimension InDimension, EPixelFormat InFormat, bool InSRGB,
 		uint16 InWidth, uint16 InHeight, uint16 InDepth, uint16 InArraySize,
 		const FTextureClearColor& InClearColor, uint8 InNumMips, uint8 InNumSamples
 	)
@@ -64,6 +65,7 @@ struct FTextureDesc
 		, ArraySize(InArraySize)
 		, Dimension(InDimension)
 		, Format(InFormat)
+		, bSRGB(InSRGB)
 		, NumMips(InNumMips)
 		, NumSamples(InNumSamples)
 		, ClearColor(InClearColor)
@@ -84,9 +86,9 @@ struct FTextureDesc
 		return *this;
 	}
 
-	static FTextureDesc MakeTexture2D(uint16 InWidth, uint16 InHeight, EPixelFormat InFormat, const FTextureClearColor& InClearColor, uint8 InNumMips = 1, uint8 InNumSamples = 1)
+	static FTextureDesc MakeTexture2D(uint16 InWidth, uint16 InHeight, EPixelFormat InFormat, bool InSRGB, const FTextureClearColor& InClearColor, uint8 InNumMips = 1, uint8 InNumSamples = 1)
 	{
-		return FTextureDesc(ETextureDimension::Texture2D, InFormat, InWidth, InHeight, 1, 1, InClearColor, InNumMips, InNumSamples);
+		return FTextureDesc(ETextureDimension::Texture2D, InFormat, InSRGB, InWidth, InHeight, 1, 1, InClearColor, InNumMips, InNumSamples);
 	}
 	
 };

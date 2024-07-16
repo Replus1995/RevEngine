@@ -8,6 +8,7 @@
 
 #include "./BasicGeometry/PlaneGeometry.hpp"
 #include "./BasicGeometry/BoxGeometry.hpp"
+#include "./GLTF/GLTFUtils.h"
 
 namespace Rev
 {
@@ -30,7 +31,7 @@ const Ref<Texture>& FAssetLibrary::GetWhiteTexture()
 {
 	if (!sWhiteTexture)
 	{
-		FTextureDesc TextureDesc = FTextureDesc::MakeTexture2D(2,2, PF_R8G8B8A8, Math::FLinearColor(1,1,1,1));
+		FTextureDesc TextureDesc = FTextureDesc::MakeTexture2D(2,2, PF_R8G8B8A8, false, Math::FLinearColor(1,1,1,1));
 		FSamplerDesc SamplerDesc;
 		sWhiteTexture = CreateRef<Texture>(FRHIResourceFactory::CreateTexture(TextureDesc, SamplerDesc));
 	}
@@ -52,7 +53,7 @@ const Ref<Material>& FAssetLibrary::GetDefaultMaterial()
 	return sDefaultMaterial;
 }
 
-const Ref<StaticMesh> FAssetLibrary::CreateBasicGeometry(EBasicGeometry InKind, const Ref<Material>& InMaterial)
+Ref<StaticMesh> FAssetLibrary::CreateBasicGeometry(EBasicGeometry InKind, const Ref<Material>& InMaterial)
 {
 	const Ref<Material>& GeoMat = InMaterial ? InMaterial : GetDefaultMaterial();
 	switch (InKind)
@@ -72,6 +73,16 @@ const Ref<StaticMesh> FAssetLibrary::CreateBasicGeometry(EBasicGeometry InKind, 
 	}
 
 	return nullptr;
+}
+
+FMeshImportResult FAssetLibrary::ImportMesh(const FPath& InPath)
+{
+	if (InPath.Extension() == "gltf" || InPath.Extension() == "glb")
+	{
+		return FGLTFUtils::ImportModel(InPath);
+	}
+
+	return FMeshImportResult();
 }
 
 

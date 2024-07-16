@@ -17,6 +17,7 @@ public:
 	static uint32 GetComponentSize(int InComponentType);
 	static EMeshDrawMode TranslateDrawMode(int InDrawMode);
 	static EPixelFormat TranslateImageFormat(const tinygltf::Image& InImage);
+	static bool TranslateImageSRGB(const tinygltf::Image& InImage);
 	static FSamplerDesc TranslateSampler(const tinygltf::Sampler& InSampler);
 	static Math::FLinearColor TranslateColor(const std::vector<double>& InColor);
 
@@ -24,7 +25,7 @@ public:
 	static Ref<FStaticMeshStorage> ImportStaticMesh(const tinygltf::Mesh& InMesh, const tinygltf::Model& InModel, const std::vector<Ref<FMaterialStorage>>& InMaterials);
 	static Ref<FTextureStorage> ImportTexture(const tinygltf::Texture& InTexture, const tinygltf::Model& InModel);
 	static Ref<FMaterialStorage> ImportMaterial(const tinygltf::Material& InMaterial, const tinygltf::Model& InModel, const std::vector<Ref<FTextureStorage>>& InTextures);
-	static Ref<FMeshImportResult> ImportModel(const FPath& InPath, bool DumpInfo = false);
+	static FMeshImportResult ImportModel(const FPath& InPath, bool DumpInfo = false);
 };
 
 

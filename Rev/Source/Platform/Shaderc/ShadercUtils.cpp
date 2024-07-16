@@ -132,13 +132,13 @@ FShadercSource FShadercUtils::LoadShaderSource(const FPath& InPath)
 		return Result;
 
 	std::string_view SrcStr(Result.FileContent.DataAs<char>(), Result.FileContent.Size());
-	std::string_view TypeToken = "#type";
-	size_t pos = SrcStr.find(TypeToken, 0);
+	std::string_view KindToken = "#kind";
+	size_t pos = SrcStr.find(KindToken, 0);
 	while (pos != std::string_view::npos)
 	{
 		size_t eol = SrcStr.find_first_of("\r\n", pos); //End of shader type declaration line
 		RE_CORE_ASSERT(eol != std::string_view::npos, "Syntax error");
-		size_t begin = pos + TypeToken.length() + 1; //Start of shader type name (after "#type " keyword)
+		size_t begin = pos + KindToken.length() + 1; //Start of shader type name (after "#type " keyword)
 
 		std::string_view TypeStr = SrcStr.substr(begin, eol - begin);
 		ERHIShaderStage Stage = StringToShaderStage(TypeStr);
@@ -146,7 +146,7 @@ FShadercSource FShadercUtils::LoadShaderSource(const FPath& InPath)
 
 		size_t nextLinePos = SrcStr.find_first_not_of("\r\n", eol); //Start of shader code after shader type declaration line
 		RE_CORE_ASSERT(nextLinePos != std::string_view::npos, "Syntax error");
-		pos = SrcStr.find(TypeToken, nextLinePos); //Start of next shader type declaration line
+		pos = SrcStr.find(KindToken, nextLinePos); //Start of next shader type declaration line
 
 		size_t StageContentSize = pos == std::string_view::npos ? Result.FileContent.Size() - nextLinePos : pos - nextLinePos;
 		FBufferView StageContent(Result.FileContent, nextLinePos, StageContentSize);

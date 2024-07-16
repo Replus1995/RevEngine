@@ -35,13 +35,13 @@ Ref<FOpenGLTexture> FOpenGLTexture::Create(const FTextureDesc& InDesc, const FSa
 
 FOpenGLTexture::FOpenGLTexture(const FTextureDesc& InDesc)
 	: FRHITexture(InDesc)
-	, mFormatData(FOpenGLPixelFormat::TranslatePixelFormat(InDesc.Format))
+	, mFormatData(FOpenGLPixelFormat::TranslatePixelFormat(InDesc.Format, InDesc.bSRGB))
 {
 }
 
 FOpenGLTexture::FOpenGLTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc)
 	: FRHITexture(InDesc)
-	, mFormatData(FOpenGLPixelFormat::TranslatePixelFormat(InDesc.Format))
+	, mFormatData(FOpenGLPixelFormat::TranslatePixelFormat(InDesc.Format, InDesc.bSRGB))
 	, mSamplerDesc(InSamplerDesc)
 {
 }
