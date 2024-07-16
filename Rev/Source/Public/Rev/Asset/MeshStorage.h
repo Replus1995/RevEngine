@@ -6,6 +6,7 @@
 
 namespace Rev
 {
+class StaticMesh;
 struct FTextureStorage;
 struct FMaterialStorage;
 struct FMeshStorage
@@ -19,6 +20,10 @@ struct FStaticMeshStorage : public FMeshStorage
 public:
 	std::vector<Ref<FMaterialStorage>> Materials;
 	std::vector<Ref<FMeshPrimitiveStorage>> Primitives;
+
+	Ref<StaticMesh> CreateStaticMesh();
+private:
+	Ref<StaticMesh> mCache = nullptr;
 };
 
 struct FMeshImportResult
