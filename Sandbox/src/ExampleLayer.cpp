@@ -32,6 +32,7 @@ ExampleLayer::ExampleLayer()
 
 	{
 		auto pBoxMat = CreateRef<ExampleMaterial>();
+		pBoxMat->Compile();
 		pBoxMat->SetColor(Math::FLinearColor(.7, .9, .8, 1));
 
 		auto meshEntity = mScene->CreateEntity();
@@ -43,6 +44,7 @@ ExampleLayer::ExampleLayer()
 
 	{
 		auto pPlaneMat = CreateRef<ExampleMaterial>();
+		pPlaneMat->Compile();
 		pPlaneMat->SetColor(Math::FLinearColor(.9, .9, .9, 1));
 
 		auto meshEntity = mScene->CreateEntity();

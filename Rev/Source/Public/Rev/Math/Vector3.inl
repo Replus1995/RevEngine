@@ -233,6 +233,11 @@ TVector3<T>& TVector3<T>::operator/=(T InScalar)
 	Z *= InvScalar;
 	return *this;
 }
+template<typename T>
+inline T TVector3<T>::Dot(const TVector3<T>& InVecA, const TVector3<T>& InVecB)
+{
+	return InVecA.X * InVecB.X + InVecA.Y * InVecB.Y + InVecA.Z * InVecB.Z;
+}
 
 template<typename T>
 inline TVector3<T> TVector3<T>::Cross(const TVector3<T>& InVecA, const TVector3<T>& InVecB)

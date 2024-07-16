@@ -18,9 +18,9 @@ class FRHIVertexArray;
 struct MeshPrimitive
 {
 public:
+	EMeshDrawMode DrawMode;
 	uint32 MaterialIndex;
 	Ref<FRHIVertexArray> VertexData;
-	EMeshDrawMode DrawMode;
 
 	MeshPrimitive();
 	MeshPrimitive(uint32 InMaterialIndex, const Ref<FRHIVertexArray>& InVertexData, EMeshDrawMode InDrawMode = EMeshDrawMode::TRIANGLES);

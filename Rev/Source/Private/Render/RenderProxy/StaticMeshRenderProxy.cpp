@@ -33,15 +33,16 @@ void StaticMeshRenderProxy::Draw(EMaterialDomain InDomain, EBlendMode InBlend)
 		if (!vPrimitives.empty())
 		{
 			RenderCmd::PrepareMaterial(pMat.get());
-			pMat->Bind();
+			pMat->GetProgram()->Bind();
 			mTransformProxy.Upload(pMat->GetProgram());
+			pMat->SyncUniform();
 
 			for (auto& pPrimitive : vPrimitives)
 			{
 				RenderCmd::DrawPrimitive(pPrimitive);
 			}
 
-			pMat->Unbind();
+			pMat->GetProgram()->Unbind();
 		}
 	}
 }

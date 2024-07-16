@@ -252,6 +252,13 @@ inline TVector4<T>& TVector4<T>::operator/=(T InScalar)
 	return *this;
 }
 
+
+template<typename T>
+inline T TVector4<T>::Dot(const TVector4<T>& InVecA, const TVector4<T>& InVecB)
+{
+	return InVecA.X * InVecB.X + InVecA.Y * InVecB.Y + InVecA.Z * InVecB.Z + InVecA.W * InVecB.W;
+}
+
 template<typename T>
 inline T TVector4<T>::Length() const
 {

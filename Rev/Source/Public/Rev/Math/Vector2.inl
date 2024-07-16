@@ -210,6 +210,12 @@ inline TVector2<T>& TVector2<T>::operator/=(T InScalar)
 }
 
 template<typename T>
+inline T TVector2<T>::Dot(const TVector2<T>& InVecA, const TVector2<T>& InVecB)
+{
+	return InVecA.X * InVecB.X + InVecA.Y * InVecB.Y;
+}
+
+template<typename T>
 inline TVector2<T> TVector2<T>::Cross(const TVector2<T>& InVecA, const TVector2<T>& InVecB)
 {
 	return TVector2<T>(InVecA.X * InVecB.Y, InVecA.Y * InVecB.X);

@@ -46,6 +46,7 @@ public:
 	TVector2 operator/(T InScalar) const;
 	TVector2& operator/=(T InScalar);
 
+	static T Dot(const TVector2<T>& InVecA, const TVector2<T>& InVecB);
 	static TVector2<T> Cross(const TVector2<T>& InVecA, const TVector2<T>& InVecB);
 
 	T Length() const;

@@ -9,7 +9,6 @@ namespace Rev
 {
 
 PBRMaterial::PBRMaterial()
-	: Material(FRHIShaderLibrary::GetInstance().CreateGraphicsProgram("PBRProgram","PBRBasic"))
 {
 
 }
@@ -18,7 +17,12 @@ PBRMaterial::~PBRMaterial()
 {
 }
 
-void PBRMaterial::UploadUniform()
+void PBRMaterial::Compile()
+{
+	mProgram = FRHIShaderLibrary::GetInstance().CreateGraphicsProgram("PBRProgram", "PBRBasic");
+}
+
+void PBRMaterial::SyncUniform()
 {
 	if(!mProgram)
 		return;
@@ -33,25 +37,12 @@ void PBRMaterial::UploadUniform()
 
 	FAssetLibrary::GetWhiteTexture()->GetResource()->Bind(0);
 
-	UploadTextureUniform(BaseColorTexture, UL_BaseColorTexture, 1);
-	UploadTextureUniform(MetallicRoughnessTexture, UL_MetallicRoughnessTexture, 2);
-	UploadTextureUniform(NormalTexture, UL_NormalTexture, 3);
-	UploadTextureUniform(OcclusionTexture, UL_OcclusionTexture, 4);
-	UploadTextureUniform(EmissiveTexture, UL_EmissiveTexture, 5);
+	SyncTextureUniform(BaseColorTexture, UL_BaseColorTexture, 1);
+	SyncTextureUniform(MetallicRoughnessTexture, UL_MetallicRoughnessTexture, 2);
+	SyncTextureUniform(NormalTexture, UL_NormalTexture, 3);
+	SyncTextureUniform(OcclusionTexture, UL_OcclusionTexture, 4);
+	SyncTextureUniform(EmissiveTexture, UL_EmissiveTexture, 5);
 	
-}
-
-void PBRMaterial::UploadTextureUniform(const Ref<class Texture>& InTexture, uint16 InLocation, int TexUnit, int TexUnitFallback)
-{
-	if (InTexture)
-	{
-		InTexture->GetResource()->Bind(TexUnit);
-		mProgram->SetUniform(InLocation, TexUnit);
-	}
-	else
-	{
-		mProgram->SetUniform(InLocation, TexUnitFallback);
-	}
 }
 
 }

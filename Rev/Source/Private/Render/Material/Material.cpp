@@ -1,4 +1,8 @@
 #include "Rev/Render/Material/Material.h"
+#include "Rev/Render/Material/MaterialUniform.h"
+#include "Rev/Render/Texture/Texture.h"
+#include "Rev/Render/RHI/RHITexture.h"
+#include <Rev/Render/RHI/RHIShaderLibrary.h>
 
 namespace Rev
 {
@@ -9,8 +13,7 @@ std::string MaterialUniform::GetProgramName(const std::string& name)
 	return std::string(sProgramNamePrefix) + name;
 }
 
-Material::Material(const Ref<FRHIShaderProgram>& InProgram)
-	:mProgram(InProgram)
+Material::Material()
 {
 }
 
@@ -18,19 +21,26 @@ Material::~Material()
 {
 }
 
-void Material::Bind()
+void Material::Compile()
 {
-	mProgram->Bind();
-	UploadUniform();
+	mProgram = FRHIShaderLibrary::GetInstance().FindProgram("BasicProgram");
 }
 
-void Material::Unbind()
+void Material::SyncUniform()
 {
-	mProgram->Unbind();
 }
 
-void Material::UploadUniform()
+void Material::SyncTextureUniform(const Ref<class Texture>& InTexture, uint16 InLocation, int TexUnit, int TexUnitFallback)
 {
+	if (InTexture)
+	{
+		InTexture->GetResource()->Bind(TexUnit);
+		mProgram->SetUniform(InLocation, TexUnit);
+	}
+	else
+	{
+		mProgram->SetUniform(InLocation, TexUnitFallback);
+	}
 }
 
 }

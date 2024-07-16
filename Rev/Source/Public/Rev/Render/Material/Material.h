@@ -1,8 +1,8 @@
 #pragma once
 #include "Rev/Math/Maths.h"
-#include "Rev/Render/Material/MaterialUniform.h"
 #include "Rev/Render/RenderCore.h"
-#include <unordered_map>
+#include <Rev/Render/RHI/RHIShader.h>
+//#include <unordered_map>
 
 namespace Rev
 {
@@ -13,31 +13,35 @@ enum EMaterialDomain : uint8
 	MD_PostProcess
 };
 
-class MaterialUniform;
+class FRHIShaderProgram;
 class REV_API Material
 {
 public:
-	Material(const Ref<FRHIShaderProgram>& InProgram);
+	Material();
 	virtual ~Material();
 	
+	/**
+	* @brief Create shader program based on ShadingModel
+	*/
+	virtual void Compile();
+	virtual void SyncUniform();
 	const Ref<FRHIShaderProgram>& GetProgram() const
 	{
 		return mProgram;
 	}
+protected:
+	void SyncTextureUniform(const Ref<class Texture>& InTexture, uint16 InLocation, int TexUnit, int TexUnitFallback = 0);
 
-	void Bind();
-	void Unbind();
+protected:
+	Ref<FRHIShaderProgram> mProgram = nullptr;
+	//EShadingModel mShadingModelCache = Rev::SM_Default;
 
+public:
 	EMaterialDomain Domain = Rev::MD_Surface;
 	EBlendMode BlendMode = Rev::BM_Opaque;
 	EShadingModel ShadingModel = Rev::SM_Default;
 	bool TwoSided = false;
 	float MaskClip = 0.5f;
-
-protected:
-	virtual void UploadUniform();
-protected:
-	Ref<FRHIShaderProgram> mProgram = nullptr;
 };
 
 }

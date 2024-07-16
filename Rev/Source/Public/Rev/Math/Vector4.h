@@ -51,6 +51,8 @@ public:
 	TVector4<T> operator/(T InScalar) const;
 	TVector4<T>& operator/=(T InScalar);
 
+	static T Dot(const TVector4<T>& InVecA, const TVector4<T>& InVecB);
+
 	T Length() const;
 	void Normalize();
 	TVector4<T> Normalized() const;

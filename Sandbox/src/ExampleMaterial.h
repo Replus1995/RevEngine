@@ -1,4 +1,6 @@
+#pragma once
 #include <Rev/Render/Material/Material.h>
+#include <Rev/Render/Material/MaterialUniform.h>
 #include <Rev/Render/Renderer.h>
 #include <Rev/Math/Maths.h>
 #include <Rev/Render/RHI/RHIShaderLibrary.h>
@@ -6,22 +8,25 @@
 class ExampleMaterial : public Rev::Material
 {
 public:
-    ExampleMaterial()
-        : Rev::Material(Rev::FRHIShaderLibrary::GetInstance().FindProgram("ExampleProgram"))
-    {}
-    virtual ~ExampleMaterial() {};
+    ExampleMaterial() : Rev::Material() {}
+    virtual ~ExampleMaterial() {}
 
     void SetColor(const Rev::Math::FVector4& color)
     {
         uColor = color;
     }
 
-protected:
-    virtual void UploadUniform() override
+    virtual void Compile() override
     {
-        Rev::Material::UploadUniform();
+        mProgram = Rev::FRHIShaderLibrary::GetInstance().FindProgram("ExampleProgram");
+    }
+
+    virtual void SyncUniform() override
+    {
+        Rev::Material::SyncUniform();
         uColor.Upload(mProgram);
     }
+
 
 protected:
     Rev::TMaterialUniform<Rev::Math::FLinearColor> uColor = { "Color", Rev::Math::FLinearColor(1) };
