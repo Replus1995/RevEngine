@@ -11,6 +11,7 @@ namespace Rev
 {
 
 static FRHIShaderLibrary* sRHIShaderLibrary_Inst = nullptr;
+static constexpr std::string_view sRHIShaderExtension = ".glsl";
 
 void FRHIShaderLibrary::CreateInstance()
 {
@@ -29,13 +30,13 @@ FRHIShaderLibrary& FRHIShaderLibrary::GetInstance()
 	return *sRHIShaderLibrary_Inst;
 }
 
-void FRHIShaderLibrary::LoadOrCompileShader(const FPath& InPath)
+FRHIGraphicsShaders FRHIShaderLibrary::LoadOrCompileShader(const FPath& InPath)
 {
 	auto CompiledData = FShadercFactory::LoadAndCompile(InPath);
 	if (CompiledData.Empty())
 	{
-		RE_CORE_WARN("No shader complied for {0}", InPath.String().c_str());
-		return;
+		RE_CORE_WARN("No shader complied for {0}", InPath.FullPath().c_str());
+		return {};
 	}
 
 	switch (GetRenderAPI())
@@ -43,14 +44,14 @@ void FRHIShaderLibrary::LoadOrCompileShader(const FPath& InPath)
 	case ERenderAPI::OpenGL:
 	{
 		FRHIGraphicsShaders GraphicsShaders = FOpenGLShaderFactory::CreateGraphicsShaders(CompiledData);
-		mGraphicsShaderCache.emplace(CompiledData.Name, std::move(GraphicsShaders));
-		break;
+		mGraphicsShaderCache.emplace(CompiledData.Name, GraphicsShaders);
+		return GraphicsShaders;
 	}
 	default:
 		RE_CORE_ASSERT(false, "Unknown RenderAPI!");
 		break;
 	}
-
+	return {};
 }
 
 Ref<FRHIShader> FRHIShaderLibrary::FindShader(const std::string& InName, ERHIShaderStage InStage)
@@ -58,9 +59,14 @@ Ref<FRHIShader> FRHIShaderLibrary::FindShader(const std::string& InName, ERHISha
 	if (InName.empty()) return nullptr;
 	if (uint8(InStage) < uint8(ERHIShaderStage::Compute))
 	{
-		if (auto Iter = mGraphicsShaderCache.find(InName); Iter != mGraphicsShaderCache.end())
+		auto ShadersIter = mGraphicsShaderCache.find(InName);
+		if (ShadersIter != mGraphicsShaderCache.end())
 		{
-			return Iter->second[InStage];
+			return ShadersIter->second[InStage];
+		}
+		else
+		{
+			return LoadOrCompileShader(InName + std::string(sRHIShaderExtension))[InStage];
 		}
 	}
 	return nullptr;
@@ -74,24 +80,31 @@ Ref<FRHIShaderProgram> FRHIShaderLibrary::CreateGraphicsProgram(
 	if(Program)
 		return Program;
 
-	if (auto Iter = mGraphicsShaderCache.find(InShadersName); Iter != mGraphicsShaderCache.end())
+	FRHIGraphicsShaders Shaders;
+	auto ShadersIter = mGraphicsShaderCache.find(InShadersName);
+	if (ShadersIter != mGraphicsShaderCache.end())
 	{
-		auto& Shaders = Iter->second;
-		switch (GetRenderAPI())
+		Shaders = ShadersIter->second;
+	}
+	else
+	{
+		Shaders = LoadOrCompileShader(InShadersName + std::string(sRHIShaderExtension));
+	}
+	
+	switch (GetRenderAPI())
+	{
+	case ERenderAPI::OpenGL:
+	{
+		Program = FOpenGLShaderFactory::CreateShaderProgram(InProgramName, Shaders);
+		if (Program)
 		{
-		case ERenderAPI::OpenGL:
-		{
-			 Program = FOpenGLShaderFactory::CreateShaderProgram(InProgramName, Shaders);
-			if (Program)
-			{
-				mShaderProgramCache.emplace(InProgramName, Program);
-			}
-			return Program;
+			mShaderProgramCache.emplace(InProgramName, Program);
 		}
-		default:
-			RE_CORE_ASSERT(false, "Unknown RenderAPI!");
-			break;
-		}
+		return Program;
+	}
+	default:
+		RE_CORE_ASSERT(false, "Unknown RenderAPI!");
+		break;
 	}
 	return nullptr;
 }

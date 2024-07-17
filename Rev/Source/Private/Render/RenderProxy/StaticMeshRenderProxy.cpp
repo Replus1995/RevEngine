@@ -4,6 +4,8 @@
 #include "Rev/Render/RenderCmd.h"
 #include "Rev/Render/Renderer.h"
 
+#include "../UniformLocation.hpp"
+
 namespace Rev
 {
 
@@ -18,10 +20,10 @@ StaticMeshRenderProxy::~StaticMeshRenderProxy()
 void StaticMeshRenderProxy::Prepare(const Ref<StaticMesh>& mesh, const Math::FMatrix4& transform)
 {
 	mStaticMesh = mesh;
-	mTransformProxy = transform;
+	mModelMat = transform;
 }
 
-void StaticMeshRenderProxy::Draw(EMaterialDomain InDomain, EBlendMode InBlend)
+void StaticMeshRenderProxy::DrawColored(EMaterialDomain InDomain, EBlendMode InBlend)
 {
 	for (uint32 i = 0; i < mStaticMesh->GetMaterialCount(); i++)
 	{
@@ -34,7 +36,7 @@ void StaticMeshRenderProxy::Draw(EMaterialDomain InDomain, EBlendMode InBlend)
 		{
 			RenderCmd::PrepareMaterial(pMat.get());
 			pMat->GetProgram()->Bind();
-			mTransformProxy.Upload(pMat->GetProgram());
+			pMat->GetProgram()->SetUniform(UL_ModelMat, mModelMat);
 			pMat->SyncUniform();
 
 			for (auto& pPrimitive : vPrimitives)
@@ -43,6 +45,26 @@ void StaticMeshRenderProxy::Draw(EMaterialDomain InDomain, EBlendMode InBlend)
 			}
 
 			pMat->GetProgram()->Unbind();
+		}
+	}
+}
+
+void StaticMeshRenderProxy::DrawShadow(EMaterialDomain InDomain, EBlendMode InBlend, const Ref<FRHIShaderProgram>& InProgram)
+{
+	for (uint32 i = 0; i < mStaticMesh->GetMaterialCount(); i++)
+	{
+		auto& pMat = mStaticMesh->GetMaterial(i);
+		if (!pMat || pMat->Domain != InDomain || pMat->BlendMode != InBlend)
+			continue;
+
+		auto vPrimitives = mStaticMesh->GetPrimitive(i);
+		if (!vPrimitives.empty())
+		{
+			InProgram->SetUniform(UL_ModelMat, mModelMat);
+			for (auto& pPrimitive : vPrimitives)
+			{
+				RenderCmd::DrawPrimitive(pPrimitive);
+			}
 		}
 	}
 }

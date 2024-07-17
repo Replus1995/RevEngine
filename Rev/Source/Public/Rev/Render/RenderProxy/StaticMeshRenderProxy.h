@@ -1,10 +1,10 @@
 #pragma once
 #include "Rev/Core/Base.h"
 #include "Rev/Render/Material/Material.h"
-#include "Rev/Render/RenderProxy/UniformRenderProxy.h"
 
 namespace Rev
 {
+class FRHIShaderProgram;
 class StaticMesh;
 class StaticMeshRenderProxy
 {
@@ -13,11 +13,12 @@ public:
 	~StaticMeshRenderProxy();
 
 	void Prepare(const Ref<StaticMesh>& mesh, const Math::FMatrix4& transform);
-	void Draw(EMaterialDomain InDomain, EBlendMode InBlend);
+	void DrawColored(EMaterialDomain InDomain, EBlendMode InBlend);
+	void DrawShadow(EMaterialDomain InDomain, EBlendMode InBlend, const Ref<FRHIShaderProgram>& InProgram);
 
 private:
 	Ref<StaticMesh> mStaticMesh;
-	FUniformRenderProxy<Math::FMatrix4, 0> mTransformProxy;
+	Math::FMatrix4 mModelMat;
 };
 
 }

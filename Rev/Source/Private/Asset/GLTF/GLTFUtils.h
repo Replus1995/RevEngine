@@ -20,6 +20,7 @@ public:
 	static bool TranslateImageSRGB(const tinygltf::Image& InImage);
 	static FSamplerDesc TranslateSampler(const tinygltf::Sampler& InSampler);
 	static Math::FLinearColor TranslateColor(const std::vector<double>& InColor);
+	static Math::FVector3 TranslateVector3(const std::vector<double>& InVector3);
 
 	static Ref<FMeshPrimitiveStorage> ImportMeshPrimitive(const tinygltf::Primitive& InPrimitive, const tinygltf::Model& InModel);
 	static Ref<FStaticMeshStorage> ImportStaticMesh(const tinygltf::Mesh& InMesh, const tinygltf::Model& InModel, const std::vector<Ref<FMaterialStorage>>& InMaterials);

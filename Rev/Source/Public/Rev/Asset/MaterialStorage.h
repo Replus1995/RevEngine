@@ -24,7 +24,7 @@ protected:
 struct FPBRMaterialStorage : public FMaterialStorage
 {
 public:
-	Math::FLinearColor BaseColor = Math::FLinearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	Math::FLinearColor BaseColorFactor = Math::FLinearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	Ref<FTextureStorage> BaseColorTexture = nullptr;
 
 	float Metallic = 1.0f;
@@ -37,7 +37,7 @@ public:
 	float OcclusionStrength = 1.0f;
 	Ref<FTextureStorage> OcclusionTexture = nullptr;
 
-	Math::FLinearColor EmissiveColor = Math::FLinearColor(0.0f, 0.0f, 0.0f);
+	Math::FVector3 EmissiveFactor = Math::FVector3(0.0f, 0.0f, 0.0f);
 	Ref<FTextureStorage> EmissiveTexture = nullptr;
 
 	virtual Ref<Material> CreateMaterial() override;

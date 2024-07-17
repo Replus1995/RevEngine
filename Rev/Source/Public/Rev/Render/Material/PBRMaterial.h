@@ -14,7 +14,7 @@ public:
 	virtual void Compile() override;
 	virtual void SyncUniform() override;
 
-	Math::FLinearColor BaseColor = Math::FLinearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	Math::FLinearColor BaseColorFactor = Math::FLinearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	Ref<Texture> BaseColorTexture = nullptr;
 
 	float Metallic = 1.0f;
@@ -27,7 +27,7 @@ public:
 	float OcclusionStrength = 1.0f;
 	Ref<Texture> OcclusionTexture = nullptr;
 
-	Math::FLinearColor EmissiveColor = Math::FLinearColor(0.0f, 0.0f, 0.0f);
+	Math::FVector3 EmissiveFactor = Math::FVector3(0.0f, 0.0f, 0.0f);
 	Ref<Texture> EmissiveTexture = nullptr;
 
 };

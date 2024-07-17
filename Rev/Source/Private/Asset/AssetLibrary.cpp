@@ -14,36 +14,51 @@ namespace Rev
 {
 
 static Ref<Material> sDefaultMaterial = nullptr;
-static Ref<Texture> sWhiteTexture = nullptr;
+static Ref<Texture> sDefaultWhiteTexture = nullptr;
+static Ref<Texture> sDefaultNormalTexture = nullptr;
 
 void FAssetLibrary::Init()
 {
-	FFileSystem::MountDir("/Game", std::filesystem::current_path().generic_u8string());
+	FFileSystem::MountDir("/Engine", (std::filesystem::current_path() / "Engine").generic_u8string());
 }
 
 void FAssetLibrary::Shutdown()
 {
-	sWhiteTexture.reset();
+	sDefaultWhiteTexture.reset();
+	sDefaultNormalTexture.reset();
 	sDefaultMaterial.reset();
 }
 
-const Ref<Texture>& FAssetLibrary::GetWhiteTexture()
+const Ref<Texture>& FAssetLibrary::GetDefaultWhiteTexture()
 {
-	if (!sWhiteTexture)
+	if (!sDefaultWhiteTexture)
 	{
 		FTextureDesc TextureDesc = FTextureDesc::MakeTexture2D(2,2, PF_R8G8B8A8, false, Math::FLinearColor(1,1,1,1));
 		FSamplerDesc SamplerDesc;
-		sWhiteTexture = CreateRef<Texture>(FRHIResourceFactory::CreateTexture(TextureDesc, SamplerDesc));
+		sDefaultWhiteTexture = CreateRef<Texture>(FRHIResourceFactory::CreateTexture(TextureDesc, SamplerDesc));
+		sDefaultWhiteTexture->GetResource()->ClearData();
 	}
-	return sWhiteTexture;
+	return sDefaultWhiteTexture;
+}
+
+const Ref<Texture>& FAssetLibrary::GetDefaultNormalTexture()
+{
+	if (!sDefaultNormalTexture)
+	{
+		FTextureDesc TextureDesc = FTextureDesc::MakeTexture2D(2, 2, PF_RGB8, false, Math::FLinearColor(0, 1, 0));
+		FSamplerDesc SamplerDesc;
+		sDefaultNormalTexture = CreateRef<Texture>(FRHIResourceFactory::CreateTexture(TextureDesc, SamplerDesc));
+		sDefaultNormalTexture->GetResource()->ClearData();
+	}
+	return sDefaultNormalTexture;
 }
 
 const Ref<Material>& FAssetLibrary::GetDefaultMaterial()
 {
 	if (!sDefaultMaterial)
 	{
-		FRHIShaderLibrary::GetInstance().LoadOrCompileShader(FPath("/Game/Assets/Shaders/Basic.glsl"));
-		auto Program = FRHIShaderLibrary::GetInstance().CreateGraphicsProgram("BasicProgram", "Basic");
+		//FRHIShaderLibrary::GetInstance().LoadOrCompileShader(FPath("/Engine/Shaders/Basic.glsl"));
+		auto Program = FRHIShaderLibrary::GetInstance().CreateGraphicsProgram("BasicProgram", "/Engine/Shaders/Basic");
 		if (Program)
 		{
 			sDefaultMaterial = CreateRef<Material>();

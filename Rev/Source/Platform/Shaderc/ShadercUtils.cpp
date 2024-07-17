@@ -158,7 +158,7 @@ FShadercSource FShadercUtils::LoadShaderSource(const FPath& InPath)
 
 bool FShadercUtils::LoadShaderCompiledData(const FPath& ShaderPath, FShadercCompiledData& OutCompiledData)
 {
-	fs::path CachedPath(GetCacheDirectory() + ShaderPath.String() + sShaderCachaExtension);
+	fs::path CachedPath(GetCacheDirectory() + ShaderPath.FullPath(false) + sShaderCachaExtension);
 	if (fs::exists(CachedPath))
 	{
 		std::ifstream InFile(CachedPath, std::ios::in | std::ios::binary);
@@ -198,7 +198,7 @@ bool FShadercUtils::SaveShaderCompiledData(const FPath& ShaderPath, const FShade
 {
 	CreateCacheDirectory();
 
-	fs::path CachedPath(GetCacheDirectory() + ShaderPath.String() + sShaderCachaExtension);
+	fs::path CachedPath(GetCacheDirectory() + ShaderPath.FullPath(false) + sShaderCachaExtension);
 	fs::path CachedDir = CachedPath.parent_path();
 	if(!fs::exists(CachedDir))
 		fs::create_directories(CachedDir);

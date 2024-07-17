@@ -12,7 +12,8 @@ enum EPixelFormat : uint8
 	PF_R8 = 3,
 	PF_R16 = 4,
 	PF_RGB8 = 5,
-	PF_DepthStencil = 6
+	PF_DepthStencil = 6,
+	PF_ShadowDepth = 7
 };
 
 

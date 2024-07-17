@@ -17,7 +17,7 @@ Ref<Material> FPBRMaterialStorage::CreateMaterial()
 	Result->MaskClip = MaskClip;
 	Result->TwoSided = TwoSided;
 
-	Result->BaseColor = BaseColor;
+	Result->BaseColorFactor = BaseColorFactor;
 	Result->BaseColorTexture = BaseColorTexture->CreateTexture();
 	Result->Metallic = Metallic;
 	Result->Roughness = Roughness;
@@ -26,7 +26,7 @@ Ref<Material> FPBRMaterialStorage::CreateMaterial()
 	Result->NormalTexture = NormalTexture->CreateTexture();
 	Result->OcclusionStrength = OcclusionStrength;
 	Result->OcclusionTexture = OcclusionTexture->CreateTexture();
-	Result->EmissiveColor = EmissiveColor;
+	Result->EmissiveFactor = EmissiveFactor;
 	Result->EmissiveTexture = EmissiveTexture->CreateTexture();
 
 	mCache = Result;

@@ -73,7 +73,7 @@ void FShadercFactory::CompileShaders(const FShadercSource& InSource, FShadercCom
 FShadercCompiledData FShadercFactory::LoadAndCompile(const FPath& InPath)
 {
 	FShadercCompiledData Result;
-	Result.Name = InPath.Name();
+	Result.Name = InPath.FullPath(false);
 
 	if (!FShadercUtils::LoadShaderCompiledData(InPath, Result))
 	{

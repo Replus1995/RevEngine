@@ -18,9 +18,9 @@ void main()
 #kind fragment
 #version 430 core
 
-layout(location = 0) out vec4 o_color;
+layout(location = 0) out vec4 o_Color;
 
 void main()
 {
-	o_color = vec4(1,1,1,1);
+	o_Color = vec4(1,1,1,1);
 }

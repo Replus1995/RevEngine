@@ -11,7 +11,7 @@ in Vertex
     vec2 TexCoord0;
 } IN;
 
-out vec4 o_Color;
+layout(location = 0) out vec4 o_Color;
 
 void main(void)
 {
@@ -21,11 +21,11 @@ void main(void)
     vec3 emissive = texture(u_EmissiveTex, IN.texCoord).xyz;
     //vec3 emissive = pow(texture(u_EmissiveTex, IN.texCoord).rgb, vec3(2.2));
 
-    fragColour.xyz = vec3(0.1) * colour * diffuse.a; // Ambient
-    fragColour.xyz += colour * diffuse.rgb; //Diffuse
+    fragColour.xyz = vec3(0.1) * color * diffuse.a; // Ambient
+    fragColour.xyz += color * diffuse.rgb; //Diffuse
     fragColour.xyz += specular; // Specular
     fragColour.xyz += emissive; // Emissive
-    fragColour.xyz = pow(fragColour.xyz,vec3(1.0/2.2));
+    fragColour.xyz = pow(fragColour.xyz, vec3(1.0/2.2)); //Gamma Correction
 
     fragColour.a = 1.0;
 }

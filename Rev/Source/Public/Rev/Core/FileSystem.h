@@ -15,15 +15,15 @@ public:
 	REV_API ~FPath();
 	REV_API FPath& operator=(const FPath& InPath);
 
-	REV_API const std::string& String() const;
+	REV_API bool Empty() const;
+	REV_API std::string FullPath(bool WithExt = true) const;
 	REV_API const std::string& Name() const;
 	REV_API const std::string& Extension() const;
-	REV_API bool Empty() const;
 	REV_API std::string ToNative() const;
 private:
-	std::string mFullPath;
-	std::string mFileName;
-	std::string mFileExtension;
+	std::string mDir;
+	std::string mName;
+	std::string mExtension;
 };
 
 class REV_API FFileSystem

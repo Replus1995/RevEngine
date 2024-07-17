@@ -5,20 +5,18 @@
 #include "Rev/Render/Renderer.h"
 #include "Rev/Render/RHI/RHIResourceFactory.h"
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include "../UniformLocation.hpp"
 
 namespace Rev
 {
 void SceneRenderProxy::Init()
 {
-	mSceneBuffer = FRHIResourceFactory::CreateUniformBuffer(sizeof(SceneRenderData), 0);
+	mSceneUB = FRHIResourceFactory::CreateUniformBuffer(sizeof(SceneUniformData), UBB_Scene);
 }
 
 void SceneRenderProxy::Release()
 {
-	mSceneBuffer.reset();
+	mSceneUB.reset();
 }
 
 void SceneRenderProxy::Prepare(const Ref<Scene>& scene)
@@ -48,12 +46,12 @@ void SceneRenderProxy::Prepare(const Ref<Scene>& scene)
 	}
 }
 
-void SceneRenderProxy::Draw()
+void SceneRenderProxy::DrawScene()
 {
 	RenderCmd::SetClearColor(Renderer::sClearColor);
 	RenderCmd::Clear();
 
-	mSceneBuffer->UpdateData(&mSceneData, sizeof(SceneRenderData));
+	mSceneUB->UpdateData(&mSceneData, sizeof(SceneUniformData));
 
 	DrawMeshes(EMaterialDomain::MD_Surface, BM_Opaque);
 }
@@ -62,7 +60,7 @@ void SceneRenderProxy::DrawMeshes(EMaterialDomain InDomain, EBlendMode InBlend)
 {
 	for (StaticMeshRenderProxy& proxy : mStaticMeshProxies)
 	{
-		proxy.Draw(InDomain, InBlend);
+		proxy.DrawColored(InDomain, InBlend);
 	}
 }
 

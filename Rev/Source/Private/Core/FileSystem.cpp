@@ -84,7 +84,7 @@ std::string FFileSystem::LoadStringFile(const FPath& InPath)
 	}
 	else
 	{
-		RE_CORE_ERROR("[FFileSystem] Open file failded '{0}'", InPath.String().c_str());
+		RE_CORE_ERROR("[FFileSystem] Open file failded '{0}'", InPath.FullPath().c_str());
 	}
 	return Result;
 }
@@ -102,7 +102,7 @@ bool FFileSystem::SaveStringFile(const FPath& InPath, const std::string& InStrin
 	}
 	else
 	{
-		RE_CORE_ERROR("[FFileSystem] Open file failded '{0}'", InPath.String().c_str());
+		RE_CORE_ERROR("[FFileSystem] Open file failded '{0}'", InPath.FullPath().c_str());
 	}
 	return false;
 }
@@ -149,9 +149,9 @@ FPath::FPath(const std::string& InPath)
 	{
 		std::filesystem::path tPath(InPath);
 		tPath.lexically_normal();
-		mFullPath = tPath.generic_u8string();
-		mFileName = tPath.stem().generic_u8string();
-		mFileExtension = tPath.extension().generic_u8string();
+		mDir = tPath.parent_path().generic_u8string();
+		mName = tPath.stem().generic_u8string();
+		mExtension = tPath.extension().generic_u8string();
 	}
 }
 
@@ -161,35 +161,39 @@ FPath::~FPath()
 
 FPath& FPath::operator=(const FPath& InPath)
 {
-	mFullPath = InPath.mFullPath;
-	mFileName = InPath.mFileName;
-	mFileExtension = InPath.mFileExtension;
+	mDir = InPath.mDir;
+	mName = InPath.mName;
+	mExtension = InPath.mExtension;
 	return *this;
-}
-
-const std::string& FPath::String() const
-{
-	return mFullPath;
-}
-
-const std::string& FPath::Name() const
-{
-	return mFileName;
-}
-
-const std::string& FPath::Extension() const
-{
-	return mFileExtension;
 }
 
 bool FPath::Empty() const
 {
-	return mFullPath.empty();
+	return mDir.empty() && mName.empty();
+}
+
+std::string FPath::FullPath(bool WithExt) const
+{
+	if (WithExt)
+	{
+		return mDir + "/" + mName + mExtension;
+	}
+	return mDir + "/" + mName;
+}
+
+const std::string& FPath::Name() const
+{
+	return mName;
+}
+
+const std::string& FPath::Extension() const
+{
+	return mExtension;
 }
 
 std::string FPath::ToNative() const
 {
-	return FFileSystem::ToNative(mFullPath);
+	return FFileSystem::ToNative(mDir) + "/" + mName + mExtension;
 }
 
 }

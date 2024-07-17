@@ -22,7 +22,8 @@ class StaticMesh;
 class REV_API FAssetLibrary
 {
 public:
-	static const Ref<Texture>& GetWhiteTexture();
+	static const Ref<Texture>& GetDefaultWhiteTexture();
+	static const Ref<Texture>& GetDefaultNormalTexture();
 	static const Ref<Material>& GetDefaultMaterial();
 	static Ref<StaticMesh> CreateBasicGeometry(EBasicGeometry InKind, const Ref<Material>& InMaterial = nullptr);
 

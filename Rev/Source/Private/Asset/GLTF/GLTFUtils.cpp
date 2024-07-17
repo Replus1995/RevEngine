@@ -235,12 +235,23 @@ FSamplerDesc FGLTFUtils::TranslateSampler(const tinygltf::Sampler& InSampler)
 
 Math::FLinearColor FGLTFUtils::TranslateColor(const std::vector<double>& InColor)
 {
-	RE_CORE_ASSERT(InColor.size() <= 4);
+	RE_CORE_ASSERT(InColor.size() == 4);
 	Math::FLinearColor Result(0, 0, 0, 1);
 	for (size_t i = 0; i < InColor.size(); i++)
 	{
 		Result[i] = InColor[i];
  	}
+	return Result;
+}
+
+Math::FVector3 FGLTFUtils::TranslateVector3(const std::vector<double>& InVector3)
+{
+	RE_CORE_ASSERT(InVector3.size() == 3);
+	Math::FVector3 Result(0, 0, 0);
+	for (size_t i = 0; i < InVector3.size(); i++)
+	{
+		Result[i] = InVector3[i];
+	}
 	return Result;
 }
 
@@ -386,7 +397,7 @@ Ref<FMaterialStorage> FGLTFUtils::ImportMaterial(const tinygltf::Material& InMat
 
 	Result->MaskClip = InMaterial.alphaCutoff;
 	Result->TwoSided = InMaterial.doubleSided;
-	Result->BaseColor = TranslateColor(pbrInfo.baseColorFactor);
+	Result->BaseColorFactor = TranslateColor(pbrInfo.baseColorFactor);
 	Result->BaseColorTexture = pbrInfo.baseColorTexture.index >= 0 ? InTextures[pbrInfo.baseColorTexture.index] : nullptr;
 	Result->Metallic = pbrInfo.metallicFactor;
 	Result->Roughness = pbrInfo.roughnessFactor;
@@ -395,7 +406,7 @@ Ref<FMaterialStorage> FGLTFUtils::ImportMaterial(const tinygltf::Material& InMat
 	Result->NormalTexture = InMaterial.normalTexture.index >= 0 ? InTextures[InMaterial.normalTexture.index] : nullptr;
 	Result->OcclusionStrength = InMaterial.occlusionTexture.strength;
 	Result->OcclusionTexture = InMaterial.occlusionTexture.index >= 0 ? InTextures[InMaterial.occlusionTexture.index] : nullptr;
-	Result->EmissiveColor = TranslateColor(InMaterial.emissiveFactor);
+	Result->EmissiveFactor = TranslateVector3(InMaterial.emissiveFactor);
 	Result->EmissiveTexture = InMaterial.emissiveTexture.index >= 0 ? InTextures[InMaterial.emissiveTexture.index] : nullptr;
 
 	return Result;

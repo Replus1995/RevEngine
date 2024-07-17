@@ -2,12 +2,17 @@
 #include "Rev/Core/Base.h"
 #include "Rev/Render/RHI/RHIBuffer.h"
 #include "Rev/Render/Material/Material.h"
-#include "Rev/Render/RenderData/RenderData.h"
 #include "Rev/Render/RenderProxy/StaticMeshRenderProxy.h"
 
 namespace Rev
 {
 class Scene;
+struct SceneUniformData
+{
+	Math::FMatrix4 ProjMatrix;
+	Math::FMatrix4 ViewMatrix;
+};
+
 class SceneRenderProxy
 {
 public:
@@ -18,14 +23,14 @@ public:
 	void Release();
 
 	void Prepare(const Ref<Scene>& scene);
-	void Draw();
+	void DrawScene();
 
 protected:
 	void DrawMeshes(EMaterialDomain InDomain, EBlendMode InBlend);
 
 protected:
-	SceneRenderData mSceneData;
-	Ref<FRHIUniformBuffer> mSceneBuffer;
+	SceneUniformData mSceneData;
+	Ref<FRHIUniformBuffer> mSceneUB;
 
 	std::vector<StaticMeshRenderProxy> mStaticMeshProxies;
 
