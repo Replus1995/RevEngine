@@ -1,7 +1,7 @@
 #include "ExampleLayer.h"
 #include <Rev/Core/Base.h>
 #include <Rev/World/Scene.h>
-#include <Rev/World/Component/Component.h>
+#include <Rev/World/Component/AllComponents.h>
 #include <Rev/World/System/PlayerCameraSystem.h>
 #include <Rev/Render/Renderer.h>
 #include <Rev/Render/Mesh/StaticMesh.h>

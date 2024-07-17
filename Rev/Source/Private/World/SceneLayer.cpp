@@ -53,7 +53,7 @@ void SceneLayer::OnUpdate(float dt)
 
 	//Render Scene
 	mSceneProxy.Prepare(mScene);
-	mSceneProxy.Draw();
+	mSceneProxy.DrawScene();
 }
 
 void SceneLayer::OnEvent(Event& event)

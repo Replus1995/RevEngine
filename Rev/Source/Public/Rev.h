@@ -8,7 +8,7 @@
 #include "Rev/Core/FileSystem.h"
 
 //World
-#include "Rev/World/Component/Component.h"
+#include "Rev/World/Component/AllComponents.h"
 #include "Rev/World/Entity.h"
 #include "Rev/World/Scene.h"
 

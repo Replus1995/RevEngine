@@ -2,7 +2,7 @@
 #include "Rev/Core/Application.h"
 #include "Rev/Core/Window.h"
 #include "Rev/World/Scene.h"
-#include "Rev/World/Component/Component.h"
+#include "Rev/World/Component/AllComponents.h"
 #include "Rev/World/System/Control/CameraController.h"
 #include "./Control/FreeCameraController.h"
 

@@ -1,5 +1,7 @@
 #pragma once
 #include "Rev/World/Component/BaseComponent.h"
+#include "Rev/World/Component/LightComponent.h"
+#include "Rev/World/Component/MeshComponent.h"
 #include <entt/entt.hpp>
 
 namespace Rev
@@ -9,7 +11,12 @@ template<typename... Component>
 struct ComponentGroup
 {
 };
-using AllComponents = ComponentGroup<TransformComponent,  CameraComponent, StaticMeshComponent>;
+
+using AllComponents = ComponentGroup<
+	TransformComponent, CameraComponent,
+	DirectionalLightComponent, SpotLightComponent, PointLightComponent, 
+	StaticMeshComponent
+>;
 
 class ComponentUtils
 {

@@ -1,7 +1,7 @@
 #pragma once
 #include "Rev/Core/UUID.h"
 #include "Rev/Core/Assert.h"
-#include "Rev/World/Component/Component.h"
+#include "Rev/World/Component/AllComponents.h"
 
 #include <entt/entt.hpp>
 
