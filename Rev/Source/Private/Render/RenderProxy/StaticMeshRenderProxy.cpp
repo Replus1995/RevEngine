@@ -23,34 +23,9 @@ void StaticMeshRenderProxy::Prepare(const Ref<StaticMesh>& mesh, const Math::FMa
 	mModelMat = transform;
 }
 
-void StaticMeshRenderProxy::DrawColored(EMaterialDomain InDomain, EBlendMode InBlend)
+void StaticMeshRenderProxy::DrawPrimitives(EMaterialDomain InDomain, EBlendMode InBlend, const Ref<FRHIShaderProgram>& InProgram)
 {
-	for (uint32 i = 0; i < mStaticMesh->GetMaterialCount(); i++)
-	{
-		auto& pMat = mStaticMesh->GetMaterial(i);
-		if(!pMat || pMat->Domain != InDomain || pMat->BlendMode != InBlend)
-			continue;
-
-		auto vPrimitives = mStaticMesh->GetPrimitive(i);
-		if (!vPrimitives.empty())
-		{
-			RenderCmd::PrepareMaterial(pMat.get());
-			pMat->GetProgram()->Bind();
-			pMat->GetProgram()->SetUniform(UL_ModelMat, mModelMat);
-			pMat->SyncUniform();
-
-			for (auto& pPrimitive : vPrimitives)
-			{
-				RenderCmd::DrawPrimitive(pPrimitive);
-			}
-
-			pMat->GetProgram()->Unbind();
-		}
-	}
-}
-
-void StaticMeshRenderProxy::DrawShadow(EMaterialDomain InDomain, EBlendMode InBlend, const Ref<FRHIShaderProgram>& InProgram)
-{
+	bool bUseProgramOverride = InProgram != nullptr;
 	for (uint32 i = 0; i < mStaticMesh->GetMaterialCount(); i++)
 	{
 		auto& pMat = mStaticMesh->GetMaterial(i);
@@ -60,10 +35,26 @@ void StaticMeshRenderProxy::DrawShadow(EMaterialDomain InDomain, EBlendMode InBl
 		auto vPrimitives = mStaticMesh->GetPrimitive(i);
 		if (!vPrimitives.empty())
 		{
-			InProgram->SetUniform(UL_ModelMat, mModelMat);
+			if (!bUseProgramOverride)
+			{
+				RenderCmd::PrepareMaterial(pMat.get());
+				pMat->GetProgram()->Bind();
+				pMat->GetProgram()->SetUniform(UL_ModelMat, mModelMat);
+				pMat->SyncUniform();
+			}
+			else
+			{
+				InProgram->SetUniform(UL_ModelMat, mModelMat);
+			}
+
 			for (auto& pPrimitive : vPrimitives)
 			{
 				RenderCmd::DrawPrimitive(pPrimitive);
+			}
+
+			if (!bUseProgramOverride)
+			{
+				pMat->GetProgram()->Unbind();
 			}
 		}
 	}

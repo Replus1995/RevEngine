@@ -13,8 +13,7 @@ public:
 	~StaticMeshRenderProxy();
 
 	void Prepare(const Ref<StaticMesh>& mesh, const Math::FMatrix4& transform);
-	void DrawColored(EMaterialDomain InDomain, EBlendMode InBlend);
-	void DrawShadow(EMaterialDomain InDomain, EBlendMode InBlend, const Ref<FRHIShaderProgram>& InProgram);
+	void DrawPrimitives(EMaterialDomain InDomain, EBlendMode InBlend, const Ref<FRHIShaderProgram>& InProgram = nullptr);
 
 private:
 	Ref<StaticMesh> mStaticMesh;

@@ -60,7 +60,7 @@ void SceneRenderProxy::DrawMeshes(EMaterialDomain InDomain, EBlendMode InBlend)
 {
 	for (StaticMeshRenderProxy& proxy : mStaticMeshProxies)
 	{
-		proxy.DrawColored(InDomain, InBlend);
+		proxy.DrawPrimitives(InDomain, InBlend);
 	}
 }
 
