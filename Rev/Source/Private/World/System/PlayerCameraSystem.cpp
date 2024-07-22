@@ -30,7 +30,7 @@ void PlayerCameraSystem::OnDestroy()
 {
 }
 
-void PlayerCameraSystem::GetCameraMatrix(Math::FMatrix4& projMat, Math::FMatrix4& viewMat) const
+void PlayerCameraSystem::FillCameraUniform(FCameraUniform& OutUniform) const
 {
 	if (mCamEntity)
 	{
@@ -41,15 +41,17 @@ void PlayerCameraSystem::GetCameraMatrix(Math::FMatrix4& projMat, Math::FMatrix4
 			float asp = float(window->GetWidth()) / float(window->GetHeight());
 			cameraComp.Camera.SetAspectRatio(asp);
 		}
-		projMat = cameraComp.Camera.GetProjectionMatrix();
-		viewMat = transformComp.GetMatrix().Inverse();
+		OutUniform.ProjMatrix = cameraComp.Camera.GetProjectionMatrix();
+		OutUniform.ViewMatrix = transformComp.GetMatrix().Inverse();
+		OutUniform.Position = Math::FVector4(transformComp.Location(), 1.0f);
 	}
 	else
 	{
 		auto window = Application::GetApp().GetWindow();
 		float asp = float(window->GetWidth()) / float(window->GetHeight());
-		projMat = Math::FMatrix4::Perspective(Math::Radians(45.0f), asp, 0.01f, 1000.0f);
-		viewMat = Math::FMatrix4(1.0f);
+		OutUniform.ProjMatrix = Math::FMatrix4::Perspective(Math::Radians(45.0f), asp, 0.01f, 1000.0f);
+		OutUniform.ViewMatrix = Math::FMatrix4(1.0f);
+		OutUniform.Position = Math::FVector4(0, 0, 0, 1);
 	}
 }
 

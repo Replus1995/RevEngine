@@ -4,7 +4,7 @@
 #include "Rev/Render/RenderCmd.h"
 #include "Rev/Render/Renderer.h"
 
-#include "../UniformLocation.hpp"
+#include "Private/Render/UniformLocation.h"
 
 namespace Rev
 {
@@ -39,13 +39,13 @@ void StaticMeshRenderProxy::DrawPrimitives(EMaterialDomain InDomain, EBlendMode 
 			{
 				RenderCmd::PrepareMaterial(pMat.get());
 				pMat->GetProgram()->Bind();
-				pMat->GetProgram()->SetUniform(UL_ModelMat, mModelMat);
 				pMat->SyncUniform();
+				//pMat->GetProgram()->SetUniform(UL_ModelMat, mModelMat);
 			}
-			else
+			/*else
 			{
 				InProgram->SetUniform(UL_ModelMat, mModelMat);
-			}
+			}*/
 
 			for (auto& pPrimitive : vPrimitives)
 			{

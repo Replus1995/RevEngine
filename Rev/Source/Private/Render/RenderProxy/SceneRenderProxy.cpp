@@ -5,18 +5,20 @@
 #include "Rev/Render/Renderer.h"
 #include "Rev/Render/RHI/RHIResourceFactory.h"
 
-#include "../UniformLocation.hpp"
+#include "Private/Render/UniformLocation.h"
 
 namespace Rev
 {
 void SceneRenderProxy::Init()
 {
-	mSceneUB = FRHIResourceFactory::CreateUniformBuffer(sizeof(SceneUniformData), UBB_Scene);
+	mCameraUB = FRHIResourceFactory::CreateUniformBuffer(sizeof(FCameraUniform), UBB_Camera);
+	mModelUB = FRHIResourceFactory::CreateUniformBuffer(sizeof(FModelUniform), UBB_Model);
 }
 
 void SceneRenderProxy::Release()
 {
-	mSceneUB.reset();
+	mCameraUB.reset();
+	mModelUB.reset();
 }
 
 void SceneRenderProxy::Prepare(const Ref<Scene>& scene)
@@ -28,7 +30,7 @@ void SceneRenderProxy::Prepare(const Ref<Scene>& scene)
 		PlayerCameraSystem* pSystem = scene->GetSystem<PlayerCameraSystem>();
 		if (pSystem)
 		{
-			pSystem->GetCameraMatrix(mSceneData.ProjMatrix, mSceneData.ViewMatrix);
+			pSystem->FillCameraUniform(mCameraData);
 		}
 	}
 	{
@@ -51,7 +53,7 @@ void SceneRenderProxy::DrawScene()
 	RenderCmd::SetClearColor(Renderer::sClearColor);
 	RenderCmd::Clear();
 
-	mSceneUB->UpdateData(&mSceneData, sizeof(SceneUniformData));
+	mCameraUB->UpdateData(&mCameraData, sizeof(FCameraUniform));
 
 	DrawMeshes(EMaterialDomain::MD_Surface, BM_Opaque);
 }
@@ -60,6 +62,7 @@ void SceneRenderProxy::DrawMeshes(EMaterialDomain InDomain, EBlendMode InBlend)
 {
 	for (StaticMeshRenderProxy& proxy : mStaticMeshProxies)
 	{
+		mModelUB->UpdateData(&proxy.GetMatrix(), sizeof(FModelUniform));
 		proxy.DrawPrimitives(InDomain, InBlend);
 	}
 }

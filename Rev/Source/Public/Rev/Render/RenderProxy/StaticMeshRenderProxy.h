@@ -14,7 +14,7 @@ public:
 
 	void Prepare(const Ref<StaticMesh>& mesh, const Math::FMatrix4& transform);
 	void DrawPrimitives(EMaterialDomain InDomain, EBlendMode InBlend, const Ref<FRHIShaderProgram>& InProgram = nullptr);
-
+	const Math::FMatrix4& GetMatrix() const { return mModelMat; }
 private:
 	Ref<StaticMesh> mStaticMesh;
 	Math::FMatrix4 mModelMat;

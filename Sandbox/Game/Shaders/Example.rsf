@@ -4,14 +4,13 @@
 #extension GL_KHR_vulkan_glsl : enable
 #extension GL_GOOGLE_include_directive : enable
 
-#include "/Engine/Shaders/GlobalInclude.rsh"
+#include "/Engine/Shaders/Global.rsh"
 
 layout(location = 0) in vec3 a_Position;
-layout(location = 0) uniform mat4 u_Transform;
 
 void main()
 {
-	gl_Position = SceneUB.u_ProjMat * SceneUB.u_ViewMat * u_Transform * vec4(a_Position, 1.0);
+	gl_Position = ub_Camera.ProjMat * ub_Camera.ViewMat * ub_Model.ModelMat * vec4(a_Position, 1.0);
 }
 
 #kind pixel

@@ -1,4 +1,5 @@
 #pragma once
+#include "Rev/Core/Base.h"
 
 namespace Rev
 {
@@ -29,8 +30,9 @@ constexpr ULType UL_EmissiveTexture				= UL_PBR_START + 10;
 
 //Uniform Buffer Binding
 using UBBType = uint16;
-constexpr UBBType UBB_Scene = 0;
-constexpr UBBType UBB_Shadow = 1;
+constexpr UBBType UBB_Camera = 0;
+constexpr UBBType UBB_Model = 1;
+constexpr UBBType UBB_Shadow = 2;
 
 }
 

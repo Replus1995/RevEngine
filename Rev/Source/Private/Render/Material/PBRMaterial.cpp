@@ -3,7 +3,7 @@
 #include "Rev/Render/RHI/RHITexture.h"
 #include "Rev/Asset/AssetLibrary.h"
 
-#include "../UniformLocation.hpp"
+#include "Private/Render/UniformLocation.h"
 
 namespace Rev
 {

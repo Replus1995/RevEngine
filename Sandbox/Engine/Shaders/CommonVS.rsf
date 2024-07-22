@@ -4,17 +4,14 @@
 #extension GL_KHR_vulkan_glsl : enable
 #extension GL_GOOGLE_include_directive : enable
 
+#include "/Engine/Shaders/Global.rsh"
+
 layout(location = 0) in vec3 a_Position;
 layout(location = 1) in vec3 a_Normal;
 layout(location = 2) in vec4 a_Tangent;
 layout(location = 3) in vec2 a_TexCoord0;
 layout(location = 4) in vec4 a_Color;
 
-layout(std140, binding = 0) uniform SceneData
-{
-    mat4 u_ProjMat;
-	mat4 u_ViewMat;
-};
 layout(location = 0) uniform mat4 u_ModelMat;
 
 out Vertex
@@ -43,6 +40,6 @@ void main(void)
     vec4 wPositon = (u_ModelMat * vec4(a_Position, 1.0));
     OUT.WorldPos = wPositon.xyz;
 
-    gl_Position = (u_ProjMat * u_ViewMat) * wPositon;
+    gl_Position = ub_Camera.ProjMat * ub_Camera.ViewMat * wPositon;
 
 }

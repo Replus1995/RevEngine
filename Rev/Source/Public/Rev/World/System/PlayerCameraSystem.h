@@ -1,7 +1,8 @@
 #pragma once
 #include "Rev/World/System/System.h"
-#include "Rev/Render/Camera.h"
 #include "Rev/World/Entity.h"
+#include "Rev/Render/Camera.h"
+#include "Rev/Render/UniformData.h"
 
 namespace Rev
 {
@@ -14,7 +15,7 @@ public:
 	virtual void OnUpdate(float dt) override;
 	virtual void OnDestroy() override;
 
-	void GetCameraMatrix(Math::FMatrix4& projMat, Math::FMatrix4& viewMat) const;
+	void FillCameraUniform(FCameraUniform& OutUniform) const;
 	bool SetPlayerCamera(Entity e);
 	void SetPlayerCameraController(const Ref<CameraController>& c);
 	
