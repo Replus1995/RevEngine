@@ -1,0 +1,31 @@
+#kind pixel
+#version 430 core
+
+layout(location = 0) uniform sampler2D s_ColorTex;
+layout(location = 1) uniform sampler2D s_DiffuseTex;
+layout(location = 2) uniform sampler2D s_SpecularTex;
+layout(location = 3) uniform sampler2D s_EmissiveTex;
+
+in Vertex
+{
+    vec2 TexCoord0;
+} IN;
+
+layout(location = 0) out vec4 o_Color;
+
+void main(void)
+{
+    vec3 color = texture(s_ColorTex, IN.TexCoord0).xyz;
+    vec4 diffuse = texture(s_DiffuseTex, IN.texCoord);
+    vec3 specular = texture(s_SpecularTex, IN.texCoord).xyz;
+    vec3 emissive = texture(s_EmissiveTex, IN.texCoord).xyz;
+    //vec3 emissive = pow(texture(s_EmissiveTex, IN.texCoord).rgb, vec3(2.2));
+
+    fragColour.xyz = vec3(0.1) * color * diffuse.a; // Ambient
+    fragColour.xyz += color * diffuse.rgb; //Diffuse
+    fragColour.xyz += specular; // Specular
+    fragColour.xyz += emissive; // Emissive
+    fragColour.xyz = pow(fragColour.xyz, vec3(1.0/2.2)); //Gamma Correction
+
+    fragColour.a = 1.0;
+}

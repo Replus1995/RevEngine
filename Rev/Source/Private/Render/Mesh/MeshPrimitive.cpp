@@ -3,35 +3,35 @@
 namespace Rev
 {
 
-MeshPrimitive::MeshPrimitive()
+FMeshPrimitive::FMeshPrimitive()
 	: MaterialIndex(0)
 	, VertexData(nullptr)
-	, DrawMode(EMeshDrawMode::TRIANGLES)
+	, DrawMode(EDrawMode::DM_Triangles)
 {
 }
 
-MeshPrimitive::MeshPrimitive(uint32 InMaterialIndex, const Ref<FRHIVertexArray>& InVertexData, EMeshDrawMode InDrawMode)
+FMeshPrimitive::FMeshPrimitive(uint32 InMaterialIndex, const Ref<FRHIVertexArray>& InVertexData, EDrawMode InDrawMode)
 	: MaterialIndex(InMaterialIndex)
 	, VertexData(InVertexData)
 	, DrawMode(InDrawMode)
 {
 }
 
-MeshPrimitive::MeshPrimitive(const MeshPrimitive& InPrimitive)
+FMeshPrimitive::FMeshPrimitive(const FMeshPrimitive& InPrimitive)
 	: MaterialIndex(InPrimitive.MaterialIndex)
 	, VertexData(InPrimitive.VertexData)
 	, DrawMode(InPrimitive.DrawMode)
 {
 }
 
-MeshPrimitive::MeshPrimitive(MeshPrimitive&& InPrimitive) noexcept
+FMeshPrimitive::FMeshPrimitive(FMeshPrimitive&& InPrimitive) noexcept
 	: MaterialIndex(InPrimitive.MaterialIndex)
 	, VertexData(std::move(InPrimitive.VertexData))
 	, DrawMode(InPrimitive.DrawMode)
 {
 }
 
-MeshPrimitive& MeshPrimitive::operator=(const MeshPrimitive& InPrimitive)
+FMeshPrimitive& FMeshPrimitive::operator=(const FMeshPrimitive& InPrimitive)
 {
 	MaterialIndex = InPrimitive.MaterialIndex;
 	VertexData = InPrimitive.VertexData;
@@ -39,7 +39,7 @@ MeshPrimitive& MeshPrimitive::operator=(const MeshPrimitive& InPrimitive)
 	return *this;
 }
 
-MeshPrimitive& MeshPrimitive::operator=(MeshPrimitive&& InPrimitive) noexcept
+FMeshPrimitive& FMeshPrimitive::operator=(FMeshPrimitive&& InPrimitive) noexcept
 {
 	MaterialIndex = InPrimitive.MaterialIndex;
 	VertexData = std::move(InPrimitive.VertexData);
@@ -47,7 +47,7 @@ MeshPrimitive& MeshPrimitive::operator=(MeshPrimitive&& InPrimitive) noexcept
 	return *this;
 }
 
-bool MeshPrimitive::Valid() const
+bool FMeshPrimitive::Valid() const
 {
 	return VertexData != nullptr;
 }

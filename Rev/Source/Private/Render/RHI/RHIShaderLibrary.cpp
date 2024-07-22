@@ -11,7 +11,7 @@ namespace Rev
 {
 
 static FRHIShaderLibrary* sRHIShaderLibrary_Inst = nullptr;
-static constexpr std::string_view sRHIShaderExtension = ".glsl";
+static constexpr std::string_view sRHIShaderExtension = ".rsf";
 
 void FRHIShaderLibrary::CreateInstance()
 {

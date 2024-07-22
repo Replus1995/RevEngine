@@ -11,7 +11,7 @@ public:
 	FSurfacePass();
 	virtual ~FSurfacePass();
 
-	virtual void BeginPass(uint32 InWidth, uint32 InHeight) override;
+	virtual void BeginPass() override;
 	virtual void EndPass() override;
 
 protected:

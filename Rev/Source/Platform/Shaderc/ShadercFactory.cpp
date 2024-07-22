@@ -12,6 +12,55 @@ namespace fs = std::filesystem;
 namespace Rev
 {
 
+class ShaderIncluder : public shaderc::CompileOptions::IncluderInterface
+{
+public:
+	virtual shaderc_include_result* GetInclude(
+		const char* requested_source,
+		shaderc_include_type type,
+		const char* requesting_source,
+		size_t include_depth
+	) override;
+	void ReleaseInclude(shaderc_include_result* data) override;
+
+	struct HeaderContainer
+	{
+		std::string Name;
+		FBuffer Content;
+	};
+};
+
+shaderc_include_result* ShaderIncluder::GetInclude(
+	const char* requested_source,
+	shaderc_include_type type,
+	const char* requesting_source,
+	size_t include_depth
+)
+{
+	std::string HeaderPath(requested_source);
+	FBuffer HeaderContent = FFileSystem::LoadBinaryFile(FPath(HeaderPath));
+	RE_CORE_ASSERT(!HeaderContent.Empty(), "ShaderIncluder::GetInclude header file load failed.");
+
+	auto Container = new HeaderContainer;
+	Container->Name = std::move(HeaderPath);
+	Container->Content = std::move(HeaderContent);
+
+	auto Result = new shaderc_include_result;
+	Result->user_data = Container;
+	Result->source_name = Container->Name.data();
+	Result->source_name_length = Container->Name.length();
+	Result->content = Container->Content.DataAs<char>();
+	Result->content_length = Container->Content.Size();
+
+	return Result;
+}
+
+void ShaderIncluder::ReleaseInclude(shaderc_include_result* data)
+{
+	delete static_cast<HeaderContainer*>(data->user_data);
+	delete data;
+}
+
 static shaderc_shader_kind ShaderStageToShadercKind(ERHIShaderStage InStage)
 {
 	switch (InStage)
@@ -41,6 +90,7 @@ static void InitCompileOptions(shaderc::CompileOptions& options)
 		RE_CORE_ASSERT(false, "Unknow Render API")
 			break;
 	}
+	options.SetIncluder(CreateScope<ShaderIncluder>());
 
 	constexpr bool bOptimize = false;
 	if (bOptimize)

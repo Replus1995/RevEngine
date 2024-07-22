@@ -1,11 +1,13 @@
 #pragma once
 #include "Rev/Core/Base.h"
 #include "Rev/Math/Maths.h"
+#include "Rev/Render/RenderCore.h"
 
 namespace Rev
 {
 class Material;
-class MeshPrimitive;
+class FMeshPrimitive;
+class FRHIVertexArray;
 class REV_API RenderCmd
 {
 public:
@@ -17,7 +19,8 @@ public:
 	static void Clear();
 
 	static void PrepareMaterial(const Material* InMaterial);
-	static void DrawPrimitive(const MeshPrimitive* InPrimitive);
+	static void DrawPrimitive(const FMeshPrimitive* InPrimitive);
+	static void DrawVertices(const Ref<FRHIVertexArray>& InVertexArray, EDrawMode InDrawMode);
 	//static void DrawLines(const Ref<VertexArray>& vertexArray, uint32_t vertexCount, float lineWidth);
 };
 }

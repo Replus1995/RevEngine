@@ -90,26 +90,26 @@ uint32 FGLTFUtils::GetComponentSize(int InComponentType)
 	}
 }
 
-EMeshDrawMode FGLTFUtils::TranslateDrawMode(int InDrawMode)
+EDrawMode FGLTFUtils::TranslateDrawMode(int InDrawMode)
 {
 	switch (InDrawMode)
 	{
 	case TINYGLTF_MODE_POINTS:
-		return EMeshDrawMode::POINTS;
+		return DM_Points;
 	case TINYGLTF_MODE_LINE:
-		return EMeshDrawMode::LINE;
+		return DM_Line;
 	case TINYGLTF_MODE_LINE_LOOP:
-		return EMeshDrawMode::LINE_LOOP;
+		return DM_LineLoop;
 	case TINYGLTF_MODE_LINE_STRIP:
-		return EMeshDrawMode::LINE_STRIP;
+		return DM_LineStrip;
 	case TINYGLTF_MODE_TRIANGLES:
-		return EMeshDrawMode::TRIANGLES;
+		return DM_Triangles;
 	case TINYGLTF_MODE_TRIANGLE_STRIP:
-		return EMeshDrawMode::TRIANGLE_STRIP;
+		return DM_TriangleStrip;
 	case TINYGLTF_MODE_TRIANGLE_FAN:
-		return EMeshDrawMode::TRIANGLE_FAN;
+		return DM_TriangleFan;
 	default:
-		return EMeshDrawMode::TRIANGLES;
+		return DM_Triangles;
 	}
 }
 

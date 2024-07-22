@@ -18,7 +18,7 @@ void StaticMesh::SetMaterials(std::vector<Ref<Material>>&& pMaterials)
 	mMaterials = std::move(pMaterials);
 }
 
-void StaticMesh::SetPrimitives(std::vector<MeshPrimitive>&& pPrimitives)
+void StaticMesh::SetPrimitives(std::vector<FMeshPrimitive>&& pPrimitives)
 {
 	mPrimitives = std::move(pPrimitives);
 }
@@ -45,9 +45,9 @@ uint32 StaticMesh::GetMaterialCount() const
 	return (uint32)mMaterials.size();
 }
 
-std::vector<const MeshPrimitive*> StaticMesh::GetPrimitive(uint32 MaterialIndex) const
+std::vector<const FMeshPrimitive*> StaticMesh::GetPrimitive(uint32 MaterialIndex) const
 {
-	std::vector<const MeshPrimitive*> outArr;
+	std::vector<const FMeshPrimitive*> outArr;
 	for (auto& RefPrim : mPrimitives)
 	{
 		if (RefPrim.MaterialIndex == MaterialIndex)

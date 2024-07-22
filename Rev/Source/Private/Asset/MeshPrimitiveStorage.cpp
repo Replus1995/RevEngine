@@ -30,7 +30,7 @@ FMeshPrimitiveStorage::FMeshPrimitiveStorage(FMeshPrimitiveStorage&& InStorage) 
 	IndexData = std::move(InStorage.IndexData);
 }
 
-MeshPrimitive FMeshPrimitiveStorage::CreateMeshPrimitive()
+FMeshPrimitive FMeshPrimitiveStorage::CreateVertexData()
 {
 	if(VertexCount == 0 || IndexCount == 0)
 		return {};
@@ -39,7 +39,7 @@ MeshPrimitive FMeshPrimitiveStorage::CreateMeshPrimitive()
 	if(TangentData.Empty())
 		CalculateTangents();
 
-	Ref<FRHIVertexArray> VertexArr = FRHIResourceFactory::CreateVertexArray();
+	Ref<FRHIVertexArray> VertexArr = FRHIResourceFactory::CreateVertexData();
 	if (!PositonData.Empty())
 	{
 		Ref<FRHIVertexBuffer> PositionBuffer = FRHIResourceFactory::CreateVertexBuffer(PositonData.DataAs<float>(), PositonData.Size());
@@ -84,8 +84,8 @@ MeshPrimitive FMeshPrimitiveStorage::CreateMeshPrimitive()
 	Ref<FRHIIndexBuffer> IndexBuffer = FRHIResourceFactory::CreateIndexBuffer(IndexData.Data(), IndexStride, IndexCount);
 	VertexArr->SetIndexBuffer(IndexBuffer);
 
-	MeshPrimitive Result;
-	Result.DrawMode = EMeshDrawMode::TRIANGLES;
+	FMeshPrimitive Result;
+	Result.DrawMode = EDrawMode::DM_Triangles;
 	Result.MaterialIndex = MaterialIndex;
 	Result.VertexData = VertexArr;
 	return Result;

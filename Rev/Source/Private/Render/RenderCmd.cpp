@@ -48,9 +48,16 @@ void RenderCmd::PrepareMaterial(const Material* InMaterial)
 	sContext->PrepareMaterial(InMaterial);
 }
 
-void RenderCmd::DrawPrimitive(const MeshPrimitive* InPrimitive)
+void RenderCmd::DrawPrimitive(const FMeshPrimitive* InPrimitive)
 {
-	sContext->DrawPrimitive(InPrimitive);
+	if(!InPrimitive)
+		return;
+	sContext->DrawVertices(InPrimitive->VertexData, InPrimitive->DrawMode);
+}
+
+void RenderCmd::DrawVertices(const Ref<FRHIVertexArray>& InVertexArray, EDrawMode InDrawMode)
+{
+	sContext->DrawVertices(InVertexArray, InDrawMode);
 }
 
 }

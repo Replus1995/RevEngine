@@ -15,10 +15,10 @@ public:
 	virtual void Clear() override;
 
 	virtual void PrepareMaterial(const Material* InMaterial) override;
-	virtual void DrawPrimitive(const MeshPrimitive* InPrimitive) override;
+	virtual void DrawVertices(const Ref<FRHIVertexArray>& InVertexArray, EDrawMode InDrawMode) override;
 
 private:
-	GLenum TranslateDrawMode(EMeshDrawMode InDrawMode);
+	GLenum TranslateDrawMode(EDrawMode InDrawMode);
 	GLenum TranslateIndexType(uint32 InStride);
 };
 

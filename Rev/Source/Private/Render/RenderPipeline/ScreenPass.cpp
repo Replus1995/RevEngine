@@ -1,5 +1,7 @@
 #include "Rev/Render/RenderPipeline/ScreenPass.h"
+#include "Rev/Render/RenderPipeline/RenderPipeline.h"
 #include "Rev/Render/RHI/RHIResourceFactory.h"
+
 
 namespace Rev
 {
@@ -14,9 +16,9 @@ FScreenPass::~FScreenPass()
 {
 }
 
-void FScreenPass::BeginPass(uint32 InWidth, uint32 InHeight)
+void FScreenPass::BeginPass()
 {
-	PrepareTarget(InWidth, InHeight);
+	PrepareTarget();
 	if (mTarget)
 	{
 		mTarget->Bind();
@@ -31,8 +33,12 @@ void FScreenPass::EndPass()
 	}
 }
 
-void FScreenPass::PrepareTarget(uint32 InWidth, uint32 InHeight)
+void FScreenPass::PrepareTarget()
 {
+	if(!FRenderPipeline::GetCurrentPipeline())
+		return;
+	uint32 InWidth = FRenderPipeline::GetCurrentPipeline()->GetWidth();
+	uint32 InHeight = FRenderPipeline::GetCurrentPipeline()->GetHeight();
 	RE_CORE_ASSERT(InWidth > 0 && InHeight > 0);
 
 	if (mOffScreen)
@@ -49,7 +55,7 @@ void FScreenPass::PrepareTarget(uint32 InWidth, uint32 InHeight)
 
 		if (bNeedCreateTarget)
 		{
-			mTarget = FRHIResourceFactory::CreateRenderTarget(MakeTargetDesc());
+			mTarget = FRHIResourceFactory::CreateRenderTarget(MakeTargetDesc(InWidth, InHeight));
 		}
 	}
 }

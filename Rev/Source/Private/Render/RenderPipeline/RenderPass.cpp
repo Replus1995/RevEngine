@@ -1,4 +1,4 @@
-#include "Rev/Render/RHI/RHIRenderPass.h"
+#include "Rev/Render/RenderPipeline/RenderPass.h"
 
 namespace Rev
 {

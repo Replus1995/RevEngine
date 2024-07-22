@@ -13,6 +13,18 @@ enum class ERenderAPI : uint8
 };
 ERenderAPI GetRenderAPI();
 
+enum EDrawMode : uint8
+{
+	DM_Unknown = 0,
+	DM_Points,
+	DM_Line,
+	DM_LineLoop,
+	DM_LineStrip,
+	DM_Triangles,
+	DM_TriangleStrip,
+	DM_TriangleFan
+};
+
 enum EBlendMode : uint8
 {
     BM_Opaque = 1,

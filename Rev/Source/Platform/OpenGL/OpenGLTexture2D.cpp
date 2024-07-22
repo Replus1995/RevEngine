@@ -108,6 +108,12 @@ void FOpenGLTexture2D::ClearData()
 		glClearTexImage(mHandle, 0, mFormatData.InternalFormat, mFormatData.DataType, (const void*)&ClearColor);
 		break;
 	}
+	case PF_ShadowDepth:
+	{
+		float Depth = mDesc.ClearColor.Depth;
+		glClearTexImage(mHandle, 0, mFormatData.InternalFormat, mFormatData.DataType, (const void*)&Depth);
+		break;
+	}
 	default:
 		break;
 	}

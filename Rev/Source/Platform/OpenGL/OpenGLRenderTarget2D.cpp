@@ -92,7 +92,7 @@ void FOpenGLRenderTarget2D::CreateResource()
 		mColorTextures.emplace_back(std::move(ColorTexture));
 	}
 
-	if (mDesc.DepthStencilTarget.Format == PF_DepthStencil)
+	if (mDesc.DepthStencilTarget.Format == PF_DepthStencil || mDesc.DepthStencilTarget.Format == PF_ShadowDepth)
 	{
 		const FDepthStencilTargetDesc& SrcDesc = mDesc.DepthStencilTarget;
 		FTextureDesc DstDesc = FTextureDesc::MakeTexture2D(mDesc.Width, mDesc.Height, SrcDesc.Format, false, { SrcDesc.ClearDepth, SrcDesc.ClearStencil }, 1, mDesc.NumSamples);

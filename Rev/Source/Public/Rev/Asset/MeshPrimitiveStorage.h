@@ -11,7 +11,7 @@ struct FMeshPrimitiveStorage
 {
 public:
 	int MaterialIndex = 0;
-	EMeshDrawMode DrawMode = EMeshDrawMode::TRIANGLES;
+	EDrawMode DrawMode = EDrawMode::DM_Triangles;
 
 	uint32 VertexCount = 0;
 	FBuffer PositonData;	//size = VertexCount * 3 * sizeof(float)
@@ -31,7 +31,7 @@ public:
 	FMeshPrimitiveStorage(const FMeshPrimitiveStorage&) = delete;
 	FMeshPrimitiveStorage(FMeshPrimitiveStorage&& InStorage) noexcept;
 
-	MeshPrimitive CreateMeshPrimitive();
+	FMeshPrimitive CreateVertexData();
 protected:
 	uint32 NumTriangles() const;
 	bool GetVertexIndices(uint32 TriIndex, uint32& A, uint32& B, uint32& C) const;

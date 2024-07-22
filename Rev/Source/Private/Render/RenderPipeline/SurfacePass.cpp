@@ -1,6 +1,5 @@
 #include "Rev/Render/RenderPipeline/SurfacePass.h"
 #include "Rev/Render/RHI/RHIResourceFactory.h"
-#include "Rev/Render/RHI/RHIRenderTarget.h"
 
 #include "Rev/Core/Assert.h"
 
@@ -16,9 +15,9 @@ FSurfacePass::~FSurfacePass()
 {
 }
 
-void FSurfacePass::BeginPass(uint32 InWidth, uint32 InHeight)
+void FSurfacePass::BeginPass()
 {
-	FScreenPass::BeginPass(InWidth, InHeight);
+	FScreenPass::BeginPass();
 }
 
 void FSurfacePass::EndPass()

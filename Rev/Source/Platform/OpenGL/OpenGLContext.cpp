@@ -115,34 +115,34 @@ void OpenGLContext::PrepareMaterial(const Material* InMaterial)
 	}
 }
 
-void OpenGLContext::DrawPrimitive(const MeshPrimitive* InPrimitive)
+void OpenGLContext::DrawVertices(const Ref<FRHIVertexArray>& InVertexArray, EDrawMode InDrawMode)
 {
-	if(!InPrimitive)
+	if(!InVertexArray)
 		return;
-	GLenum DrawMode = TranslateDrawMode(InPrimitive->DrawMode);
-	uint32 IndexCount = InPrimitive->VertexData->GetIndexBuffer()->GetCount();
-	GLenum IndexType = TranslateIndexType(InPrimitive->VertexData->GetIndexBuffer()->GetStride());
-	InPrimitive->VertexData->Bind();
+	GLenum DrawMode = TranslateDrawMode(InDrawMode);
+	uint32 IndexCount = InVertexArray->GetIndexBuffer()->GetCount();
+	GLenum IndexType = TranslateIndexType(InVertexArray->GetIndexBuffer()->GetStride());
+	InVertexArray->Bind();
 	glDrawElements(DrawMode, IndexCount, IndexType, nullptr);
 }
 
-GLenum OpenGLContext::TranslateDrawMode(EMeshDrawMode InDrawMode)
+GLenum OpenGLContext::TranslateDrawMode(EDrawMode InDrawMode)
 {
 	switch (InDrawMode)
 	{
-	case Rev::EMeshDrawMode::POINTS:
+	case Rev::DM_Points:
 		return GL_POINTS;
-	case Rev::EMeshDrawMode::LINE:
+	case Rev::DM_Line:
 		return GL_LINE;
-	case Rev::EMeshDrawMode::LINE_LOOP:
+	case Rev::DM_LineLoop:
 		return GL_LINE_LOOP;
-	case Rev::EMeshDrawMode::LINE_STRIP:
+	case Rev::DM_LineStrip:
 		return GL_LINE_STRIP;
-	case Rev::EMeshDrawMode::TRIANGLES:
+	case Rev::DM_Triangles:
 		return GL_TRIANGLES;
-	case Rev::EMeshDrawMode::TRIANGLE_STRIP:
+	case Rev::DM_TriangleStrip:
 		return GL_TRIANGLE_STRIP;
-	case Rev::EMeshDrawMode::TRIANGLE_FAN:
+	case Rev::DM_TriangleFan:
 		return GL_TRIANGLE_FAN;
 	default:
 		break;

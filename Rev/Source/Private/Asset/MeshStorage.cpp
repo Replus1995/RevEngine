@@ -8,7 +8,7 @@ namespace Rev
 Ref<StaticMesh> FStaticMeshStorage::CreateStaticMesh()
 {
 	std::vector<Ref<Material>> vMaterials;
-	std::vector<MeshPrimitive> vPrimitives;
+	std::vector<FMeshPrimitive> vPrimitives;
 
 	vMaterials.reserve(Materials.size());
 	for (auto& Storage : Materials)
@@ -19,7 +19,7 @@ Ref<StaticMesh> FStaticMeshStorage::CreateStaticMesh()
 	vPrimitives.reserve(Primitives.size());
 	for (auto& Storage : Primitives)
 	{
-		vPrimitives.emplace_back(Storage->CreateMeshPrimitive());
+		vPrimitives.emplace_back(Storage->CreateVertexData());
 	}
 
 	Ref<StaticMesh> OutMesh = CreateRef<StaticMesh>();

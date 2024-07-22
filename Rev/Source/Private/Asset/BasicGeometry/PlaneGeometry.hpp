@@ -9,10 +9,10 @@ namespace Rev
 {
 
 static constexpr float sPlaneVertices[] = {
-    -0.5, -0.5, 0.0,
-    -0.5, 0.5, 0.0,
-    0.5, 0.5, 0.0,
-    0.5, -0.5, 0.0
+    -0.5, -0.5, 0.0, 0.0, 0.0,
+    -0.5, +0.5, 0.0, 0.0, 1.0,
+    +0.5, +0.5, 0.0, 1.0, 1.0,
+    +0.5, -0.5, 0.0, 1.0, 0.0
 };
 
 static constexpr uint32 sPlaneIndices[] = {
@@ -26,24 +26,10 @@ public:
     static Ref<StaticMesh> Create(const Ref<Material>& InMat)
     {
         std::vector<Ref<Material>> planeMatArr = { InMat };
-        std::vector<MeshPrimitive> planePrimArr;
+        std::vector<FMeshPrimitive> planePrimArr;
         {
-            constexpr uint32 planeVerticesSize = sizeof(sPlaneVertices);
-            Ref<FRHIVertexBuffer> planeVertices = FRHIResourceFactory::CreateVertexBuffer(sPlaneVertices, planeVerticesSize);
-            planeVertices->SetLayout({
-                {"Position", EVertexElementType::Float3,  0}
-                //{EShaderDataType::Float3, "a_Normal"},
-                //{EShaderDataType::Float2, "a_TexCoord"}
-                });
-
-            constexpr uint32 planeIndicesCount = sizeof(sPlaneIndices) / sizeof(uint32);
-            Ref<FRHIIndexBuffer> planeIndices = FRHIResourceFactory::CreateIndexBuffer(sPlaneIndices, sizeof(uint32), planeIndicesCount);
-
-            MeshPrimitive planeMeshPrim;
-            planeMeshPrim.VertexData = FRHIResourceFactory::CreateVertexArray();
-            planeMeshPrim.VertexData->AddVertexBuffer(planeVertices);
-            planeMeshPrim.VertexData->SetIndexBuffer(planeIndices);
-
+            FMeshPrimitive planeMeshPrim;
+            planeMeshPrim.VertexData = MakeVertexData();
             planePrimArr.emplace_back(std::move(planeMeshPrim));
         }
 
@@ -51,6 +37,24 @@ public:
         OutMesh->SetMaterials(std::move(planeMatArr));
         OutMesh->SetPrimitives(std::move(planePrimArr));
         return OutMesh;
+    }
+
+    static Ref<FRHIVertexArray> MakeVertexData()
+    {
+        constexpr uint32 planeVerticesSize = sizeof(sPlaneVertices);
+        Ref<FRHIVertexBuffer> planeVertices = FRHIResourceFactory::CreateVertexBuffer(sPlaneVertices, planeVerticesSize);
+        planeVertices->SetLayout({
+            {"Position", EVertexElementType::Float3, 0},
+            {"TexCoord", EVertexElementType::Float2, 1}
+            });
+
+        constexpr uint32 planeIndicesCount = sizeof(sPlaneIndices) / sizeof(uint32);
+        Ref<FRHIIndexBuffer> planeIndices = FRHIResourceFactory::CreateIndexBuffer(sPlaneIndices, sizeof(uint32), planeIndicesCount);
+
+        Ref<FRHIVertexArray> Result = FRHIResourceFactory::CreateVertexData();
+        Result->AddVertexBuffer(planeVertices);
+        Result->SetIndexBuffer(planeIndices);
+        return Result;
     }
 };
 

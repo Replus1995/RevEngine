@@ -1,0 +1,29 @@
+#kind vertex
+#version 450 core
+#extension GL_ARB_separate_shader_objects : enable
+#extension GL_KHR_vulkan_glsl : enable
+#extension GL_GOOGLE_include_directive : enable
+
+#include "/Engine/Shaders/GlobalInclude.rsh"
+
+layout(location = 0) in vec3 a_Position;
+layout(location = 0) uniform mat4 u_Transform;
+
+void main()
+{
+	gl_Position = SceneUB.u_ProjMat * SceneUB.u_ViewMat * u_Transform * vec4(a_Position, 1.0);
+}
+
+#kind pixel
+#version 450 core
+#extension GL_ARB_separate_shader_objects : enable
+#extension GL_KHR_vulkan_glsl : enable
+#extension GL_GOOGLE_include_directive : enable
+
+layout(location = 1) uniform vec4 u_Color;
+layout(location = 0) out vec4 color;
+
+void main()
+{
+	color = u_Color;
+}

@@ -2,11 +2,11 @@
 #include <memory>
 #include "Rev/Core/Base.h"
 #include "Rev/Math/Maths.h"
+#include "Rev/Render/RenderCore.h"
 
 namespace Rev
 {
 class Material;
-class MeshPrimitive;
 class FRHIVertexArray;
 class FRHIContext
 {
@@ -19,7 +19,7 @@ public:
 	virtual void Clear() = 0;
 
 	virtual void PrepareMaterial(const Material* InMaterial) = 0;
-	virtual void DrawPrimitive(const MeshPrimitive* InPrimitive) = 0;
+	virtual void DrawVertices(const Ref<FRHIVertexArray>& InVertexArray, EDrawMode InDrawMode) = 0;
 
 	static std::unique_ptr<FRHIContext> Create();
 };

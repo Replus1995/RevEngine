@@ -15,7 +15,7 @@ class FGLTFUtils
 {
 public:
 	static uint32 GetComponentSize(int InComponentType);
-	static EMeshDrawMode TranslateDrawMode(int InDrawMode);
+	static EDrawMode TranslateDrawMode(int InDrawMode);
 	static EPixelFormat TranslateImageFormat(const tinygltf::Image& InImage);
 	static bool TranslateImageSRGB(const tinygltf::Image& InImage);
 	static FSamplerDesc TranslateSampler(const tinygltf::Sampler& InSampler);

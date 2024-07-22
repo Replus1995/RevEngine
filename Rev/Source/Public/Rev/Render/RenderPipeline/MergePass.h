@@ -1,16 +1,20 @@
 #pragma once
 #include "Rev/Core/Base.h"
-#include "Rev/Render/RHI/RHIRenderPass.h"
+#include "Rev/Render/RenderPipeline/PostPass.h"
 
 namespace Rev
 {
-
-class FMergePass : public FRHIRenderPass
+class FRHIShaderProgram;
+class FMergePass : public FPostPass
 {
 public:
 	FMergePass();
 	virtual ~FMergePass();
+	virtual void BeginPass() override;
+	virtual void EndPass() override;
 
+private:
+	Ref<FRHIShaderProgram> mMergeProgram;
 };
 
 }
