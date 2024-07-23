@@ -31,18 +31,31 @@ ExampleLayer::ExampleLayer()
 	//Create Sandbox Scene
 	mScene = CreateRef<Rev::Scene>();
 
-	{
-		//auto pBoxMat = CreateRef<ExampleMaterial>();
-		auto pBoxMat = CreateRef<PBRMaterial>();
+	/*{
+		auto pBoxMat = CreateRef<ExampleMaterial>();
 		pBoxMat->Compile();
-		//pBoxMat->SetColor(Math::FLinearColor(.7, .9, .8, 1));
-		pBoxMat->BaseColorFactor = Math::FLinearColor(.7, .9, .8, 1);
+		pBoxMat->SetColor(Math::FLinearColor(.7, .9, .8, 1));
 
 		auto meshEntity = mScene->CreateEntity();
 		auto& meshComp = meshEntity.AddComponent<StaticMeshComponent>();
 		meshComp.StaticMesh = FAssetLibrary::CreateBasicGeometry(EBasicGeometry::Box, pBoxMat);
 		auto& transformComp = meshEntity.GetComponent<TransformComponent>();
 		transformComp.SetLocation(Math::FVector3(0, 0.6, -5));
+	}*/
+
+	{
+		auto importRes = FAssetLibrary::ImportMesh(FPath("/Game/Assets/Models/BoxVertexColors.glb"));
+		if (!importRes.StaticMeshes.empty())
+		{
+			auto meshStorage = importRes.StaticMeshes[0];
+
+			auto meshEntity = mScene->CreateEntity();
+			auto& meshComp = meshEntity.AddComponent<StaticMeshComponent>();
+			meshComp.StaticMesh = meshStorage->CreateStaticMesh();
+			auto & transformComp = meshEntity.GetComponent<TransformComponent>();
+			transformComp.SetLocation(Math::FVector3(0, 0.6, -5));
+		}
+		
 	}
 
 	{

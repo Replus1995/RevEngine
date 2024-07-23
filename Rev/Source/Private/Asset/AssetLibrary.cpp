@@ -92,7 +92,7 @@ Ref<StaticMesh> FAssetLibrary::CreateBasicGeometry(EBasicGeometry InKind, const 
 
 FMeshImportResult FAssetLibrary::ImportMesh(const FPath& InPath)
 {
-	if (InPath.Extension() == "gltf" || InPath.Extension() == "glb")
+	if (InPath.Extension() == ".gltf" || InPath.Extension() == ".glb")
 	{
 		return FGLTFUtils::ImportModel(InPath);
 	}

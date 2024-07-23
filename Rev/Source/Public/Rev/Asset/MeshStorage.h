@@ -9,13 +9,13 @@ namespace Rev
 class StaticMesh;
 struct FTextureStorage;
 struct FMaterialStorage;
-struct FMeshStorage
+struct REV_API FMeshStorage
 {
 public:
 	std::string Name;
 };
 
-struct FStaticMeshStorage : public FMeshStorage
+struct REV_API FStaticMeshStorage : public FMeshStorage
 {
 public:
 	std::vector<Ref<FMaterialStorage>> Materials;

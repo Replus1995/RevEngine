@@ -66,8 +66,6 @@ void WriteData(std::ofstream& ofile, const std::vector<T>& values)
 
 }
 
-static const char* sShaderCachaExtension = ".shaderc_cached";
-
 const char* FShadercUtils::GetCacheDirectory()
 {
 	switch (GetRenderAPI())
@@ -88,6 +86,11 @@ void FShadercUtils::CreateCacheDirectory()
 	fs::path CacheDir(GetCacheDirectory());
 	if (!fs::exists(CacheDir))
 		fs::create_directories(CacheDir);
+}
+
+const char* FShadercUtils::GetCacheExtension()
+{
+	return ".shaderc_cached";
 }
 
 ERHIShaderStage FShadercUtils::StringToShaderStage(std::string_view InStr)
@@ -156,12 +159,12 @@ FShadercSource FShadercUtils::LoadShaderSource(const FPath& InPath)
 	return Result;
 }
 
-bool FShadercUtils::LoadShaderCompiledData(const FPath& ShaderPath, FShadercCompiledData& OutCompiledData)
+bool FShadercUtils::LoadShaderCompiledData(const std::filesystem::path& ShaderCachePath, FShadercCompiledData& OutCompiledData)
 {
-	fs::path CachedPath(GetCacheDirectory() + ShaderPath.FullPath(false) + sShaderCachaExtension);
-	if (fs::exists(CachedPath))
+	//fs::path CachedPath(GetCacheDirectory() + ShaderPath.FullPath(false) + sShaderCachaExtension);
+	if (fs::exists(ShaderCachePath))
 	{
-		std::ifstream InFile(CachedPath, std::ios::in | std::ios::binary);
+		std::ifstream InFile(ShaderCachePath, std::ios::in | std::ios::binary);
 		if (InFile.is_open())
 		{
 			Clock timer;
@@ -188,22 +191,22 @@ bool FShadercUtils::LoadShaderCompiledData(const FPath& ShaderPath, FShadercComp
 		}
 		else
 		{
-			RE_CORE_ERROR("[FShadercUtils] Open file failded '{0}'", CachedPath.string().c_str());
+			RE_CORE_ERROR("[FShadercUtils] Open file failded '{0}'", ShaderCachePath.string().c_str());
 		}
 	}
 	return false;
 }
 
-bool FShadercUtils::SaveShaderCompiledData(const FPath& ShaderPath, const FShadercCompiledData& InCompiledData)
+bool FShadercUtils::SaveShaderCompiledData(const std::filesystem::path& ShaderCachePath, const FShadercCompiledData& InCompiledData)
 {
 	CreateCacheDirectory();
 
-	fs::path CachedPath(GetCacheDirectory() + ShaderPath.FullPath(false) + sShaderCachaExtension);
-	fs::path CachedDir = CachedPath.parent_path();
+	//fs::path CachedPath(GetCacheDirectory() + ShaderPath.FullPath(false) + sShaderCachaExtension);
+	fs::path CachedDir = ShaderCachePath.parent_path();
 	if(!fs::exists(CachedDir))
 		fs::create_directories(CachedDir);
 
-	std::ofstream OutFile(CachedPath, std::ios::out | std::ios::binary);
+	std::ofstream OutFile(ShaderCachePath, std::ios::out | std::ios::binary);
 	if (OutFile.is_open())
 	{
 		for (auto&[Stage, CompiledData] : InCompiledData.CompiledDataMap)
@@ -215,7 +218,7 @@ bool FShadercUtils::SaveShaderCompiledData(const FPath& ShaderPath, const FShade
 	}
 	else
 	{
-		RE_CORE_ERROR("[FShadercUtils] Open file failded '{0}'", CachedPath.string().c_str());
+		RE_CORE_ERROR("[FShadercUtils] Open file failded '{0}'", ShaderCachePath.string().c_str());
 	}
 
 	return false;

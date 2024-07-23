@@ -28,6 +28,7 @@ Ref<Material> FPBRMaterialStorage::CreateMaterial()
 	Result->OcclusionTexture = OcclusionTexture->CreateTexture();
 	Result->EmissiveFactor = EmissiveFactor;
 	Result->EmissiveTexture = EmissiveTexture->CreateTexture();
+	Result->Compile();
 
 	mCache = Result;
 	return mCache;

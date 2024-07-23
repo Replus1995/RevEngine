@@ -122,14 +122,28 @@ void FShadercFactory::CompileShaders(const FShadercSource& InSource, FShadercCom
 
 FShadercCompiledData FShadercFactory::LoadAndCompile(const FPath& InPath)
 {
+
 	FShadercCompiledData Result;
 	Result.Name = InPath.FullPath(false);
 
-	if (!FShadercUtils::LoadShaderCompiledData(InPath, Result))
+	fs::path ShaderCachePath(FShadercUtils::GetCacheDirectory() + InPath.FullPath(false) + FShadercUtils::GetCacheExtension());
+	auto CacheWriteTime = fs::last_write_time(ShaderCachePath);
+	auto SourceWriteTime = fs::last_write_time(InPath.ToNative());
+	bool bNeedCompile = SourceWriteTime > CacheWriteTime;
+	if (!bNeedCompile)
+	{
+		bNeedCompile = !FShadercUtils::LoadShaderCompiledData(ShaderCachePath, Result);
+	}
+	else
+	{
+		RE_CORE_INFO("Shader '{0}' cache out of date.", Result.Name.c_str());
+	}
+
+	if (bNeedCompile)
 	{
 		auto ShaderSource = FShadercUtils::LoadShaderSource(InPath);
 		CompileShaders(ShaderSource, Result);
-		FShadercUtils::SaveShaderCompiledData(InPath, Result);
+		FShadercUtils::SaveShaderCompiledData(ShaderCachePath, Result);
 	}
 
 #ifdef RE_DEBUG
