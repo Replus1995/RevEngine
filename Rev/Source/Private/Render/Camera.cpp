@@ -27,21 +27,27 @@ void Camera::SetOrthographic(float size, float dnear, float dfar)
 
 void Camera::SetAspectRatio(float ratio)
 {
-	mAspectRatio = ratio;
-	RecalculateProjection();
+	if (mAspectRatio != ratio)
+	{
+		mAspectRatio = ratio;
+		RecalculateProjection();
+	}
 }
 
 void Camera::SetProjectionType(ProjectionType type)
 {
-	mProjectionType = type;
-	RecalculateProjection();
+	if (mProjectionType != type)
+	{
+		mProjectionType = type;
+		RecalculateProjection();
+	}
 }
 
 void Camera::RecalculateProjection()
 {
 	if (mProjectionType == ProjectionType::Perspective)
 	{
-		mProjection = Math::FMatrix4::Perspective(mPerspectiveFOV, mAspectRatio, mPerspectiveNear, mPerspectiveFar);
+		mProjection = Math::FMatrix4::Perspective(Math::Radians(mPerspectiveFOV), mAspectRatio, mPerspectiveNear, mPerspectiveFar);
 	}
 	else
 	{

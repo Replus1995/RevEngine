@@ -376,7 +376,7 @@ Ref<FTextureStorage> FGLTFUtils::ImportTexture(const tinygltf::Texture& InTextur
 Ref<FMaterialStorage> FGLTFUtils::ImportMaterial(const tinygltf::Material& InMaterial, const tinygltf::Model& InModel, const std::vector<Ref<FTextureStorage>>& InTextures)
 {
 	auto& pbrInfo = InMaterial.pbrMetallicRoughness;
-	Ref<FPBRMaterialStorage> Result;
+	Ref<FPBRMaterialStorage> Result = CreateRef<FPBRMaterialStorage>();
 	Result->Name = InMaterial.name;
 	
 	{
@@ -421,7 +421,7 @@ FMeshImportResult FGLTFUtils::ImportModel(const FPath& InPath, bool DumpInfo)
 	
 	std::string NativePath = InPath.ToNative();
 	bool ret = false;
-	if (InPath.Extension().compare("glb") == 0) {
+	if (InPath.Extension().compare(".glb") == 0) {
 	
 	    RE_CORE_INFO("Reading binary glTF {0}", NativePath);
 	    // assume binary glTF.

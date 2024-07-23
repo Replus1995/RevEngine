@@ -44,7 +44,7 @@ ExampleLayer::ExampleLayer()
 	}*/
 
 	{
-		auto importRes = FAssetLibrary::ImportMesh(FPath("/Game/Assets/Models/BoxVertexColors.glb"));
+		auto importRes = FAssetLibrary::ImportMesh(FPath("/Game/Assets/Models/Cube/Cube.gltf"));
 		if (!importRes.StaticMeshes.empty())
 		{
 			auto meshStorage = importRes.StaticMeshes[0];
@@ -54,6 +54,7 @@ ExampleLayer::ExampleLayer()
 			meshComp.StaticMesh = meshStorage->CreateStaticMesh();
 			auto & transformComp = meshEntity.GetComponent<TransformComponent>();
 			transformComp.SetLocation(Math::FVector3(0, 0.6, -5));
+			transformComp.SetScale(Math::FVector3(0.5, 0.5, 0.5));
 		}
 		
 	}
@@ -76,17 +77,17 @@ ExampleLayer::ExampleLayer()
 
 		auto lightEntity = mScene->CreateEntity();
 		auto& dirLightComp = lightEntity.AddComponent<DirectionalLightComponent>();
-		dirLightComp.Light.SetColor(Math::FLinearColor(0.8, 0.8, 0.3, 1));
+		dirLightComp.Light.SetColorByTemperature(6500.0f);
 		auto& transformComp = lightEntity.GetComponent<TransformComponent>();
 		transformComp.SetLocation(Math::FVector3(0, 0, 0));
-		transformComp.SetRotation(Math::FRotator(-45.0F, 0, 0));
+		transformComp.SetRotation(Math::FRotator(-60.0F, 0, 0));
 	}
-
 
 	{
 		auto camEntity = mScene->CreateEntity();
 		auto& camComp = camEntity.AddComponent<CameraComponent>();
 		camComp.AutoAspectRatio = true;
+		//camComp.Camera.SetPerspective(30.0f, 0.01f, 10000.0f);
 		auto& transformComp = camEntity.GetComponent<TransformComponent>();
 		transformComp.SetLocation(Math::FVector3(0, 2, 0));
 		transformComp.SetRotation(Math::FRotator(-30.0f, 0, 0));

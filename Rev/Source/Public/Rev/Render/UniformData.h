@@ -3,7 +3,7 @@
 #include "Rev/Math/Maths.h"
 #include "Rev/Render/RenderCore.h"
 
-#define UNIFORM_MAX_FORWARD_LIGHTS 32
+#define UNIFORM_MAX_FORWARD_LIGHTS 8
 
 namespace Rev
 {
@@ -31,18 +31,18 @@ struct FShadowUniform
 struct FUnifiedLight
 {
 	uint32 Type; //ELightKind 
-	Math::FVector3 Position;
-	Math::FVector3 Direction;
 	int32 ShadowIndex;
-	Math::FVector3 Color;
 	float Intensity;
+	alignas(16) Math::FVector4 Position;
+	Math::FVector4 Direction;
+	Math::FVector4 Color;
 	Math::FVector4 Params;
 };
 
 struct FForwardLightUniform
 {
-	FUnifiedLight Lights[UNIFORM_MAX_FORWARD_LIGHTS];
 	uint32 LightCount = 0;
+	alignas(16) FUnifiedLight Lights[UNIFORM_MAX_FORWARD_LIGHTS];
 };
 
 struct FDeferredLightUniform

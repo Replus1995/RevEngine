@@ -18,16 +18,23 @@ Ref<Material> FPBRMaterialStorage::CreateMaterial()
 	Result->TwoSided = TwoSided;
 
 	Result->BaseColorFactor = BaseColorFactor;
-	Result->BaseColorTexture = BaseColorTexture->CreateTexture();
 	Result->Metallic = Metallic;
 	Result->Roughness = Roughness;
-	Result->MetallicRoughnessTexture = MetallicRoughnessTexture->CreateTexture();
 	Result->NormalScale = NormalScale;
-	Result->NormalTexture = NormalTexture->CreateTexture();
 	Result->OcclusionStrength = OcclusionStrength;
-	Result->OcclusionTexture = OcclusionTexture->CreateTexture();
 	Result->EmissiveFactor = EmissiveFactor;
-	Result->EmissiveTexture = EmissiveTexture->CreateTexture();
+
+	if(BaseColorTexture)
+		Result->BaseColorTexture = BaseColorTexture->CreateTexture();
+	if (MetallicRoughnessTexture)
+		Result->MetallicRoughnessTexture = MetallicRoughnessTexture->CreateTexture();
+	if (NormalTexture)
+		Result->NormalTexture = NormalTexture->CreateTexture();
+	if (OcclusionTexture)
+		Result->OcclusionTexture = OcclusionTexture->CreateTexture();
+	if (EmissiveTexture)
+		Result->EmissiveTexture = EmissiveTexture->CreateTexture();
+
 	Result->Compile();
 
 	mCache = Result;

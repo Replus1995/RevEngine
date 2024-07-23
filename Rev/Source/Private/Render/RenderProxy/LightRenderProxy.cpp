@@ -7,11 +7,11 @@ namespace Rev
 static void ToUnifiedLight(FUnifiedLight& Result, const Light* InLight, const Math::FTransform& InTransform)
 {
 	Result.Type = (uint32)InLight->GetKind();
-	Result.Position = InTransform.Location;
-	Result.Direction = InTransform.Forward();
 	Result.ShadowIndex = -1;
-	Result.Color = { InLight->GetColor().R, InLight->GetColor().G, InLight->GetColor().B };
 	Result.Intensity = InLight->GetIntensity();
+	Result.Position = InTransform.Location;
+	Result.Direction = InTransform.Forward() * -1.0f;
+	Result.Color = InLight->GetColor();
 }
 
 LightRenderProxy::LightRenderProxy()

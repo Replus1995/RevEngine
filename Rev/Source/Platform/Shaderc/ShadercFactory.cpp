@@ -126,17 +126,20 @@ FShadercCompiledData FShadercFactory::LoadAndCompile(const FPath& InPath)
 	FShadercCompiledData Result;
 	Result.Name = InPath.FullPath(false);
 
+	bool bNeedCompile = true;
 	fs::path ShaderCachePath(FShadercUtils::GetCacheDirectory() + InPath.FullPath(false) + FShadercUtils::GetCacheExtension());
-	auto CacheWriteTime = fs::last_write_time(ShaderCachePath);
-	auto SourceWriteTime = fs::last_write_time(InPath.ToNative());
-	bool bNeedCompile = SourceWriteTime > CacheWriteTime;
-	if (!bNeedCompile)
+	if (fs::exists(ShaderCachePath))
 	{
-		bNeedCompile = !FShadercUtils::LoadShaderCompiledData(ShaderCachePath, Result);
-	}
-	else
-	{
-		RE_CORE_INFO("Shader '{0}' cache out of date.", Result.Name.c_str());
+		auto CacheWriteTime = fs::last_write_time(ShaderCachePath);
+		auto SourceWriteTime = fs::last_write_time(InPath.ToNative());
+		if (SourceWriteTime > CacheWriteTime)
+		{
+			RE_CORE_INFO("Shader '{0}' cache out of date.", Result.Name.c_str());
+		}
+		else
+		{
+			bNeedCompile = !FShadercUtils::LoadShaderCompiledData(ShaderCachePath, Result);
+		}
 	}
 
 	if (bNeedCompile)

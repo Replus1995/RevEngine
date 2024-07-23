@@ -37,7 +37,8 @@ void main(void)
     BaseColor.rgb = pow(BaseColor.rgb, vec3(2.2)); //ToLinear
 
     //Normal
-    mat3 TBN =  mat3(normalize(IN.Tangent), normalize(IN.Binormal), normalize(IN.Normal));
+    //mat3 TBN =  mat3(normalize(IN.Tangent), normalize(IN.Binormal), normalize(IN.Normal));
+    mat3 TBN =  mat3(normalize(IN.Binormal), normalize(IN.Tangent), normalize(IN.Normal));
     vec3 LocalNormal = texture(s_NormalTex, IN.TexCoord0).rgb;
     LocalNormal = normalize((LocalNormal * 2.0 - 1.0) * vec3(u_NormalScale, u_NormalScale, 1.0f));
     vec3 WorldNormal = normalize(TBN * LocalNormal);
@@ -71,5 +72,9 @@ void main(void)
     o_Color.xyz += FinalEmissive.rgb; // Emissive
     o_Color.xyz = pow(o_Color.xyz, vec3(1.0/2.2)); //Gamma Correction
 
-    o_Color.a = 1.0;
+    //o_Color.rgb = vec3(1, .8, .3);
+    //o_Color.rgb = BaseColor.rgb;
+    //o_Color.rgb = ub_ForwardLight.Lights[0].Dir * 1;
+    //o_Color.rgb = vec3(ub_ForwardLight.Lights[0].ColorAndIntensity.a);
+    o_Color.a = BaseColor.a;
 }

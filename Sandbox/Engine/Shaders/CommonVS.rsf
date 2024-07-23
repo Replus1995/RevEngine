@@ -28,7 +28,7 @@ void main(void)
     OUT.Color = a_Color;
     OUT.TexCoord0 = a_TexCoord0;
 
-    mat3 NormalMat = transpose(inverse(mat3(u_ModelMat)));
+    mat3 NormalMat = transpose(inverse(mat3(ub_Model.ModelMat)));
     vec3 wNormal = normalize(NormalMat * normalize(a_Normal));
     vec3 wTangent =  normalize(NormalMat * normalize(a_Tangent.xyz));
 
@@ -36,7 +36,7 @@ void main(void)
     OUT.Tangent = wTangent;
     OUT.Binormal = cross(wTangent, wNormal) * a_Tangent.w;
 
-    vec4 wPositon = (u_ModelMat * vec4(a_Position, 1.0));
+    vec4 wPositon = (ub_Model.ModelMat * vec4(a_Position, 1.0));
     OUT.WorldPos = wPositon.xyz;
 
     gl_Position = ub_Camera.ProjMat * ub_Camera.ViewMat * wPositon;

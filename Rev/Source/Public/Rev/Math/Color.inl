@@ -329,7 +329,29 @@ inline FColor FLinearColor::ToSRGB(const FLinearColor& InColor)
 	return Result;
 }
 
+inline FLinearColor FLinearColor::FromTemperature(float InTemperature)
+{
+	float Temp = Clamp(InTemperature, 1000.0f, 15000.0f);
 
+	// Approximate Planckian locus in CIE 1960 UCS
+	float u = (0.860117757f + 1.54118254e-4f * Temp + 1.28641212e-7f * Temp * Temp) / (1.0f + 8.42420235e-4f * Temp + 7.08145163e-7f * Temp * Temp);
+	float v = (0.317398726f + 4.22806245e-5f * Temp + 4.20481691e-8f * Temp * Temp) / (1.0f - 2.89741816e-5f * Temp + 1.61456053e-7f * Temp * Temp);
+
+	float x = 3.0f * u / (2.0f * u - 8.0f * v + 4.0f);
+	float y = 2.0f * v / (2.0f * u - 8.0f * v + 4.0f);
+	float z = 1.0f - x - y;
+
+	float Y = 1.0f;
+	float X = Y / y * x;
+	float Z = Y / y * z;
+
+	// XYZ to RGB with BT.709 primaries
+	float R = 3.2404542f * X + -1.5371385f * Y + -0.4985314f * Z;
+	float G = -0.9692660f * X + 1.8760108f * Y + 0.0415560f * Z;
+	float B = 0.0556434f * X + -0.2040259f * Y + 1.0572252f * Z;
+
+	return FLinearColor(R, G, B);
+}
 
 }
 }

@@ -1,8 +1,8 @@
-#define UNIFORM_MAX_FORWARD_LIGHTS 32
+#define UNIFORM_MAX_FORWARD_LIGHTS 8
 #define UBO_BINDING_START 0
 #define UBO_BINDING(NUMBER) UBO_BINDING_START + NUMBER
 
-const float PI = 3.14159265;
+#define PI 3.1415926
 
 layout(std140, binding = UBO_BINDING(0)) uniform CameraUniformBuffer
 {
@@ -27,16 +27,22 @@ layout(std140, binding = UBO_BINDING(2)) uniform ShadowUniformBuffer
 struct UnifiedLight
 {
     uint Type;
-    vec3 Pos;
-    vec3 Dir;
     int ShadowIndex;
-    vec3 Color;
     float Intensity;
+    vec4 Pos;
+    vec4 Dir;
+    vec4 Color;
     vec4 Params;
 };
 
 layout(std140, binding = UBO_BINDING(3)) uniform ForwardLightUniformBuffer
 {
-	UnifiedLight Lights[UNIFORM_MAX_FORWARD_LIGHTS];
 	uint LightCount;
+	UnifiedLight Lights[UNIFORM_MAX_FORWARD_LIGHTS];
 } ub_ForwardLight;
+
+
+float Saturate(in float value)
+{
+    return clamp(value, 0.0, 1.0);
+}

@@ -18,15 +18,18 @@ Light::~Light()
 {
 }
 
+void Light::SetColorByTemperature(float InTemperature)
+{
+	mColor = Math::FLinearColor::FromTemperature(InTemperature);
+}
+
 DirectionalLight::DirectionalLight()
 	: Light()
-	, mDistance(1000.0F)
 {
 }
 
 DirectionalLight::DirectionalLight(float InDistance, float InIntensity, const Math::FLinearColor& InColor)
 	: Light(InIntensity, InColor)
-	, mDistance(InDistance)
 {
 }
 

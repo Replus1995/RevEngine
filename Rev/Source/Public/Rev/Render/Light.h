@@ -39,12 +39,6 @@ public:
 	DirectionalLight(float InDistance, float InIntensity, const Math::FLinearColor& InColor);
 	virtual ~DirectionalLight();
 	virtual ELightKind GetKind() const override { return LK_Directional; }
-
-	float GetDistance() const { return mDistance; }
-	void SetDistance(float InDistance) { mDistance = InDistance; }
-
-private:
-	float mDistance;
 };
 
 class REV_API SpotLight : public Light
