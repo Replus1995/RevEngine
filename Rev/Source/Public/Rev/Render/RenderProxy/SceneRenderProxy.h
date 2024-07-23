@@ -4,6 +4,7 @@
 #include "Rev/Render/RHI/RHIBuffer.h"
 #include "Rev/Render/Material/Material.h"
 #include "Rev/Render/RenderProxy/StaticMeshRenderProxy.h"
+#include "Rev/Render/RenderProxy/LightRenderProxy.h"
 
 namespace Rev
 {
@@ -27,8 +28,11 @@ protected:
 	FCameraUniform mCameraData;
 	Ref<FRHIUniformBuffer> mCameraUB;
 	Ref<FRHIUniformBuffer> mModelUB;
+	FForwardLightUniform mForwardLightData;
+	Ref<FRHIUniformBuffer> mForwardLightUB;
 
 	std::vector<StaticMeshRenderProxy> mStaticMeshProxies;
+	std::vector<LightRenderProxy> mLightProxies;
 
 };
 

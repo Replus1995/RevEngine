@@ -17,10 +17,10 @@ StaticMeshRenderProxy::~StaticMeshRenderProxy()
 {
 }
 
-void StaticMeshRenderProxy::Prepare(const Ref<StaticMesh>& mesh, const Math::FMatrix4& transform)
+void StaticMeshRenderProxy::Prepare(const Ref<StaticMesh>& InMesh, const Math::FTransform& InTransform)
 {
-	mStaticMesh = mesh;
-	mModelMat = transform;
+	mStaticMesh = InMesh;
+	mModelMat = InTransform.ToMatrix();
 }
 
 void StaticMeshRenderProxy::DrawPrimitives(EMaterialDomain InDomain, EBlendMode InBlend, const Ref<FRHIShaderProgram>& InProgram)

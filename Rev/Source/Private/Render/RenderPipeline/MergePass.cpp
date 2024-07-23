@@ -17,7 +17,7 @@ void FMergePass::BeginPass()
 {
 	if (!mMergeProgram)
 	{
-		mMergeProgram = FRHIShaderLibrary::GetInstance().CreateGraphicsProgram("FMergeProgram", "/Engine/Shaders/PBR/MergeVS", "/Engine/Shaders/PBR/MergePS");
+		mMergeProgram = FRHIShaderLibrary::GetInstance().CreateGraphicsProgram("FMergeProgram", "/Engine/Shaders/PostVS", "/Engine/Shaders/PBR/MergePS");
 	}
 	FPostPass::BeginPass();
 	mMergeProgram->Bind();

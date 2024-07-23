@@ -37,14 +37,14 @@ DirectionalLight::~DirectionalLight()
 
 SpotLight::SpotLight()
 	: Light()
-	, mDistance(10.0F)
+	, mRadius(10.0F)
 	, mAngle(30.0F)
 {
 }
 
 SpotLight::SpotLight(float InDistance, float InAngle, float InIntensity, const Math::FLinearColor& InColor)
 	: Light(InIntensity, InColor)
-	, mDistance(InDistance)
+	, mRadius(InDistance)
 	, mAngle(InAngle)
 {
 }

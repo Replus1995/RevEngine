@@ -21,11 +21,11 @@ void main(void)
     vec3 emissive = texture(s_EmissiveTex, IN.texCoord).xyz;
     //vec3 emissive = pow(texture(s_EmissiveTex, IN.texCoord).rgb, vec3(2.2));
 
-    fragColour.xyz = vec3(0.1) * color * diffuse.a; // Ambient
-    fragColour.xyz += color * diffuse.rgb; //Diffuse
-    fragColour.xyz += specular; // Specular
-    fragColour.xyz += emissive; // Emissive
-    fragColour.xyz = pow(fragColour.xyz, vec3(1.0/2.2)); //Gamma Correction
+    o_Color.xyz = vec3(0.1) * color * diffuse.a; // Ambient
+    o_Color.xyz += color * diffuse.rgb; //Diffuse
+    o_Color.xyz += specular; // Specular
+    o_Color.xyz += emissive; // Emissive
+    o_Color.xyz = pow(o_Color.xyz, vec3(1.0/2.2)); //Gamma Correction
 
-    fragColour.a = 1.0;
+    o_Color.a = 1.0;
 }

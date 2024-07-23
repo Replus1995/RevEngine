@@ -12,7 +12,7 @@ public:
 	StaticMeshRenderProxy();
 	~StaticMeshRenderProxy();
 
-	void Prepare(const Ref<StaticMesh>& mesh, const Math::FMatrix4& transform);
+	void Prepare(const Ref<StaticMesh>& InMesh, const Math::FTransform& InTransform);
 	void DrawPrimitives(EMaterialDomain InDomain, EBlendMode InBlend, const Ref<FRHIShaderProgram>& InProgram = nullptr);
 	const Math::FMatrix4& GetMatrix() const { return mModelMat; }
 private:

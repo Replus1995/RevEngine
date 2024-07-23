@@ -5,6 +5,7 @@
 #include <Rev/World/System/PlayerCameraSystem.h>
 #include <Rev/Render/Renderer.h>
 #include <Rev/Render/Mesh/StaticMesh.h>
+#include <Rev/Render/Material/PBRMaterial.h>
 #include <Rev/Render/RHI/RHIShaderLibrary.h>
 #include <Rev/Core/FileSystem.h>
 #include <Rev/Asset/AssetLibrary.h>
@@ -31,9 +32,11 @@ ExampleLayer::ExampleLayer()
 	mScene = CreateRef<Rev::Scene>();
 
 	{
-		auto pBoxMat = CreateRef<ExampleMaterial>();
+		//auto pBoxMat = CreateRef<ExampleMaterial>();
+		auto pBoxMat = CreateRef<PBRMaterial>();
 		pBoxMat->Compile();
-		pBoxMat->SetColor(Math::FLinearColor(.7, .9, .8, 1));
+		//pBoxMat->SetColor(Math::FLinearColor(.7, .9, .8, 1));
+		pBoxMat->BaseColorFactor = Math::FLinearColor(.7, .9, .8, 1);
 
 		auto meshEntity = mScene->CreateEntity();
 		auto& meshComp = meshEntity.AddComponent<StaticMeshComponent>();
@@ -54,6 +57,16 @@ ExampleLayer::ExampleLayer()
 		transformComp.SetLocation(Math::FVector3(0, 0, -5));
 		transformComp.SetRotation(Math::FRotator(90.0F, 0, 0));
 		transformComp.SetScale(Math::FVector3(5, 5, 0));
+	}
+
+	{
+
+		auto lightEntity = mScene->CreateEntity();
+		auto& dirLightComp = lightEntity.AddComponent<DirectionalLightComponent>();
+		dirLightComp.Light.SetColor(Math::FLinearColor(0.8, 0.8, 0.3, 1));
+		auto& transformComp = lightEntity.GetComponent<TransformComponent>();
+		transformComp.SetLocation(Math::FVector3(0, 0, 0));
+		transformComp.SetRotation(Math::FRotator(-45.0F, 0, 0));
 	}
 
 

@@ -1,0 +1,75 @@
+#kind pixel
+#version 450 core
+#extension GL_ARB_separate_shader_objects : enable
+#extension GL_GOOGLE_include_directive : enable
+
+#include "/Engine/Shaders/PBR/LightPBR.rsh"
+
+layout(location = 5) uniform vec4 u_BaseColorFactor;
+layout(location = 6) uniform float u_Metallic;
+layout(location = 7) uniform float u_Roughness;
+layout(location = 8) uniform float u_NormalScale;
+layout(location = 9) uniform float u_OcclusionStrength;
+layout(location = 10) uniform vec3 u_EmissiveFactor;
+
+layout(location = 11) uniform sampler2D s_BaseColorTex;
+layout(location = 12) uniform sampler2D s_MetallicRoughnessTex;
+layout(location = 13) uniform sampler2D s_NormalTex;
+layout(location = 14) uniform sampler2D s_OcclusionTex;
+layout(location = 15) uniform sampler2D s_EmissiveTex;
+
+layout(location = 0) in Vertex
+{
+    vec3 WorldPos;
+    vec3 Normal;
+    vec3 Tangent;
+    vec3 Binormal;
+    vec4 Color;
+    vec2 TexCoord0;
+} IN;
+
+layout(location = 0) out vec4 o_Color;
+
+void main(void)
+{
+    //Color
+    vec4 BaseColor = texture(s_BaseColorTex, IN.TexCoord0) * u_BaseColorFactor;
+    BaseColor.rgb = pow(BaseColor.rgb, vec3(2.2)); //ToLinear
+
+    //Normal
+    mat3 TBN =  mat3(normalize(IN.Tangent), normalize(IN.Binormal), normalize(IN.Normal));
+    vec3 LocalNormal = texture(s_NormalTex, IN.TexCoord0).rgb;
+    LocalNormal = normalize((LocalNormal * 2.0 - 1.0) * vec3(u_NormalScale, u_NormalScale, 1.0f));
+    vec3 WorldNormal = normalize(TBN * LocalNormal);
+
+    //MetallicRoughnessOcclusion
+    float FinalMetallic = u_Metallic * texture(s_MetallicRoughnessTex, IN.TexCoord0).r;
+    float FinalRoughness = u_Roughness * texture(s_MetallicRoughnessTex, IN.TexCoord0).g;
+    float FinalOcclution = u_OcclusionStrength * texture(s_OcclusionTex, IN.TexCoord0).r;
+
+    vec4 FinalDiffuse = vec4(0.0);
+    vec4 FinalSpecular = vec4(0.0);
+    for(uint i = 0; i < ub_ForwardLight.LightCount; i++)
+    {
+        vec4 OutDiffuse = vec4(0.0);
+        vec4 OutSpecular = vec4(0.0);
+        ComputeLightPBR(OutDiffuse, OutSpecular,
+                        ub_ForwardLight.Lights[i], IN.WorldPos,
+                        BaseColor.rgb, WorldNormal,
+                        FinalMetallic, FinalRoughness);
+        FinalDiffuse += OutDiffuse;
+        FinalSpecular += OutSpecular;
+    }
+    FinalDiffuse.a = FinalOcclution;
+    FinalSpecular.a = 0.0;
+
+    vec3 FinalEmissive = texture(s_EmissiveTex, IN.TexCoord0).rgb * u_EmissiveFactor;
+
+    o_Color.xyz = vec3(0.1) * BaseColor.rgb * FinalDiffuse.a; // Ambient
+    o_Color.xyz += BaseColor.rgb * FinalDiffuse.rgb; //Diffuse
+    o_Color.xyz += FinalSpecular.rgb; // Specular
+    o_Color.xyz += FinalEmissive.rgb; // Emissive
+    o_Color.xyz = pow(o_Color.xyz, vec3(1.0/2.2)); //Gamma Correction
+
+    o_Color.a = 1.0;
+}

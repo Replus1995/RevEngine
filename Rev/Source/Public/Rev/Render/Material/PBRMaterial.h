@@ -5,7 +5,7 @@
 namespace Rev
 {
 
-class PBRMaterial : public Material
+class REV_API PBRMaterial : public Material
 {
 public:
 	PBRMaterial();

@@ -22,7 +22,7 @@ void PBRMaterial::Compile()
 	mProgram = FRHIShaderLibrary::GetInstance().CreateGraphicsProgram(
 		"PbrProgram_Opaque",
 		"/Engine/Shaders/CommonVS",
-		"/Engine/Shaders/PBR/CommonPS"
+		"/Engine/Shaders/PBR/ForwardPS"
 	);
 }
 

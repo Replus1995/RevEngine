@@ -33,6 +33,7 @@ using UBBType = uint16;
 constexpr UBBType UBB_Camera = 0;
 constexpr UBBType UBB_Model = 1;
 constexpr UBBType UBB_Shadow = 2;
+constexpr UBBType UBB_ForwardLight = 3;
 
 }
 

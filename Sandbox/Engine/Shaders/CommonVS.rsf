@@ -1,7 +1,6 @@
 #kind vertex
 #version 450 core
 #extension GL_ARB_separate_shader_objects : enable
-#extension GL_KHR_vulkan_glsl : enable
 #extension GL_GOOGLE_include_directive : enable
 
 #include "/Engine/Shaders/Global.rsh"
@@ -14,7 +13,7 @@ layout(location = 4) in vec4 a_Color;
 
 layout(location = 0) uniform mat4 u_ModelMat;
 
-out Vertex
+layout(location = 0) out Vertex
 {
     vec3 WorldPos;
     vec3 Normal;
