@@ -18,7 +18,7 @@ layout(location = 0) out Vertex
     vec3 WorldPos;
     vec3 Normal;
     vec3 Tangent;
-    vec3 Binormal;
+    vec3 Bitangent;
     vec4 Color;
     vec2 TexCoord0;
 } OUT;
@@ -28,13 +28,14 @@ void main(void)
     OUT.Color = a_Color;
     OUT.TexCoord0 = a_TexCoord0;
 
-    mat3 NormalMat = transpose(inverse(mat3(ub_Model.ModelMat)));
-    vec3 wNormal = normalize(NormalMat * normalize(a_Normal));
-    vec3 wTangent =  normalize(NormalMat * normalize(a_Tangent.xyz));
+    mat3 NormalMat = mat3(ub_Model.ModelMat);
+    vec3 wNormal = normalize(NormalMat * a_Normal);
+    vec3 wTangent = normalize(NormalMat * a_Tangent.xyz);
 
     OUT.Normal = wNormal;
     OUT.Tangent = wTangent;
-    OUT.Binormal = cross(wTangent, wNormal) * a_Tangent.w;
+    OUT.Bitangent = normalize(cross(wNormal, wTangent) * a_Tangent.w);
+    //OUT.BiNormal = normalize(cross(wTangent, wNormal) * a_Tangent.w);
 
     vec4 wPositon = (ub_Model.ModelMat * vec4(a_Position, 1.0));
     OUT.WorldPos = wPositon.xyz;

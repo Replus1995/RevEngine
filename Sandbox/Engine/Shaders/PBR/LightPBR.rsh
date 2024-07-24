@@ -1,47 +1,6 @@
 #include "/Engine/Shaders/Global.rsh"
 #include "/Engine/Shaders/PBR/GlobalPBR.rsh"
 
-// compute fresnel specular factor for given base specular and product
-// product could be NdV or VdH depending on used technique
-vec3 fresnel_factor(in vec3 f0, in float product)
-{
-    return mix(f0, vec3(1.0), pow(1.01 - product, 5.0));
-}
-
-// following functions are copies of UE4
-// for computing cook-torrance specular lighting terms
-
-float D_blinn(in float roughness, in float NdH)
-{
-    float m = roughness * roughness;
-    float m2 = m * m;
-    float n = 2.0 / m2 - 2.0;
-    return (n + 2.0) / (2.0 * PI) * pow(NdH, n);
-}
-
-float D_beckmann(in float roughness, in float NdH)
-{
-    float m = roughness * roughness;
-    float m2 = m * m;
-    float NdH2 = NdH * NdH;
-    return exp((NdH2 - 1.0) / (m2 * NdH2)) / (PI * m2 * NdH2 * NdH2);
-}
-
-float D_GGX(in float roughness, in float NdH)
-{
-    float m = roughness * roughness;
-    float m2 = m * m;
-    float d = (NdH * m2 - NdH) * NdH + 1.0;
-    return m2 / (PI * d * d);
-}
-
-float G_schlick(in float roughness, in float NdV, in float NdL)
-{
-    float k = roughness * roughness * 0.5;
-    float V = NdV * (1.0 - k) + k;
-    float L = NdL * (1.0 - k) + k;
-    return 0.25 / (V * L);
-}
 
 
 vec3 Schlick_F(vec3 R0, float cosTheta)

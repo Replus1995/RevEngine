@@ -83,6 +83,7 @@ void FOpenGLTexture2D::ClearData()
 	case PF_R8G8B8A8:
 	case PF_RGB8:
 	{
+		//Math::FColor RGBA8 = Math::FLinearColor::ToSRGB(mDesc.ClearColor.RGBA);
 		Math::FLinearColor RGBA8 = mDesc.ClearColor.RGBA * 255.0f;
 		uint8 ClearColor[4] = { RGBA8.R, RGBA8.G, RGBA8.B, RGBA8.A };
 		glClearTexImage(mHandle, 0, mFormatData.DataFormat, mFormatData.DataType, (const void*)&ClearColor);

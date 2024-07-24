@@ -15,7 +15,7 @@ public:
 	virtual void OnEvent(Event& e, Camera& camera, Math::FTransform& transform) override;
 
 private:
-	void MousePan(Math::FTransform& transform, const Math::FVector2& delta);
+	void MousePan(Math::FTransform& transform, const Math::FVector3& delta);
 	void MouseRotate(Math::FTransform& transform, const Math::FVector2& delta);
 	//void MouseZoom(float delta);
 

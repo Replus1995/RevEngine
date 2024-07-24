@@ -45,7 +45,7 @@ const Ref<Texture>& FAssetLibrary::GetDefaultNormalTexture()
 {
 	if (!sDefaultNormalTexture)
 	{
-		FTextureDesc TextureDesc = FTextureDesc::MakeTexture2D(2, 2, PF_RGB8, false, Math::FLinearColor(0, 1, 0));
+		FTextureDesc TextureDesc = FTextureDesc::MakeTexture2D(2, 2, PF_RGB8, false, Math::FLinearColor(0.5f, 0.5f, 1.0f));
 		FSamplerDesc SamplerDesc;
 		sDefaultNormalTexture = CreateRef<Texture>(FRHIResourceFactory::CreateTexture(TextureDesc, SamplerDesc));
 		sDefaultNormalTexture->GetResource()->ClearData();

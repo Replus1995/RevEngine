@@ -10,7 +10,7 @@ static void ToUnifiedLight(FUnifiedLight& Result, const Light* InLight, const Ma
 	Result.ShadowIndex = -1;
 	Result.Intensity = InLight->GetIntensity();
 	Result.Position = InTransform.Location;
-	Result.Direction = InTransform.Forward() * -1.0f;
+	Result.Direction = InTransform.Up() * -1.0f;
 	Result.Color = InLight->GetColor();
 }
 

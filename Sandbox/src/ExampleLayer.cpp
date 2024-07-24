@@ -80,7 +80,7 @@ ExampleLayer::ExampleLayer()
 		dirLightComp.Light.SetColorByTemperature(6500.0f);
 		auto& transformComp = lightEntity.GetComponent<TransformComponent>();
 		transformComp.SetLocation(Math::FVector3(0, 0, 0));
-		transformComp.SetRotation(Math::FRotator(-60.0F, 0, 0));
+		transformComp.SetRotation(Math::FRotator(0, 0, 45.0f));
 	}
 
 	{

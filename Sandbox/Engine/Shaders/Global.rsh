@@ -3,6 +3,7 @@
 #define UBO_BINDING(NUMBER) UBO_BINDING_START + NUMBER
 
 #define PI 3.1415926
+#define EPSILON 0.00001
 
 layout(std140, binding = UBO_BINDING(0)) uniform CameraUniformBuffer
 {
@@ -40,9 +41,3 @@ layout(std140, binding = UBO_BINDING(3)) uniform ForwardLightUniformBuffer
 	uint LightCount;
 	UnifiedLight Lights[UNIFORM_MAX_FORWARD_LIGHTS];
 } ub_ForwardLight;
-
-
-float Saturate(in float value)
-{
-    return clamp(value, 0.0, 1.0);
-}

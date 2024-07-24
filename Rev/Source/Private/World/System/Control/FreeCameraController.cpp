@@ -19,15 +19,19 @@ void FreeCameraController::OnUpdate(float dt, Camera& camera, Math::FTransform& 
 		}
 		else
 		{
-			Math::FVector2 deltaPan(0.0f, 0.0f);
+			Math::FVector3 deltaPan(0.0f);
 			if(Input::KeyDown(Key::W))
-				deltaPan.Y += dt;
+				deltaPan.Z += dt;
 			if (Input::KeyDown(Key::S))
-				deltaPan.Y += -dt;
+				deltaPan.Z += -dt;
 			if (Input::KeyDown(Key::A))
 				deltaPan.X += -dt;
 			if (Input::KeyDown(Key::D))
 				deltaPan.X += dt;
+			if (Input::KeyDown(Key::LeftShift))
+				deltaPan.Y += dt;
+			if (Input::KeyDown(Key::LeftControl))
+				deltaPan.Y += -dt;
 			deltaPan *= sPanSpeed;
 			MousePan(transform, deltaPan);
 
@@ -53,11 +57,12 @@ void FreeCameraController::OnEvent(Event& e, Camera& camera, Math::FTransform& t
 	}*/
 }
 
-void FreeCameraController::MousePan(Math::FTransform& transform, const Math::FVector2& delta)
+void FreeCameraController::MousePan(Math::FTransform& transform, const Math::FVector3& delta)
 {
 	Math::FVector3 dRight = transform.Right() * delta.X;
-	Math::FVector3 dForward = transform.Forward() * delta.Y;
-	transform.Location += dRight + dForward;
+	Math::FVector3 dUp = transform.Up() * delta.Y;
+	Math::FVector3 dForward = transform.Forward() * delta.Z;
+	transform.Location += dRight + dUp + dForward;
 }
 
 void FreeCameraController::MouseRotate(Math::FTransform& transform, const Math::FVector2& delta)
