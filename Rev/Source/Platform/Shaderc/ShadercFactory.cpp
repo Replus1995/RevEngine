@@ -7,6 +7,20 @@
 #include <shaderc/shaderc.hpp>
 #include <spirv_cross/spirv_glsl.hpp>
 
+/*
+[[shader-stage-selection]]
+.Shader Stage Selection
+|===
+|Shader Stage |Shader File Extension |`<stage>`
+|vertex                 |`.vert` |`vertex`
+|fragment               |`.frag` |`fragment`
+|tesselation control    |`.tesc` |`tesscontrol`
+|tesselation evaluation |`.tese` |`tesseval`
+|geometry               |`.geom` |`geometry`
+|compute                |`.comp` |`compute`
+|===
+*/
+
 namespace fs = std::filesystem;
 
 namespace Rev
@@ -65,14 +79,14 @@ static shaderc_shader_kind ShaderStageToShadercKind(ERHIShaderStage InStage)
 {
 	switch (InStage)
 	{
-	case ERHIShaderStage::Vertex:   return shaderc_glsl_vertex_shader;
-	case ERHIShaderStage::Hull:		return shaderc_glsl_tess_control_shader;
-	case ERHIShaderStage::Domain:   return shaderc_glsl_tess_evaluation_shader;
-	case ERHIShaderStage::Pixel:	return shaderc_glsl_fragment_shader;
-	case ERHIShaderStage::Geometry: return shaderc_glsl_geometry_shader;
-	case ERHIShaderStage::Compute:	return shaderc_glsl_compute_shader;
+	case ERHIShaderStage::Vertex:		return shaderc_glsl_vertex_shader;
+	case ERHIShaderStage::TessControl:	return shaderc_glsl_tess_control_shader;
+	case ERHIShaderStage::TessEval:		return shaderc_glsl_tess_evaluation_shader;
+	case ERHIShaderStage::Fragment:		return shaderc_glsl_fragment_shader;
+	case ERHIShaderStage::Geometry:		return shaderc_glsl_geometry_shader;
+	case ERHIShaderStage::Compute:		return shaderc_glsl_compute_shader;
 	}
-	RE_CORE_ASSERT(false);
+	RE_CORE_ASSERT(false, "Unknown Shader Stage");
 	return (shaderc_shader_kind)0;
 }
 
@@ -97,37 +111,37 @@ static void InitCompileOptions(shaderc::CompileOptions& options)
 		options.SetOptimizationLevel(shaderc_optimization_level_performance);
 }
 
-void FShadercFactory::CompileShaders(const FShadercSource& InSource, FShadercCompiledData& OutData)
+void FShadercFactory::CompileShaders(const FShadercSource& InSource, const FRHIShaderCompileOptions& InOptions, FShadercCompiledData& OutData)
 {
 	Clock timer;
-	OutData.CompiledDataMap.clear();
 	std::string NativeFilePath = InSource.FilePath.ToNative();
 	shaderc::Compiler compiler;
 	shaderc::CompileOptions options;
 	InitCompileOptions(options);
 
-	for (auto&& [Stage, Content] : InSource.StageSourceMap)
 	{
-		shaderc::SpvCompilationResult CompileResult = compiler.CompileGlslToSpv(Content.DataAs<char>(), Content.Size(), ShaderStageToShadercKind(Stage), NativeFilePath.c_str(), options);
+		shaderc::SpvCompilationResult CompileResult = compiler.CompileGlslToSpv(InSource.FileContent.DataAs<char>(), InSource.FileContent.Size(), ShaderStageToShadercKind(InSource.Stage), NativeFilePath.c_str(), options);
 		if (CompileResult.GetCompilationStatus() != shaderc_compilation_status_success)
 		{
 			RE_CORE_ERROR(CompileResult.GetErrorMessage());
 			RE_CORE_ASSERT(false);
 		}
-		std::vector<uint32_t> CompileData(CompileResult.cbegin(), CompileResult.cend());
-		OutData.CompiledDataMap.emplace(Stage, std::move(CompileData));
+		OutData.Stage = InSource.Stage;
+		size_t CompiledSize = CompileResult.cend() - CompileResult.cbegin();
+		OutData.CompiledData.Allocate(CompiledSize * sizeof(uint32_t));
+		memcpy(OutData.CompiledData.Data(), CompileResult.cbegin(), CompiledSize * sizeof(uint32_t));
 	}
 	RE_CORE_INFO("Shader '{0}' compile took {1} ms", OutData.Name.c_str(), timer.ElapsedMillis());
 }
 
-FShadercCompiledData FShadercFactory::LoadAndCompile(const FPath& InPath)
+FShadercCompiledData FShadercFactory::LoadOrCompileShader(const FPath& InPath, const FRHIShaderCompileOptions& InOptions)
 {
-
 	FShadercCompiledData Result;
 	Result.Name = InPath.FullPath(false);
 
+	std::string OptionHashStr = std::to_string(InOptions.Hash() );
+	fs::path ShaderCachePath(FShadercUtils::GetCacheDirectory() + Result.Name + "_" + OptionHashStr + FShadercUtils::GetCacheExtension());
 	bool bNeedCompile = true;
-	fs::path ShaderCachePath(FShadercUtils::GetCacheDirectory() + InPath.FullPath(false) + FShadercUtils::GetCacheExtension());
 	if (fs::exists(ShaderCachePath))
 	{
 		auto CacheWriteTime = fs::last_write_time(ShaderCachePath);
@@ -145,7 +159,7 @@ FShadercCompiledData FShadercFactory::LoadAndCompile(const FPath& InPath)
 	if (bNeedCompile)
 	{
 		auto ShaderSource = FShadercUtils::LoadShaderSource(InPath);
-		CompileShaders(ShaderSource, Result);
+		CompileShaders(ShaderSource, InOptions, Result);
 		FShadercUtils::SaveShaderCompiledData(ShaderCachePath, Result);
 	}
 

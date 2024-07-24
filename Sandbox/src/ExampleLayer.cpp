@@ -23,8 +23,6 @@ ExampleLayer::ExampleLayer()
 
 	//FFileSystem::MountDir("/SandBox", std::filesystem::current_path().generic_u8string());
 	FFileSystem::MountDir("/Game", (std::filesystem::current_path() / "Game").generic_u8string());
-	//FRHIShaderLibrary::GetInstance().LoadOrCompileShader(FPath("/Game/Shaders/Example.glsl"));
-	FRHIShaderLibrary::GetInstance().CreateGraphicsProgram("ExampleProgram", "/Game/Shaders/Example");
 
 	FPath TestPath("/Game/Assets/Shaders/Common.vs.glsl");
 
@@ -98,8 +96,6 @@ ExampleLayer::ExampleLayer()
 			camSys->SetPlayerCamera(camEntity);
 		}
 	}
-	
-
 }
 
 ExampleLayer::~ExampleLayer()

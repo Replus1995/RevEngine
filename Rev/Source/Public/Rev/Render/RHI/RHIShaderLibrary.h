@@ -2,6 +2,7 @@
 #include "Rev/Core/Base.h"
 #include "Rev/Core/FileSystem.h"
 #include "Rev/Render/RHI/RHIShader.h"
+#include "Rev/Render/RHI/RHIShaderCompile.h"
 
 namespace Rev
 {
@@ -12,25 +13,18 @@ public:
     static FRHIShaderLibrary& GetInstance();
 
     Ref<FRHIShaderProgram> CreateGraphicsProgram(
-        const std::string& InProgramName, 
-        const std::string& InShadersName
-    );
-    Ref<FRHIShaderProgram> CreateGraphicsProgram(
         const std::string& InProgramName,
-        const std::string& InVertexName,
-        const std::string& InPixelName,
-        const std::string& InHullName = "",
-        const std::string& InDomainName = "",
-        const std::string& InGeometryName = ""
+        const FRHIShaderCreateDesc& InVertexDesc,
+        const FRHIShaderCreateDesc& InFragmentDesc,
+        const FRHIShaderCreateDesc& InTessControlDesc = {},
+        const FRHIShaderCreateDesc& InTessEvalDesc = {},
+        const FRHIShaderCreateDesc& InGeometryDesc = {}
     );
-    Ref<FRHIShaderProgram> FindProgram(const std::string& InName);
 
     void ClearShadersCache();
-    void ClearShaderProgramsCache();
-
 private:
-    FRHIGraphicsShaders LoadOrCompileShader(const FPath& InPath);
-    Ref<FRHIShader> FindShader(const std::string& InName, ERHIShaderStage InStage);
+    Ref<FRHIShader> LoadOrCompileShader(const FPath& InPath, const FRHIShaderCompileOptions& InOptions);
+    Ref<FRHIShader> CreateShader(const FRHIShaderCreateDesc& InDesc);
 
 private:
     FRHIShaderLibrary() = default;
@@ -40,8 +34,7 @@ private:
     static void ReleaseInstance();
 
 private:
-    std::unordered_map<std::string, FRHIGraphicsShaders> mGraphicsShaderCache;
-    std::unordered_map<std::string, Ref<FRHIShaderProgram>> mShaderProgramCache;
+    std::unordered_map<std::string, FCompiledShaders> mShadersCache;
 };
 
 

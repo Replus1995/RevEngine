@@ -37,7 +37,7 @@ protected:
 	//EShadingModel mShadingModelCache = Rev::SM_Default;
 
 public:
-	EMaterialDomain Domain = Rev::MD_Surface;
+	EMaterialDomain TessEval = Rev::MD_Surface;
 	EBlendMode BlendMode = Rev::BM_Opaque;
 	EShadingModel ShadingModel = Rev::SM_Default;
 	bool TwoSided = false;

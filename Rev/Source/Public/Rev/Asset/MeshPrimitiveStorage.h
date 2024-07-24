@@ -39,6 +39,7 @@ protected:
 	void CalculateNormals();
 	Math::FVector4 CalculateTangent(uint32 a, uint32 b, uint32 c) const;
 	void CalculateTangents();
+	void FillColorData(const Math::FLinearColor& InColor);
 };
 
 }

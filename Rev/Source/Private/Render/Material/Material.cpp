@@ -23,7 +23,9 @@ Material::~Material()
 
 void Material::Compile()
 {
-	mProgram = FRHIShaderLibrary::GetInstance().FindProgram("BasicProgram");
+	mProgram = FRHIShaderLibrary::GetInstance().CreateGraphicsProgram("BasicProgram",
+		{ "/Engine/Shaders/BasicVS" },
+		{ "/Engine/Shaders/BasicFS" });
 }
 
 void Material::SyncUniform()

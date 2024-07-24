@@ -30,6 +30,7 @@ class REV_API FFileSystem
 {
 public:
 	static void MountDir(const std::string& VirtualDir, const std::string& NativeDir);
+	static bool Exists(const FPath& InPath);
 
 	static FBuffer LoadBinaryFile(const std::string& InNativePath);
 	static FBuffer LoadBinaryFile(const FPath& InPath);

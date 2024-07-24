@@ -9,8 +9,7 @@ namespace Rev
 class FOpenGLShaderFactory
 {
 public:
-	static FRHIGraphicsShaders CreateGraphicsShaders(const FShadercCompiledData& InData);
-	//CreateComputeShader
+	static Ref<FOpenGLShader> CreateShader(const FShadercCompiledData& InData);
 	static Ref<FOpenGLShaderProgram> CreateShaderProgram(const std::string& InName, const FRHIGraphicsShaders& InShaders);
 };
 

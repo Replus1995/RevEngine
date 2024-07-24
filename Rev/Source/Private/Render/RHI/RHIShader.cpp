@@ -13,11 +13,11 @@ const Ref<FRHIShader>& FRHIGraphicsShaders::operator[](ERHIShaderStage Stage) co
 	{
 	case Rev::ERHIShaderStage::Vertex:
 		return VertexShader;
-	case Rev::ERHIShaderStage::Hull:
+	case Rev::ERHIShaderStage::TessControl:
 		return HullShader;
-	case Rev::ERHIShaderStage::Domain:
+	case Rev::ERHIShaderStage::TessEval:
 		return DomainShader;
-	case Rev::ERHIShaderStage::Pixel:
+	case Rev::ERHIShaderStage::Fragment:
 		return PixelShader;
 	case Rev::ERHIShaderStage::Geometry:
 		return GeometryShader;

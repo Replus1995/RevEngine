@@ -32,15 +32,17 @@ FMeshPrimitiveStorage::FMeshPrimitiveStorage(FMeshPrimitiveStorage&& InStorage) 
 
 FMeshPrimitive FMeshPrimitiveStorage::CreateVertexData()
 {
-	if(VertexCount == 0 || IndexCount == 0)
+	if(VertexCount == 0 || IndexCount == 0 || TexCoordData.Empty())
 		return {};
-	if(NormalData.Empty())
+	if (NormalData.Empty())
 		CalculateNormals();
-	if(TangentData.Empty())
+	if (TangentData.Empty())
 		CalculateTangents();
+	if (ColorData.Empty())
+		FillColorData(Math::FLinearColor(1));
 
 	Ref<FRHIVertexArray> VertexArr = FRHIResourceFactory::CreateVertexData();
-	if (!PositonData.Empty())
+	//Position
 	{
 		Ref<FRHIVertexBuffer> PositionBuffer = FRHIResourceFactory::CreateVertexBuffer(PositonData.DataAs<float>(), PositonData.Size());
 		PositionBuffer->SetLayout({
@@ -48,7 +50,7 @@ FMeshPrimitive FMeshPrimitiveStorage::CreateVertexData()
 			});
 		VertexArr->AddVertexBuffer(PositionBuffer);
 	}
-	if (!NormalData.Empty())
+	//Normal
 	{
 		Ref<FRHIVertexBuffer> NormalBuffer = FRHIResourceFactory::CreateVertexBuffer(NormalData.DataAs<float>(), NormalData.Size());
 		NormalBuffer->SetLayout({
@@ -56,7 +58,7 @@ FMeshPrimitive FMeshPrimitiveStorage::CreateVertexData()
 			});
 		VertexArr->AddVertexBuffer(NormalBuffer);
 	}
-	if (!TangentData.Empty())
+	//Tangent
 	{
 		Ref<FRHIVertexBuffer> TangentBuffer = FRHIResourceFactory::CreateVertexBuffer(TangentData.DataAs<float>(), TangentData.Size());
 		TangentBuffer->SetLayout({
@@ -64,7 +66,7 @@ FMeshPrimitive FMeshPrimitiveStorage::CreateVertexData()
 			});
 		VertexArr->AddVertexBuffer(TangentBuffer);
 	}
-	if (!TexCoordData.Empty())
+	//TexCoord
 	{
 		Ref<FRHIVertexBuffer> TexCoordBuffer = FRHIResourceFactory::CreateVertexBuffer(TexCoordData.DataAs<float>(), TexCoordData.Size());
 		TexCoordBuffer->SetLayout({
@@ -72,7 +74,7 @@ FMeshPrimitive FMeshPrimitiveStorage::CreateVertexData()
 			});
 		VertexArr->AddVertexBuffer(TexCoordBuffer);
 	}
-	if (!ColorData.Empty())
+	//Color
 	{
 		Ref<FRHIVertexBuffer> ColorBuffer = FRHIResourceFactory::CreateVertexBuffer(ColorData.DataAs<float>(), ColorData.Size());
 		ColorBuffer->SetLayout({
@@ -223,6 +225,17 @@ void FMeshPrimitiveStorage::CalculateTangents()
 		Tangents[i].W = handedness;
 	}
 }
+
+void FMeshPrimitiveStorage::FillColorData(const Math::FLinearColor& InColor)
+{
+	ColorData.Allocate(VertexCount * sizeof(Math::FLinearColor));
+	Math::FLinearColor* Colors = TangentData.DataAs<Math::FLinearColor>();
+	for (uint32 i = 0; i < VertexCount; i++)
+	{
+		Colors[i] = InColor;
+	}
+}
+
 
 }
 

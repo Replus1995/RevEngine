@@ -10,7 +10,7 @@ struct FMaterialStorage
 {
 public:
 	std::string Name;
-	EMaterialDomain Domain = Rev::MD_Surface;
+	EMaterialDomain TessEval = Rev::MD_Surface;
 	EBlendMode BlendMode = Rev::BM_Opaque;
 	EShadingModel ShadingModel = Rev::SM_Default;
 	float MaskClip = 0.5f;

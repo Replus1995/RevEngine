@@ -7,8 +7,8 @@ namespace Rev
 class FShadercFactory
 {
 public:
-	static void CompileShaders(const FShadercSource& InSource, FShadercCompiledData& OutData);
-	static FShadercCompiledData LoadAndCompile(const FPath& InPath);
+	static void CompileShaders(const FShadercSource& InSource, const FRHIShaderCompileOptions& InOptions, FShadercCompiledData& OutData);
+	static FShadercCompiledData LoadOrCompileShader(const FPath& InPath, const FRHIShaderCompileOptions& InOptions = {});
 };
 
 }

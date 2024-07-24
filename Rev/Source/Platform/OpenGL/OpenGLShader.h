@@ -1,5 +1,6 @@
 #pragma once
 #include "Rev/Render/RHI/RHIShader.h"
+#include "Rev/Core/Buffer.h"
 #include <map>
 #include <glad/glad.h>
 
@@ -9,7 +10,7 @@ namespace Rev
 class FOpenGLShader : public FRHIShader
 {
 public:
-	FOpenGLShader(ERHIShaderStage InStage, std::vector<uint32_t> InCompiledData);
+	FOpenGLShader(ERHIShaderStage InStage, const FBuffer& InCompiledData);
 	virtual ~FOpenGLShader();
 	virtual void* GetNativeHandle() override { return &mHandle; }
 

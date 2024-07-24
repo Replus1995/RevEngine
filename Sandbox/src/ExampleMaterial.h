@@ -18,7 +18,7 @@ public:
 
     virtual void Compile() override
     {
-        mProgram = Rev::FRHIShaderLibrary::GetInstance().FindProgram("ExampleProgram");
+        mProgram = Rev::FRHIShaderLibrary::GetInstance().CreateGraphicsProgram("ExampleProgram", "/Game/Shaders/ExampleVS", "/Game/Shaders/ExampleFS");
     }
 
     virtual void SyncUniform() override

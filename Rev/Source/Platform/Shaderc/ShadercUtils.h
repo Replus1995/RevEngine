@@ -4,6 +4,7 @@
 #include "Rev/Core/FileSystem.h"
 #include "Rev/Render/RenderCore.h"
 #include "Rev/Render/RHI/RHIShader.h"
+#include "Rev/Render/RHI/RHIShaderCompile.h"
 #include <map>
 #include <filesystem>
 
@@ -14,17 +15,18 @@ struct FShadercSource
 {
 	FPath FilePath;
 	FBuffer FileContent;
-	std::map<ERHIShaderStage, FBufferView> StageSourceMap;
+	ERHIShaderStage Stage = ERHIShaderStage::Unknown;
 };
 
 struct FShadercCompiledData
 {
 	std::string Name;
-	std::map<ERHIShaderStage, std::vector<uint32_t>> CompiledDataMap;
+	FBuffer CompiledData;
+	ERHIShaderStage Stage = ERHIShaderStage::Unknown;
 
 	bool Empty() const
 	{
-		return CompiledDataMap.empty();
+		return CompiledData.Empty();
 	}
 };
 

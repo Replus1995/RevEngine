@@ -15,6 +15,11 @@ void FFileSystem::MountDir(const std::string& VirtualDir, const std::string& Nat
 	}
 }
 
+bool FFileSystem::Exists(const FPath& InPath)
+{
+	return std::filesystem::exists(InPath.ToNative());
+}
+
 FBuffer FFileSystem::LoadBinaryFile(const std::string& InNativePath)
 {
 	FBuffer OutBuffer;
