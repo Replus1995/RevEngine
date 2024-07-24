@@ -79,6 +79,8 @@ void main(void)
         vec3 diffuseBRDF = kd * BaseColor.rgb;
         vec3 specularBRDF = (F * D * G) / max(EPSILON, 4.0 * NdL * NdV);
 
+        //TODO: Shadow
+
         LightColor += (diffuseBRDF + specularBRDF) * Radiance * NdL;
     }
 

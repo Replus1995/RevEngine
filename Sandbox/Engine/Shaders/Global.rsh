@@ -1,4 +1,4 @@
-#define UNIFORM_MAX_FORWARD_LIGHTS 8
+#define UNIFORM_MAX_FORWARD_LIGHTS 32
 #define UBO_BINDING_START 0
 #define UBO_BINDING(NUMBER) UBO_BINDING_START + NUMBER
 
@@ -21,8 +21,7 @@ layout(std140, binding = UBO_BINDING(2)) uniform ShadowUniformBuffer
 {
 	mat4 LightProjMats[6];
 	mat4 LightViewMats[6];
-	uint LightViewCount;
-	vec3 LightParams;
+	vec4 LightParams;
 } ub_Shadow;
 
 struct UnifiedLight

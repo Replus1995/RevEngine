@@ -3,7 +3,7 @@
 #include "Rev/Math/Maths.h"
 #include "Rev/Render/RenderCore.h"
 
-#define UNIFORM_MAX_FORWARD_LIGHTS 8
+#define UNIFORM_MAX_FORWARD_LIGHTS 32
 
 namespace Rev
 {
@@ -24,8 +24,7 @@ struct FShadowUniform
 {
 	Math::FMatrix4 LightProjMats[6];
 	Math::FMatrix4 LightViewMats[6];
-	uint32 LightViewCount = 1;
-	Math::FVector3 LightParams;
+	Math::FVector4 LightParams; //X = ViewCount
 };
 
 struct FUnifiedLight
