@@ -8,8 +8,8 @@ project "Sandbox"
 
     files
     {
-        "src/**.h",
-        "src/**.cpp"
+        "Source/**.h",
+        "Source/**.cpp"
     }
 
     includedirs

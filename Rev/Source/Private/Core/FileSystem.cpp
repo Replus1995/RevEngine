@@ -6,6 +6,64 @@
 namespace Rev
 {
 
+
+FPath::FPath()
+{
+}
+
+FPath::FPath(const std::string& InPath)
+{
+	if (!InPath.empty())
+	{
+		std::filesystem::path tPath(InPath);
+		tPath.lexically_normal();
+		mDir = tPath.parent_path().generic_u8string();
+		mName = tPath.stem().generic_u8string();
+		mExtension = tPath.extension().generic_u8string();
+	}
+}
+
+FPath::~FPath()
+{
+}
+
+FPath& FPath::operator=(const FPath& InPath)
+{
+	mDir = InPath.mDir;
+	mName = InPath.mName;
+	mExtension = InPath.mExtension;
+	return *this;
+}
+
+bool FPath::Empty() const
+{
+	return mDir.empty() && mName.empty();
+}
+
+std::string FPath::FullPath(bool WithExt) const
+{
+	if (WithExt)
+	{
+		return mDir + "/" + mName + mExtension;
+	}
+	return mDir + "/" + mName;
+}
+
+const std::string& FPath::Name() const
+{
+	return mName;
+}
+
+const std::string& FPath::Extension() const
+{
+	return mExtension;
+}
+
+std::string FPath::ToNative() const
+{
+	return FFileSystem::ToNative(mDir) + "/" + mName + mExtension;
+}
+
 void FFileSystem::MountDir(const std::string& VirtualDir, const std::string& NativeDir)
 {
 	auto res = GetDirMap().emplace(VirtualDir, NativeDir);
@@ -144,61 +202,5 @@ std::map<std::string, std::string>& FFileSystem::GetDirMap()
 	return sDirMap;
 }
 
-FPath::FPath()
-{
-}
-
-FPath::FPath(const std::string& InPath)
-{
-	if (!InPath.empty())
-	{
-		std::filesystem::path tPath(InPath);
-		tPath.lexically_normal();
-		mDir = tPath.parent_path().generic_u8string();
-		mName = tPath.stem().generic_u8string();
-		mExtension = tPath.extension().generic_u8string();
-	}
-}
-
-FPath::~FPath()
-{
-}
-
-FPath& FPath::operator=(const FPath& InPath)
-{
-	mDir = InPath.mDir;
-	mName = InPath.mName;
-	mExtension = InPath.mExtension;
-	return *this;
-}
-
-bool FPath::Empty() const
-{
-	return mDir.empty() && mName.empty();
-}
-
-std::string FPath::FullPath(bool WithExt) const
-{
-	if (WithExt)
-	{
-		return mDir + "/" + mName + mExtension;
-	}
-	return mDir + "/" + mName;
-}
-
-const std::string& FPath::Name() const
-{
-	return mName;
-}
-
-const std::string& FPath::Extension() const
-{
-	return mExtension;
-}
-
-std::string FPath::ToNative() const
-{
-	return FFileSystem::ToNative(mDir) + "/" + mName + mExtension;
-}
 
 }

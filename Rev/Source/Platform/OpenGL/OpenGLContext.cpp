@@ -5,14 +5,12 @@
 #include "Rev/Core/Window.h"
 #include "Rev/Render/Material/Material.h"
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
 #include "OpenGLShader.h"
 #include "OpenGLVertexBuffer.h"
 #include "OpenGLUniformBuffer.h"
 #include "OpenGLTexture.h"
-#include "OpenGLFrameBuffer.h"
+
+#include <GLFW/glfw3.h>
 
 namespace Rev
 {

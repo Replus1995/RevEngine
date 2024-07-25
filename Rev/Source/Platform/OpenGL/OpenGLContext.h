@@ -1,7 +1,7 @@
 #pragma once
+#include <glad/glad.h>
 #include "Rev/Render/RHI/RHIContext.h"
 #include "Rev/Render/Mesh/MeshPrimitive.h"
-#include <glad/glad.h>
 
 namespace Rev
 {
