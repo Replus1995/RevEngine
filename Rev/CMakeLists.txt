@@ -13,6 +13,8 @@ target_compile_definitions(Rev
 PUBLIC
     $<$<CONFIG:Debug>:RE_DEBUG>
     $<$<CONFIG:Release>:RE_RELEASE>
+    NOMINMAX #spdlog
+    _SCL_SECURE_NO_WARNINGS #spdlog
 PRIVATE
     RE_BUILD_DLL
     GLFW_INCLUDE_NONE
