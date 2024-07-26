@@ -1,5 +1,5 @@
 #include "Rev/Core/Window.h"
-#include "Platform/GLFW/GLFWWindow.h"
+#include "GLFW/GLFWWindow.h"
 
 namespace Rev
 {

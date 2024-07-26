@@ -25,7 +25,7 @@ public:
 	FTextureDesc TextureDesc;
 	FBuffer ImageData;
 
-	Ref<Texture> CreateTexture();
+	Ref<Texture> CreateTexture(bool bSRGB = false);
 private:
 	Ref<Texture> mCache = nullptr;
 };

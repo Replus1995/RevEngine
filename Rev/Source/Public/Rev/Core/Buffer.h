@@ -1,5 +1,6 @@
 #pragma once
 #include "Rev/Core/Base.h" 
+#include "Rev/Archive/Archive.h"
 #include <stdint.h>
 #include <cstring>
 
@@ -37,6 +38,8 @@ public:
 	T* DataAs() { return (T*)mData; }
 	template<typename T>
 	const T* DataAs() const { return (const T*)mData; }
+
+	friend FArchive& operator<<(FArchive& Ar, FBuffer& Buffer);
 
 private:
 	friend class FBufferView;

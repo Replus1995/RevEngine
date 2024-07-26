@@ -62,6 +62,23 @@ void FBuffer::Release()
 	mSize = 0;
 }
 
+FArchive& operator<<(FArchive& Ar, FBuffer& Buffer)
+{
+	uint64 BufferSize = 0;
+	if (Ar.IsLoading())
+	{
+		Ar << BufferSize;
+		Buffer.Allocate(BufferSize);
+		Ar.Serialize(Buffer.Data(), BufferSize);
+	}
+	else
+	{
+		BufferSize = Buffer.Size();
+		Ar << BufferSize;
+		Ar.Serialize(Buffer.Data(), BufferSize);
+	}
+	return Ar;
+}
 
 FBufferView::FBufferView()
 	: mData(nullptr)

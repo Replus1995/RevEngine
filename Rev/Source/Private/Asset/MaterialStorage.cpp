@@ -11,7 +11,7 @@ Ref<Material> FPBRMaterialStorage::CreateMaterial()
 		return mCache;
 
 	Ref<PBRMaterial> Result = CreateRef<PBRMaterial>();
-	Result->Domain = Domain;
+	Result->TessEval = TessEval;
 	Result->BlendMode = BlendMode;
 	Result->ShadingModel = ShadingModel;
 	Result->MaskClip = MaskClip;
@@ -25,7 +25,7 @@ Ref<Material> FPBRMaterialStorage::CreateMaterial()
 	Result->EmissiveFactor = EmissiveFactor;
 
 	if(BaseColorTexture)
-		Result->BaseColorTexture = BaseColorTexture->CreateTexture();
+		Result->BaseColorTexture = BaseColorTexture->CreateTexture(true);
 	if (MetallicRoughnessTexture)
 		Result->MetallicRoughnessTexture = MetallicRoughnessTexture->CreateTexture();
 	if (NormalTexture)
@@ -33,7 +33,7 @@ Ref<Material> FPBRMaterialStorage::CreateMaterial()
 	if (OcclusionTexture)
 		Result->OcclusionTexture = OcclusionTexture->CreateTexture();
 	if (EmissiveTexture)
-		Result->EmissiveTexture = EmissiveTexture->CreateTexture();
+		Result->EmissiveTexture = EmissiveTexture->CreateTexture(true);
 
 	Result->Compile();
 

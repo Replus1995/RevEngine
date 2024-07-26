@@ -57,13 +57,8 @@ const Ref<Material>& FAssetLibrary::GetDefaultMaterial()
 {
 	if (!sDefaultMaterial)
 	{
-		//FRHIShaderLibrary::GetInstance().LoadOrCompileShader(FPath("/Engine/Shaders/Basic.glsl"));
-		auto Program = FRHIShaderLibrary::GetInstance().CreateGraphicsProgram("BasicProgram", "/Engine/Shaders/Basic");
-		if (Program)
-		{
-			sDefaultMaterial = CreateRef<Material>();
-			sDefaultMaterial->Compile();
-		}
+		sDefaultMaterial = CreateRef<Material>();
+		sDefaultMaterial->Compile();
 	}
 	return sDefaultMaterial;
 }

@@ -23,7 +23,9 @@ Material::~Material()
 
 void Material::Compile()
 {
-	mProgram = FRHIShaderLibrary::GetInstance().FindProgram("BasicProgram");
+	mProgram = FRHIShaderLibrary::GetInstance().CreateGraphicsProgram("BasicProgram",
+		{ "/Engine/Shaders/BasicVS" },
+		{ "/Engine/Shaders/BasicFS" });
 }
 
 void Material::SyncUniform()
@@ -37,10 +39,10 @@ void Material::SyncTextureUniform(const Ref<class Texture>& InTexture, uint16 In
 		InTexture->GetResource()->Bind(TexUnit);
 		mProgram->SetUniform(InLocation, TexUnit);
 	}
-	else
+	/*else
 	{
 		mProgram->SetUniform(InLocation, TexUnitFallback);
-	}
+	}*/
 }
 
 }

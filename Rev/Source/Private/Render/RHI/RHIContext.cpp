@@ -2,7 +2,8 @@
 #include "Rev/Core/Assert.h"
 #include "Rev/Core/Application.h"
 
-#include "Platform/OpenGL/OpenGLContext.h"
+//Private
+#include "OpenGL/OpenGLContext.h"
 
 namespace Rev
 {

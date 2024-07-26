@@ -35,9 +35,9 @@ FOpenGLFormatData FOpenGLPixelFormat::TranslatePixelFormat(EPixelFormat InFormat
 		switch (InFormat)
 		{
 		case Rev::PF_R8G8B8A8:
-			return { GL_SRGB8_ALPHA8, GL_SRGB_ALPHA, GL_UNSIGNED_BYTE, 4 };
+			return { GL_SRGB8_ALPHA8, GL_RGBA, GL_UNSIGNED_BYTE, 4 };
 		case Rev::PF_RGB8:
-			return { GL_SRGB8, GL_SRGB, GL_UNSIGNED_BYTE, 3 };
+			return { GL_SRGB8, GL_RGB, GL_UNSIGNED_BYTE, 3 };
 		default:
 			break;
 		}

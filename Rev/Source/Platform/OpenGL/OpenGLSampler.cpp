@@ -1,4 +1,5 @@
 #include "OpenGLSampler.h"
+#include "Rev/Core/Assert.h"
 
 namespace Rev
 {
@@ -59,6 +60,8 @@ GLenum FOpenGLSampler::TranslateFilterMode(ESamplerFilterMode InMode, bool bMipM
 			return GL_LINEAR;
 		}
 	}
+	RE_CORE_ASSERT(false, "Invalid filter mode");
+	return GLenum(0);
 }
 
 GLenum FOpenGLSampler::TranslateWarpMode(ESamplerWarpMode InMode)

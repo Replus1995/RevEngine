@@ -23,7 +23,6 @@ void RenderCmd::Init()
 void RenderCmd::Shutdown()
 {
 	FRHIShaderLibrary::GetInstance().ClearShadersCache();
-	FRHIShaderLibrary::GetInstance().ClearShaderProgramsCache();
 	FRHIShaderLibrary::ReleaseInstance();
 	sContext.reset();
 }

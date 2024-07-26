@@ -12,12 +12,12 @@ namespace fs = std::filesystem;
 namespace Rev
 {
 
-FOpenGLShader::FOpenGLShader(ERHIShaderStage InStage, std::vector<uint32_t> InCompiledData)
+FOpenGLShader::FOpenGLShader(ERHIShaderStage InStage, const FBuffer& InCompiledData)
 	: FRHIShader(InStage)
 {
 	GLenum GLStage = TranslateShaderStage(InStage);
 	mHandle = glCreateShader(GLStage);
-	glShaderBinary(1, &mHandle, GL_SHADER_BINARY_FORMAT_SPIR_V, InCompiledData.data(), InCompiledData.size() * sizeof(uint32_t));
+	glShaderBinary(1, &mHandle, GL_SHADER_BINARY_FORMAT_SPIR_V, InCompiledData.Data(), InCompiledData.Size());
 	glSpecializeShader(mHandle, "main", 0, nullptr, nullptr);
 }
 
@@ -32,12 +32,12 @@ GLenum FOpenGLShader::TranslateShaderStage(ERHIShaderStage InStage)
 	{
 	case ERHIShaderStage::Vertex:
 		return GL_VERTEX_SHADER;
-	case ERHIShaderStage::Hull:
-		return GL_TESS_CONTROL_SHADER;
-	case ERHIShaderStage::Domain:
-		return GL_TESS_EVALUATION_SHADER;
-	case ERHIShaderStage::Pixel:
+	case ERHIShaderStage::Fragment:
 		return GL_FRAGMENT_SHADER;
+	case ERHIShaderStage::TessControl:
+		return GL_TESS_CONTROL_SHADER;
+	case ERHIShaderStage::TessEval:
+		return GL_TESS_EVALUATION_SHADER;
 	case ERHIShaderStage::Geometry:
 		return GL_GEOMETRY_SHADER;
 	case ERHIShaderStage::Compute:
@@ -47,20 +47,6 @@ GLenum FOpenGLShader::TranslateShaderStage(ERHIShaderStage InStage)
 	}
 	RE_CORE_ASSERT(false);
 	return 0;
-}
-
-namespace
-{
-	static shaderc_shader_kind StageToShaderC(GLenum stage)
-	{
-		switch (stage)
-		{
-		case GL_VERTEX_SHADER:   return shaderc_glsl_vertex_shader;
-		case GL_FRAGMENT_SHADER: return shaderc_glsl_fragment_shader;
-		}
-		RE_CORE_ASSERT(false);
-		return (shaderc_shader_kind)0;
-	}
 }
 
 

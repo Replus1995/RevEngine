@@ -5,7 +5,8 @@
 #include "Rev/Render/Renderer.h"
 #include "Rev/Render/RHI/RHIResourceFactory.h"
 
-#include "Private/Render/UniformLocation.h"
+//Private
+#include "Render/UniformLocation.h"
 
 namespace Rev
 {

@@ -1,11 +1,15 @@
 #include "ShadercUtils.h"
-#include "Rev/Core/Assert.h"
 #include "Rev/Core/Log.h"
+#include "Rev/Core/Assert.h"
 #include "Rev/Core/Clock.h"
+#include "Rev/Archive/FileArchive.h"
 
 #include <vector>
 #include <filesystem>
+#include <regex>
 #include <spirv_cross/spirv_cross.hpp>
+
+#include <iostream>
 
 namespace fs = std::filesystem;
 
@@ -90,7 +94,7 @@ void FShadercUtils::CreateCacheDirectory()
 
 const char* FShadercUtils::GetCacheExtension()
 {
-	return ".shaderc_cached";
+	return ".rscached";
 }
 
 ERHIShaderStage FShadercUtils::StringToShaderStage(std::string_view InStr)
@@ -98,15 +102,15 @@ ERHIShaderStage FShadercUtils::StringToShaderStage(std::string_view InStr)
 	if (InStr == "vertex")
 		return ERHIShaderStage::Vertex;
 	else if (InStr == "fragment" || InStr == "pixel")
-		return ERHIShaderStage::Pixel;
-	else if (InStr == "geometry" )
+		return ERHIShaderStage::Fragment;
+	else if (InStr == "tesscontrol" || InStr == "hull")
+		return ERHIShaderStage::TessControl;
+	else if (InStr == "tesseval" || InStr == "domain")
+		return ERHIShaderStage::TessEval;
+	else if (InStr == "geometry")
 		return ERHIShaderStage::Geometry;
-	else if (InStr == "tess_control" || InStr == "hull")
-		return ERHIShaderStage::Hull;
-	else if (InStr == "tess_evaluation" || InStr == "domain")
-		return ERHIShaderStage::Domain;
 	else if (InStr == "compute")
-		return ERHIShaderStage::Domain;
+		return ERHIShaderStage::Compute;
 
 	return ERHIShaderStage::Unknown;
 }
@@ -115,12 +119,12 @@ const char* FShadercUtils::ShaderStageToString(ERHIShaderStage InStage)
 {
 	switch (InStage)
 	{
-	case ERHIShaderStage::Vertex:   return "Vertex";
-	case ERHIShaderStage::Hull:		return "Hull";
-	case ERHIShaderStage::Domain:   return "Domain";
-	case ERHIShaderStage::Pixel:	return "Pixel";
-	case ERHIShaderStage::Geometry: return "Geometry";
-	case ERHIShaderStage::Compute:	return "Compute";
+	case ERHIShaderStage::Vertex:		return "Vertex";
+	case ERHIShaderStage::Fragment:		return "Fragment";
+	case ERHIShaderStage::TessControl:	return "Tesselation Control";
+	case ERHIShaderStage::TessEval:		return "Tesselation Evaluation";
+	case ERHIShaderStage::Geometry:		return "Geometry";
+	case ERHIShaderStage::Compute:		return "Compute";
 	}
 	RE_CORE_ASSERT(false);
 	return nullptr;
@@ -135,25 +139,22 @@ FShadercSource FShadercUtils::LoadShaderSource(const FPath& InPath)
 		return Result;
 
 	std::string_view SrcStr(Result.FileContent.DataAs<char>(), Result.FileContent.Size());
-	std::string_view KindToken = "#kind";
-	size_t pos = SrcStr.find(KindToken, 0);
-	while (pos != std::string_view::npos)
+	const std::regex re(R"(#pragma\s+shader_stage\((.*?)\))");
+
+	using MatchResult = std::match_results<std::string_view::const_iterator>;
+	MatchResult MatchRes;
+
+	if (std::regex_search(SrcStr.begin(), SrcStr.end(), MatchRes, re))
 	{
-		size_t eol = SrcStr.find_first_of("\r\n", pos); //End of shader type declaration line
-		RE_CORE_ASSERT(eol != std::string_view::npos, "Syntax error");
-		size_t begin = pos + KindToken.length() + 1; //Start of shader type name (after "#type " keyword)
-
-		std::string_view TypeStr = SrcStr.substr(begin, eol - begin);
-		ERHIShaderStage Stage = StringToShaderStage(TypeStr);
-		RE_CORE_ASSERT(Stage != ERHIShaderStage::Unknown, "Invalid shader type specified");
-
-		size_t nextLinePos = SrcStr.find_first_not_of("\r\n", eol); //Start of shader code after shader type declaration line
-		RE_CORE_ASSERT(nextLinePos != std::string_view::npos, "Syntax error");
-		pos = SrcStr.find(KindToken, nextLinePos); //Start of next shader type declaration line
-
-		size_t StageContentSize = pos == std::string_view::npos ? Result.FileContent.Size() - nextLinePos : pos - nextLinePos;
-		FBufferView StageContent(Result.FileContent, nextLinePos, StageContentSize);
-		Result.StageSourceMap.emplace(Stage, std::move(StageContent));
+		RE_CORE_ASSERT(MatchRes.size() == 2, "Syntax error");
+		const auto& SubRes = MatchRes[1];
+		size_t StageBegin = SubRes.first - SrcStr.begin();
+		const std::string_view StageStr(SrcStr.data() + StageBegin, SubRes.length());
+		Result.Stage = StringToShaderStage(StageStr);
+	}
+	else
+	{
+		RE_CORE_ASSERT(false, "Unknow shader source stage");
 	}
 
 	return Result;
@@ -161,64 +162,36 @@ FShadercSource FShadercUtils::LoadShaderSource(const FPath& InPath)
 
 bool FShadercUtils::LoadShaderCompiledData(const std::filesystem::path& ShaderCachePath, FShadercCompiledData& OutCompiledData)
 {
-	//fs::path CachedPath(GetCacheDirectory() + ShaderPath.FullPath(false) + sShaderCachaExtension);
 	if (fs::exists(ShaderCachePath))
 	{
-		std::ifstream InFile(ShaderCachePath, std::ios::in | std::ios::binary);
-		if (InFile.is_open())
+		Clock timer;
 		{
-			Clock timer;
-			OutCompiledData.CompiledDataMap.clear();
-			bool ReadSuccess = true;
-			while (InFile.peek() != EOF)
-			{
-				ERHIShaderStage Stage = ERHIShaderStage::Unknown;
-				std::vector<uint32_t> CompiledData;
-				if(ReadSuccess = ReadData(InFile, Stage); !ReadSuccess)
-					break;
-				if (ReadSuccess = ReadData(InFile, CompiledData); !ReadSuccess)
-					break;
-				OutCompiledData.CompiledDataMap.emplace(Stage, std::move(CompiledData));
-			}
-			if(ReadSuccess)
-				RE_CORE_INFO("Shader '{0}' read from cache took {1} ms", OutCompiledData.Name.c_str(), timer.ElapsedMillis());
-			else
-			{
-				RE_CORE_ERROR("Shader '{0}' cache corrupted", OutCompiledData.Name.c_str());
-				OutCompiledData.CompiledDataMap.clear();
-			}
-			return ReadSuccess;
+			FFileArchive Ar(ShaderCachePath.generic_u8string(), EFileArchiveKind::Read);
+			Ar << OutCompiledData;
+		}
+		if (!OutCompiledData.Binary.Empty())
+		{
+			RE_CORE_INFO("Shader '{0}' read from cache took {1} ms", OutCompiledData.Name.c_str(), timer.ElapsedMillis());
 		}
 		else
 		{
-			RE_CORE_ERROR("[FShadercUtils] Open file failded '{0}'", ShaderCachePath.string().c_str());
+			RE_CORE_ERROR("Shader '{0}' read from cache failed", OutCompiledData.Name.c_str());
 		}
+		return !OutCompiledData.Binary.Empty();
 	}
 	return false;
 }
 
-bool FShadercUtils::SaveShaderCompiledData(const std::filesystem::path& ShaderCachePath, const FShadercCompiledData& InCompiledData)
+bool FShadercUtils::SaveShaderCompiledData(const std::filesystem::path& ShaderCachePath, FShadercCompiledData& InCompiledData)
 {
 	CreateCacheDirectory();
-
-	//fs::path CachedPath(GetCacheDirectory() + ShaderPath.FullPath(false) + sShaderCachaExtension);
 	fs::path CachedDir = ShaderCachePath.parent_path();
 	if(!fs::exists(CachedDir))
 		fs::create_directories(CachedDir);
 
-	std::ofstream OutFile(ShaderCachePath, std::ios::out | std::ios::binary);
-	if (OutFile.is_open())
 	{
-		for (auto&[Stage, CompiledData] : InCompiledData.CompiledDataMap)
-		{
-			WriteData(OutFile, Stage);
-			WriteData(OutFile, CompiledData);
-		}
-		return true;
-	}
-	else
-	{
-		RE_CORE_ERROR("[FShadercUtils] Open file failded '{0}'", ShaderCachePath.string().c_str());
+		FFileArchive Ar(ShaderCachePath.generic_u8string(), EFileArchiveKind::Write);
+		Ar << InCompiledData;
 	}
 
 	return false;
@@ -226,12 +199,12 @@ bool FShadercUtils::SaveShaderCompiledData(const std::filesystem::path& ShaderCa
 
 void FShadercUtils::DumpShaderInfo(const FShadercCompiledData& InData)
 {
-	for (auto&& [Stage, CompiledData] : InData.CompiledDataMap)
+	//for (auto&& [Stage, CompiledData] : InData.CompiledDataMap)
 	{
-		spirv_cross::Compiler compiler(CompiledData);
+		spirv_cross::Compiler compiler(InData.Binary.DataAs<uint32_t>(), InData.Binary.Size() / sizeof(uint32_t));
 		spirv_cross::ShaderResources resources = compiler.get_shader_resources();
 
-		RE_CORE_TRACE("Shaderc::Reflect - {0} {1}", InData.Name.c_str(), ShaderStageToString(Stage));
+		RE_CORE_TRACE("Shaderc::Reflect - {0} {1}", InData.Name.c_str(), ShaderStageToString(InData.Stage));
 		RE_CORE_TRACE("    {0} uniform buffers", resources.uniform_buffers.size());
 		RE_CORE_TRACE("    {0} resources", resources.sampled_images.size());
 

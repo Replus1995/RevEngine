@@ -4,7 +4,8 @@
 #include "Rev/Render/RenderCmd.h"
 #include "Rev/Core/Assert.h"
 
-#include "Private/Asset/BasicGeometry/PlaneGeometry.hpp"
+//Private
+#include "Asset/BasicGeometry/PlaneGeometry.hpp"
 
 namespace Rev
 {

@@ -1,0 +1,18 @@
+macro(group_source SRC_FILES)
+	set(SRC_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/)
+	foreach(SRC_FILE ${${SRC_FILES}})
+		string(REGEX REPLACE ${SRC_ROOT} "" SRC_FILE_PATH ${SRC_FILE})
+		string(REGEX REPLACE "[^/\\\\]+$" "" SRC_GROUP_NAME ${SRC_FILE_PATH})
+		if(SRC_GROUP_NAME)
+			string(REPLACE "/"   "\\\\"  SRC_GROUP_NAME_NORMAL ${SRC_GROUP_NAME})
+			source_group(${SRC_GROUP_NAME_NORMAL} FILES ${SRC_FILE})
+		endif(SRC_GROUP_NAME)
+	endforeach(SRC_FILE)
+endmacro(group_source)
+
+macro(group_target TARGET_NAME FOLDER_NAME)
+    if(MSVC AND TARGET ${TARGET_NAME})
+        set_target_properties(${TARGET_NAME} PROPERTIES FOLDER ${FOLDER_NAME})
+    endif()
+endmacro(group_target)
+

@@ -2,7 +2,6 @@
 #include "Rev/Core/Assert.h"
 
 #include "OpenGLSampler.h"
-//#include <stb_image.h>
 
 namespace Rev
 {
@@ -18,46 +17,6 @@ FOpenGLTexture2D::FOpenGLTexture2D(const FTextureDesc& InDesc, const FSamplerDes
 	CreateResource();
 	FOpenGLSampler::UpdateSampleState(InSamplerDesc, mHandle, mDesc.NumMips > 1);
 }
-
-
-	//int width, height, channels;
-	//stbi_set_flip_vertically_on_load(1);
-	//stbi_uc* data = nullptr;
-	//{
-	//	//PE_PROFILE_SCOPE("stbi_load - OpenGLTexture2D::OpenGLTexture2D(const std::string&)");
-	//	data = stbi_load(path.c_str(), &width, &height, &channels, 0);
-	//}
-
-	//if (data)
-	//{
-	//	mLoaded = true;
-
-	//	mWidth = width;
-	//	mHeight = height;
-
-	//	GLenum internalFormat = 0, dataFormat = 0;
-	//	if (channels == 4)
-	//	{
-	//		internalFormat = GL_RGBA8;
-	//		dataFormat = GL_RGBA;
-	//	}
-	//	else if (channels == 3)
-	//	{
-	//		internalFormat = GL_RGB8;
-	//		dataFormat = GL_RGB;
-	//	}
-
-	//	mInternalFormat = internalFormat;
-	//	mDataFormat = dataFormat;
-	//	mDataType = GL_UNSIGNED_BYTE; //do not support float format
-
-	//	RE_CORE_ASSERT(internalFormat & dataFormat, "Format not supported!");
-
-	//	CreateTexture();
-	//	glTextureSubImage2D(mHandle, 0, 0, 0, mWidth, mHeight, dataFormat, GL_UNSIGNED_BYTE, data);
-
-	//	stbi_image_free(data);
-	//}
 
 FOpenGLTexture2D::~FOpenGLTexture2D()
 {
@@ -83,9 +42,18 @@ void FOpenGLTexture2D::ClearData()
 	case PF_R8G8B8A8:
 	case PF_RGB8:
 	{
-		//Math::FColor RGBA8 = Math::FLinearColor::ToSRGB(mDesc.ClearColor.RGBA);
-		Math::FLinearColor RGBA8 = mDesc.ClearColor.RGBA * 255.0f;
-		uint8 ClearColor[4] = { RGBA8.R, RGBA8.G, RGBA8.B, RGBA8.A };
+		Math::FColor ClearColor(0, 0, 0, 0);
+		if (mDesc.bSRGB)
+		{
+			ClearColor = Math::FLinearColor::ToSRGB(mDesc.ClearColor.RGBA);
+		}
+		else
+		{
+			for (size_t i = 0; i < 4; i++)
+			{
+				ClearColor[i] = uint8(mDesc.ClearColor.RGBA[i] * 255.0f);
+			}
+		}
 		glClearTexImage(mHandle, 0, mFormatData.DataFormat, mFormatData.DataType, (const void*)&ClearColor);
 		break;
 	}

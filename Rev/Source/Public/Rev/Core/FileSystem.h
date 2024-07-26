@@ -1,35 +1,21 @@
 #pragma once
 #include "Rev/Core/Base.h"
+#include "Rev/Core/Path.h"
+#include "Rev/Core/File.h"
 #include "Rev/Core/Buffer.h"
-#include <string_view>
 #include <map>
 
 namespace Rev
 {
 
-class FPath
-{
-public:
-	REV_API FPath();
-	REV_API FPath(const std::string& InPath);
-	REV_API ~FPath();
-	REV_API FPath& operator=(const FPath& InPath);
-
-	REV_API bool Empty() const;
-	REV_API std::string FullPath(bool WithExt = true) const;
-	REV_API const std::string& Name() const;
-	REV_API const std::string& Extension() const;
-	REV_API std::string ToNative() const;
-private:
-	std::string mDir;
-	std::string mName;
-	std::string mExtension;
-};
-
 class REV_API FFileSystem
 {
 public:
+	static void Init(const char* argv0);
+	static void Shutdown();
+
 	static void MountDir(const std::string& VirtualDir, const std::string& NativeDir);
+	static bool Exists(const FPath& InPath);
 
 	static FBuffer LoadBinaryFile(const std::string& InNativePath);
 	static FBuffer LoadBinaryFile(const FPath& InPath);

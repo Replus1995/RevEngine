@@ -12,9 +12,9 @@ enum class ERHIShaderStage : uint8
 {
     Unknown = 0,
     Vertex = 1,
-    Hull = 2, //unsupported
-    Domain = 3, //unsupported
-    Pixel = 4,
+    Fragment = 2,
+    TessControl = 3, //unsupported
+    TessEval = 4, //unsupported
     Geometry = 5, //unsupported
     Compute = 6, //unsupported
     Count = 7
@@ -30,17 +30,6 @@ protected:
     FRHIShader(ERHIShaderStage InStage) : mStage(InStage) {}
 protected:
     ERHIShaderStage mStage;
-};
-
-struct REV_API FRHIGraphicsShaders
-{
-    Ref<FRHIShader> VertexShader = nullptr;
-    Ref<FRHIShader> HullShader = nullptr;
-    Ref<FRHIShader> DomainShader = nullptr;
-    Ref<FRHIShader> PixelShader = nullptr;
-    Ref<FRHIShader> GeometryShader = nullptr;
-
-    const Ref<FRHIShader>& operator[](ERHIShaderStage Stage) const;
 };
 
 class REV_API FRHIShaderProgram : public FRHIResource
@@ -80,6 +69,18 @@ protected:
     FRHIShaderProgram(const std::string& InName) : mProgramName(InName) {}
 protected:
     std::string mProgramName;
+};
+
+
+struct REV_API FRHIGraphicsShaders
+{
+    Ref<FRHIShader> VertexShader = nullptr;
+    Ref<FRHIShader> HullShader = nullptr;
+    Ref<FRHIShader> DomainShader = nullptr;
+    Ref<FRHIShader> PixelShader = nullptr;
+    Ref<FRHIShader> GeometryShader = nullptr;
+
+    const Ref<FRHIShader>& operator[](ERHIShaderStage Stage) const;
 };
 
 }
