@@ -90,25 +90,39 @@ static shaderc_shader_kind ShaderStageToShadercKind(ERHIShaderStage InStage)
 	return (shaderc_shader_kind)0;
 }
 
-static void InitCompileOptions(shaderc::CompileOptions& options)
+static void InitCompileOptions(shaderc::CompileOptions& Options)
 {
 	switch (GetRenderAPI())
 	{
 	case Rev::ERenderAPI::OpenGL:
-		options.SetTargetEnvironment(shaderc_target_env_opengl, shaderc_env_version_opengl_4_5);
+		Options.SetTargetEnvironment(shaderc_target_env_opengl, shaderc_env_version_opengl_4_5);
 		break;
 	case Rev::ERenderAPI::Vulkan:
-		options.SetTargetEnvironment(shaderc_target_env_vulkan, shaderc_env_version_vulkan_1_2);
+		Options.SetTargetEnvironment(shaderc_target_env_vulkan, shaderc_env_version_vulkan_1_2);
 		break;
 	default:
 		RE_CORE_ASSERT(false, "Unknow Render API")
 			break;
 	}
-	options.SetIncluder(CreateScope<ShaderIncluder>());
+	Options.SetIncluder(CreateScope<ShaderIncluder>());
 
 	constexpr bool bOptimize = false;
 	if (bOptimize)
-		options.SetOptimizationLevel(shaderc_optimization_level_performance);
+		Options.SetOptimizationLevel(shaderc_optimization_level_performance);
+}
+
+static void AddCompileMacros(shaderc::CompileOptions& Options, uint64 InMacros)
+{
+	if (InMacros & SCM_USE_BASECOLOR_TEX)
+		Options.AddMacroDefinition("USE_BASECOLOR_TEX");
+	if (InMacros & SCM_USE_METALLICROUGHNESS_TEX)
+		Options.AddMacroDefinition("USE_METALLICROUGHNESS_TEX");
+	if (InMacros & SCM_USE_NORMAL_TEX)
+		Options.AddMacroDefinition("USE_NORMAL_TEX");
+	if (InMacros & SCM_USE_OCCLUSION_TEX)
+		Options.AddMacroDefinition("USE_OCCLUSION_TEX");
+	if (InMacros & SCM_USE_EMISSIVE_TEX)
+		Options.AddMacroDefinition("USE_EMISSIVE_TEX");
 }
 
 void FShadercFactory::CompileShaders(const FShadercSource& InSource, const FRHIShaderCompileOptions& InOptions, FShadercCompiledData& OutData)
@@ -118,6 +132,7 @@ void FShadercFactory::CompileShaders(const FShadercSource& InSource, const FRHIS
 	shaderc::Compiler compiler;
 	shaderc::CompileOptions options;
 	InitCompileOptions(options);
+	AddCompileMacros(options, InOptions.mMacros);
 
 	{
 		shaderc::SpvCompilationResult CompileResult = compiler.CompileGlslToSpv(InSource.FileContent.DataAs<char>(), InSource.FileContent.Size(), ShaderStageToShadercKind(InSource.Stage), NativeFilePath.c_str(), options);

@@ -166,18 +166,6 @@ EPixelFormat FGLTFUtils::TranslateImageFormat(const tinygltf::Image& InImage)
 	return PF_Unknown;
 }
 
-bool FGLTFUtils::TranslateImageSRGB(const tinygltf::Image& InImage)
-{
-	if (InImage.pixel_type == TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE)
-	{
-		if (InImage.component == 3 || InImage.component == 4)
-		{
-			return true;
-		}
-	}
-	return false;
-}
-
 FSamplerDesc FGLTFUtils::TranslateSampler(const tinygltf::Sampler& InSampler)
 {
 	FSamplerDesc Result;
@@ -361,7 +349,7 @@ Ref<FTextureStorage> FGLTFUtils::ImportTexture(const tinygltf::Texture& InTextur
 	{
 		Result->Name = InTexture.name;
 	}
-	Result->TextureDesc = FTextureDesc::MakeTexture2D(InImage.width, InImage.height, TranslateImageFormat(InImage), TranslateImageSRGB(InImage), Math::FLinearColor(0, 0, 0, 1));
+	Result->TextureDesc = FTextureDesc::MakeTexture2D(InImage.width, InImage.height, TranslateImageFormat(InImage), false, Math::FLinearColor(0, 0, 0, 1));
 	Result->SamplerDesc = TranslateSampler(InSampler);
 	{
 		//Decoded data

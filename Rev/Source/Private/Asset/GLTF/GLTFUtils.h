@@ -17,7 +17,6 @@ public:
 	static uint32 GetComponentSize(int InComponentType);
 	static EDrawMode TranslateDrawMode(int InDrawMode);
 	static EPixelFormat TranslateImageFormat(const tinygltf::Image& InImage);
-	static bool TranslateImageSRGB(const tinygltf::Image& InImage);
 	static FSamplerDesc TranslateSampler(const tinygltf::Sampler& InSampler);
 	static Math::FLinearColor TranslateColor(const std::vector<double>& InColor);
 	static Math::FVector3 TranslateVector3(const std::vector<double>& InVector3);
