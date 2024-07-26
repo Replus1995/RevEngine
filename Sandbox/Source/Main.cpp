@@ -2,23 +2,18 @@
 #include "ExampleLayer.h"
 
 
-class SandBox : public Rev::Application
+class SandBoxApp: public Rev::Application
 {
 public:
-	SandBox() 
+	SandBoxApp()
 	{
 		PushLayer(new ExampleLayer());
 		//PushLayer(new Rev::ImGuiLayer());
 	};
-	~SandBox() {};
+	~SandBoxApp() {};
 };
-
-Rev::Application* Rev::CreateApplication()
-{
-	return new SandBox();
-}
 
 int main(int argc, char** argv)
 {
-	return Rev::RunApp(argc, argv);
+	return Rev::RunApp<SandBoxApp>(argc, argv);
 }

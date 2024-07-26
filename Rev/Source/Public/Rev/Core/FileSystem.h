@@ -29,6 +29,9 @@ private:
 class REV_API FFileSystem
 {
 public:
+	static void Init(const char* argv0);
+	static void Shutdown();
+
 	static void MountDir(const std::string& VirtualDir, const std::string& NativeDir);
 	static bool Exists(const FPath& InPath);
 

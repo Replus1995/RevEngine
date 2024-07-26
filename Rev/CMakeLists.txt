@@ -9,6 +9,8 @@ STATIC
     ${REV_SRC_FILES}
 )
 
+set_target_properties(Rev PROPERTIES UNITY_BUILD TRUE)
+
 target_compile_definitions(Rev
 PUBLIC
     $<$<CONFIG:Debug>:RE_DEBUG>
@@ -52,13 +54,14 @@ if(WIN32)
 
     target_link_libraries(Rev
     PRIVATE
-        Glad
-        imgui
+        physfs-static
         glfw3
+        Glad
         vulkan-1
         shaderc_shared
         spirv-cross-core
         spirv-cross-glsl
+        imgui
     )
 endif()
 
