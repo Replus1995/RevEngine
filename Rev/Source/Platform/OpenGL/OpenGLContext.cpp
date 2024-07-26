@@ -40,7 +40,7 @@ void OpenGLContext::Init()
 	Window* pWnd = Application::GetApp().GetWindow();
 	RE_CORE_ASSERT(pWnd, "[OpenGLRHI] Invalid window!");
 
-	switch (pWnd->GetType())
+	/*switch (pWnd->GetType())
 	{
 	case EWindowType::GLFW:
 	{
@@ -50,7 +50,8 @@ void OpenGLContext::Init()
 	}
 	default:
 		RE_CORE_ASSERT(false, "[OpenGLRHI] Unknown window type!");
-	}
+	}*/
+	gladLoadGL();
 
 #ifdef RE_DEBUG
 	glEnable(GL_DEBUG_OUTPUT);

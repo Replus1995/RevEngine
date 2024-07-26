@@ -60,7 +60,6 @@ void PBRMaterial::SyncUniform()
 	SyncTextureUniform(NormalTexture, UL_NormalTexture, 4);
 	SyncTextureUniform(OcclusionTexture, UL_OcclusionTexture, 5);
 	SyncTextureUniform(EmissiveTexture, UL_EmissiveTexture, 6);
-	
 }
 
 }

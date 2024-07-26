@@ -1,5 +1,7 @@
-#kind pixel
-#version 430 core
+#version 460 core
+#pragma shader_stage(fragment)
+#extension GL_ARB_separate_shader_objects : enable
+#extension GL_GOOGLE_include_directive : enable
 
 layout(location = 0) out vec4 o_Color;
 
