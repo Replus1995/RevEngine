@@ -1,7 +1,7 @@
 #pragma once
 #include "OpenGLShader.h"
 #include "Rev/Core/FileSystem.h"
-#include "Platform/Shaderc/ShadercFactory.h"
+#include "Shaderc/ShadercFactory.h"
 
 namespace Rev
 {

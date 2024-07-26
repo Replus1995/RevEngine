@@ -1,5 +1,5 @@
 #pragma once
-#include "Platform/Shaderc/ShadercUtils.h"
+#include "Shaderc/ShadercUtils.h"
 
 namespace Rev
 {

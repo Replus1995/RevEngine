@@ -3,9 +3,9 @@
 #include "Rev/Core/Assert.h"
 #include "Rev/Render/RenderCore.h"
 
-#include "Platform/Shaderc/ShadercFactory.h"
-//OpenGL
-#include "Platform/OpenGL/OpenGLShaderFactory.h"
+//Private
+#include "Shaderc/ShadercFactory.h"
+#include "OpenGL/OpenGLShaderFactory.h"
 
 namespace Rev
 {
@@ -52,10 +52,10 @@ Ref<FRHIShaderProgram> FRHIShaderLibrary::CreateGraphicsProgram(const std::strin
 
 Ref<FRHIShader> FRHIShaderLibrary::LoadOrCompileShader(const FPath& InPath, const FRHIShaderCompileOptions& InOptions)
 {
-	auto CompiledData = FShadercFactory::LoadOrCompileShader(InPath, InOptions);
-	if (CompiledData.Empty())
+	auto Binary = FShadercFactory::LoadOrCompileShader(InPath, InOptions);
+	if (Binary.Empty())
 	{
-		RE_CORE_WARN("No shader complied for {0}", InPath.FullPath().c_str());
+		RE_CORE_WARN("No shader complied for {0}", InPath.ToString().c_str());
 		return {};
 	}
 
@@ -63,8 +63,8 @@ Ref<FRHIShader> FRHIShaderLibrary::LoadOrCompileShader(const FPath& InPath, cons
 	{
 	case ERenderAPI::OpenGL:
 	{
-		auto pShader = FOpenGLShaderFactory::CreateShader(CompiledData);
-		mShadersCache[CompiledData.Name].Add(InOptions.Hash(), pShader);
+		auto pShader = FOpenGLShaderFactory::CreateShader(Binary);
+		mShadersCache[Binary.Name].Add(InOptions.Hash(), pShader);
 		return pShader;
 	}
 	default:

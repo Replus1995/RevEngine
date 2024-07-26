@@ -2,8 +2,6 @@
 #include "Rev/Render/RenderCore.h"
 #include "Rev/Core/Assert.h"
 
-#include "Platform/OpenGL/OpenGLShader.h"
-
 namespace Rev
 {
 

@@ -5,7 +5,7 @@ file(GLOB_RECURSE REV_SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/Source/*)
 group_source(REV_SRC_FILES)
 
 add_library(Rev
-STATIC
+SHARED
     ${REV_SRC_FILES}
 )
 
@@ -15,12 +15,12 @@ target_compile_definitions(Rev
 PUBLIC
     $<$<CONFIG:Debug>:RE_DEBUG>
     $<$<CONFIG:Release>:RE_RELEASE>
+    _SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING
     NOMINMAX #spdlog
     _SCL_SECURE_NO_WARNINGS #spdlog
 PRIVATE
     RE_BUILD_DLL
     GLFW_INCLUDE_NONE
-    _SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING
 )
 
 
@@ -31,7 +31,8 @@ PUBLIC
     ${VENDOR_ROOT}/entt/single_include
     ${VENDOR_ROOT}/glm
 PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/Source
+    ${CMAKE_CURRENT_SOURCE_DIR}/Source/Private
+    ${CMAKE_CURRENT_SOURCE_DIR}/Source/Platform
     $ENV{VULKAN_SDK}/Include
     ${VENDOR_ROOT}/jsonhpp
     ${VENDOR_ROOT}/stb

@@ -4,7 +4,8 @@
 #include "Rev/Render/RenderCmd.h"
 #include "Rev/Render/Renderer.h"
 
-#include "Private/Render/UniformLocation.h"
+//Private
+#include "Render/UniformLocation.h"
 
 namespace Rev
 {

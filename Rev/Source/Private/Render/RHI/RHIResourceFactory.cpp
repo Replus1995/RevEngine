@@ -3,11 +3,11 @@
 #include "Rev/Core/Assert.h"
 
 //OpenGL impl headers
-#include "Platform/OpenGL/OpenGLVertexBuffer.h"
-#include "Platform/OpenGL/OpenGLUniformBuffer.h"
-#include "Platform/OpenGL/OpenGLSampler.h"
-#include "Platform/OpenGL/OpenGLTexture.h"
-#include "Platform/OpenGL/OpenGLRenderTarget2D.h"
+#include "OpenGL/OpenGLVertexBuffer.h"
+#include "OpenGL/OpenGLUniformBuffer.h"
+#include "OpenGL/OpenGLSampler.h"
+#include "OpenGL/OpenGLTexture.h"
+#include "OpenGL/OpenGLRenderTarget2D.h"
 
 namespace Rev
 {

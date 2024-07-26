@@ -16,8 +16,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_CURRENT_BINARY_DIR}/Release/B
 project(RevEngine)
 if(MSVC)
     add_compile_options(
-        $<$<CONFIG:Debug>:/MDd>
-        $<$<CONFIG:Release>:/MD>
+        #$<$<CONFIG:Debug>:/MDd>
+        #$<$<CONFIG:Release>:/MD>
+        "/MD"
         "/std:c++17"
     )
 endif()
@@ -33,3 +34,7 @@ group_target(Rev "Core")
 #SandBox
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Sandbox ${CMAKE_CURRENT_BINARY_DIR}/Sandbox)
 group_target(Sandbox "Misc")
+
+if(MSVC)
+    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Sandbox)
+endif()

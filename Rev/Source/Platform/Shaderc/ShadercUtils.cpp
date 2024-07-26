@@ -1,7 +1,8 @@
 #include "ShadercUtils.h"
-#include "Rev/Core/Assert.h"
 #include "Rev/Core/Log.h"
+#include "Rev/Core/Assert.h"
 #include "Rev/Core/Clock.h"
+#include "Rev/Archive/FileArchive.h"
 
 #include <vector>
 #include <filesystem>
@@ -93,7 +94,7 @@ void FShadercUtils::CreateCacheDirectory()
 
 const char* FShadercUtils::GetCacheExtension()
 {
-	return ".shaderc_cached";
+	return ".rscached";
 }
 
 ERHIShaderStage FShadercUtils::StringToShaderStage(std::string_view InStr)
@@ -164,8 +165,11 @@ bool FShadercUtils::LoadShaderCompiledData(const std::filesystem::path& ShaderCa
 	if (fs::exists(ShaderCachePath))
 	{
 		Clock timer;
-		OutCompiledData.CompiledData = FFileSystem::LoadBinaryFile(ShaderCachePath.generic_u8string());
-		if (!OutCompiledData.CompiledData.Empty())
+		{
+			FFileArchive Ar(ShaderCachePath.generic_u8string(), EFileArchiveKind::Read);
+			Ar << OutCompiledData;
+		}
+		if (!OutCompiledData.Binary.Empty())
 		{
 			RE_CORE_INFO("Shader '{0}' read from cache took {1} ms", OutCompiledData.Name.c_str(), timer.ElapsedMillis());
 		}
@@ -173,25 +177,21 @@ bool FShadercUtils::LoadShaderCompiledData(const std::filesystem::path& ShaderCa
 		{
 			RE_CORE_ERROR("Shader '{0}' read from cache failed", OutCompiledData.Name.c_str());
 		}
-		return !OutCompiledData.CompiledData.Empty();
+		return !OutCompiledData.Binary.Empty();
 	}
 	return false;
 }
 
-bool FShadercUtils::SaveShaderCompiledData(const std::filesystem::path& ShaderCachePath, const FShadercCompiledData& InCompiledData)
+bool FShadercUtils::SaveShaderCompiledData(const std::filesystem::path& ShaderCachePath, FShadercCompiledData& InCompiledData)
 {
 	CreateCacheDirectory();
 	fs::path CachedDir = ShaderCachePath.parent_path();
 	if(!fs::exists(CachedDir))
 		fs::create_directories(CachedDir);
 
-	if (FFileSystem::SaveBinaryFile(ShaderCachePath.generic_u8string(), InCompiledData.CompiledData))
 	{
-		return true;
-	}
-	else
-	{
-		RE_CORE_ERROR("Shader save cache failed: '{0}'", ShaderCachePath.string().c_str());
+		FFileArchive Ar(ShaderCachePath.generic_u8string(), EFileArchiveKind::Write);
+		Ar << InCompiledData;
 	}
 
 	return false;
@@ -201,7 +201,7 @@ void FShadercUtils::DumpShaderInfo(const FShadercCompiledData& InData)
 {
 	//for (auto&& [Stage, CompiledData] : InData.CompiledDataMap)
 	{
-		spirv_cross::Compiler compiler(InData.CompiledData.DataAs<uint32_t>(), InData.CompiledData.Size() / sizeof(uint32_t));
+		spirv_cross::Compiler compiler(InData.Binary.DataAs<uint32_t>(), InData.Binary.Size() / sizeof(uint32_t));
 		spirv_cross::ShaderResources resources = compiler.get_shader_resources();
 
 		RE_CORE_TRACE("Shaderc::Reflect - {0} {1}", InData.Name.c_str(), ShaderStageToString(InData.Stage));

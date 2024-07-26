@@ -16,17 +16,33 @@ struct FShadercSource
 	FPath FilePath;
 	FBuffer FileContent;
 	ERHIShaderStage Stage = ERHIShaderStage::Unknown;
+
+	FShadercSource() = default;
+	FShadercSource(FShadercSource&& Other) noexcept
+		: FilePath(std::move(Other.FilePath))
+		, FileContent(std::move(Other.FileContent))
+		, Stage(Other.Stage)
+	{
+	}
 };
 
 struct FShadercCompiledData
 {
 	std::string Name;
-	FBuffer CompiledData;
 	ERHIShaderStage Stage = ERHIShaderStage::Unknown;
+	FBuffer Binary;
 
 	bool Empty() const
 	{
-		return CompiledData.Empty();
+		return Binary.Empty();
+	}
+
+	FORCEINLINE friend FArchive& operator<<(FArchive& Ar, FShadercCompiledData& Data)
+	{
+		//Ar << Data.Name;
+		Ar << Data.Stage;
+		Ar << Data.Binary;
+		return Ar;
 	}
 };
 
@@ -42,7 +58,7 @@ public:
 
 	static FShadercSource LoadShaderSource(const FPath& InPath);
 	static bool LoadShaderCompiledData(const std::filesystem::path& ShaderCachePath, FShadercCompiledData& OutCompiledData);
-	static bool SaveShaderCompiledData(const std::filesystem::path& ShaderCachePath, const FShadercCompiledData& InCompiledData);
+	static bool SaveShaderCompiledData(const std::filesystem::path& ShaderCachePath, FShadercCompiledData& InCompiledData);
 	static void DumpShaderInfo(const FShadercCompiledData& InData);
 };
 

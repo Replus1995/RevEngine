@@ -1,7 +1,6 @@
 #include <Rev.h>
 #include "ExampleLayer.h"
 
-
 class SandBoxApp: public Rev::Application
 {
 public:

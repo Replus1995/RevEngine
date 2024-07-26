@@ -128,8 +128,8 @@ void FShadercFactory::CompileShaders(const FShadercSource& InSource, const FRHIS
 		}
 		OutData.Stage = InSource.Stage;
 		size_t CompiledSize = CompileResult.cend() - CompileResult.cbegin();
-		OutData.CompiledData.Allocate(CompiledSize * sizeof(uint32_t));
-		memcpy(OutData.CompiledData.Data(), CompileResult.cbegin(), CompiledSize * sizeof(uint32_t));
+		OutData.Binary.Allocate(CompiledSize * sizeof(uint32_t));
+		memcpy(OutData.Binary.Data(), CompileResult.cbegin(), CompiledSize * sizeof(uint32_t));
 	}
 	RE_CORE_INFO("Shader '{0}' compile took {1} ms", OutData.Name.c_str(), timer.ElapsedMillis());
 }
@@ -137,7 +137,7 @@ void FShadercFactory::CompileShaders(const FShadercSource& InSource, const FRHIS
 FShadercCompiledData FShadercFactory::LoadOrCompileShader(const FPath& InPath, const FRHIShaderCompileOptions& InOptions)
 {
 	FShadercCompiledData Result;
-	Result.Name = InPath.FullPath(false);
+	Result.Name = InPath.ToString(false);
 
 	std::string OptionHashStr = std::to_string(InOptions.Hash() );
 	fs::path ShaderCachePath(FShadercUtils::GetCacheDirectory() + Result.Name + "_" + OptionHashStr + FShadercUtils::GetCacheExtension());

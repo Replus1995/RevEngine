@@ -4,6 +4,8 @@
 #include <string>
 #include <functional>
 
+#define RE_BIND_EVENT_FN(fn, owner) std::bind(&fn, owner, std::placeholders::_1)
+
 namespace Rev
 {
 	//Naive blocking events
