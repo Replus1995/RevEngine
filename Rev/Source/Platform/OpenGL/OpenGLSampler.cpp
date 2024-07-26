@@ -4,6 +4,17 @@
 namespace Rev
 {
 
+FOpenGLSampler::FOpenGLSampler(const FSamplerDesc& InDesc)
+	: FRHISampler(InDesc)
+{
+	glCreateSamplers(1, &mHandle);
+}
+
+FOpenGLSampler::~FOpenGLSampler()
+{
+	glDeleteSamplers(1, &mHandle);
+}
+
 void FOpenGLSampler::UpdateSampleState(const FSamplerDesc& InDesc, GLuint InTexHandle, bool bMipMap)
 {
 	glTextureParameteri(InTexHandle, GL_TEXTURE_MIN_FILTER, TranslateFilterMode(InDesc.Filter, bMipMap));
@@ -26,6 +37,25 @@ void FOpenGLSampler::UpdateSampleState(const FSamplerDesc& InDesc, GLuint InTexH
 	{
 		glTextureParameterfv(InTexHandle, GL_TEXTURE_BORDER_COLOR, mDesc.BorderColor.Data());
 	}*/
+}
+
+void FOpenGLSampler::FullUpdateState()
+{
+	glSamplerParameteri(mHandle, GL_TEXTURE_MIN_FILTER, TranslateFilterMode(mDesc.Filter, true));
+	glSamplerParameteri(mHandle, GL_TEXTURE_MAG_FILTER, TranslateFilterMode(mDesc.Filter, false));
+
+	glSamplerParameteri(mHandle, GL_TEXTURE_WRAP_S, TranslateWarpMode(mDesc.WarpU));
+	glSamplerParameteri(mHandle, GL_TEXTURE_WRAP_T, TranslateWarpMode(mDesc.WarpV));
+	glSamplerParameteri(mHandle, GL_TEXTURE_WRAP_R, TranslateWarpMode(mDesc.WarpW));
+
+	if (UseAnisotropicFilter(mDesc))
+	{
+		glSamplerParameteri(mHandle, GL_TEXTURE_MAX_ANISOTROPY, mDesc.Anisotropic);
+	}
+	else
+	{
+		glSamplerParameteri(mHandle, GL_TEXTURE_MAX_ANISOTROPY, 1.0f);
+	}
 }
 
 GLenum FOpenGLSampler::TranslateFilterMode(ESamplerFilterMode InMode, bool bMipMap)

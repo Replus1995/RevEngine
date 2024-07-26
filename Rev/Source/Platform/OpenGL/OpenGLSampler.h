@@ -8,11 +8,16 @@ namespace Rev
 class FOpenGLSampler : public FRHISampler
 {
 public:
-	FOpenGLSampler(const FSamplerDesc& InDesc) : FRHISampler(InDesc) {}
-	virtual ~FOpenGLSampler() {};
-	virtual void* GetNativeHandle() override { return nullptr; }
+	FOpenGLSampler(const FSamplerDesc& InDesc);
+	virtual ~FOpenGLSampler();
+	virtual void* GetNativeHandle() override { return &mHandle; }
 
 	static void UpdateSampleState(const FSamplerDesc& InDesc, GLuint InTexHandle, bool bMipMap);
+
+private:
+	void FullUpdateState();
+private:
+	GLuint mHandle = 0;
 
 private:
 	static GLenum TranslateFilterMode(ESamplerFilterMode InMode, bool bMipMap);
