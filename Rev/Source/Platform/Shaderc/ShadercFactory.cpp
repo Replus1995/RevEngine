@@ -113,6 +113,7 @@ static void InitCompileOptions(shaderc::CompileOptions& Options)
 
 static void AddCompileMacros(shaderc::CompileOptions& Options, uint64 InMacros)
 {
+	//TODO: Use cpp reflect to optimize this step
 	if (InMacros & SCM_USE_BASECOLOR_TEX)
 		Options.AddMacroDefinition("USE_BASECOLOR_TEX");
 	if (InMacros & SCM_USE_METALLICROUGHNESS_TEX)
