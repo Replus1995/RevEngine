@@ -2,7 +2,7 @@
 #include "Rev/Render/RHI/RHIShader.h"
 #include "Rev/Core/Buffer.h"
 #include <map>
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 namespace Rev
 {
@@ -39,6 +39,7 @@ public:
 	virtual void SetUniform(uint16 location, const Math::FVector4& value) override;
 	virtual void SetUniform(uint16 location, const Math::FMatrix3& value) override;
 	virtual void SetUniform(uint16 location, const Math::FMatrix4& value) override;
+	virtual void SetUniform(uint16 location, const Ref<FRHITexture>& value) override;
 
 	virtual void SetUniformArray(uint16 location, const int* values, uint32_t count) override;
 

@@ -32,18 +32,6 @@ void Material::SyncUniform()
 {
 }
 
-void Material::SyncTextureUniform(const Ref<class Texture>& InTexture, uint16 InLocation, int TexUnit, int TexUnitFallback)
-{
-	if (InTexture)
-	{
-		InTexture->GetResource()->Bind(TexUnit);
-		mProgram->SetUniform(InLocation, TexUnit);
-	}
-	/*else
-	{
-		mProgram->SetUniform(InLocation, TexUnitFallback);
-	}*/
-}
 
 }
 

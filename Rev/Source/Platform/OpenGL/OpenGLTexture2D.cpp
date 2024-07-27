@@ -3,6 +3,7 @@
 
 #include "OpenGLSampler.h"
 
+
 namespace Rev
 {
 
@@ -10,10 +11,13 @@ FOpenGLTexture2D::FOpenGLTexture2D(const FTextureDesc& InDesc, const FSamplerDes
 	: FOpenGLTexture(InDesc, InSamplerDesc)
 {
 	CreateResource();
+	mBindlessHandle = glGetTextureSamplerHandleARB(mHandle, *(GLuint*)mSampler->GetNativeHandle());
+	glMakeTextureHandleResidentARB(mBindlessHandle);
 }
 
 FOpenGLTexture2D::~FOpenGLTexture2D()
 {
+	glMakeTextureHandleNonResidentARB(mBindlessHandle);
 	glDeleteTextures(1, &mHandle);
 }
 
@@ -81,12 +85,6 @@ void FOpenGLTexture2D::ClearData()
 		break;
 	}
 	
-}
-
-void FOpenGLTexture2D::Bind(uint32 InUnit) const
-{
-	glBindTextureUnit(InUnit, mHandle);
-	glBindSampler(InUnit, *(GLuint*)mSampler->GetNativeHandle());
 }
 
 void FOpenGLTexture2D::CreateResource()

@@ -15,7 +15,7 @@ namespace Rev
 			RE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!");
 			return nullptr;
 		case Rev::ERenderAPI::OpenGL:
-			return CreateScope<OpenGLContext>();
+			return CreateScope<FOpenGLContext>();
 		case Rev::ERenderAPI::Vulkan:
 			RE_CORE_ASSERT(false, "ERenderAPI::Vulkan is currently not supported!");
 			return nullptr;

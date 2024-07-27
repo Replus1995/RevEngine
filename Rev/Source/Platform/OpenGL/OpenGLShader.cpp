@@ -1,6 +1,7 @@
-#include "OpenGLShader.h"
+﻿#include "OpenGLShader.h"
 #include "Rev/Core/Assert.h"
 #include "Rev/Core/Clock.h"
+#include "Rev/Render/RHI/RHITexture.h"
 
 #include <fstream>
 #include <shaderc/shaderc.hpp>
@@ -144,6 +145,11 @@ void FOpenGLShaderProgram::SetUniform(uint16 location, const Math::FMatrix3& val
 void FOpenGLShaderProgram::SetUniform(uint16 location, const Math::FMatrix4& value)
 {
 	glUniformMatrix4fv(location, 1, GL_FALSE, value.Data());
+}
+
+void FOpenGLShaderProgram::SetUniform(uint16 location, const Ref<FRHITexture>& value)
+{
+	glUniformHandleui64ARB(location, value->GetBindlessHandle());
 }
 
 void FOpenGLShaderProgram::SetUniformArray(uint16 location, const int* values, uint32_t count)

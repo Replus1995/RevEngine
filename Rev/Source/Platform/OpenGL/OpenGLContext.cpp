@@ -35,23 +35,22 @@ void OpenGLMessageCallback(
 	RE_CORE_ASSERT(false, "[OpenGLRHI] Unknown severity level!");
 }
 
-void OpenGLContext::Init()
+void FOpenGLContext::Init()
 {
 	Window* pWnd = Application::GetApp().GetWindow();
 	RE_CORE_ASSERT(pWnd, "[OpenGLRHI] Invalid window!");
 
-	/*switch (pWnd->GetType())
+	switch (pWnd->GetType())
 	{
 	case EWindowType::GLFW:
 	{
-		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-		RE_CORE_ASSERT(status, "[OpenGLRHI] Failed to initialize Glad.");
+		int version = gladLoadGL(glfwGetProcAddress);
+		RE_CORE_TRACE("[OpenGLRHI] Version {0}.{1}", GLAD_VERSION_MAJOR(version), GLAD_VERSION_MINOR(version));
 		break;
 	}
 	default:
 		RE_CORE_ASSERT(false, "[OpenGLRHI] Unknown window type!");
-	}*/
-	gladLoadGL();
+	}
 
 #ifdef RE_DEBUG
 	glEnable(GL_DEBUG_OUTPUT);
@@ -67,22 +66,22 @@ void OpenGLContext::Init()
 	glEnable(GL_LINE_SMOOTH);
 }
 
-void OpenGLContext::SetViewport(uint32 x, uint32 y, uint32 width, uint32 height)
+void FOpenGLContext::SetViewport(uint32 x, uint32 y, uint32 width, uint32 height)
 {
 	glViewport(x, y, width, height);
 }
 
-void OpenGLContext::SetClearColor(const Math::FLinearColor& color)
+void FOpenGLContext::SetClearColor(const Math::FLinearColor& color)
 {
 	glClearColor(color.R, color.G, color.B, color.A);
 }
 
-void OpenGLContext::Clear()
+void FOpenGLContext::Clear()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void OpenGLContext::PrepareMaterial(const Material* InMaterial)
+void FOpenGLContext::PrepareMaterial(const Material* InMaterial)
 {
 	if(!InMaterial)
 		return;
@@ -114,7 +113,7 @@ void OpenGLContext::PrepareMaterial(const Material* InMaterial)
 	}
 }
 
-void OpenGLContext::DrawVertices(const Ref<FRHIVertexArray>& InVertexArray, EDrawMode InDrawMode)
+void FOpenGLContext::DrawVertices(const Ref<FRHIVertexArray>& InVertexArray, EDrawMode InDrawMode)
 {
 	if(!InVertexArray)
 		return;
@@ -125,7 +124,7 @@ void OpenGLContext::DrawVertices(const Ref<FRHIVertexArray>& InVertexArray, EDra
 	glDrawElements(DrawMode, IndexCount, IndexType, nullptr);
 }
 
-GLenum OpenGLContext::TranslateDrawMode(EDrawMode InDrawMode)
+GLenum FOpenGLContext::TranslateDrawMode(EDrawMode InDrawMode)
 {
 	switch (InDrawMode)
 	{
@@ -150,7 +149,7 @@ GLenum OpenGLContext::TranslateDrawMode(EDrawMode InDrawMode)
 	return 0;
 }
 
-GLenum OpenGLContext::TranslateIndexType(uint32 InStride)
+GLenum FOpenGLContext::TranslateIndexType(uint32 InStride)
 {
 	switch (InStride)
 	{

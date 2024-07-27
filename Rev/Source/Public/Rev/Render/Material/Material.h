@@ -29,8 +29,6 @@ public:
 	{
 		return mProgram;
 	}
-protected:
-	void SyncTextureUniform(const Ref<class Texture>& InTexture, uint16 InLocation, int TexUnit, int TexUnitFallback = 0);
 
 protected:
 	Ref<FRHIShaderProgram> mProgram = nullptr;

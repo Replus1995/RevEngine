@@ -3,9 +3,9 @@ project(Glad)
 
 add_library(Glad
     STATIC
-    "include/glad/glad.h"
+    "include/glad/gl.h"
     "include/KHR/khrplatform.h"
-    "src/glad.c"
+    "src/gl.c"
 )
 
 target_include_directories(Glad

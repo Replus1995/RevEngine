@@ -11,6 +11,11 @@ const FRHISampler* FOpenGLTexture::GetSampler() const
 	return mSampler.get();
 }
 
+uint64 FOpenGLTexture::GetBindlessHandle() const
+{
+	return mBindlessHandle;
+}
+
 Ref<FOpenGLTexture> FOpenGLTexture::Create(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc)
 {
 	switch (InDesc.Dimension)

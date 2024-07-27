@@ -1,7 +1,7 @@
 #pragma once
 #include "Rev/Render/RHI/RHIRenderTarget.h"
 #include "OpenGLTexture2D.h"
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 namespace Rev
 {

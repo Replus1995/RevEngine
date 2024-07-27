@@ -1,7 +1,6 @@
 #include "OpenGLVertexBuffer.h"
 #include "Rev/Core/Assert.h"
-
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 namespace Rev
 {

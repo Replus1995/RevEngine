@@ -54,12 +54,17 @@ void PBRMaterial::SyncUniform()
 
 	//FAssetLibrary::GetDefaultWhiteTexture()->GetResource()->Bind(0);
 	//FAssetLibrary::GetDefaultNormalTexture()->GetResource()->Bind(1);
-
-	SyncTextureUniform(BaseColorTexture, UL_BaseColorTexture, 2);
-	SyncTextureUniform(MetallicRoughnessTexture, UL_MetallicRoughnessTexture, 3);
-	SyncTextureUniform(NormalTexture, UL_NormalTexture, 4);
-	SyncTextureUniform(OcclusionTexture, UL_OcclusionTexture, 5);
-	SyncTextureUniform(EmissiveTexture, UL_EmissiveTexture, 6);
+	
+	if (BaseColorTexture)
+		mProgram->SetUniform(UL_BaseColorTexture, BaseColorTexture->GetResource());
+	if (MetallicRoughnessTexture)
+		mProgram->SetUniform(UL_MetallicRoughnessTexture, MetallicRoughnessTexture->GetResource());
+	if (NormalTexture)
+		mProgram->SetUniform(UL_NormalTexture, NormalTexture->GetResource());
+	if (OcclusionTexture)
+		mProgram->SetUniform(UL_OcclusionTexture, OcclusionTexture->GetResource());
+	if (EmissiveTexture)
+		mProgram->SetUniform(UL_EmissiveTexture, EmissiveTexture->GetResource());
 }
 
 }

@@ -1,12 +1,12 @@
 #pragma once
-#include <glad/glad.h>
 #include "Rev/Render/RHI/RHIContext.h"
 #include "Rev/Render/Mesh/MeshPrimitive.h"
+#include <glad/gl.h>
 
 namespace Rev
 {
 
-class OpenGLContext : public FRHIContext
+class FOpenGLContext : public FRHIContext
 {
 public:
 	virtual void Init() override;

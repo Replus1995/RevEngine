@@ -1,6 +1,6 @@
 #pragma once
 #include "Rev/Render/PixelFormat.h"
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 namespace Rev
 {
