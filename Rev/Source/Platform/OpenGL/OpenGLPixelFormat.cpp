@@ -17,7 +17,7 @@ constexpr FOpenGLFormatMapping sOpenGLFormatMappings[] = {
 	{ PF_R8,			{ GL_R8, GL_RED, GL_UNSIGNED_BYTE, 1 } },
 	{ PF_R16,			{ GL_R16, GL_RED, GL_UNSIGNED_SHORT, 2 } },
 	{ PF_RGB8,			{ GL_RGB8, GL_RGB, GL_UNSIGNED_BYTE, 3 } },
-	{ PF_DepthStencil,	{ GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, 4 } },
+	{ PF_DepthStencil,	{ GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, 4} },
 	{ PF_ShadowDepth,	{ GL_DEPTH_COMPONENT32F, GL_DEPTH_COMPONENT, GL_FLOAT, 4 } },
 };
 

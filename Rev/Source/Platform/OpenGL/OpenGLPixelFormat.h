@@ -10,7 +10,7 @@ struct FOpenGLFormatData
 	GLenum InternalFormat;
 	GLenum DataFormat;
 	GLenum DataType;
-	uint32 BytePerPixel;
+	uint32 PixelSize;
 };
 
 class FOpenGLPixelFormat

@@ -5,17 +5,11 @@
 
 namespace Rev
 {
-FOpenGLTexture2D::FOpenGLTexture2D(const FTextureDesc& InDesc)
-	: FOpenGLTexture(InDesc)
-{
-	CreateResource();
-}
 
 FOpenGLTexture2D::FOpenGLTexture2D(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc)
 	: FOpenGLTexture(InDesc, InSamplerDesc)
 {
 	CreateResource();
-	FOpenGLSampler::UpdateSampleState(InSamplerDesc, mHandle, mDesc.NumMips > 1);
 }
 
 FOpenGLTexture2D::~FOpenGLTexture2D()
@@ -25,7 +19,7 @@ FOpenGLTexture2D::~FOpenGLTexture2D()
 
 void FOpenGLTexture2D::UpdateData(const void* InData, uint32 InSize)
 {
-	RE_CORE_ASSERT(InSize == GetWidth() * GetHeight() * mFormatData.BytePerPixel, "Data must be entire texture!");
+	RE_CORE_ASSERT(InSize == GetWidth() * GetHeight() * mFormatData.PixelSize, "Data must be entire texture!");
 	glTextureSubImage2D(mHandle, 0, 0, 0, GetWidth(), GetHeight(), mFormatData.DataFormat, mFormatData.DataType, InData);
 }
 
@@ -92,6 +86,7 @@ void FOpenGLTexture2D::ClearData()
 void FOpenGLTexture2D::Bind(uint32 InUnit) const
 {
 	glBindTextureUnit(InUnit, mHandle);
+	glBindSampler(InUnit, *(GLuint*)mSampler->GetNativeHandle());
 }
 
 void FOpenGLTexture2D::CreateResource()

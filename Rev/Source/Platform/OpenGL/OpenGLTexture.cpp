@@ -6,14 +6,9 @@
 
 namespace Rev
 {
-
-void FOpenGLTexture::SetSamplerState(const FSamplerDesc& InSamplerDesc)
+const FRHISampler* FOpenGLTexture::GetSampler() const
 {
-	if (mSamplerDesc != InSamplerDesc)
-	{
-		mSamplerDesc = InSamplerDesc;
-		FOpenGLSampler::UpdateSampleState(mSamplerDesc, mHandle, mDesc.NumMips > 1);
-	}
+	return mSampler.get();
 }
 
 Ref<FOpenGLTexture> FOpenGLTexture::Create(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc)
@@ -33,17 +28,12 @@ Ref<FOpenGLTexture> FOpenGLTexture::Create(const FTextureDesc& InDesc, const FSa
 	return nullptr;
 }
 
-FOpenGLTexture::FOpenGLTexture(const FTextureDesc& InDesc)
-	: FRHITexture(InDesc)
-	, mFormatData(FOpenGLPixelFormat::TranslatePixelFormat(InDesc.Format, InDesc.bSRGB))
-{
-}
 
 FOpenGLTexture::FOpenGLTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc)
 	: FRHITexture(InDesc)
 	, mFormatData(FOpenGLPixelFormat::TranslatePixelFormat(InDesc.Format, InDesc.bSRGB))
-	, mSamplerDesc(InSamplerDesc)
 {
+	mSampler = CreateRef<FOpenGLSampler>(InSamplerDesc, mFormatData.DataType, InDesc.NumMips > 1);
 }
 
 }

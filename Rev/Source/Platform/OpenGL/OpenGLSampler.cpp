@@ -4,10 +4,13 @@
 namespace Rev
 {
 
-FOpenGLSampler::FOpenGLSampler(const FSamplerDesc& InDesc)
+FOpenGLSampler::FOpenGLSampler(const FSamplerDesc& InDesc, GLenum InTexDataType, bool bHasMip)
 	: FRHISampler(InDesc)
+	, mTexDataType(InTexDataType)
+	, mHasMip(bHasMip)
 {
 	glCreateSamplers(1, &mHandle);
+	FullUpdateState();
 }
 
 FOpenGLSampler::~FOpenGLSampler()
@@ -15,33 +18,75 @@ FOpenGLSampler::~FOpenGLSampler()
 	glDeleteSamplers(1, &mHandle);
 }
 
-void FOpenGLSampler::UpdateSampleState(const FSamplerDesc& InDesc, GLuint InTexHandle, bool bMipMap)
+void FOpenGLSampler::SetFilterMode(ESamplerFilterMode InMode)
 {
-	glTextureParameteri(InTexHandle, GL_TEXTURE_MIN_FILTER, TranslateFilterMode(InDesc.Filter, bMipMap));
-	glTextureParameteri(InTexHandle, GL_TEXTURE_MAG_FILTER, TranslateFilterMode(InDesc.Filter, false));
-
-	glTextureParameteri(InTexHandle, GL_TEXTURE_WRAP_S, TranslateWarpMode(InDesc.WarpU));
-	glTextureParameteri(InTexHandle, GL_TEXTURE_WRAP_T, TranslateWarpMode(InDesc.WarpV));
-	glTextureParameteri(InTexHandle, GL_TEXTURE_WRAP_R, TranslateWarpMode(InDesc.WarpW));
-
-	if (UseAnisotropicFilter(InDesc))
+	if (mDesc.Filter != InMode)
 	{
-		glTextureParameterf(InTexHandle, GL_TEXTURE_MAX_ANISOTROPY, InDesc.Anisotropic);
+		mDesc.Filter = InMode;
+		glSamplerParameteri(mHandle, GL_TEXTURE_MIN_FILTER, TranslateFilterMode(mDesc.Filter, mHasMip));
+		glSamplerParameteri(mHandle, GL_TEXTURE_MAG_FILTER, TranslateFilterMode(mDesc.Filter, false));
 	}
-	else
-	{
-		glTextureParameterf(InTexHandle, GL_TEXTURE_MAX_ANISOTROPY, 1.0f);
-	}
+}
 
-	/*if (UseBorderWarp(InDesc))
+void FOpenGLSampler::SetAnisotropicMode(ESamplerAnisotropicMode InMode)
+{
+	if (mDesc.Anisotropic != InMode)
 	{
-		glTextureParameterfv(InTexHandle, GL_TEXTURE_BORDER_COLOR, mDesc.BorderColor.Data());
-	}*/
+		mDesc.Anisotropic = InMode;
+		if (UseAnisotropicFilter(mDesc))
+			glSamplerParameteri(mHandle, GL_TEXTURE_MAX_ANISOTROPY, mDesc.Anisotropic);
+		else
+			glSamplerParameteri(mHandle, GL_TEXTURE_MAX_ANISOTROPY, 1.0f);
+	}
+}
+
+void FOpenGLSampler::SetWarpU(ESamplerWarpMode InMode)
+{
+	if (mDesc.WarpU != InMode)
+	{
+		mDesc.WarpU = InMode;
+		glSamplerParameteri(mHandle, GL_TEXTURE_WRAP_S, TranslateWarpMode(mDesc.WarpU));
+		if (UseBorderWarp(mDesc))
+			glSamplerParameterfv(mHandle, GL_TEXTURE_BORDER_COLOR, mDesc.BorderColor.Data());
+	}
+}
+
+void FOpenGLSampler::SetWarpV(ESamplerWarpMode InMode)
+{
+	if (mDesc.WarpV != InMode)
+	{
+		mDesc.WarpV = InMode;
+		glSamplerParameteri(mHandle, GL_TEXTURE_WRAP_T, TranslateWarpMode(mDesc.WarpV));
+		if (UseBorderWarp(mDesc))
+			glSamplerParameterfv(mHandle, GL_TEXTURE_BORDER_COLOR, mDesc.BorderColor.Data());
+	}
+}
+
+void FOpenGLSampler::SetWarpW(ESamplerWarpMode InMode)
+{
+	if (mDesc.WarpW != InMode)
+	{
+		mDesc.WarpW = InMode;
+		glSamplerParameteri(mHandle, GL_TEXTURE_WRAP_R, TranslateWarpMode(mDesc.WarpW));
+		if (UseBorderWarp(mDesc))
+			glSamplerParameterfv(mHandle, GL_TEXTURE_BORDER_COLOR, mDesc.BorderColor.Data());
+	}
+}
+
+void FOpenGLSampler::SetBorderColor(const Math::FLinearColor& InColor)
+{
+	if (mDesc.BorderColor != InColor)
+	{
+		mDesc.BorderColor = InColor;
+		if (UseBorderWarp(mDesc))
+			glSamplerParameterfv(mHandle, GL_TEXTURE_BORDER_COLOR, mDesc.BorderColor.Data());
+	}
+	
 }
 
 void FOpenGLSampler::FullUpdateState()
 {
-	glSamplerParameteri(mHandle, GL_TEXTURE_MIN_FILTER, TranslateFilterMode(mDesc.Filter, true));
+	glSamplerParameteri(mHandle, GL_TEXTURE_MIN_FILTER, TranslateFilterMode(mDesc.Filter, mHasMip));
 	glSamplerParameteri(mHandle, GL_TEXTURE_MAG_FILTER, TranslateFilterMode(mDesc.Filter, false));
 
 	glSamplerParameteri(mHandle, GL_TEXTURE_WRAP_S, TranslateWarpMode(mDesc.WarpU));
@@ -55,6 +100,11 @@ void FOpenGLSampler::FullUpdateState()
 	else
 	{
 		glSamplerParameteri(mHandle, GL_TEXTURE_MAX_ANISOTROPY, 1.0f);
+	}
+
+	if (UseBorderWarp(mDesc))
+	{
+		glSamplerParameterfv(mHandle, GL_TEXTURE_BORDER_COLOR, mDesc.BorderColor.Data());
 	}
 }
 

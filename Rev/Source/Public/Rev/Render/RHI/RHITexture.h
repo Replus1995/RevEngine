@@ -102,10 +102,10 @@ public:
 	uint32 GetHeight() const { return mDesc.Height; }
 	EPixelFormat GetFormat() const { return mDesc.Format; }
 
-	virtual void SetSamplerState(const FSamplerDesc& InSamplerDesc) = 0;
 	virtual void UpdateData(const void* InData, uint32 InSize) = 0;
 	virtual void ClearData() = 0;
 	virtual void Bind(uint32 InUnit) const = 0;
+	virtual const FRHISampler* GetSampler() const = 0;
 protected:
 	FRHITexture(const FTextureDesc& InDesc) : mDesc(InDesc) {}
 protected:

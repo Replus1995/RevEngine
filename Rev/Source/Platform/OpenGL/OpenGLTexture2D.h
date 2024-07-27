@@ -8,8 +8,7 @@ namespace Rev
 class FOpenGLTexture2D : public FOpenGLTexture
 {
 public:
-	FOpenGLTexture2D(const FTextureDesc& InDesc);
-	FOpenGLTexture2D(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc);
+	FOpenGLTexture2D(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc = {});
 	virtual ~FOpenGLTexture2D();
 
 	virtual void UpdateData(const void* InData, uint32 InSize) override;
