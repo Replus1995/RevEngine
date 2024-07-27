@@ -206,21 +206,23 @@ void FShadercUtils::DumpShaderInfo(const FShadercCompiledData& InData)
 
 		RE_CORE_TRACE("Shaderc::Reflect - {0} {1}", InData.Name.c_str(), ShaderStageToString(InData.Stage));
 		RE_CORE_TRACE("    {0} uniform buffers", resources.uniform_buffers.size());
-		RE_CORE_TRACE("    {0} resources", resources.sampled_images.size());
+		RE_CORE_TRACE("    {0} sampled images", resources.sampled_images.size());
+		RE_CORE_TRACE("    {0} separate images", resources.separate_images.size());
+		RE_CORE_TRACE("    {0} separate samplers", resources.separate_samplers.size());
 
-		RE_CORE_TRACE("Uniform buffers:");
-		for (const auto& resource : resources.uniform_buffers)
-		{
-			const auto& bufferType = compiler.get_type(resource.base_type_id);
-			size_t bufferSize = compiler.get_declared_struct_size(bufferType);
-			uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
-			size_t memberCount = bufferType.member_types.size();
+		//RE_CORE_TRACE("Uniform buffers:");
+		//for (const auto& resource : resources.uniform_buffers)
+		//{
+		//	const auto& bufferType = compiler.get_type(resource.base_type_id);
+		//	size_t bufferSize = compiler.get_declared_struct_size(bufferType);
+		//	uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
+		//	size_t memberCount = bufferType.member_types.size();
 
-			RE_CORE_TRACE("  {0}", resource.name);
-			RE_CORE_TRACE("    Size = {0}", bufferSize);
-			RE_CORE_TRACE("    Binding = {0}", binding);
-			RE_CORE_TRACE("    Members = {0}", memberCount);
-		}
+		//	RE_CORE_TRACE("  {0}", resource.name);
+		//	RE_CORE_TRACE("    Size = {0}", bufferSize);
+		//	RE_CORE_TRACE("    Binding = {0}", binding);
+		//	RE_CORE_TRACE("    Members = {0}", memberCount);
+		//}
 	}
 }
 

@@ -42,7 +42,8 @@ ExampleLayer::ExampleLayer()
 	}*/
 
 	{
-		auto importRes = FAssetLibrary::ImportMesh(FPath("/Game/Assets/Models/Cube/Cube.gltf"));
+		//auto importRes = FAssetLibrary::ImportMesh(FPath("/Game/Assets/Models/Cube/Cube.gltf"));
+		auto importRes = FAssetLibrary::ImportMesh(FPath("/Game/Assets/Models/DamagedHelmet.glb"));
 		if (!importRes.StaticMeshes.empty())
 		{
 			auto meshStorage = importRes.StaticMeshes[0];
@@ -53,6 +54,7 @@ ExampleLayer::ExampleLayer()
 			auto & transformComp = meshEntity.GetComponent<TransformComponent>();
 			transformComp.SetLocation(Math::FVector3(0, 0.6, -5));
 			transformComp.SetScale(Math::FVector3(0.5, 0.5, 0.5));
+			transformComp.SetRotation(Math::FRotator(90, 0, 0));
 		}
 		
 	}
