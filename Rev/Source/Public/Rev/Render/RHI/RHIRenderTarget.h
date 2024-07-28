@@ -9,7 +9,7 @@
 namespace Rev
 {
 
-enum ERenderTargetAttachment
+enum ERenderTargetAttachment : uint8
 {
 	RTA_ColorAttachment0 = 0,
 	RTA_ColorAttachment1 = 1,
@@ -66,6 +66,25 @@ struct FRenderTargetDesc
 			ColorTargets[i] = InColorTargets[i];
 		}
 	}
+};
+
+struct FRenderTargetSource
+{
+	ERenderTargetAttachment Attachment;
+	uint8 MipLevel;
+	uint16 ArrayIndex;
+	Ref<FRHITexture> Texture;
+
+	FRenderTargetSource(
+		ERenderTargetAttachment InAttachment, const Ref<FRHITexture>& InTexture, 
+		uint16 InArrayIndex = 0, uint8 InMipLevel = 0
+	)
+		: Attachment(InAttachment)
+		, MipLevel(InMipLevel)
+		, ArrayIndex(InArrayIndex)
+		, Texture(InTexture)
+	{}
+
 };
 
 class FRHIRenderTarget : public FRHIResource
