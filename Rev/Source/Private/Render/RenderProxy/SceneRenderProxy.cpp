@@ -4,17 +4,16 @@
 #include "Rev/Render/RenderCmd.h"
 #include "Rev/Render/Renderer.h"
 #include "Rev/Render/RHI/RHIResourceFactory.h"
+#include "Rev/Render/UniformLayout.h"
 
-//Private
-#include "Render/UniformLocation.h"
 
 namespace Rev
 {
 void SceneRenderProxy::Init()
 {
-	mCameraUB = FRHIResourceFactory::CreateUniformBuffer(sizeof(FCameraUniform), UBB_Camera);
-	mModelUB = FRHIResourceFactory::CreateUniformBuffer(sizeof(FModelUniform), UBB_Model);
-	mForwardLightUB = FRHIResourceFactory::CreateUniformBuffer(sizeof(FForwardLightUniform), UBB_ForwardLight);
+	mCameraUB = FRHIResourceFactory::CreateUniformBuffer(sizeof(FCameraUniform), UL::BCamera);
+	mModelUB = FRHIResourceFactory::CreateUniformBuffer(sizeof(FModelUniform), UL::BModel);
+	mForwardLightUB = FRHIResourceFactory::CreateUniformBuffer(sizeof(FForwardLightUniform), UL::BForwardLight);
 }
 
 void SceneRenderProxy::Release()

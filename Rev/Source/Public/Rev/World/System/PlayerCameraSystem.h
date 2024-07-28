@@ -2,7 +2,7 @@
 #include "Rev/World/System/System.h"
 #include "Rev/World/Entity.h"
 #include "Rev/Render/Camera.h"
-#include "Rev/Render/UniformData.h"
+#include "Rev/Render/UniformDefine.h"
 
 namespace Rev
 {

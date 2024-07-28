@@ -12,7 +12,7 @@ public:
 	virtual ~FOpenGLTexture() = default;
 	virtual void* GetNativeHandle() override { return &mHandle; }
 	virtual const FRHISampler* GetSampler() const override;
-	virtual uint64 GetBindlessHandle() const override;
+	virtual void Bind(uint32 InUnit) const override;
 
 	static Ref<FOpenGLTexture> Create(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc);
 protected:
@@ -21,7 +21,6 @@ protected:
 	GLuint mHandle = 0;
 	FOpenGLFormatData mFormatData;
 	Ref<FOpenGLSampler> mSampler = nullptr;
-	GLuint64 mBindlessHandle = 0;
 };
 
 }

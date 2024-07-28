@@ -50,7 +50,6 @@ public:
     virtual void SetUniform(uint16 location, const Math::FVector4& value) = 0;
     virtual void SetUniform(uint16 location, const Math::FMatrix3& value) = 0;
     virtual void SetUniform(uint16 location, const Math::FMatrix4& value) = 0;
-    virtual void SetUniform(uint16 location, const Ref<FRHITexture>& value) = 0;
 
     template<typename T>
     void SetUniform(const std::string& name, const T& value)

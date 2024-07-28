@@ -1,9 +1,6 @@
 #include "OpenGLTexture2D.h"
 #include "Rev/Core/Assert.h"
 
-#include "OpenGLSampler.h"
-
-
 namespace Rev
 {
 
@@ -11,13 +8,10 @@ FOpenGLTexture2D::FOpenGLTexture2D(const FTextureDesc& InDesc, const FSamplerDes
 	: FOpenGLTexture(InDesc, InSamplerDesc)
 {
 	CreateResource();
-	mBindlessHandle = glGetTextureSamplerHandleARB(mHandle, *(GLuint*)mSampler->GetNativeHandle());
-	glMakeTextureHandleResidentARB(mBindlessHandle);
 }
 
 FOpenGLTexture2D::~FOpenGLTexture2D()
 {
-	glMakeTextureHandleNonResidentARB(mBindlessHandle);
 	glDeleteTextures(1, &mHandle);
 }
 

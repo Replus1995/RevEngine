@@ -1,10 +1,9 @@
 #include "Rev/Render/Material/PBRMaterial.h"
 #include "Rev/Render/RHI/RHIShaderLibrary.h"
 #include "Rev/Render/RHI/RHITexture.h"
+#include "Rev/Render/UniformLayout.h"
 #include "Rev/Asset/AssetLibrary.h"
 
-//Private
-#include "Render/UniformLocation.h"
 
 namespace Rev
 {
@@ -45,26 +44,26 @@ void PBRMaterial::SyncUniform()
 	if(!mProgram)
 		return;
 
-	mProgram->SetUniform(UL_BaseColorFactor, BaseColorFactor);
-	mProgram->SetUniform(UL_Metallic, Metallic);
-	mProgram->SetUniform(UL_Roughness, Roughness);
-	mProgram->SetUniform(UL_NormalScale, NormalScale);
-	mProgram->SetUniform(UL_OcclusionStrength, OcclusionStrength);
-	mProgram->SetUniform(UL_EmissiveFactor, EmissiveFactor);
+	mProgram->SetUniform(UL::LBaseColorFactor, BaseColorFactor);
+	mProgram->SetUniform(UL::LMetallic, Metallic);
+	mProgram->SetUniform(UL::LRoughness, Roughness);
+	mProgram->SetUniform(UL::LNormalScale, NormalScale);
+	mProgram->SetUniform(UL::LOcclusionStrength, OcclusionStrength);
+	mProgram->SetUniform(UL::LEmissiveFactor, EmissiveFactor);
 
 	//FAssetLibrary::GetDefaultWhiteTexture()->GetResource()->Bind(0);
 	//FAssetLibrary::GetDefaultNormalTexture()->GetResource()->Bind(1);
 	
 	if (BaseColorTexture)
-		mProgram->SetUniform(UL_BaseColorTexture, BaseColorTexture->GetResource());
+		BaseColorTexture->GetResource()->Bind(UL::SBaseColorTex);
 	if (MetallicRoughnessTexture)
-		mProgram->SetUniform(UL_MetallicRoughnessTexture, MetallicRoughnessTexture->GetResource());
+		MetallicRoughnessTexture->GetResource()->Bind(UL::SMetallicRoughnessTex);
 	if (NormalTexture)
-		mProgram->SetUniform(UL_NormalTexture, NormalTexture->GetResource());
+		NormalTexture->GetResource()->Bind(UL::SNormalTex);
 	if (OcclusionTexture)
-		mProgram->SetUniform(UL_OcclusionTexture, OcclusionTexture->GetResource());
+		OcclusionTexture->GetResource()->Bind(UL::SOcclusionTex);
 	if (EmissiveTexture)
-		mProgram->SetUniform(UL_EmissiveTexture, EmissiveTexture->GetResource());
+		EmissiveTexture->GetResource()->Bind(UL::SEmissiveTex);
 }
 
 }

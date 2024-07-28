@@ -2,7 +2,6 @@
 #pragma shader_stage(fragment)
 #extension GL_ARB_separate_shader_objects : enable
 #extension GL_GOOGLE_include_directive : enable
-#define NV_bindless_texture 1
 
 #include "/Engine/Shaders/Light.rsh"
 #include "/Engine/Shaders/PBR/GlobalPBR.rsh"
@@ -14,11 +13,11 @@ layout(location = 8) uniform float u_NormalScale;
 layout(location = 9) uniform float u_OcclusionStrength;
 layout(location = 10) uniform vec3 u_EmissiveFactor;
 
-layout(bindless_sampler, location = 11) uniform sampler2D s_BaseColorTex;
-layout(bindless_sampler, location = 12) uniform sampler2D s_MetallicRoughnessTex;
-layout(bindless_sampler, location = 13) uniform sampler2D s_NormalTex;
-layout(bindless_sampler, location = 14) uniform sampler2D s_OcclusionTex;
-layout(bindless_sampler, location = 15) uniform sampler2D s_EmissiveTex;
+layout(location = 11, binding = 5) uniform sampler2D s_BaseColorTex;
+layout(location = 12, binding = 6) uniform sampler2D s_MetallicRoughnessTex;
+layout(location = 13, binding = 7) uniform sampler2D s_NormalTex;
+layout(location = 14, binding = 8) uniform sampler2D s_OcclusionTex;
+layout(location = 15, binding = 9) uniform sampler2D s_EmissiveTex;
 
 layout(location = 0) in Vertex
 {

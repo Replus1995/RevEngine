@@ -1,6 +1,6 @@
 #pragma once
 #include "Rev/Core/Base.h"
-#include "Rev/Render/UniformData.h"
+#include "Rev/Render/UniformDefine.h"
 #include "Rev/Render/Light.h"
 
 namespace Rev

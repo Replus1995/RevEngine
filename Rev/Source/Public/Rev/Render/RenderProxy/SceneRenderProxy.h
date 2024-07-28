@@ -1,6 +1,6 @@
 #pragma once
 #include "Rev/Core/Base.h"
-#include "Rev/Render/UniformData.h"
+#include "Rev/Render/UniformDefine.h"
 #include "Rev/Render/RHI/RHIBuffer.h"
 #include "Rev/Render/Material/Material.h"
 #include "Rev/Render/RenderProxy/StaticMeshRenderProxy.h"

@@ -147,11 +147,6 @@ void FOpenGLShaderProgram::SetUniform(uint16 location, const Math::FMatrix4& val
 	glUniformMatrix4fv(location, 1, GL_FALSE, value.Data());
 }
 
-void FOpenGLShaderProgram::SetUniform(uint16 location, const Ref<FRHITexture>& value)
-{
-	glUniformHandleui64ARB(location, value->GetBindlessHandle());
-}
-
 void FOpenGLShaderProgram::SetUniformArray(uint16 location, const int* values, uint32_t count)
 {
 	glUniform1iv(location, count, values);
