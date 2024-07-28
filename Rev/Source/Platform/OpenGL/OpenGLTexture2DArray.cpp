@@ -18,6 +18,11 @@ FOpenGLTexture2DArray::~FOpenGLTexture2DArray()
 
 void FOpenGLTexture2DArray::UpdateData(const void* InData, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex, uint16 InDepth)
 {
+	if (mDesc.NumSamples != 1)
+	{
+		RE_CORE_ERROR("Updating multisample texture is not allowed");
+		return;
+	}
 	//Update one mip of one texture at a time
 	RE_CORE_ASSERT(InDepth == 0, "Depth must be 0 for 2d array texture");
 	RE_CORE_ASSERT(InArrayIndex < mDesc.ArraySize, "ArrayIndex out of range");
@@ -32,8 +37,17 @@ void FOpenGLTexture2DArray::UpdateData(const void* InData, uint32 InSize, uint8 
 
 void FOpenGLTexture2DArray::CreateResource()
 {
-	glCreateTextures(GL_TEXTURE_2D_ARRAY, 1, &mHandle);
-	glTextureStorage3D(mHandle, mDesc.NumMips, mFormatData.InternalFormat,  GetWidth(), GetHeight(), mDesc.ArraySize);
+	if (mDesc.NumSamples == 1)
+	{
+		glCreateTextures(GL_TEXTURE_2D_ARRAY, 1, &mHandle);
+		glTextureStorage3D(mHandle, mDesc.NumMips, mFormatData.InternalFormat, GetWidth(), GetHeight(), mDesc.ArraySize);
+	}
+	else
+	{
+		RE_CORE_ASSERT(mDesc.NumSamples > 1 && mDesc.NumMips == 1);
+		glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, 1, &mHandle);
+		glTexStorage3DMultisample(mHandle, mDesc.NumSamples, mFormatData.InternalFormat, GetWidth(), GetHeight(), mDesc.ArraySize, GL_TRUE);
+	}
 }
 
 }
