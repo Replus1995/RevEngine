@@ -11,17 +11,6 @@ FOpenGLRenderTarget2D::FOpenGLRenderTarget2D(const FRenderTargetDesc& InDesc)
 	CreateResource();
 }
 
-FOpenGLRenderTarget2D::FOpenGLRenderTarget2D(const FRenderTargetSource* InSources, uint32 InNumSources)
-	: FRHIRenderTarget(InSources, InNumSources)
-	, mUseExternalSource(true)
-{
-	for (uint32 i = 0; i < InNumSources; i++)
-	{
-		const FRenderTargetSource& Source = InSources[i];
-
-	}
-}
-
 FOpenGLRenderTarget2D::~FOpenGLRenderTarget2D()
 {
 	glDeleteFramebuffers(1, &mHandle);
@@ -136,6 +125,7 @@ void FOpenGLRenderTarget2D::CreateResource()
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
+
 
 }
 

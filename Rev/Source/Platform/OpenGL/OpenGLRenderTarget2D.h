@@ -10,7 +10,6 @@ class FOpenGLRenderTarget2D : public FRHIRenderTarget
 {
 public:
 	FOpenGLRenderTarget2D(const FRenderTargetDesc& InDesc);
-	FOpenGLRenderTarget2D(const FRenderTargetSource* InSources, uint32 InNumSources);
 	virtual ~FOpenGLRenderTarget2D();
 	virtual void* GetNativeHandle() override { return &mHandle; }
 

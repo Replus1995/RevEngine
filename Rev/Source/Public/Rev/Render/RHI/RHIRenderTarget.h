@@ -71,21 +71,9 @@ struct FRenderTargetDesc
 
 struct FRenderTargetSource
 {
-	ERenderTargetAttachment Attachment;
-	uint8 MipLevel;
-	uint16 ArrayIndex;
-	Ref<FRHITexture> Texture;
-
-	FRenderTargetSource(
-		ERenderTargetAttachment InAttachment, const Ref<FRHITexture>& InTexture, 
-		uint16 InArrayIndex = 0, uint8 InMipLevel = 0
-	)
-		: Attachment(InAttachment)
-		, MipLevel(InMipLevel)
-		, ArrayIndex(InArrayIndex)
-		, Texture(InTexture)
-	{}
-
+	Ref<FRHITexture> Texture = nullptr;
+	uint16 ArrayIndex = 0;
+	uint8 MipLevel = 0;
 };
 
 class FRHIRenderTarget : public FRHIResource
@@ -104,7 +92,7 @@ public:
 
 protected:
 	FRHIRenderTarget(const FRenderTargetDesc& InDesc) : mDesc(InDesc) {}
-	FRHIRenderTarget(const FRenderTargetSource* InSources, uint32 InNumSources);
+	FRHIRenderTarget(const FRenderTargetSource* InColorSources, uint32 InNumColorSources, const FRenderTargetSource& InDepthSource = {});
 protected:
 	FRenderTargetDesc mDesc;
 };

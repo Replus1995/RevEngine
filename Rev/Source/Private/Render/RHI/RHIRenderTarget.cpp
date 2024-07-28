@@ -4,33 +4,33 @@
 namespace Rev
 {
 
-FRHIRenderTarget::FRHIRenderTarget(const FRenderTargetSource* InSources, uint32 InNumSources)
+FRHIRenderTarget::FRHIRenderTarget(const FRenderTargetSource* InColorSources, uint32 InNumColorSources, const FRenderTargetSource& InDepthSource)
 {
-	RE_CORE_ASSERT(InNumSources > 0);
-	for (uint32 i = 0; i < InNumSources; i++)
+	RE_CORE_ASSERT(InNumColorSources > 0 || InDepthSource.Texture != nullptr);
+	for (uint32 i = 0; i < InNumColorSources; i++)
 	{
-		const FRenderTargetSource& Source = InSources[i];
-		if (!Source.Texture)
+		const FRenderTargetSource& ColorSource = InColorSources[i];
+		if (!ColorSource.Texture)
 			continue;
 		if (mDesc.Width == 0)
-			mDesc.Width = Source.Texture->GetWidth();
+			mDesc.Width = ColorSource.Texture->GetWidth();
 		if (mDesc.Height == 0)
-			mDesc.Height = Source.Texture->GetHeight();
-		if (Source.Attachment < RTA_MaxColorAttachments)
-		{
-			FColorTargetDesc& ColorDesc = mDesc.ColorTargets[Source.Attachment];
-			ColorDesc.Format = Source.Texture->GetFormat();
-			ColorDesc.ClearColor = Source.Texture->GetDesc().ClearColor.RGBA;
-			mDesc.NumColorTargets++;
-		}
-		else if (Source.Attachment == RTA_DepthStencilAttachment)
-		{
-			mDesc.DepthStencilTarget.Format = Source.Texture->GetFormat();
-			mDesc.DepthStencilTarget.ClearDepth = Source.Texture->GetDesc().ClearColor.Depth;
-			mDesc.DepthStencilTarget.ClearStencil = Source.Texture->GetDesc().ClearColor.Stencil;
-		}
-		else
-			RE_CORE_ASSERT(false, "Unsupported attachement");
+			mDesc.Height = ColorSource.Texture->GetHeight();
+		FColorTargetDesc& ColorDesc = mDesc.ColorTargets[i];
+		ColorDesc.Format = ColorSource.Texture->GetFormat();
+		ColorDesc.ClearColor = ColorSource.Texture->GetDesc().ClearColor.RGBA;
+		mDesc.NumColorTargets++;
+	}
+	if (InDepthSource.Texture != nullptr)
+	{
+		if (mDesc.Width == 0)
+			mDesc.Width = InDepthSource.Texture->GetWidth();
+		if (mDesc.Height == 0)
+			mDesc.Height = InDepthSource.Texture->GetHeight();
+
+		mDesc.DepthStencilTarget.Format = InDepthSource.Texture->GetFormat();
+		mDesc.DepthStencilTarget.ClearDepth = InDepthSource.Texture->GetDesc().ClearColor.Depth;
+		mDesc.DepthStencilTarget.ClearStencil = InDepthSource.Texture->GetDesc().ClearColor.Stencil;
 	}
 }
 
