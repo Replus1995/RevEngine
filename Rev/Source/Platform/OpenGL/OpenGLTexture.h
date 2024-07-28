@@ -18,6 +18,7 @@ public:
 protected:
 	FOpenGLTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc);
 	void ClearMipData(uint32 InMipLevel);
+	void CalculateMipSize(uint32 InMipLevel, uint32& OutMipWidth, uint32& OutMipHeight);
 protected:
 	GLuint mHandle = 0;
 	FOpenGLFormatData mFormatData;

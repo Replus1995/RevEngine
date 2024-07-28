@@ -9,13 +9,24 @@
 namespace Rev
 {
 
-enum class ETextureDimension
+enum class ETextureDimension : uint8
 {
 	Texture2D,
-	Texture2DArray, //Unsupported
+	Texture2DArray,
 	Texture3D, //Unsupported
-	TextureCube, //Unsupported
-	TextureCubeArray //Unsupported
+	TextureCube,
+	TextureCubeArray
+};
+ 
+enum class ETextureCubeFace : uint8
+{
+	PositiveX = 0,
+	NegativeX = 1,
+	PositiveY = 2,
+	NegativeY = 3,
+	PositiveZ = 4,
+	NegativeZ = 5,
+	Count = 6
 };
 
 struct FTextureClearColor
@@ -105,7 +116,7 @@ public:
 	virtual const FRHISampler* GetSampler() const = 0;
 	virtual void Bind(uint32 InUnit) const = 0;
 
-	virtual void UpdateData(const void* InData, uint32 InSize, uint8 InMipLevel = 0, uint16 InArrayIndex = 0) = 0;
+	virtual void UpdateData(const void* InData, uint32 InSize, uint8 InMipLevel = 0, uint16 InArrayIndex = 0, uint16 InDepth = 0) = 0;
 	virtual void ClearData() = 0;
 protected:
 	FRHITexture(const FTextureDesc& InDesc) : mDesc(InDesc) {}

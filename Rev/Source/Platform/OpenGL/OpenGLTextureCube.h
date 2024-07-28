@@ -5,11 +5,11 @@
 namespace Rev
 {
 
-class FOpenGLTexture2DArray : public FOpenGLTexture
+class FOpenGLTextureCube : public FOpenGLTexture
 {
 public:
-	FOpenGLTexture2DArray(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc = {});
-	virtual ~FOpenGLTexture2DArray();
+	FOpenGLTextureCube(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc = {});
+	virtual ~FOpenGLTextureCube();
 
 	virtual void UpdateData(const void* InData, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex, uint16 InDepth) override;
 

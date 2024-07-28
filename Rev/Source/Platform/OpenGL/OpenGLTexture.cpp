@@ -91,6 +91,13 @@ void FOpenGLTexture::ClearMipData(uint32 InMipLevel)
 	}
 }
 
+void FOpenGLTexture::CalculateMipSize(uint32 InMipLevel, uint32& OutMipWidth, uint32& OutMipHeight)
+{
+	uint32 MipFactor = Math::PowI<uint32>(2, InMipLevel);
+	OutMipWidth = std::max<uint32>(1, GetWidth() / MipFactor);
+	OutMipHeight = std::max<uint32>(1, GetHeight() / MipFactor);
+}
+
 Ref<FOpenGLTexture> CreateOpenGLTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc)
 {
 	switch (InDesc.Dimension)
