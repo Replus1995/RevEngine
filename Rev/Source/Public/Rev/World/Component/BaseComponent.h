@@ -4,7 +4,6 @@
 #include "Rev/Math/Maths.h"
 #include "Rev/Render/Camera.h"
 
-#include <string>
 
 namespace Rev
 {

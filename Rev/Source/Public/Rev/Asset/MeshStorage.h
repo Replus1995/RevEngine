@@ -2,7 +2,6 @@
 #include "Rev/Core/Base.h"
 #include "Rev/Asset/MeshPrimitiveStorage.h"
 #include <vector>
-#include <string>
 
 namespace Rev
 {

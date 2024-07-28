@@ -1,7 +1,5 @@
 #pragma once
-
 #include "Rev/Core/Base.h"
-#include <string>
 #include <functional>
 
 #define RE_BIND_EVENT_FN(fn, owner) std::bind(&fn, owner, std::placeholders::_1)

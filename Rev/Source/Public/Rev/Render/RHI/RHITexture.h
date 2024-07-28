@@ -4,7 +4,6 @@
 #include "Rev/Render/PixelFormat.h"
 #include "Rev/Render/RHI/RHIResource.h"
 #include "Rev/Render/RHI/RHISampler.h"
-#include <string>
 
 namespace Rev
 {

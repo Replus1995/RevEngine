@@ -2,7 +2,6 @@
 #include "Rev/Core/Base.h"
 #include "Rev/Render/RenderCore.h"
 #include "Rev/Render/RHI/RHIResource.h"
-#include <string>
 #include <vector>
 
 namespace Rev

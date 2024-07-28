@@ -2,7 +2,6 @@
 #include "Rev/Core/Base.h"
 #include "Rev/Render/Mesh/MeshPrimitive.h"
 #include <vector>
-#include <string>
 
 namespace Rev
 {

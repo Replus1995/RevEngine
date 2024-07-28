@@ -6,7 +6,7 @@
 namespace Rev
 {
 class Material;
-class FMeshPrimitive;
+struct FMeshPrimitive;
 class FRHIVertexArray;
 class REV_API RenderCmd
 {

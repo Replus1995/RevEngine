@@ -2,7 +2,6 @@
 #include "Rev/Core/Base.h"
 #include "Rev/Math/Maths.h"
 #include "Rev/Render/RHI/RHIResource.h"
-#include <string>
 #include <unordered_map>
 
 namespace Rev

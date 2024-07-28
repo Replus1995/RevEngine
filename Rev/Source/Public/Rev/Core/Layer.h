@@ -1,5 +1,4 @@
 #pragma once
-
 #include "Rev/Core/Base.h"
 #include "Rev/Events/Event.h"
 

@@ -1,6 +1,7 @@
 #pragma once
 #include "Rev/Core/CoreDefines.h"
 #include "Rev/Core/CoreTypes.h"
+#include <string>
 
 namespace Rev
 {
