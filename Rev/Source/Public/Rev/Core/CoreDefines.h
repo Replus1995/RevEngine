@@ -40,6 +40,14 @@
 #endif
 #endif
 
+#ifndef DEPRECATED
+#ifdef _MSC_VER
+#define DEPRECATED(...) __declspec(deprecated(__VA_ARGS__))
+#else
+#define DEPRECATED(...)
+#endif
+#endif
+
 #define BIT(x) (1 << x)
 #define RE_EXPAND_MACRO(x) x
 #define RE_STRINGIFY_MACRO(x) #x

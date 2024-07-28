@@ -39,7 +39,7 @@ void PBRMaterial::Compile()
 	);
 }
 
-void PBRMaterial::SyncUniform()
+void PBRMaterial::PreDraw()
 {
 	if(!mProgram)
 		return;

@@ -28,7 +28,11 @@ void Material::Compile()
 		{ "/Engine/Shaders/BasicFS" });
 }
 
-void Material::SyncUniform()
+void Material::PreDraw()
+{
+}
+
+void Material::PostDraw()
 {
 }
 

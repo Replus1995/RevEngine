@@ -49,6 +49,7 @@ void SceneRenderProxy::Prepare(const Ref<Scene>& scene)
 		//ToDo: sort static meshes by depth
 	}
 	{
+		//TODO: Cluster Forward Light
 		//Collect lights
 		mLightProxies.clear();
 
@@ -86,7 +87,6 @@ void SceneRenderProxy::DrawMeshes(EMaterialDomain InDomain, EBlendMode InBlend)
 {
 	for (StaticMeshRenderProxy& proxy : mStaticMeshProxies)
 	{
-		//TODO: Cluster Forward Light
 		mModelUB->UpdateData(&proxy.GetMatrix(), sizeof(FModelUniform));
 		proxy.DrawPrimitives(InDomain, InBlend);
 	}

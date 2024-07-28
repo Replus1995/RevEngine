@@ -24,7 +24,8 @@ public:
 	* @brief Create shader program based on ShadingModel
 	*/
 	virtual void Compile();
-	virtual void SyncUniform();
+	virtual void PreDraw();
+	virtual void PostDraw();
 	const Ref<FRHIShaderProgram>& GetProgram() const
 	{
 		return mProgram;

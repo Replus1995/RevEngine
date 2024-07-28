@@ -39,13 +39,8 @@ void StaticMeshRenderProxy::DrawPrimitives(EMaterialDomain InDomain, EBlendMode 
 			{
 				RenderCmd::PrepareMaterial(pMat.get());
 				pMat->GetProgram()->Bind();
-				pMat->SyncUniform();
-				//pMat->GetProgram()->SetUniform(UL_ModelMat, mModelMat);
+				pMat->PreDraw();
 			}
-			/*else
-			{
-				InProgram->SetUniform(UL_ModelMat, mModelMat);
-			}*/
 
 			for (auto& pPrimitive : vPrimitives)
 			{
@@ -54,6 +49,7 @@ void StaticMeshRenderProxy::DrawPrimitives(EMaterialDomain InDomain, EBlendMode 
 
 			if (!bUseProgramOverride)
 			{
+				pMat->PostDraw();
 				pMat->GetProgram()->Unbind();
 			}
 		}

@@ -60,9 +60,9 @@ ExampleLayer::ExampleLayer()
 	}
 
 	{
-		auto pPlaneMat = CreateRef<ExampleMaterial>();
+		auto pPlaneMat = CreateRef<PBRMaterial>();
 		pPlaneMat->Compile();
-		pPlaneMat->SetColor(Math::FLinearColor(.9, .9, .9, 1));
+		pPlaneMat->BaseColorFactor = (Math::FLinearColor(.8, .8, .8, 1));
 
 		auto meshEntity = mScene->CreateEntity();
 		auto& meshComp = meshEntity.AddComponent<StaticMeshComponent>();

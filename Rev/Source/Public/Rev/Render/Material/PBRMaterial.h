@@ -12,7 +12,7 @@ public:
 	virtual ~PBRMaterial();
 
 	virtual void Compile() override;
-	virtual void SyncUniform() override;
+	virtual void PreDraw() override;
 
 	Math::FLinearColor BaseColorFactor = Math::FLinearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	Ref<Texture> BaseColorTexture = nullptr;

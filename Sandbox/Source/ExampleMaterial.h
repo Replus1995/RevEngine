@@ -21,9 +21,9 @@ public:
         mProgram = Rev::FRHIShaderLibrary::GetInstance().CreateGraphicsProgram("ExampleProgram", "/Game/Shaders/ExampleVS", "/Game/Shaders/ExampleFS");
     }
 
-    virtual void SyncUniform() override
+    virtual void PreDraw() override
     {
-        Rev::Material::SyncUniform();
+        Rev::Material::PreDraw();
         uColor.Upload(mProgram);
     }
 
