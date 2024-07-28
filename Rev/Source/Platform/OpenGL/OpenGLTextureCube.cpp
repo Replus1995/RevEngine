@@ -19,7 +19,7 @@ FOpenGLTextureCube::~FOpenGLTextureCube()
 void FOpenGLTextureCube::UpdateData(const void* InData, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex, uint16 InDepth)
 {
 	//Update one mip of one face of one cube texture at a time
-	RE_CORE_ASSERT(InDepth < (uint16)ETextureCubeFace::Count, "Depth must be in range 0~5");
+	RE_CORE_ASSERT(InDepth < (uint16)ETextureCubeFace::Count, "Depth for cube must be in range 0~5");
 	RE_CORE_ASSERT(InArrayIndex == 0, "ArrayIndex must be 0 for cube texture");
 	RE_CORE_ASSERT(InMipLevel < mDesc.NumMips, "MipLevel out of range");
 

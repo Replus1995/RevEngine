@@ -13,7 +13,7 @@ enum class ETextureDimension : uint8
 {
 	Texture2D,
 	Texture2DArray,
-	Texture3D, //Unsupported
+	Texture3D,
 	TextureCube,
 	TextureCubeArray
 };
