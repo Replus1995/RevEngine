@@ -30,6 +30,10 @@ FMeshPrimitiveStorage::FMeshPrimitiveStorage(FMeshPrimitiveStorage&& InStorage) 
 	IndexData = std::move(InStorage.IndexData);
 }
 
+FMeshPrimitiveStorage::~FMeshPrimitiveStorage()
+{
+}
+
 FMeshPrimitive FMeshPrimitiveStorage::CreateVertexData()
 {
 	if(VertexCount == 0 || IndexCount == 0 || TexCoordData.Empty())

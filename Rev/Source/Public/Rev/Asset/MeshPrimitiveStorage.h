@@ -30,6 +30,7 @@ public:
 	FMeshPrimitiveStorage();
 	FMeshPrimitiveStorage(const FMeshPrimitiveStorage&) = delete;
 	FMeshPrimitiveStorage(FMeshPrimitiveStorage&& InStorage) noexcept;
+	~FMeshPrimitiveStorage();
 
 	FMeshPrimitive CreateVertexData();
 protected:

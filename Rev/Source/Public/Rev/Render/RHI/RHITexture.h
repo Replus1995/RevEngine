@@ -105,7 +105,7 @@ public:
 	virtual const FRHISampler* GetSampler() const = 0;
 	virtual void Bind(uint32 InUnit) const = 0;
 
-	virtual void UpdateData(const void* InData, uint32 InSize) = 0;
+	virtual void UpdateData(const void* InData, uint32 InSize, uint8 InMipLevel = 0, uint16 InArrayIndex = 0) = 0;
 	virtual void ClearData() = 0;
 protected:
 	FRHITexture(const FTextureDesc& InDesc) : mDesc(InDesc) {}

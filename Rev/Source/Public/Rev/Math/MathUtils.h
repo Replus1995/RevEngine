@@ -23,6 +23,9 @@ inline T Max(T InValA, T InValB);
 template<typename T>
 inline T Clamp(T InVal, T InMin, T InMax);
 
+template<typename T>
+inline T PowI(T InX, T InY);
+
 }
 }
 

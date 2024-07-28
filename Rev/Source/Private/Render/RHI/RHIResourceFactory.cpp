@@ -121,7 +121,7 @@ Ref<FRHITexture> FRHIResourceFactory::CreateTexture(const FTextureDesc& InDesc, 
 	switch (GetRenderAPI())
 	{
 	case ERenderAPI::None:    RE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
-	case ERenderAPI::OpenGL:  return FOpenGLTexture::Create(InDesc, InSamplerDesc);
+	case ERenderAPI::OpenGL:  return CreateOpenGLTexture(InDesc, InSamplerDesc);
 	}
 
 	RE_CORE_ASSERT(false, "Unknown RenderAPI!");
