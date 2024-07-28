@@ -10,6 +10,7 @@ class FOpenGLRenderTarget2D : public FRHIRenderTarget
 {
 public:
 	FOpenGLRenderTarget2D(const FRenderTargetDesc& InDesc);
+	FOpenGLRenderTarget2D(const FRenderTargetSource* InSources, uint32 InNumSources);
 	virtual ~FOpenGLRenderTarget2D();
 	virtual void* GetNativeHandle() override { return &mHandle; }
 
@@ -24,8 +25,9 @@ private:
 	void CreateResource();
 protected:
 	GLuint mHandle = 0;
-	std::vector<Ref<FOpenGLTexture2D>> mColorTextures;
+	Ref<FOpenGLTexture2D> mColorTextures[RTA_MaxColorAttachments];
 	Ref<FOpenGLTexture2D> mDepthTexture;
+	bool mUseExternalSource = false;
 };
 
 }

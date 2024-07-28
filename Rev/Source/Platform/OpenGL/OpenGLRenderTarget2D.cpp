@@ -11,6 +11,17 @@ FOpenGLRenderTarget2D::FOpenGLRenderTarget2D(const FRenderTargetDesc& InDesc)
 	CreateResource();
 }
 
+FOpenGLRenderTarget2D::FOpenGLRenderTarget2D(const FRenderTargetSource* InSources, uint32 InNumSources)
+	: FRHIRenderTarget(InSources, InNumSources)
+	, mUseExternalSource(true)
+{
+	for (uint32 i = 0; i < InNumSources; i++)
+	{
+		const FRenderTargetSource& Source = InSources[i];
+
+	}
+}
+
 FOpenGLRenderTarget2D::~FOpenGLRenderTarget2D()
 {
 	glDeleteFramebuffers(1, &mHandle);
@@ -29,12 +40,12 @@ void FOpenGLRenderTarget2D::Unbind()
 
 void FOpenGLRenderTarget2D::ClearTarget(ERenderTargetAttachment Index)
 {
-	if (Index == ERenderTargetAttachment::RTA_DepthStencilAttachment)
+	if (Index == RTA_DepthStencilAttachment)
 	{
 		if(mDepthTexture)
 			mDepthTexture->ClearData();
 	}
-	else if (Index >= 0 && Index < mColorTextures.size())
+	else if (Index >= 0 && Index < RTA_MaxColorAttachments)
 	{
 		auto& ColorTexture = mColorTextures[Index];
 		if (ColorTexture)
@@ -44,11 +55,11 @@ void FOpenGLRenderTarget2D::ClearTarget(ERenderTargetAttachment Index)
 
 const Ref<FRHITexture> FOpenGLRenderTarget2D::GetTargetTexture(ERenderTargetAttachment Index) const
 {
-	if (Index == ERenderTargetAttachment::RTA_DepthStencilAttachment)
+	if (Index == RTA_DepthStencilAttachment)
 	{
 		return mDepthTexture;
 	}
-	else if (Index >= 0 && Index < mColorTextures.size())
+	else if (Index >= 0 && Index < RTA_MaxColorAttachments)
 	{
 		return mColorTextures[Index];
 	}
@@ -73,7 +84,10 @@ void FOpenGLRenderTarget2D::CreateResource()
 	if (mHandle)
 	{
 		glDeleteFramebuffers(1, &mHandle);
-		mColorTextures.clear();
+		for (uint8 i = 0; i < RTA_MaxColorAttachments; i++)
+		{
+			mColorTextures[i].reset();
+		}
 		mDepthTexture.reset();
 	}
 	glCreateFramebuffers(1, &mHandle);
@@ -89,7 +103,7 @@ void FOpenGLRenderTarget2D::CreateResource()
 		GLenum TexTarget = bMultiSample ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, TexTarget, TexHandle, 0);
 
-		mColorTextures.emplace_back(std::move(ColorTexture));
+		mColorTextures[i] = std::move(ColorTexture);
 	}
 
 	if (mDesc.DepthStencilTarget.Format == PF_DepthStencil || mDesc.DepthStencilTarget.Format == PF_ShadowDepth)
@@ -103,13 +117,14 @@ void FOpenGLRenderTarget2D::CreateResource()
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, TexTarget, TexHandle, 0);
 	}
 
-	if (!mColorTextures.empty())
+	if (mDesc.NumColorTargets > 0)
 	{
-		std::vector<GLenum> ColorBuffers(mColorTextures.size());
+		std::vector<GLenum> ColorBuffers(mDesc.NumColorTargets);
 		for (size_t i = 0; i < ColorBuffers.size(); i++)
 		{
 			ColorBuffers[i] = GL_COLOR_ATTACHMENT0 + i;
-		}glDrawBuffers(ColorBuffers.size(), ColorBuffers.data());
+		}
+		glDrawBuffers(ColorBuffers.size(), ColorBuffers.data());
 	}
 	else
 	{

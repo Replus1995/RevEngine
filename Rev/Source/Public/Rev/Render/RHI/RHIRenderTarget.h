@@ -47,6 +47,7 @@ struct FRenderTargetDesc
 	FDepthStencilTargetDesc DepthStencilTarget;
 	uint8 NumSamples = 1; //MSAA
 
+	FRenderTargetDesc() = default;
 	FRenderTargetDesc(
 		uint32 InWidth, uint32 InHeight,
 		const FColorTargetDesc* InColorTargets,
@@ -103,6 +104,7 @@ public:
 
 protected:
 	FRHIRenderTarget(const FRenderTargetDesc& InDesc) : mDesc(InDesc) {}
+	FRHIRenderTarget(const FRenderTargetSource* InSources, uint32 InNumSources);
 protected:
 	FRenderTargetDesc mDesc;
 };
