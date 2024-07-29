@@ -13,40 +13,12 @@ namespace Rev
 static Ref<FRHIVertexArray> sPostPassVertexData = nullptr;
 
 FPostPass::FPostPass(std::string_view InName)
-	: FRHIRenderPass(InName)
+	: FRenderPass(InName)
 {
 }
 
 FPostPass::~FPostPass()
 {
-}
-
-void FPostPass::BeginPass()
-{
-	mInPass = true;
-	if (mTarget)
-	{
-		mTarget->Bind();
-	}
-}
-
-void FPostPass::EndPass()
-{
-	if (mTarget)
-	{
-		mTarget->Unbind();
-	}
-	mInPass = false;
-}
-
-void FPostPass::SetRenderTarget(const Ref<FRHIRenderTarget>& InTarget)
-{
-	if (mInPass)
-	{
-		RE_CORE_ASSERT(false, "Never set render target in pass.")
-		return;
-	}
-	mTarget = InTarget;
 }
 
 void FPostPass::DrawQuad()

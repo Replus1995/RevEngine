@@ -1,21 +1,26 @@
 #pragma once
 #include "Rev/Core/Base.h"
-#include "Rev/Render/RenderPipeline/ScreenPass.h"
+#include "Rev/Render/RenderPipeline/RenderPass.h"
 
 namespace Rev
 {
 
-class FSurfacePass : public FScreenPass
+class SceneRenderProxy;
+class FForwardSurfacePass : public FRenderPass
 {
 public:
-	FSurfacePass();
-	virtual ~FSurfacePass();
+	FForwardSurfacePass();
+	virtual ~FForwardSurfacePass();
 
-	virtual void BeginPass() override;
-	virtual void EndPass() override;
+	void RunPass(SceneRenderProxy& InSceneProxy);
+};
 
-protected:
-	virtual FRenderTargetDesc MakeTargetDesc(uint32 InWidth, uint32 InHeight) override;
+
+class FDeferredSurfacePass : public FRenderPass
+{
+public:
+	FDeferredSurfacePass();
+	virtual ~FDeferredSurfacePass();
 };
 
 }

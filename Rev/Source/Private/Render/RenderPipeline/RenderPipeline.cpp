@@ -23,6 +23,10 @@ void FRenderPipeline::BeginPipeline(uint32 InWidth, uint32 InHeight)
 	sCurrentPipeline = this;
 }
 
+void FRenderPipeline::RunPipeline(SceneRenderProxy& InSceneProxy)
+{
+}
+
 void FRenderPipeline::EndPipeline()
 {
 	sCurrentPipeline = nullptr;

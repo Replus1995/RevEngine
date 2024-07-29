@@ -1,34 +1,38 @@
 #include "Rev/Render/RenderPipeline/SurfacePass.h"
+#include "Rev/Render/RenderProxy/SceneRenderProxy.h"
 #include "Rev/Render/RHI/RHIResourceFactory.h"
-
 #include "Rev/Core/Assert.h"
 
 namespace Rev
 {
 
-FSurfacePass::FSurfacePass()
-	: FScreenPass("SurfacePass", true)
+FForwardSurfacePass::FForwardSurfacePass()
+	: FRenderPass("ForwardSurfacePass")
 {
 }
 
-FSurfacePass::~FSurfacePass()
+FForwardSurfacePass::~FForwardSurfacePass()
 {
 }
 
-void FSurfacePass::BeginPass()
+void FForwardSurfacePass::RunPass(SceneRenderProxy& InSceneProxy)
 {
-	FScreenPass::BeginPass();
+	InSceneProxy.DrawScene();
 }
 
-void FSurfacePass::EndPass()
+FDeferredSurfacePass::FDeferredSurfacePass()
+	: FRenderPass("SurfacePass")
 {
-	FScreenPass::EndPass();
 }
 
-FRenderTargetDesc FSurfacePass::MakeTargetDesc(uint32 InWidth, uint32 InHeight)
+FDeferredSurfacePass::~FDeferredSurfacePass()
+{
+}
+
+FRenderTargetDesc MakeTargetDesc(uint32 InWidth, uint32 InHeight)
 {
 	std::vector<FColorTargetDesc> vColorDesc;
-	vColorDesc.push_back({ PF_R32G32B32A32F, Math::FLinearColor(0, 0, 0, 1) }); //BaseClor
+	vColorDesc.push_back({ PF_R32G32B32A32F, Math::FLinearColor(0, 0, 0, 1) }); //BaseColor
 	vColorDesc.push_back({ PF_R32G32B32A32F, Math::FLinearColor(0, 0, 0, 1) }); //Normal
 	vColorDesc.push_back({ PF_R32G32B32A32F, Math::FLinearColor(0, 0, 0, 0) }); //MetallicRoughnessOcclusion
 	vColorDesc.push_back({ PF_R32G32B32A32F, Math::FLinearColor(0, 0, 0, 1) }); //Emissive

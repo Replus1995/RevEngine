@@ -3,13 +3,14 @@
 
 namespace Rev
 {
-
+class SceneRenderProxy;
 class FRenderPipeline
 {
 public:
 	FRenderPipeline();
 	virtual ~FRenderPipeline();
 	virtual void BeginPipeline(uint32 InWidth, uint32 InHeight);
+	virtual void RunPipeline(SceneRenderProxy& InSceneProxy);
 	virtual void EndPipeline();
 
 	uint32 GetWidth() const { return mWidth; }
