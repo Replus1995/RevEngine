@@ -11,7 +11,7 @@ Ref<Material> FPBRMaterialStorage::CreateMaterial()
 		return mCache;
 
 	Ref<PBRMaterial> Result = CreateRef<PBRMaterial>();
-	Result->TessEval = TessEval;
+	Result->Domain = Domain;
 	Result->BlendMode = BlendMode;
 	Result->ShadingModel = ShadingModel;
 	Result->MaskClip = MaskClip;

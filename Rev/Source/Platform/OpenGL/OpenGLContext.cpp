@@ -86,32 +86,43 @@ void FOpenGLContext::PrepareMaterial(const Material* InMaterial)
 {
 	if(!InMaterial)
 		return;
-	switch (InMaterial->BlendMode)
+	if (InMaterial->Domain == MD_Surface)
 	{
-	case BM_Opaque:
-		glDisable(GL_BLEND);
-		break;
-	case BM_Transparent:
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		break;
-	case BM_Masked:
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		break;
-	default:
-		break;
-	}
+		switch (InMaterial->BlendMode)
+		{
+		case BM_Opaque:
+			glDisable(GL_BLEND);
+			break;
+		case BM_Transparent:
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			break;
+		case BM_Masked:
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			break;
+		default:
+			break;
+		}
 
-	if (InMaterial->TwoSided)
-	{
-		 glDisable(GL_CULL_FACE);
+		if (InMaterial->TwoSided)
+		{
+			glDisable(GL_CULL_FACE);
+		}
+		else
+		{
+			glEnable(GL_CULL_FACE);
+			glCullFace(GL_BACK);
+		}
 	}
-	else
+	else if (InMaterial->Domain == MD_PostProcess)
 	{
+		glEnable(GL_BLEND);
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
 	}
+
+	
 }
 
 void FOpenGLContext::DrawVertices(const Ref<FRHIVertexArray>& InVertexArray, EDrawMode InDrawMode)

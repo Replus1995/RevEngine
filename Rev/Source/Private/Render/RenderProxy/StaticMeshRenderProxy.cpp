@@ -29,7 +29,7 @@ void StaticMeshRenderProxy::DrawPrimitives(EMaterialDomain InDomain, EBlendMode 
 	for (uint32 i = 0; i < mStaticMesh->GetMaterialCount(); i++)
 	{
 		auto& pMat = mStaticMesh->GetMaterial(i);
-		if (!pMat || pMat->TessEval != InDomain || pMat->BlendMode != InBlend)
+		if (!pMat || pMat->Domain != InDomain || pMat->BlendMode != InBlend)
 			continue;
 
 		auto vPrimitives = mStaticMesh->GetPrimitive(i);
