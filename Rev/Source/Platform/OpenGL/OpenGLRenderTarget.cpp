@@ -41,6 +41,9 @@ void FOpenGLRenderTarget::ResizeTargets(uint16 InWidth, uint16 InHeight)
 		RE_CORE_WARN("Attempted to rezize framebuffer to {0}, {1} failed", InWidth, InHeight);
 		return;
 	}
+	if (mDesc.Width == InWidth && mDesc.Height == InHeight)
+		return;
+
 	mDesc.Width = InWidth;
 	mDesc.Height = InHeight;
 	ReleaseResource();

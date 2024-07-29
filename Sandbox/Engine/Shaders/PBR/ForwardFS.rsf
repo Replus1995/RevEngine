@@ -112,6 +112,6 @@ void main(void)
     vec3 Ambient = kAmbientFactor * BaseColor.rgb * Occlution;
 
     o_Color.rgb = Ambient + LightColor + Emissive;
-    o_Color.rgb = pow(o_Color.rgb, vec3(1.0/2.2)); //Gamma Correction
+    //o_Color.rgb = pow(o_Color.rgb, vec3(1.0/2.2)); //Gamma Correction
     o_Color.a = BaseColor.a;
 }

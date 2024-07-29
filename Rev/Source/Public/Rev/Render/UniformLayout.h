@@ -26,6 +26,8 @@ constexpr IndexType LBaseColorTexture	= LPbrStart + 6;
 
 
 //Sampler Binding
+constexpr IndexType SLinearScreenTex = 1;
+
 constexpr IndexType SPbrStart = 5;
 constexpr IndexType SBaseColorTex			= SPbrStart + 0;
 constexpr IndexType SMetallicRoughnessTex	= LPbrStart + 1;

@@ -6,6 +6,7 @@
 
 namespace Rev
 {
+class FRenderPipeline;
 class REV_API SceneLayer : public Layer
 {
 public:
@@ -21,7 +22,7 @@ public:
 protected:
 	Ref<Scene> mScene;
 	SceneRenderProxy mSceneProxy;
-	//Ref<Framebuffer> mFrameBuffer;
+	Ref<FRenderPipeline> mRenderPipeline;
 };
 
 }

@@ -3,6 +3,9 @@
 #include "Rev/Render/RenderCmd.h"
 #include "Rev/Render/Renderer.h"
 #include "Rev/Core/Application.h"
+#include "Rev/Core/Window.h"
+
+#include "Rev/Render/RenderPipeline/ForwardPipeline.h"
 
 namespace Rev
 {
@@ -30,10 +33,12 @@ void SceneLayer::OnAttach()
 	{
 		mScene->OnRuntimeStart();
 	}
+	mRenderPipeline = CreateRef<FForwardPipeline>();
 }
 
 void SceneLayer::OnDetach()
 {
+	mRenderPipeline.reset();
 	if (mScene)
 	{
 		mScene->OnRuntimeStop();
@@ -53,7 +58,14 @@ void SceneLayer::OnUpdate(float dt)
 
 	//Render Scene
 	mSceneProxy.Prepare(mScene);
-	mSceneProxy.DrawScene();
+	//mSceneProxy.DrawScene();
+
+	uint32 WinWidth = Application::GetApp().GetWindow()->GetWidth();
+	uint32 WinHeight = Application::GetApp().GetWindow()->GetHeight();
+
+	mRenderPipeline->BeginPipeline(WinWidth, WinHeight);
+	mRenderPipeline->RunPipeline(mSceneProxy);
+	mRenderPipeline->EndPipeline();
 }
 
 void SceneLayer::OnEvent(Event& event)

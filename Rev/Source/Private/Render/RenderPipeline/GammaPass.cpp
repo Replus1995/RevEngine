@@ -20,6 +20,13 @@ FGammaCorrectPass::~FGammaCorrectPass()
 {
 }
 
+void FGammaCorrectPass::RunPass()
+{
+	mProgram->Bind();
+	DrawQuad();
+	mProgram->Unbind();
+}
+
 
 }
 
