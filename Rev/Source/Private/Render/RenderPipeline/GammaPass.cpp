@@ -1,30 +1,62 @@
 #include "Rev/Render/RenderPipeline/GammaPass.h"
 #include "Rev/Render/RHI/RHIResourceFactory.h"
 #include "Rev/Render/RHI/RHIShaderLibrary.h"
+#include "Rev/Render/RenderCmd.h"
+#include "Rev/Render/Material/Material.h"
+
 
 
 namespace Rev
 {
 
+class GammaCorrectMaterial : public Material
+{
+public:
+	GammaCorrectMaterial()
+	{
+		Domain = MD_PostProcess;
+	}
+	virtual ~GammaCorrectMaterial() = default;
+
+	virtual void Compile() override
+	{
+		mProgram = FRHIShaderLibrary::GetInstance().CreateGraphicsProgram(
+			"GammaCorrectProgram",
+			{ "/Engine/Shaders/PostVS" },
+			{ "/Engine/Shaders/GammaCorrectFS" }
+		);
+	}
+};
+
+
 FGammaCorrectPass::FGammaCorrectPass()
 	: FPostPass("GammaCorrectPass")
 {
-	mProgram = FRHIShaderLibrary::GetInstance().CreateGraphicsProgram(
-		"GammaCorrectProgram",
-		{ "/Engine/Shaders/PostVS" },
-		{ "/Engine/Shaders/GammaCorrectFS" }
-	);
 }
 
 FGammaCorrectPass::~FGammaCorrectPass()
 {
 }
 
+void FGammaCorrectPass::BeginPass()
+{
+	FPostPass::BeginPass();
+	if (!mMaterial)
+	{
+		mMaterial = CreateRef<GammaCorrectMaterial>();
+		mMaterial->Compile();
+	}
+}
+
 void FGammaCorrectPass::RunPass()
 {
-	mProgram->Bind();
+	RenderCmd::Clear();
+	RenderCmd::PrepareMaterial(mMaterial.get());
+	mMaterial->GetProgram()->Bind();
+	mMaterial->PreDraw();
 	DrawQuad();
-	mProgram->Unbind();
+	mMaterial->PostDraw();
+	mMaterial->GetProgram()->Unbind();
 }
 
 
