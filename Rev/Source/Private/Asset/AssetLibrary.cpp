@@ -29,7 +29,7 @@ void FAssetLibrary::Shutdown()
 	sDefaultMaterial.reset();
 }
 
-const Ref<Texture>& FAssetLibrary::GetDefaultWhiteTexture()
+const Ref<Texture>& FAssetLibrary::GetDefaultWhiteTexture2D()
 {
 	if (!sDefaultWhiteTexture)
 	{
@@ -41,7 +41,19 @@ const Ref<Texture>& FAssetLibrary::GetDefaultWhiteTexture()
 	return sDefaultWhiteTexture;
 }
 
-const Ref<Texture>& FAssetLibrary::GetDefaultNormalTexture()
+const Ref<Texture>& FAssetLibrary::GetDefaultBlackTexture2D()
+{
+	if (!sDefaultWhiteTexture)
+	{
+		FTextureDesc TextureDesc = FTextureDesc::MakeTexture2D(2, 2, PF_R8G8B8A8, false, Math::FLinearColor(0, 0, 0, 1));
+		FSamplerDesc SamplerDesc;
+		sDefaultWhiteTexture = CreateRef<Texture>(FRHIResourceFactory::CreateTexture(TextureDesc, SamplerDesc));
+		sDefaultWhiteTexture->GetResource()->ClearAllData();
+	}
+	return sDefaultWhiteTexture;
+}
+
+const Ref<Texture>& FAssetLibrary::GetDefaultNormalTexture2D()
 {
 	if (!sDefaultNormalTexture)
 	{
