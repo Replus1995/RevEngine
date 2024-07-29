@@ -1,0 +1,13 @@
+#version 460 core
+#pragma shader_stage(vertex)
+#extension GL_ARB_separate_shader_objects : enable
+#extension GL_GOOGLE_include_directive : enable
+
+#include "/Engine/Shaders/Global.rsh"
+
+layout(location = 0) in vec3 a_Position;
+
+void main()
+{
+	gl_Position = ub_Camera.ProjMat * ub_Camera.ViewMat * ub_Model.ModelMat * vec4(a_Position, 1.0);
+}

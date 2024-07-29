@@ -1,0 +1,3 @@
+[submodule "vendor/physfs"]
+	path = vendor/physfs
+	url = https://github.com/Replus1995/physfs.git

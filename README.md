@@ -1,7 +1,1 @@
-# Pine Engine
-### Build System
-* PreMake
-
-### Log
-* spdlog
-
+An render engine repository follows the HazelEngine programing guide
