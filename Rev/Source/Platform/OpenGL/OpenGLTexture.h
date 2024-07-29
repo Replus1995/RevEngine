@@ -1,10 +1,12 @@
 #pragma once
 #include "Rev/Render/RHI/RHITexture.h"
+#include "Rev/Core/Buffer.h"
 #include "OpenGLPixelFormat.h"
 #include <glad/gl.h>
 
 namespace Rev
 {
+using FClearColorBuffer = FScopedBuffer<4 * sizeof(float)>;
 class FOpenGLSampler;
 class FOpenGLTexture : public FRHITexture
 {
@@ -13,12 +15,13 @@ public:
 	virtual void* GetNativeHandle() override { return &mHandle; }
 	virtual const FRHISampler* GetSampler() const override;
 	virtual void Bind(uint32 InUnit) const override;
-	virtual void ClearData() override;
+	virtual void ClearMipData(uint8 InMipLevel) override;
 
 protected:
 	FOpenGLTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc);
-	void ClearMipData(uint32 InMipLevel);
-	void CalculateMipSize(uint32 InMipLevel, uint32& OutMipWidth, uint32& OutMipHeight);
+	std::pair<uint32, uint32> CalculateMipSize2D(uint32 InMipLevel);
+	std::tuple<uint32, uint32, uint32> CalculateMipSize3D(uint32 InMipLevel);
+	void FillClearColor(FClearColorBuffer& OutBuffer);
 protected:
 	GLuint mHandle = 0;
 	FOpenGLFormatData mFormatData;

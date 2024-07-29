@@ -10,7 +10,7 @@ Ref<Texture> FTextureStorage::CreateTexture(bool bSRGB)
 		return mCache;
 	TextureDesc.bSRGB = bSRGB;
 	mCache = CreateRef<Texture>(FRHIResourceFactory::CreateTexture(TextureDesc, SamplerDesc));
-	mCache->GetResource()->UpdateData(ImageData.Data(), ImageData.Size());
+	mCache->GetResource()->UpdateLayerData(ImageData.Data(), ImageData.Size());
 	return mCache;
 }
 

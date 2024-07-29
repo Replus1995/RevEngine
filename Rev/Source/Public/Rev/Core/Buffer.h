@@ -75,6 +75,7 @@ private:
 template<uint64 N>
 class FScopedBuffer
 {
+public:
 	FScopedBuffer()
 	{
 	}
@@ -84,13 +85,13 @@ class FScopedBuffer
 	}
 
 	uint64 Size() const { return N; }
-	uint8* Data() { return mBuffer.mData; }
+	uint8* Data() { return mData; }
 	const uint8* Data() const { return mData; }
 
 	template<typename T>
-	T* As() { return (T*)mData; }
+	T* DataAs() { return (T*)mData; }
 	template<typename T>
-	const T* As() const { return (const T*)mData; }
+	const T* DataAs() const { return (const T*)mData; }
 
 	operator bool() const { return mBuffer; }
 private:

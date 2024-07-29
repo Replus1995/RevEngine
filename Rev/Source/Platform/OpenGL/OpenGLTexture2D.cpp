@@ -16,22 +16,33 @@ FOpenGLTexture2D::~FOpenGLTexture2D()
 	glDeleteTextures(1, &mHandle);
 }
 
-void FOpenGLTexture2D::UpdateData(const void* InData, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex, uint16 InDepth)
+void FOpenGLTexture2D::UpdateLayerData(const void* InData, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex, int32 InDepth)
 {
 	if (mDesc.NumSamples != 1)
 	{
 		RE_CORE_ERROR("Updating multisample texture is not allowed");
 		return;
 	}
-	RE_CORE_ASSERT(InDepth == 0, "Depth must be 0 for 2d texture");
+	RE_CORE_ASSERT(InDepth <= 0, "Depth must be 0(-1) for 2d texture");
 	RE_CORE_ASSERT(InArrayIndex == 0, "ArrayIndex must be 0 for 2d texture");
 	RE_CORE_ASSERT(InMipLevel < mDesc.NumMips, "MipLevel out of range");
 
-	uint32 MipWidth = 0, MipHeight = 0;
-	CalculateMipSize(InMipLevel, MipWidth, MipHeight);
+	auto [MipWidth, MipHeight] = CalculateMipSize2D(InMipLevel);
 	RE_CORE_ASSERT(InSize == MipWidth * MipWidth * mFormatData.PixelSize, "Data size mismatch");
 
 	glTextureSubImage2D(mHandle, InMipLevel, 0, 0, MipWidth, MipHeight, mFormatData.DataFormat, mFormatData.DataType, InData);
+}
+
+void FOpenGLTexture2D::ClearLayerData(uint8 InMipLevel, uint16 InArrayIndex, int32 InDepth)
+{
+	RE_CORE_ASSERT(InDepth <= 0, "Depth must be 0(-1) for 2d texture");
+	RE_CORE_ASSERT(InArrayIndex == 0, "ArrayIndex must be 0 for 2d texture");
+	RE_CORE_ASSERT(InMipLevel < mDesc.NumMips, "MipLevel out of range");
+
+	FClearColorBuffer ColorBuffer;
+	FillClearColor(ColorBuffer);
+	auto [MipWidth, MipHeight] = CalculateMipSize2D(InMipLevel);
+	glClearTexSubImage(mHandle, InMipLevel, 0, 0, 0, MipWidth, MipHeight, 1, mFormatData.DataFormat, mFormatData.DataType, (const void*)ColorBuffer.Data());
 }
 
 void FOpenGLTexture2D::CreateResource()

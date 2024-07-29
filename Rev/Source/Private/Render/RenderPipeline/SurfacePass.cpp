@@ -33,12 +33,7 @@ FRenderTargetDesc FSurfacePass::MakeTargetDesc(uint32 InWidth, uint32 InHeight)
 	vColorDesc.push_back({ PF_R32G32B32A32F, Math::FLinearColor(0, 0, 0, 0) }); //MetallicRoughnessOcclusion
 	vColorDesc.push_back({ PF_R32G32B32A32F, Math::FLinearColor(0, 0, 0, 1) }); //Emissive
 
-	FRenderTargetDesc SurfaceDesc(InWidth, InHeight,
-		vColorDesc.data(), vColorDesc.size(),
-		{ PF_DepthStencil, 1.0F, 0 },
-		1
-	);
-
+	FRenderTargetDesc SurfaceDesc = FRenderTargetDesc::Make2D(InWidth, InHeight, vColorDesc.data(), vColorDesc.size(), { PF_DepthStencil, 1.0F, 0 });
 	return SurfaceDesc;
 }
 

@@ -16,7 +16,7 @@ FOpenGLUniformBuffer::~FOpenGLUniformBuffer()
 	glDeleteBuffers(1, &mHandle);
 }
 
-void FOpenGLUniformBuffer::UpdateData(const void* data, uint32 size, uint32 offset)
+void FOpenGLUniformBuffer::UpdateLayerData(const void* data, uint32 size, uint32 offset)
 {
 	glNamedBufferSubData(mHandle, offset, size, data);
 }

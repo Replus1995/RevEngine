@@ -10,22 +10,22 @@ namespace Rev
 
 enum class ETextureDimension : uint8
 {
-	Texture2D,
-	Texture2DArray,
-	Texture3D,
-	TextureCube,
-	TextureCubeArray
+	Texture2D			= 1,
+	Texture2DArray		= 2,
+	TextureCube			= 3,
+	TextureCubeArray	= 4,
+	Texture3D			= 5,
 };
  
-enum class ETextureCubeFace : uint8
+enum ETextureCubeFace : uint8
 {
-	PositiveX = 0,
-	NegativeX = 1,
-	PositiveY = 2,
-	NegativeY = 3,
-	PositiveZ = 4,
-	NegativeZ = 5,
-	Count = 6
+	TCF_PositiveX = 0,
+	TCF_NegativeX = 1,
+	TCF_PositiveY = 2,
+	TCF_NegativeY = 3,
+	TCF_PositiveZ = 4,
+	TCF_NegativeZ = 5,
+	TCF_Count = 6
 };
 
 struct FTextureClearColor
@@ -110,13 +110,19 @@ public:
 	const FTextureDesc& GetDesc() const { return mDesc; }
 	uint32 GetWidth() const { return mDesc.Width; }
 	uint32 GetHeight() const { return mDesc.Height; }
+	uint32 GetDepth() const { return mDesc.Depth; }
+	uint32 GetArraySize() const { return mDesc.ArraySize; }
 	EPixelFormat GetFormat() const { return mDesc.Format; }
 
 	virtual const FRHISampler* GetSampler() const = 0;
 	virtual void Bind(uint32 InUnit) const = 0;
 
-	virtual void UpdateData(const void* InData, uint32 InSize, uint8 InMipLevel = 0, uint16 InArrayIndex = 0, uint16 InDepth = 0) = 0;
-	virtual void ClearData() = 0;
+	//Depth < 0 means updaing all 2d mips in this layer
+	//Depth = FaceIndex for CubeMap
+	virtual void UpdateLayerData(const void* InData, uint32 InSize, uint8 InMipLevel = 0, uint16 InArrayIndex = 0, int32 InDepth = -1) = 0;
+	virtual void ClearLayerData(uint8 InMipLevel = 0, uint16 InArrayIndex = 0, int32 InDepth = -1) = 0;
+	virtual void ClearMipData(uint8 InMipLevel = 0) = 0;
+	void ClearAllData(); //Clear all mips and all layers of texture
 protected:
 	FRHITexture(const FTextureDesc& InDesc) : mDesc(InDesc) {}
 protected:

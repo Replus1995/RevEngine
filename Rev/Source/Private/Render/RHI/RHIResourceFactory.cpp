@@ -7,7 +7,7 @@
 #include "OpenGL/OpenGLUniformBuffer.h"
 #include "OpenGL/OpenGLSampler.h"
 #include "OpenGL/OpenGLTexture.h"
-#include "OpenGL/OpenGLRenderTarget2D.h"
+#include "OpenGL/OpenGLRenderTarget.h"
 
 namespace Rev
 {
@@ -133,7 +133,7 @@ Ref<FRHIRenderTarget> FRHIResourceFactory::CreateRenderTarget(const FRenderTarge
 	switch (GetRenderAPI())
 	{
 	case ERenderAPI::None:    RE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
-	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLRenderTarget2D>(InDesc);
+	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLRenderTarget>(InDesc);
 	}
 
 	RE_CORE_ASSERT(false, "Unknown RenderAPI!");

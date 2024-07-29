@@ -92,7 +92,7 @@ public:
 	* @param size : memory size in bytes
 	* @param offset : memory offset in bytes
 	*/
-	virtual void UpdateData(const void* data, uint32 size, uint32 offset = 0) = 0;
+	virtual void UpdateLayerData(const void* data, uint32 size, uint32 offset = 0) = 0;
 
 	virtual const FVertexBufferLayout& GetLayout() const = 0;
 	virtual void SetLayout(const FVertexBufferLayout& layout) = 0;
@@ -113,7 +113,7 @@ public:
 	* @param count : element count (size = count * stride)
 	* @param offset : element offset (byteoffset = offset * stride)
 	*/
-	virtual void UpdateData(const void* data, uint32 count, uint32 offset = 0) = 0;
+	virtual void UpdateLayerData(const void* data, uint32 count, uint32 offset = 0) = 0;
 
 	virtual uint32 GetStride() const = 0;
 	virtual uint32 GetCount() const = 0;
@@ -139,7 +139,7 @@ class REV_API FRHIUniformBuffer : public FRHIResource
 {
 public:
 	virtual ~FRHIUniformBuffer() = default;
-	virtual void UpdateData(const void* data, uint32 size, uint32 offset = 0) = 0;
+	virtual void UpdateLayerData(const void* data, uint32 size, uint32 offset = 0) = 0;
 };
 
 }

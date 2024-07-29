@@ -70,7 +70,7 @@ void SceneRenderProxy::DrawScene()
 	RenderCmd::SetClearColor(Renderer::sClearColor);
 	RenderCmd::Clear();
 
-	mCameraUB->UpdateData(&mCameraData, sizeof(FCameraUniform));
+	mCameraUB->UpdateLayerData(&mCameraData, sizeof(FCameraUniform));
 
 	uint32 LightCount = Math::Min<uint32>(mLightProxies.size(), UNIFORM_MAX_FORWARD_LIGHTS);
 	for (uint32 i = 0; i < LightCount; i++)
@@ -78,7 +78,7 @@ void SceneRenderProxy::DrawScene()
 		mForwardLightData.Lights[i] = mLightProxies[i].GetUnifiedLight();
 	}
 	mForwardLightData.LightCount = LightCount;
-	mForwardLightUB->UpdateData(&mForwardLightData, sizeof(FForwardLightUniform));
+	mForwardLightUB->UpdateLayerData(&mForwardLightData, sizeof(FForwardLightUniform));
 
 	DrawMeshes(EMaterialDomain::MD_Surface, BM_Opaque);
 }
@@ -87,7 +87,7 @@ void SceneRenderProxy::DrawMeshes(EMaterialDomain InDomain, EBlendMode InBlend)
 {
 	for (StaticMeshRenderProxy& proxy : mStaticMeshProxies)
 	{
-		mModelUB->UpdateData(&proxy.GetMatrix(), sizeof(FModelUniform));
+		mModelUB->UpdateLayerData(&proxy.GetMatrix(), sizeof(FModelUniform));
 		proxy.DrawPrimitives(InDomain, InBlend);
 	}
 }

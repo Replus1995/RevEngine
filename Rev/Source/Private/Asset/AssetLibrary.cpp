@@ -36,7 +36,7 @@ const Ref<Texture>& FAssetLibrary::GetDefaultWhiteTexture()
 		FTextureDesc TextureDesc = FTextureDesc::MakeTexture2D(2,2, PF_R8G8B8A8, false, Math::FLinearColor(1,1,1,1));
 		FSamplerDesc SamplerDesc;
 		sDefaultWhiteTexture = CreateRef<Texture>(FRHIResourceFactory::CreateTexture(TextureDesc, SamplerDesc));
-		sDefaultWhiteTexture->GetResource()->ClearData();
+		sDefaultWhiteTexture->GetResource()->ClearAllData();
 	}
 	return sDefaultWhiteTexture;
 }
@@ -48,7 +48,7 @@ const Ref<Texture>& FAssetLibrary::GetDefaultNormalTexture()
 		FTextureDesc TextureDesc = FTextureDesc::MakeTexture2D(2, 2, PF_RGB8, false, Math::FLinearColor(0.5f, 0.5f, 1.0f));
 		FSamplerDesc SamplerDesc;
 		sDefaultNormalTexture = CreateRef<Texture>(FRHIResourceFactory::CreateTexture(TextureDesc, SamplerDesc));
-		sDefaultNormalTexture->GetResource()->ClearData();
+		sDefaultNormalTexture->GetResource()->ClearAllData();
 	}
 	return sDefaultNormalTexture;
 }

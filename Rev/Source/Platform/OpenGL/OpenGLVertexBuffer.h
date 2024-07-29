@@ -14,7 +14,7 @@ public:
 
 	virtual void Bind() const override;
 	virtual void Unbind() const override;
-	virtual void UpdateData(const void* data, uint32 size, uint32 offset) override;
+	virtual void UpdateLayerData(const void* data, uint32 size, uint32 offset) override;
 
 	virtual const FVertexBufferLayout& GetLayout() const override { return mLayout; }
 	virtual void SetLayout(const FVertexBufferLayout& layout) override { mLayout = layout; }
@@ -36,7 +36,7 @@ public:
 
 	virtual void Bind() const override;
 	virtual void Unbind() const override;
-	virtual void UpdateData(const void* data, uint32 count, uint32 offset) override;
+	virtual void UpdateLayerData(const void* data, uint32 count, uint32 offset) override;
 
 	virtual uint32 GetStride() const override { return mStride; };
 	virtual uint32 GetCount() const override { return mCount; }

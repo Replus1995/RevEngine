@@ -37,7 +37,7 @@ void FOpenGLVertexBuffer::Unbind() const
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void FOpenGLVertexBuffer::UpdateData(const void* data, uint32 size, uint32 offset)
+void FOpenGLVertexBuffer::UpdateLayerData(const void* data, uint32 size, uint32 offset)
 {
 	RE_CORE_ASSERT(size + offset <= mSize);
 
@@ -82,7 +82,7 @@ void FOpenGLIndexBuffer::Unbind() const
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void FOpenGLIndexBuffer::UpdateData(const void* data, uint32 count, uint32 offset)
+void FOpenGLIndexBuffer::UpdateLayerData(const void* data, uint32 count, uint32 offset)
 {
 	RE_CORE_ASSERT(count + offset <= mCount);
 
