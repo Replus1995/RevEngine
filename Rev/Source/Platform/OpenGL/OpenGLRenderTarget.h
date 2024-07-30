@@ -18,6 +18,7 @@ public:
 
 	virtual void ResizeTargets(uint16 InWidth, uint16 InHeight) override;
 	virtual void ClearTarget(ERenderTargetAttachment Index) override;
+	virtual void ClearTargets() override;
 	virtual const Ref<FRHITexture> GetTargetTexture(ERenderTargetAttachment Index) const override;
 
 	virtual void Attach(ERenderTargetAttachment Index, const Ref<FRHITexture>& InTexture, uint8 InMipLevel, int32 InArrayIndex) override;

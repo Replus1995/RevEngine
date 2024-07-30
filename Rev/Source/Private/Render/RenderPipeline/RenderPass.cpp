@@ -1,12 +1,13 @@
 #include "Rev/Render/RenderPipeline/RenderPass.h"
 #include "Rev/Render/RHI/RHIRenderTarget.h"
+#include "Rev/Render/RenderCmd.h"
 
 namespace Rev
 {
 
 FRenderPass::FRenderPass(std::string_view InName)
 	: mName(InName)
-	, mTarget(nullptr)
+	, mRenderTarget(nullptr)
 {
 }
 
@@ -17,29 +18,46 @@ FRenderPass::~FRenderPass()
 void FRenderPass::BeginPass()
 {
 	mInPass = true;
-	if (mTarget)
+	if (mRenderTarget)
 	{
-		mTarget->Bind();
+		mRenderTarget->Bind();
 	}
 }
 
 void FRenderPass::EndPass()
 {
-	if (mTarget)
+	if (mRenderTarget)
 	{
-		mTarget->Unbind();
+		mRenderTarget->Unbind();
 	}
 	mInPass = false;
 }
 
-void FRenderPass::SetTarget(const Ref<FRHIRenderTarget>& InTarget)
+const Ref<FRHIRenderTarget>& FRenderPass::GetRenderTarget() const
+{
+	return mRenderTarget;
+}
+
+void FRenderPass::SetRenderTarget(const Ref<FRHIRenderTarget>& InTarget)
 {
 	if (mInPass)
 	{
 		RE_CORE_ASSERT(false, "Never set render target in pass.")
 		return;
 	}
-	mTarget = InTarget;
+	mRenderTarget = InTarget;
+}
+
+void FRenderPass::ClearRenderTarget()
+{
+	if (mRenderTarget)
+	{
+		mRenderTarget->ClearTargets();
+	}
+	else
+	{
+		RenderCmd::ClearBackBuffer();
+	}
 }
 
 }

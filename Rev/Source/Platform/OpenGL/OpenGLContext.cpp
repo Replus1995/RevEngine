@@ -78,55 +78,66 @@ void FOpenGLContext::SetClearColor(const Math::FLinearColor& color)
 	glClearColor(color.R, color.G, color.B, color.A);
 }
 
-void FOpenGLContext::Clear()
+void FOpenGLContext::ClearBackBuffer()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void FOpenGLContext::PrepareMaterial(const Material* InMaterial)
+void FOpenGLContext::EnableDepthTest(bool bEnable)
 {
-	if(!InMaterial)
-		return;
-	if (InMaterial->GetDomain() == MD_Surface)
-	{
-		const SurfaceMaterial* SurfaceMat = static_cast<const SurfaceMaterial*>(InMaterial);
-		switch (SurfaceMat->BlendMode)
-		{
-		case BM_Opaque:
-			glDisable(GL_BLEND);
-			break;
-		case BM_Transparent:
-			glEnable(GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			break;
-		case BM_Masked:
-			glEnable(GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			break;
-		default:
-			break;
-		}
+	if(bEnable)
+		glEnable(GL_DEPTH_TEST);
+	else
+		glDisable(GL_DEPTH_TEST);
+}
 
-		if (SurfaceMat->TwoSided)
-		{
-			glDisable(GL_CULL_FACE);
-		}
-		else
-		{
-			glEnable(GL_CULL_FACE);
-			glCullFace(GL_BACK);
-		}
-	}
-	else if (InMaterial->GetDomain() == MD_PostProcess)
+void FOpenGLContext::EnableDepthWrite(bool bEnable)
+{
+	glDepthMask(bEnable ? GL_TRUE : GL_FALSE);
+}
+
+void FOpenGLContext::SetBlendMode(EBlendMode InMode)
+{
+	switch (InMode)
 	{
-		//glEnable(GL_BLEND);
-		//glDisable(GL_CULL_FACE);
-		//glEnable(GL_CULL_FACE);
+	case BM_Opaque:
+		glDisable(GL_BLEND);
+		break;
+	case BM_Transparent:
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		break;
+	case BM_Masked:
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		break;
+	default:
+		break;
+	}
+}
+
+void FOpenGLContext::SetCullFaceMode(ECullFaceMode InMode)
+{
+	switch (InMode)
+	{
+	case Rev::CFM_Disabled:
+		glDisable(GL_CULL_FACE);
+		break;
+	case Rev::CFM_Back:
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
+		break;
+	case Rev::CFM_Front:
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_FRONT);
+		break;
+	case Rev::CFM_BackAndFront:
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_FRONT_AND_BACK);
+		break;
+	default:
+		break;
 	}
-
-	
 }
 
 void FOpenGLContext::DrawVertices(const Ref<FRHIVertexArray>& InVertexArray, EDrawMode InDrawMode)

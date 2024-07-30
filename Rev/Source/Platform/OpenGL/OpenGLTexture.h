@@ -17,6 +17,8 @@ public:
 	virtual void Bind(uint32 InUnit) const override;
 	virtual void ClearMipData(uint8 InMipLevel) override;
 
+	const FOpenGLFormatData& GetOpenGLFormatData() const{ return mFormatData; }
+
 protected:
 	FOpenGLTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc);
 	std::pair<uint32, uint32> CalculateMipSize2D(uint32 InMipLevel);

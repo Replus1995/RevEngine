@@ -17,6 +17,7 @@ FForwardSurfacePass::~FForwardSurfacePass()
 
 void FForwardSurfacePass::RunPass(SceneRenderProxy& InSceneProxy)
 {
+	ClearRenderTarget();
 	InSceneProxy.DrawScene();
 }
 

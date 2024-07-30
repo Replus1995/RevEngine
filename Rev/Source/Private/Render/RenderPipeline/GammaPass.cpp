@@ -26,6 +26,11 @@ public:
 			{ "/Engine/Shaders/GammaCorrectFS" }
 		);
 	}
+	virtual void PreDraw() override
+	{
+		RenderCmd::SetCullFaceMode(CFM_Back);
+		Material::PreDraw();
+	}
 };
 
 
@@ -50,8 +55,7 @@ void FGammaCorrectPass::BeginPass()
 
 void FGammaCorrectPass::RunPass()
 {
-	RenderCmd::Clear();
-	RenderCmd::PrepareMaterial(mMaterial.get());
+	ClearRenderTarget();
 	mMaterial->PreDraw();
 	DrawQuad();
 	mMaterial->PostDraw();

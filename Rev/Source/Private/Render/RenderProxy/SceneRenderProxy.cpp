@@ -67,9 +67,6 @@ void SceneRenderProxy::Prepare(const Ref<Scene>& scene)
 
 void SceneRenderProxy::DrawScene()
 {
-	RenderCmd::SetClearColor(Renderer::sClearColor);
-	RenderCmd::Clear();
-
 	mCameraUB->UpdateLayerData(&mCameraData, sizeof(FCameraUniform));
 
 	uint32 LightCount = Math::Min<uint32>(mLightProxies.size(), UNIFORM_MAX_FORWARD_LIGHTS);

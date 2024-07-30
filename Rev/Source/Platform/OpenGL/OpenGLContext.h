@@ -11,10 +11,15 @@ class FOpenGLContext : public FRHIContext
 public:
 	virtual void Init() override;
 	virtual void SetViewport(uint32 x, uint32 y, uint32 width, uint32 height) override;
-	virtual void SetClearColor(const Math::FLinearColor& color) override;
-	virtual void Clear() override;
 
-	virtual void PrepareMaterial(const Material* InMaterial) override;
+	virtual void SetClearColor(const Math::FLinearColor& color) override;
+	virtual void ClearBackBuffer() override;
+
+	virtual void EnableDepthTest(bool bEnable) override;
+	virtual void EnableDepthWrite(bool bEnable) override;
+	virtual void SetBlendMode(EBlendMode InMode) override;
+	virtual void SetCullFaceMode(ECullFaceMode InMode) override;
+
 	virtual void DrawVertices(const Ref<FRHIVertexArray>& InVertexArray, EDrawMode InDrawMode) override;
 
 private:

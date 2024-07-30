@@ -10,7 +10,6 @@ public:
 	static void Init();
 	static void Shutdown();
 	static void ResizeWindow(uint32 InWidth, uint32 InHeight);
-	static Math::FLinearColor sClearColor;
 };
 
 }

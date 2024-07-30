@@ -5,8 +5,8 @@
 
 namespace Rev
 {
-class Material;
 struct FMeshPrimitive;
+
 class FRHIVertexArray;
 class REV_API RenderCmd
 {
@@ -16,9 +16,13 @@ public:
 
 	static void SetViewport(uint32 x, uint32 y, uint32 width, uint32 height);
 	static void SetClearColor(const Math::FLinearColor& color);
-	static void Clear();
+	static void ClearBackBuffer();
 
-	static void PrepareMaterial(const Material* InMaterial);
+	static void EnableDepthTest(bool bEnable);
+	static void EnableDepthWrite(bool bEnable);
+	static void SetBlendMode(EBlendMode InMode);
+	static void SetCullFaceMode(ECullFaceMode InMode);
+
 	static void DrawPrimitive(const FMeshPrimitive* InPrimitive);
 	static void DrawVertices(const Ref<FRHIVertexArray>& InVertexArray, EDrawMode InDrawMode);
 	//static void DrawLines(const Ref<VertexArray>& vertexArray, uint32_t vertexCount, float lineWidth);

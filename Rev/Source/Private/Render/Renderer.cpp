@@ -5,8 +5,6 @@
 namespace Rev
 {
 
-Math::FLinearColor Renderer::sClearColor = Math::FLinearColor(0,0,0,1);
-
 void Renderer::Init()
 {
 	RenderCmd::Init();

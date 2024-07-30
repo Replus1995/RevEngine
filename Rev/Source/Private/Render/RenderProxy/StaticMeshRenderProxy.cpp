@@ -38,7 +38,6 @@ void StaticMeshRenderProxy::DrawPrimitives(EMaterialDomain InDomain, EBlendMode 
 		{
 			if (!bUseProgramOverride)
 			{
-				RenderCmd::PrepareMaterial(pMat.get());
 				pMat->PreDraw();
 			}
 

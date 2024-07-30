@@ -63,17 +63,7 @@ void FOpenGLTexture::FillClearColor(FClearColorBuffer& OutBuffer)
 	case PF_RGB8:
 	{
 		Math::FColor& ClearColor = *OutBuffer.DataAs<Math::FColor>();
-		if (mDesc.bSRGB)
-		{
-			ClearColor = Math::FLinearColor::ToSRGB(mDesc.ClearColor.RGBA);
-		}
-		else
-		{
-			for (size_t i = 0; i < 4; i++)
-			{
-				ClearColor[i] = uint8(mDesc.ClearColor.RGBA[i] * 255.0f);
-			}
-		}
+		ClearColor = Math::FLinearColor::ToColor(mDesc.ClearColor.RGBA, mDesc.bSRGB);
 		break;
 	}
 	case PF_R8:

@@ -17,7 +17,8 @@ void RenderCmd::Init()
 	sContext = FRHIContext::Create();
 	sContext->Init();
 	FRHIShaderLibrary::CreateInstance();
-	
+
+	SetClearColor(Math::FLinearColor(0, 0, 0, 1));
 }
 
 void RenderCmd::Shutdown()
@@ -37,14 +38,29 @@ void RenderCmd::SetClearColor(const Math::FLinearColor& color)
 	sContext->SetClearColor(color);
 }
 
-void RenderCmd::Clear()
+void RenderCmd::ClearBackBuffer()
 {
-	sContext->Clear();
+	sContext->ClearBackBuffer();
 }
 
-void RenderCmd::PrepareMaterial(const Material* InMaterial)
+void RenderCmd::EnableDepthTest(bool bEnable)
 {
-	sContext->PrepareMaterial(InMaterial);
+	sContext->EnableDepthTest(bEnable);
+}
+
+void RenderCmd::EnableDepthWrite(bool bEnable)
+{
+	sContext->EnableDepthWrite(bEnable);
+}
+
+void RenderCmd::SetBlendMode(EBlendMode InMode)
+{
+	sContext->SetBlendMode(InMode);
+}
+
+void RenderCmd::SetCullFaceMode(ECullFaceMode InMode)
+{
+	sContext->SetCullFaceMode(InMode);
 }
 
 void RenderCmd::DrawPrimitive(const FMeshPrimitive* InPrimitive)

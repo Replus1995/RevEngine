@@ -52,7 +52,7 @@ void FOpenGLRenderTarget::ResizeTargets(uint16 InWidth, uint16 InHeight)
 
 void FOpenGLRenderTarget::ClearTarget(ERenderTargetAttachment Index)
 {
-	if (Index == RTA_DepthStencilAttachment)
+	/*if (Index == RTA_DepthStencilAttachment)
 	{
 		if (mDepthStencilAttachment.Texture)
 		{
@@ -72,7 +72,92 @@ void FOpenGLRenderTarget::ClearTarget(ERenderTargetAttachment Index)
 				mColorAttachments[Index].Texture->ClearLayerData(mColorAttachments[Index].MipLevel, mColorAttachments[Index].ArrayIndex);
 		}
 			
+	}*/
+	if (Index < RTA_MaxColorAttachments)
+	{
+		if (mColorAttachments[Index].Texture)
+		{
+			auto& LinearClearColor = mColorAttachments[Index].Texture->GetDesc().ClearColor.RGBA;
+			GLenum DataType = mColorAttachments[Index].Texture->GetOpenGLFormatData().DataType;
+			switch (DataType)
+			{
+			case GL_BYTE:
+			{
+				const float ColorSacle = 128.0f;
+				GLint IntClearColor[4] = { LinearClearColor.R * ColorSacle, LinearClearColor.G * ColorSacle, LinearClearColor.B * ColorSacle, LinearClearColor.A * ColorSacle };
+				glClearNamedFramebufferiv(mHandle, GL_COLOR, Index, IntClearColor);
+				break;
+			}
+			case GL_UNSIGNED_BYTE:
+			{
+				const float ColorSacle = 255.0f;
+				GLuint IntClearColor[4] = { LinearClearColor.R * ColorSacle, LinearClearColor.G * ColorSacle, LinearClearColor.B * ColorSacle, LinearClearColor.A * ColorSacle };
+				glClearNamedFramebufferuiv(mHandle, GL_COLOR, Index, IntClearColor);
+				break;
+			}
+			case GL_SHORT:
+			{
+				const float ColorSacle = 32767.0f;
+				GLint IntClearColor[4] = { LinearClearColor.R * ColorSacle, LinearClearColor.G * ColorSacle, LinearClearColor.B * ColorSacle, LinearClearColor.A * ColorSacle };
+				glClearNamedFramebufferiv(mHandle, GL_COLOR, Index, IntClearColor);
+				break;
+			}
+			case GL_UNSIGNED_SHORT:
+			{
+				const float ColorSacle = 65535.0f;
+				GLuint IntClearColor[4] = { LinearClearColor.R * ColorSacle, LinearClearColor.G * ColorSacle, LinearClearColor.B * ColorSacle, LinearClearColor.A * ColorSacle };
+				glClearNamedFramebufferuiv(mHandle, GL_COLOR, Index, IntClearColor);
+				break;
+			}
+			case GL_INT:
+			{
+				const double ColorSacle = 2147483647.0f;
+				GLint IntClearColor[4] = { (double)LinearClearColor.R * ColorSacle, (double)LinearClearColor.G * ColorSacle, (double)LinearClearColor.B * ColorSacle, (double)LinearClearColor.A * ColorSacle };
+				glClearNamedFramebufferiv(mHandle, GL_COLOR, Index, IntClearColor);
+				break;
+			}
+			case GL_UNSIGNED_INT:
+			{
+				const double ColorSacle = 4294967295.0f;
+				GLuint IntClearColor[4] = { (double)LinearClearColor.R * ColorSacle, (double)LinearClearColor.G * ColorSacle, (double)LinearClearColor.B * ColorSacle, (double)LinearClearColor.A * ColorSacle };
+				glClearNamedFramebufferuiv(mHandle, GL_COLOR, Index, IntClearColor);
+				break;
+			}
+			case GL_FLOAT:
+				glClearNamedFramebufferfv(mHandle, GL_COLOR, Index, &LinearClearColor.R);
+				break;
+			default:
+				RE_CORE_ASSERT(false, "Unknown render target texture data type");
+				break;
+			}
+		}
 	}
+	else if (Index > RTA_MaxColorAttachments)
+	{
+		if (mDepthStencilAttachment.Texture)
+		{
+			float ClearDepth = mDepthStencilAttachment.Texture->GetDesc().ClearColor.Depth;
+			uint32 ClearStencil = mDepthStencilAttachment.Texture->GetDesc().ClearColor.Stencil;
+
+			if (Index == RTA_DepthAttachment)
+			{
+				glClearNamedFramebufferfv(mHandle, GL_DEPTH, 0, &ClearDepth);
+			} 
+			else //RTA_DepthStencilAttachment
+			{
+				glClearNamedFramebufferfi(mHandle, GL_DEPTH_STENCIL, 0, ClearDepth, ClearStencil);
+			}
+		}
+	}
+}
+
+void FOpenGLRenderTarget::ClearTargets()
+{
+	for (uint8 i = 0; i < RTA_MaxColorAttachments; i++)
+	{
+		ClearTarget((ERenderTargetAttachment)i);
+	}
+	ClearTarget(RTA_DepthStencilAttachment);
 }
 
 const Ref<FRHITexture> FOpenGLRenderTarget::GetTargetTexture(ERenderTargetAttachment Index) const
@@ -92,6 +177,12 @@ void FOpenGLRenderTarget::Attach(ERenderTargetAttachment Index, const Ref<FRHITe
 {
 	if(!InTexture)
 		return;
+	if (InTexture->GetDesc().bSRGB)
+	{
+		RE_CORE_ERROR("SRGB texture is not allowed to be attached as render target");
+		return;
+	}
+
 	FAttachment& TargetAttachment = Index < RTA_MaxColorAttachments ? mColorAttachments[Index] : mDepthStencilAttachment;
 	GLenum AttachPoint = 0;
 	if (Index < RTA_MaxColorAttachments)

@@ -120,6 +120,7 @@ public:
 
 	virtual void ResizeTargets(uint16 InWidth, uint16 InHeight) = 0;
 	virtual void ClearTarget(ERenderTargetAttachment Index) = 0;
+	virtual void ClearTargets() = 0;
 	virtual const Ref<FRHITexture> GetTargetTexture(ERenderTargetAttachment Index) const = 0;
 
 	//Use textures created by user

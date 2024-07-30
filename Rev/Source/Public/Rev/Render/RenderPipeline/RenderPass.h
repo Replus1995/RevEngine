@@ -13,12 +13,14 @@ public:
 	virtual void EndPass();
 
 	const std::string& GetName() const { return mName; }
-	const Ref<FRHIRenderTarget>& GetTarget() const { return mTarget; }
-	void SetTarget(const Ref<FRHIRenderTarget>& InTarget);
+
+	const Ref<FRHIRenderTarget>& GetRenderTarget() const;
+	void SetRenderTarget(const Ref<FRHIRenderTarget>& InTarget);
+	void ClearRenderTarget();
 
 protected:
 	std::string mName;
-	Ref<FRHIRenderTarget> mTarget;
+	Ref<FRHIRenderTarget> mRenderTarget;
 	bool mInPass = false;
 };
 
