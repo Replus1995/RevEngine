@@ -23,7 +23,29 @@ FOpenGLRenderTarget::~FOpenGLRenderTarget()
 
 void FOpenGLRenderTarget::Bind()
 {
+	if (mAttachmentsDirty)
+	{
+		std::vector<GLenum> ColorAttachPoints;
+		for (uint8 i = 0; i < RTA_MaxColorAttachments; i++)
+		{
+			if (mColorAttachments[i].Texture)
+			{
+				ColorAttachPoints.push_back(GL_COLOR_ATTACHMENT0 + i);
+			}
+		}
+		if (!ColorAttachPoints.empty())
+		{
+			glNamedFramebufferDrawBuffers(mHandle, ColorAttachPoints.size(), ColorAttachPoints.data());
+		}
+		else
+		{
+			glNamedFramebufferDrawBuffer(mHandle, GL_NONE);
+		}
+
+		mAttachmentsDirty = false;
+	}
 	glBindFramebuffer(GL_FRAMEBUFFER, mHandle);
+	
 }
 
 void FOpenGLRenderTarget::Unbind()
