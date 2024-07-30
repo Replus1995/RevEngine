@@ -1,5 +1,6 @@
 #include "Rev/Render/RenderProxy/StaticMeshRenderProxy.h"
 #include "Rev/Render/Mesh/StaticMesh.h"
+#include "Rev/Render/Material/SurfaceMaterial.h"
 #include "Rev/Render/RenderProxy/SceneRenderProxy.h"
 #include "Rev/Render/RenderCmd.h"
 #include "Rev/Render/Renderer.h"
@@ -29,7 +30,7 @@ void StaticMeshRenderProxy::DrawPrimitives(EMaterialDomain InDomain, EBlendMode 
 	for (uint32 i = 0; i < mStaticMesh->GetMaterialCount(); i++)
 	{
 		auto& pMat = mStaticMesh->GetMaterial(i);
-		if (!pMat || pMat->Domain != InDomain || pMat->BlendMode != InBlend)
+		if (!pMat || pMat->GetDomain() != InDomain || pMat->BlendMode != InBlend)
 			continue;
 
 		auto vPrimitives = mStaticMesh->GetPrimitive(i);
@@ -38,7 +39,6 @@ void StaticMeshRenderProxy::DrawPrimitives(EMaterialDomain InDomain, EBlendMode 
 			if (!bUseProgramOverride)
 			{
 				RenderCmd::PrepareMaterial(pMat.get());
-				pMat->GetProgram()->Bind();
 				pMat->PreDraw();
 			}
 
@@ -50,7 +50,6 @@ void StaticMeshRenderProxy::DrawPrimitives(EMaterialDomain InDomain, EBlendMode 
 			if (!bUseProgramOverride)
 			{
 				pMat->PostDraw();
-				pMat->GetProgram()->Unbind();
 			}
 		}
 	}

@@ -1,8 +1,5 @@
 #pragma once
-#include "Rev/Math/Maths.h"
-#include "Rev/Render/RenderCore.h"
-#include <Rev/Render/RHI/RHIShader.h>
-//#include <unordered_map>
+#include "Rev/Core/Base.h"
 
 namespace Rev
 {
@@ -23,24 +20,15 @@ public:
 	/**
 	* @brief Create shader program based on ShadingModel
 	*/
-	virtual void Compile();
-	virtual void PreDraw();
-	virtual void PostDraw();
-	const Ref<FRHIShaderProgram>& GetProgram() const
-	{
-		return mProgram;
-	}
+	virtual void Compile() = 0;
+	virtual void PreDraw(); //Bind Program
+	virtual void PostDraw(); //Unbind Program
+	//const Ref<FRHIShaderProgram>& GetProgram() const { return mProgram; }
 
+	EMaterialDomain GetDomain() const { return mDomain; }
 protected:
 	Ref<FRHIShaderProgram> mProgram = nullptr;
-	//EShadingModel mShadingModelCache = Rev::SM_Default;
-
-public:
-	EMaterialDomain Domain = MD_Surface;
-	EBlendMode BlendMode = BM_Opaque;
-	EShadingModel ShadingModel = SM_Default;
-	bool TwoSided = false;
-	float MaskClip = 0.5f;
+	EMaterialDomain mDomain = MD_Surface;
 };
 
 }

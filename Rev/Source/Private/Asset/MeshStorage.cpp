@@ -7,7 +7,7 @@ namespace Rev
 
 Ref<StaticMesh> FStaticMeshStorage::CreateStaticMesh()
 {
-	std::vector<Ref<Material>> vMaterials;
+	std::vector<Ref<SurfaceMaterial>> vMaterials;
 	std::vector<FMeshPrimitive> vPrimitives;
 
 	vMaterials.reserve(Materials.size());

@@ -14,7 +14,7 @@ class GammaCorrectMaterial : public Material
 public:
 	GammaCorrectMaterial()
 	{
-		Domain = MD_PostProcess;
+		mDomain = MD_PostProcess;
 	}
 	virtual ~GammaCorrectMaterial() = default;
 
@@ -52,11 +52,9 @@ void FGammaCorrectPass::RunPass()
 {
 	RenderCmd::Clear();
 	RenderCmd::PrepareMaterial(mMaterial.get());
-	mMaterial->GetProgram()->Bind();
 	mMaterial->PreDraw();
 	DrawQuad();
 	mMaterial->PostDraw();
-	mMaterial->GetProgram()->Unbind();
 }
 
 

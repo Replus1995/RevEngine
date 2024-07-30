@@ -41,6 +41,7 @@ void PBRMaterial::Compile()
 
 void PBRMaterial::PreDraw()
 {
+	SurfaceMaterial::PreDraw(); //BindProgram
 	if(!mProgram)
 		return;
 

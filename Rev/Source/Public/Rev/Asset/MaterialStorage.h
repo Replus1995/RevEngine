@@ -1,27 +1,26 @@
 #pragma once
 #include "Rev/Core/Base.h"
-#include "Rev/Render/Material/Material.h"
+#include "Rev/Render/Material/SurfaceMaterial.h"
 #include "Rev/Math/Maths.h"
 
 namespace Rev
 {
 struct FTextureStorage;
-struct FMaterialStorage
+struct FSurfaceMaterialStorage
 {
 public:
 	std::string Name;
-	EMaterialDomain Domain = Rev::MD_Surface;
 	EBlendMode BlendMode = Rev::BM_Opaque;
 	EShadingModel ShadingModel = Rev::SM_Default;
 	float MaskClip = 0.5f;
 	bool TwoSided = false;
 
-	virtual Ref<Material> CreateMaterial() { return mCache; }
+	virtual Ref<SurfaceMaterial> CreateMaterial() { return mCache; }
 protected:
-	Ref<Material> mCache = nullptr;
+	Ref<SurfaceMaterial> mCache = nullptr;
 };
 
-struct FPBRMaterialStorage : public FMaterialStorage
+struct FPBRMaterialStorage : public FSurfaceMaterialStorage
 {
 public:
 	Math::FLinearColor BaseColorFactor = Math::FLinearColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -40,7 +39,7 @@ public:
 	Math::FVector3 EmissiveFactor = Math::FVector3(0.0f, 0.0f, 0.0f);
 	Ref<FTextureStorage> EmissiveTexture = nullptr;
 
-	virtual Ref<Material> CreateMaterial() override;
+	virtual Ref<SurfaceMaterial> CreateMaterial() override;
 };
 
 

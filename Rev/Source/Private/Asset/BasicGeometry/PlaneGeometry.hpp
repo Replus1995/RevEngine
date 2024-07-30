@@ -1,6 +1,6 @@
 #pragma once
 #include "Rev/Core/Base.h"
-#include "Rev/Render/Material/Material.h"
+#include "Rev/Render/Material/SurfaceMaterial.h"
 #include "Rev/Render/Mesh/StaticMesh.h"
 #include "Rev/Render/RHI/RHIBuffer.h"
 #include "Rev/Render/RHI/RHIResourceFactory.h"
@@ -23,9 +23,9 @@ static constexpr uint32 sPlaneIndices[] = {
 class FPlaneGeometry
 {
 public:
-    static Ref<StaticMesh> Create(const Ref<Material>& InMat)
+    static Ref<StaticMesh> Create(const Ref<SurfaceMaterial>& InMat)
     {
-        std::vector<Ref<Material>> planeMatArr = { InMat };
+        std::vector<Ref<SurfaceMaterial>> planeMatArr = { InMat };
         std::vector<FMeshPrimitive> planePrimArr;
         {
             FMeshPrimitive planeMeshPrim;

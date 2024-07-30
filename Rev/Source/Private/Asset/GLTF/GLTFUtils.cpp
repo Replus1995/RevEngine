@@ -299,7 +299,7 @@ Ref<FMeshPrimitiveStorage> FGLTFUtils::ImportMeshPrimitive(const tinygltf::Primi
 	return OutStorage;
 }
 
-Ref<FStaticMeshStorage> FGLTFUtils::ImportStaticMesh(const tinygltf::Mesh& InMesh, const tinygltf::Model& InModel, const std::vector<Ref<FMaterialStorage>>& InMaterials)
+Ref<FStaticMeshStorage> FGLTFUtils::ImportStaticMesh(const tinygltf::Mesh& InMesh, const tinygltf::Model& InModel, const std::vector<Ref<FSurfaceMaterialStorage>>& InMaterials)
 {
 	std::map<int, int> MaterialIndexMap;
 
@@ -311,7 +311,7 @@ Ref<FStaticMeshStorage> FGLTFUtils::ImportStaticMesh(const tinygltf::Mesh& InMes
 		{
 			if (MaterialIndexMap.count(PrimitiveStorage->MaterialIndex) == 0)
 			{
-				Ref<FMaterialStorage> Mat = PrimitiveStorage->MaterialIndex < 0 ? CreateRef<FPBRMaterialStorage>() : InMaterials[PrimitiveStorage->MaterialIndex];
+				Ref<FSurfaceMaterialStorage> Mat = PrimitiveStorage->MaterialIndex < 0 ? CreateRef<FPBRMaterialStorage>() : InMaterials[PrimitiveStorage->MaterialIndex];
 				int MappedIndex = OutStorage->Materials.size();
 				PrimitiveStorage->MaterialIndex = MappedIndex;
 				MaterialIndexMap.emplace(PrimitiveStorage->MaterialIndex, MappedIndex);
@@ -361,7 +361,7 @@ Ref<FTextureStorage> FGLTFUtils::ImportTexture(const tinygltf::Texture& InTextur
 	return Result;
 }
 
-Ref<FMaterialStorage> FGLTFUtils::ImportMaterial(const tinygltf::Material& InMaterial, const tinygltf::Model& InModel, const std::vector<Ref<FTextureStorage>>& InTextures)
+Ref<FSurfaceMaterialStorage> FGLTFUtils::ImportMaterial(const tinygltf::Material& InMaterial, const tinygltf::Model& InModel, const std::vector<Ref<FTextureStorage>>& InTextures)
 {
 	auto& pbrInfo = InMaterial.pbrMetallicRoughness;
 	Ref<FPBRMaterialStorage> Result = CreateRef<FPBRMaterialStorage>();
@@ -449,7 +449,7 @@ FMeshImportResult FGLTFUtils::ImportModel(const FPath& InPath, bool DumpInfo)
 
 	for (size_t i = 0; i < InModel.materials.size(); i++)
 	{
-		Ref<FMaterialStorage> MaterialStorage = ImportMaterial(InModel.materials[i], InModel, Result.Textures);
+		Ref<FSurfaceMaterialStorage> MaterialStorage = ImportMaterial(InModel.materials[i], InModel, Result.Textures);
 		Result.Materials.emplace_back(std::move(MaterialStorage));
 	}
 

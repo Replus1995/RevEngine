@@ -3,6 +3,7 @@
 #include "Rev/Render/RHI/RHIShaderLibrary.h"
 #include "Rev/Render/RHI/RHIResourceFactory.h"
 #include "Rev/Render/Material/Material.h"
+#include "Rev/Render/Material/SurfaceMaterial.h"
 #include "Rev/Render/Mesh/StaticMesh.h"
 #include "Rev/Render/Texture/Texture.h"
 
@@ -13,7 +14,7 @@
 namespace Rev
 {
 
-static Ref<Material> sDefaultMaterial = nullptr;
+static Ref<SurfaceMaterial> sDefaultSurfaceMaterial = nullptr;
 static Ref<Texture> sDefaultWhiteTexture = nullptr;
 static Ref<Texture> sDefaultNormalTexture = nullptr;
 
@@ -26,7 +27,7 @@ void FAssetLibrary::Shutdown()
 {
 	sDefaultWhiteTexture.reset();
 	sDefaultNormalTexture.reset();
-	sDefaultMaterial.reset();
+	sDefaultSurfaceMaterial.reset();
 }
 
 const Ref<Texture>& FAssetLibrary::GetDefaultWhiteTexture2D()
@@ -65,19 +66,19 @@ const Ref<Texture>& FAssetLibrary::GetDefaultNormalTexture2D()
 	return sDefaultNormalTexture;
 }
 
-const Ref<Material>& FAssetLibrary::GetDefaultMaterial()
+const Ref<SurfaceMaterial>& FAssetLibrary::GetDefaultSurfaceMaterial()
 {
-	if (!sDefaultMaterial)
+	if (!sDefaultSurfaceMaterial)
 	{
-		sDefaultMaterial = CreateRef<Material>();
-		sDefaultMaterial->Compile();
+		sDefaultSurfaceMaterial = CreateRef<SurfaceMaterial>();
+		sDefaultSurfaceMaterial->Compile();
 	}
-	return sDefaultMaterial;
+	return sDefaultSurfaceMaterial;
 }
 
-Ref<StaticMesh> FAssetLibrary::CreateBasicGeometry(EBasicGeometry InKind, const Ref<Material>& InMaterial)
+Ref<StaticMesh> FAssetLibrary::CreateBasicGeometry(EBasicGeometry InKind, const Ref<SurfaceMaterial>& InMaterial)
 {
-	const Ref<Material>& GeoMat = InMaterial ? InMaterial : GetDefaultMaterial();
+	const Ref<SurfaceMaterial>& GeoMat = InMaterial ? InMaterial : GetDefaultSurfaceMaterial();
 	switch (InKind)
 	{
 	case Rev::EBasicGeometry::Plane:

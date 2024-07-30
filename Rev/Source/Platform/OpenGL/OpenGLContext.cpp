@@ -4,6 +4,7 @@
 #include "Rev/Core/Application.h"
 #include "Rev/Core/Window.h"
 #include "Rev/Render/Material/Material.h"
+#include "Rev/Render/Material/SurfaceMaterial.h"
 
 #include "OpenGLShader.h"
 #include "OpenGLVertexBuffer.h"
@@ -86,9 +87,10 @@ void FOpenGLContext::PrepareMaterial(const Material* InMaterial)
 {
 	if(!InMaterial)
 		return;
-	if (InMaterial->Domain == MD_Surface)
+	if (InMaterial->GetDomain() == MD_Surface)
 	{
-		switch (InMaterial->BlendMode)
+		const SurfaceMaterial* SurfaceMat = static_cast<const SurfaceMaterial*>(InMaterial);
+		switch (SurfaceMat->BlendMode)
 		{
 		case BM_Opaque:
 			glDisable(GL_BLEND);
@@ -105,7 +107,7 @@ void FOpenGLContext::PrepareMaterial(const Material* InMaterial)
 			break;
 		}
 
-		if (InMaterial->TwoSided)
+		if (SurfaceMat->TwoSided)
 		{
 			glDisable(GL_CULL_FACE);
 		}
@@ -115,7 +117,7 @@ void FOpenGLContext::PrepareMaterial(const Material* InMaterial)
 			glCullFace(GL_BACK);
 		}
 	}
-	else if (InMaterial->Domain == MD_PostProcess)
+	else if (InMaterial->GetDomain() == MD_PostProcess)
 	{
 		//glEnable(GL_BLEND);
 		//glDisable(GL_CULL_FACE);

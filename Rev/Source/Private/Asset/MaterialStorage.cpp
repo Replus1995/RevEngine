@@ -5,13 +5,12 @@
 namespace Rev
 {
 
-Ref<Material> FPBRMaterialStorage::CreateMaterial()
+Ref<SurfaceMaterial> FPBRMaterialStorage::CreateMaterial()
 {
 	if(mCache)
 		return mCache;
 
 	Ref<PBRMaterial> Result = CreateRef<PBRMaterial>();
-	Result->Domain = Domain;
 	Result->BlendMode = BlendMode;
 	Result->ShadingModel = ShadingModel;
 	Result->MaskClip = MaskClip;

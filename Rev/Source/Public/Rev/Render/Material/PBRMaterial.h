@@ -1,11 +1,11 @@
 #pragma once
-#include "Rev/Render/Material/Material.h"
+#include "Rev/Render/Material/SurfaceMaterial.h"
 #include "Rev/Render/Texture/Texture.h"
 
 namespace Rev
 {
 
-class REV_API PBRMaterial : public Material
+class REV_API PBRMaterial : public SurfaceMaterial
 {
 public:
 	PBRMaterial();
