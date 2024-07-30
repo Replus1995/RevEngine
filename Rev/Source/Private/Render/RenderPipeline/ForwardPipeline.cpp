@@ -20,7 +20,7 @@ void FForwardPipeline::BeginPipeline(uint32 InWidth, uint32 InHeight)
 	{
 		std::vector<FColorTargetDesc> vColorDesc;
 		vColorDesc.push_back({ PF_R8G8B8A8, Math::FLinearColor(0, 0, 0, 1) });
-		FRenderTargetDesc Desc = FRenderTargetDesc::Make2D(InWidth, InHeight, vColorDesc.data(), vColorDesc.size(), {});
+		FRenderTargetDesc Desc = FRenderTargetDesc::Make2D(InWidth, InHeight, vColorDesc.data(), vColorDesc.size(), {PF_DepthStencil});
 		mLinearScreenTarget = FRHIResourceFactory::CreateRenderTarget(Desc);
 		mForwardSurfacePass.SetTarget(mLinearScreenTarget);
 	}

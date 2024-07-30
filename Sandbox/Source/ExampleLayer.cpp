@@ -69,7 +69,7 @@ ExampleLayer::ExampleLayer()
 		meshComp.StaticMesh = FAssetLibrary::CreateBasicGeometry(EBasicGeometry::Plane, pPlaneMat);
 		auto& transformComp = meshEntity.GetComponent<TransformComponent>();
 		transformComp.SetLocation(Math::FVector3(0, 0, -5));
-		transformComp.SetRotation(Math::FRotator(90.0F, 0, 0));
+		transformComp.SetRotation(Math::FRotator(-90.0F, 0, 0));
 		transformComp.SetScale(Math::FVector3(5, 5, 0));
 	}
 

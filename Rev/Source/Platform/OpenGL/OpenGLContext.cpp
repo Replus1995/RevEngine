@@ -118,9 +118,10 @@ void FOpenGLContext::PrepareMaterial(const Material* InMaterial)
 	else if (InMaterial->Domain == MD_PostProcess)
 	{
 		//glEnable(GL_BLEND);
-		glDisable(GL_CULL_FACE);
-		/*glEnable(GL_CULL_FACE);
-		glCullFace(GL_BACK);*/
+		//glDisable(GL_CULL_FACE);
+		//glEnable(GL_CULL_FACE);
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
 	}
 
 	
