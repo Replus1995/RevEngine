@@ -352,9 +352,11 @@ Ref<FTextureStorage> FGLTFUtils::ImportTexture(const tinygltf::Texture& InTextur
 	Result->TextureDesc = FTextureDesc::MakeTexture2D(InImage.width, InImage.height, TranslateImageFormat(InImage), false, Math::FLinearColor(0, 0, 0, 1));
 	Result->SamplerDesc = TranslateSampler(InSampler);
 	{
+		Result->LayeredImageData.resize(1);
+		FBuffer& ImageBuffer = Result->LayeredImageData[0];
 		//Decoded data
-		Result->ImageData.Allocate(InImage.image.size());
-		memcpy(Result->ImageData.Data(), InImage.image.data(), InImage.image.size());
+		ImageBuffer.Allocate(InImage.image.size());
+		memcpy(ImageBuffer.Data(), InImage.image.data(), InImage.image.size());
 	}
 	//TODO: Decode image data from buffer
 	
@@ -400,7 +402,7 @@ Ref<FSurfaceMaterialStorage> FGLTFUtils::ImportMaterial(const tinygltf::Material
 	return Result;
 }
 
-FMeshImportResult FGLTFUtils::ImportModel(const FPath& InPath, bool DumpInfo)
+FModelImportResult FGLTFUtils::ImportModel(const FPath& InPath, bool DumpInfo)
 {
 	tinygltf::Model InModel;
 	tinygltf::TinyGLTF ctx;
@@ -439,7 +441,7 @@ FMeshImportResult FGLTFUtils::ImportModel(const FPath& InPath, bool DumpInfo)
 	    FGLTFDebug::DumpModelInfo(InModel);
 	}
 
-	FMeshImportResult Result;
+	FModelImportResult Result;
 
 	for (size_t i = 0; i < InModel.textures.size(); i++)
 	{

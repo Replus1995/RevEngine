@@ -43,7 +43,7 @@ ExampleLayer::ExampleLayer()
 
 	{
 		//auto importRes = FAssetLibrary::ImportMesh(FPath("/Game/Assets/Models/Cube/Cube.gltf"));
-		auto importRes = FAssetLibrary::ImportMesh(FPath("/Game/Assets/Models/DamagedHelmet.glb"));
+		auto importRes = FAssetLibrary::ImportModel(FPath("/Game/Assets/Models/DamagedHelmet.glb"));
 		if (!importRes.StaticMeshes.empty())
 		{
 			auto meshStorage = importRes.StaticMeshes[0];

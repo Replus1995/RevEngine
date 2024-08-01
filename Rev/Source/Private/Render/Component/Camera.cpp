@@ -1,4 +1,4 @@
-#include "Rev/Render/Camera.h"
+#include "Rev/Render/Component/Camera.h"
 #include "Rev/Core/Assert.h"
 
 namespace Rev

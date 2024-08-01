@@ -1,4 +1,4 @@
-#include "Rev/Render/Light.h"
+#include "Rev/Render/Component/Light.h"
 
 namespace Rev
 {

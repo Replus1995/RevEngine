@@ -49,4 +49,38 @@ struct FDeferredLightUniform
 
 };
 
+struct FLightUniform
+{
+	struct {
+		Math::FVector4 Direction;
+		Math::FVector4 Color;
+		float Intensity;
+		int32 ShadowIndex;
+		uint32 ShadowCount;
+		float Padding;
+	} Directional[REV_MAX_DIRECTIONAL_LIGHTS];
+
+	struct {
+		Math::FVector4 Position;
+		Math::FVector4 Direction;
+		Math::FVector4 Color;
+		float Intensity;
+		int32 ShadowIndex;
+		float Radius;
+		float Angle;
+	} Spot[REV_MAX_SPOT_LIGHTS];
+
+	struct {
+		Math::FVector4 Position;
+		Math::FVector4 Color;
+		float Intensity;
+		int32 ShadowIndex;
+		float Radius;
+		float Padding;
+	} Point[REV_MAX_POINT_LIGHTS];
+
+	uint32 DirectionalCount = 0;
+	uint32 SpotCount = 0;
+	uint32 PointCount = 0;
+};
 }

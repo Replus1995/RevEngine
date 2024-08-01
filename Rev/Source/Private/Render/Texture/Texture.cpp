@@ -5,11 +5,6 @@
 namespace Rev
 {
 
-Texture::Texture()
-	: mResource(nullptr)
-{
-}
-
 Texture::Texture(const Ref<FRHITexture>& InResource)
 	: mResource(InResource)
 {
@@ -27,6 +22,16 @@ uint16 Texture::Width() const
 uint16 Texture::Height() const
 {
 	return mResource ? mResource->GetHeight() : 0;
+}
+
+uint16 Texture::Depth() const
+{
+	return mResource ? mResource->GetDepth() : 0;
+}
+
+uint16 Texture::ArraySize() const
+{
+	return mResource ? mResource->GetArraySize() : 0;
 }
 
 EPixelFormat Texture::Format() const

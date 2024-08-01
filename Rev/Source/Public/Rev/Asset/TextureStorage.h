@@ -8,12 +8,19 @@
 namespace Rev
 {
 
-struct FImageImport
+struct FImageStorage
 {
-	EPixelFormat Format;
-	uint16 Width;
-	uint16 Height;
-	FBuffer Data;
+public:
+	FImageStorage() = default;
+	~FImageStorage() = default;
+
+	uint8 NumMips();
+	uint8 NumLayers();
+	void Resize(uint8 NumMips, uint8 NumLayers);
+	FBuffer& At(uint8 MipIndex, uint8 LayerIndex);
+
+
+	std::vector<std::vector<FBuffer>> mImages; //[size = TextureDesc.ArraySize][size = TextureDesc.MipNum]
 };
 
 struct FTextureStorage
@@ -22,7 +29,9 @@ public:
 	std::string Name;
 	FSamplerDesc SamplerDesc;
 	FTextureDesc TextureDesc;
-	FBuffer ImageData;
+	FImageStorage ImageData;
+
+	void Resize(uint8 NumMips, uint8 NumLayer);
 
 	Ref<Texture> CreateTexture(bool bSRGB = false);
 private:

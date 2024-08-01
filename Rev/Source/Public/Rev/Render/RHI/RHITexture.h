@@ -108,10 +108,10 @@ class REV_API FRHITexture : public FRHIResource
 public:
 	virtual ~FRHITexture() = default;
 	const FTextureDesc& GetDesc() const { return mDesc; }
-	uint32 GetWidth() const { return mDesc.Width; }
-	uint32 GetHeight() const { return mDesc.Height; }
-	uint32 GetDepth() const { return mDesc.Depth; }
-	uint32 GetArraySize() const { return mDesc.ArraySize; }
+	uint16 GetWidth() const { return mDesc.Width; }
+	uint16 GetHeight() const { return mDesc.Height; }
+	uint16 GetDepth() const { return mDesc.Depth; }
+	uint16 GetArraySize() const { return mDesc.ArraySize; }
 	EPixelFormat GetFormat() const { return mDesc.Format; }
 
 	virtual const FRHISampler* GetSampler() const = 0;

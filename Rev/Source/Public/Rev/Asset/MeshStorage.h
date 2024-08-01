@@ -25,7 +25,7 @@ private:
 	Ref<StaticMesh> mCache = nullptr;
 };
 
-struct FMeshImportResult
+struct FModelImportResult
 {
 	std::vector<Ref<FTextureStorage>> Textures;
 	std::vector<Ref<FSurfaceMaterialStorage>> Materials;
