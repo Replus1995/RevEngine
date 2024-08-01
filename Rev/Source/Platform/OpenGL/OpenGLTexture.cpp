@@ -39,14 +39,12 @@ FOpenGLTexture::FOpenGLTexture(const FTextureDesc& InDesc, const FSamplerDesc& I
 
 std::pair<uint32, uint32> FOpenGLTexture::CalculateMipSize2D(uint32 InMipLevel)
 {
-	uint32 MipFactor = Math::PowI<uint32>(2, InMipLevel);
-	return { std::max<uint32>(1, GetWidth() / MipFactor), std::max<uint32>(1, GetHeight() / MipFactor) };
+	return { std::max<uint32>(1, GetWidth() >> InMipLevel), std::max<uint32>(1, GetHeight() >> InMipLevel) };
 }
 
 std::tuple<uint32, uint32, uint32> FOpenGLTexture::CalculateMipSize3D(uint32 InMipLevel)
 {
-	uint32 MipFactor = Math::PowI<uint32>(2, InMipLevel);
-	return { std::max<uint32>(1, GetWidth() / MipFactor), std::max<uint32>(1, GetHeight() / MipFactor), std::max<uint32>(1, GetDepth() / MipFactor)};
+	return { std::max<uint32>(1, GetWidth() >> InMipLevel), std::max<uint32>(1, GetHeight() >> InMipLevel), std::max<uint32>(1, GetDepth() >> InMipLevel)};
 }
 
 void FOpenGLTexture::FillClearColor(FClearColorBuffer& OutBuffer)

@@ -10,6 +10,7 @@
 #include "./BasicGeometry/PlaneGeometry.hpp"
 #include "./BasicGeometry/BoxGeometry.hpp"
 #include "./GLTF/GLTFUtils.h"
+#include "./STB/STBImage.h"
 
 namespace Rev
 {
@@ -100,6 +101,11 @@ Ref<StaticMesh> FAssetLibrary::CreateBasicGeometry(EBasicGeometry InKind, const 
 
 FTextureStorage FAssetLibrary::ImportTexture(const FPath& InPath)
 {
+	FTextureStorage Result;
+	if (FSTBImage2D res = FSTBImage::ImportImage2D(InPath); !res.Empty())
+	{
+
+	}
 	return FTextureStorage();
 }
 

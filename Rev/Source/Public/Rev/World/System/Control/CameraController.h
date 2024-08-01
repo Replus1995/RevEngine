@@ -1,7 +1,7 @@
 #pragma once
 #include "Rev/Core/Base.h"
 #include "Rev/Events/Event.h"
-#include "Rev/Render/Camera.h"
+#include "Rev/Render/Component/Camera.h"
 
 namespace Rev
 {

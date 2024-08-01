@@ -10,7 +10,6 @@
 namespace Rev
 {
 
-
 class FGLTFUtils
 {
 public:

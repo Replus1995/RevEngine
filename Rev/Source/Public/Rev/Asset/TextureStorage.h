@@ -4,6 +4,7 @@
 #include "Rev/Render/RHI/RHISampler.h"
 #include "Rev/Render/RHI/RHITexture.h"
 #include "Rev/Render/Texture/Texture.h"
+#include <vector>
 
 namespace Rev
 {
@@ -19,7 +20,7 @@ public:
 	void Resize(uint8 NumMips, uint8 NumLayers);
 	FBuffer& At(uint8 MipIndex, uint8 LayerIndex);
 
-
+private:
 	std::vector<std::vector<FBuffer>> mImages; //[size = TextureDesc.ArraySize][size = TextureDesc.MipNum]
 };
 
@@ -31,9 +32,7 @@ public:
 	FTextureDesc TextureDesc;
 	FImageStorage ImageData;
 
-	void Resize(uint8 NumMips, uint8 NumLayer);
-
-	Ref<Texture> CreateTexture(bool bSRGB = false);
+	Ref<Texture> CreateTexture(bool bForceSRGB = false);
 private:
 	Ref<Texture> mCache = nullptr;
 };

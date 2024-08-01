@@ -352,8 +352,8 @@ Ref<FTextureStorage> FGLTFUtils::ImportTexture(const tinygltf::Texture& InTextur
 	Result->TextureDesc = FTextureDesc::MakeTexture2D(InImage.width, InImage.height, TranslateImageFormat(InImage), false, Math::FLinearColor(0, 0, 0, 1));
 	Result->SamplerDesc = TranslateSampler(InSampler);
 	{
-		Result->LayeredImageData.resize(1);
-		FBuffer& ImageBuffer = Result->LayeredImageData[0];
+		Result->ImageData.Resize(1, 1);
+		FBuffer& ImageBuffer = Result->ImageData.At(0, 0);
 		//Decoded data
 		ImageBuffer.Allocate(InImage.image.size());
 		memcpy(ImageBuffer.Data(), InImage.image.data(), InImage.image.size());

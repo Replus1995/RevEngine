@@ -1,7 +1,7 @@
 #pragma once
 #include "Rev/Core/Base.h"
 #include "Rev/Render/UniformDefine.h"
-#include "Rev/Render/Light.h"
+#include "Rev/Render/Component/Light.h"
 
 namespace Rev
 {
