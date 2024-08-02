@@ -349,7 +349,7 @@ Ref<FTextureStorage> FGLTFUtils::ImportTexture(const tinygltf::Texture& InTextur
 	{
 		Result->Name = InTexture.name;
 	}
-	Result->TextureDesc = FTextureDesc::MakeTexture2D(InImage.width, InImage.height, TranslateImageFormat(InImage), false, Math::FLinearColor(0, 0, 0, 1));
+	Result->TextureDesc = FTextureDesc::Make2D(InImage.width, InImage.height, TranslateImageFormat(InImage), false, Math::FLinearColor(0, 0, 0, 1));
 	Result->SamplerDesc = TranslateSampler(InSampler);
 	{
 		Result->ImageData.Resize(1, 1);

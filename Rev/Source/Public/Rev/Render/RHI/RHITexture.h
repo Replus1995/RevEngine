@@ -96,11 +96,31 @@ struct FTextureDesc
 		return *this;
 	}
 
-	static FTextureDesc MakeTexture2D(uint16 InWidth, uint16 InHeight, EPixelFormat InFormat, bool InSRGB, const FTextureClearColor& InClearColor, uint8 InNumMips = 1, uint8 InNumSamples = 1)
+	static FTextureDesc Make2D(uint16 InWidth, uint16 InHeight, EPixelFormat InFormat, bool InSRGB, const FTextureClearColor& InClearColor = {}, uint8 InNumMips = 1, uint8 InNumSamples = 1)
 	{
 		return FTextureDesc(ETextureDimension::Texture2D, InFormat, InSRGB, InWidth, InHeight, 1, 1, InClearColor, InNumMips, InNumSamples);
 	}
 	
+	static FTextureDesc Make2DArray(uint16 InWidth, uint16 InHeight, EPixelFormat InFormat, bool InSRGB, uint16 InArraySize, const FTextureClearColor& InClearColor = {}, uint8 InNumMips = 1, uint8 InNumSamples = 1)
+	{
+		return FTextureDesc(ETextureDimension::Texture2DArray, InFormat, InSRGB, InWidth, InHeight, 1, InArraySize, InClearColor, InNumMips, InNumSamples);
+	}
+
+	static FTextureDesc MakeCube(uint16 InWidth, uint16 InHeight, EPixelFormat InFormat, bool InSRGB, const FTextureClearColor& InClearColor = {}, uint8 InNumMips = 1, uint8 InNumSamples = 1)
+	{
+		return FTextureDesc(ETextureDimension::TextureCube, InFormat, InSRGB, InWidth, InHeight, 1, 1, InClearColor, InNumMips, InNumSamples);
+	}
+
+	static FTextureDesc MakeCubeArray(uint16 InWidth, uint16 InHeight, EPixelFormat InFormat, bool InSRGB, uint16 InArraySize, const FTextureClearColor& InClearColor = {}, uint8 InNumMips = 1, uint8 InNumSamples = 1)
+	{
+		return FTextureDesc(ETextureDimension::TextureCubeArray, InFormat, InSRGB, InWidth, InHeight, 1, InArraySize, InClearColor, InNumMips, InNumSamples);
+	}
+
+	static FTextureDesc Make3D(uint16 InWidth, uint16 InHeight, uint16 InDepth, EPixelFormat InFormat, bool InSRGB, const FTextureClearColor& InClearColor = {}, uint8 InNumMips = 1, uint8 InNumSamples = 1)
+	{
+		return FTextureDesc(ETextureDimension::Texture3D, InFormat, InSRGB, InWidth, InHeight, InDepth, 1, InClearColor, InNumMips, InNumSamples);
+	}
+
 };
 
 class REV_API FRHITexture : public FRHIResource

@@ -11,16 +11,18 @@ FSTBImage2D::FSTBImage2D()
 	, mWidth(0)
 	, mHeight(0)
 	, mChannels(0)
-	, m16Bit(false)
+	, mPixelDepth(8)
+	, mFormat(PF_Unknown)
 {
 }
 
-FSTBImage2D::FSTBImage2D(uint8* InData, int InWidth, int InHeight, int InChannels, bool In16Bit)
+FSTBImage2D::FSTBImage2D(uint8* InData, int InWidth, int InHeight, int InChannels, int InPixelDepth)
 	: mData(InData)
 	, mWidth(InWidth)
 	, mHeight(InHeight)
 	, mChannels(InChannels)
-	, m16Bit(In16Bit)
+	, mPixelDepth(InPixelDepth)
+	, mFormat(GetDesiredFormat(InChannels, InPixelDepth))
 {
 }
 
@@ -35,13 +37,79 @@ FSTBImage2D::FSTBImage2D(FSTBImage2D&& Other) noexcept
 	, mWidth(Other.mWidth)
 	, mHeight(Other.mHeight)
 	, mChannels(Other.mChannels)
-	, m16Bit(Other.m16Bit)
+	, mPixelDepth(Other.mPixelDepth)
+	, mFormat(Other.mFormat)
 {
 	Other.mData = nullptr;
 	Other.mWidth = 0;
 	Other.mHeight = 0;
 	Other.mChannels = 0;
-	Other.m16Bit = false;
+	Other.mPixelDepth = 8;
+	Other.mFormat = PF_Unknown;
+}
+
+FSTBImage2D& FSTBImage2D::operator=(FSTBImage2D&& Other) noexcept
+{
+	mData = Other.mData;
+	mWidth = Other.mWidth;
+	mHeight = Other.mHeight;
+	mChannels = Other.mChannels;
+	mPixelDepth = Other.mPixelDepth;
+	mFormat = Other.mFormat;
+
+	Other.mData = nullptr;
+	Other.mWidth = 0;
+	Other.mHeight = 0;
+	Other.mChannels = 0;
+	Other.mPixelDepth = 8;
+	Other.mFormat = PF_Unknown;
+}
+
+bool FSTBImage2D::SameSizeAndFormat(const FSTBImage2D& InA, const FSTBImage2D& InB)
+{
+	return InA.mWidth == InB.mWidth && InA.mHeight == InB.mHeight && InA.mFormat == InB.mFormat;
+}
+
+EPixelFormat FSTBImage2D::GetDesiredFormat(int InChannels, int InPixelDepth)
+{
+	switch (InChannels)
+	{
+	case 1:
+	{
+		switch (InPixelDepth)
+		{
+		case 8: return PF_R8;
+		case 16: return PF_R16;
+		default: break;
+		}
+	}
+	case 2:
+	{
+		break;
+	}
+	case 3:
+	{
+		switch (InPixelDepth)
+		{
+		case 8: return PF_RGB8;
+		default: break;
+		}
+		break;
+	}
+	case 4:
+	{
+		switch (InPixelDepth)
+		{
+		case 8: return PF_R8G8B8A8;
+		default: break;
+		}
+		break;
+		break;
+	}
+	default:
+		break;
+	}
+	return PF_Unknown;
 }
 
 
