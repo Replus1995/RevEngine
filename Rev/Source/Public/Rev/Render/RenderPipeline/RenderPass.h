@@ -10,6 +10,7 @@ public:
 	FRenderPass(std::string_view InName);
 	virtual ~FRenderPass();
 	virtual void BeginPass();
+	virtual void RunPass() = 0;
 	virtual void EndPass();
 
 	const std::string& GetName() const { return mName; }

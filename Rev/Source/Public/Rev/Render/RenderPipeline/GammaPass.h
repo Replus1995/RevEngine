@@ -11,7 +11,7 @@ public:
 	FGammaCorrectPass();
 	virtual ~FGammaCorrectPass();
 	virtual void BeginPass() override;
-	void RunPass();
+	virtual void RunPass() override;
 
 protected:
 	Ref<Material> mMaterial;

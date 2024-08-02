@@ -11,8 +11,7 @@ class FForwardSurfacePass : public FRenderPass
 public:
 	FForwardSurfacePass();
 	virtual ~FForwardSurfacePass();
-
-	void RunPass(SceneRenderProxy& InSceneProxy);
+	virtual void RunPass() override;
 };
 
 

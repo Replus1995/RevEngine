@@ -17,6 +17,12 @@ public:
 	uint16 ArraySize() const;
 	EPixelFormat Format() const;
 
+	bool IsTexture2D() const;
+	bool IsTexture2DArray() const;
+	bool IsTextureCube() const;
+	bool IsTextureCubeArray() const;
+	bool IsTexture3D() const;
+
 	const Ref<FRHITexture> GetResource() const { return mResource; }
 
 private:
