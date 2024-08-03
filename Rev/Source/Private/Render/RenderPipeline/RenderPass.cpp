@@ -18,18 +18,12 @@ FRenderPass::~FRenderPass()
 void FRenderPass::BeginPass()
 {
 	mInPass = true;
-	if (mRenderTarget)
-	{
-		mRenderTarget->Bind();
-	}
+	RenderCmd::BindRenderTarget(mRenderTarget);
 }
 
 void FRenderPass::EndPass()
 {
-	if (mRenderTarget)
-	{
-		mRenderTarget->Unbind();
-	}
+	//RenderCmd::BindRenderTarget(nullptr);
 	mInPass = false;
 }
 

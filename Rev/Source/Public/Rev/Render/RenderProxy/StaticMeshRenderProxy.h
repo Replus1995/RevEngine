@@ -1,6 +1,8 @@
 #pragma once
 #include "Rev/Core/Base.h"
+#include "Rev/Render/RenderCore.h"
 #include "Rev/Render/Material/Material.h"
+#include "Rev/Math/Maths.h"
 
 namespace Rev
 {

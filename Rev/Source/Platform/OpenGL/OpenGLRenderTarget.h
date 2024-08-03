@@ -11,10 +11,7 @@ class FOpenGLRenderTarget : public FRHIRenderTarget
 public:
 	FOpenGLRenderTarget(const FRenderTargetDesc& InDesc);
 	virtual ~FOpenGLRenderTarget();
-	virtual void* GetNativeHandle() override { return &mHandle; }
-
-	virtual void Bind() override;
-	virtual void Unbind() override;
+	virtual const void* GetNativeHandle() const override { return &mHandle; }
 
 	virtual void ResizeTargets(uint16 InWidth, uint16 InHeight) override;
 	virtual void ClearTarget(ERenderTargetAttachment Index) override;
@@ -24,6 +21,7 @@ public:
 	virtual void Attach(ERenderTargetAttachment Index, const Ref<FRHITexture>& InTexture, uint8 InMipLevel, int32 InArrayIndex) override;
 	virtual void Detach(ERenderTargetAttachment Index) override;
 	virtual void DetachAll() override;
+	virtual void FlushAttach() override;
 
 protected:
 	bool IsEmptyTarget() const;

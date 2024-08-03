@@ -12,7 +12,7 @@ class FOpenGLTexture : public FRHITexture
 {
 public:
 	virtual ~FOpenGLTexture() = default;
-	virtual void* GetNativeHandle() override { return &mHandle; }
+	virtual const void* GetNativeHandle() const override { return &mHandle; }
 	virtual const FRHISampler* GetSampler() const override;
 	virtual void Bind(uint32 InUnit) const override;
 	virtual void ClearMipData(uint8 InMipLevel) override;

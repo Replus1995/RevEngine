@@ -6,27 +6,26 @@ namespace Rev
 
 uint8 FImageStorage::NumMips()
 {
-	return mImages.empty() ? 0 : (uint8)mImages[0].size();
+	return mNumMips;
 }
 
-uint8 FImageStorage::NumLayers()
+uint16 FImageStorage::NumLayers()
 {
-	return (uint8)mImages.size();
+	return mNumLayers;
 }
 
-void FImageStorage::Resize(uint8 NumMips, uint8 NumLayers)
+void FImageStorage::Resize(uint8 NumMips, uint16 NumLayers)
 {
-	mImages.resize(NumLayers);
-	for (uint8 i = 0; i < NumLayers; i++)
-	{
-		mImages[i].resize(NumMips);
-	}
+	mImages.resize(NumLayers * NumLayers);
+	mNumMips = NumMips;
+	mNumLayers = NumLayers;
 }
 
-FBuffer& FImageStorage::At(uint8 MipIndex, uint8 LayerIndex)
+FBuffer& FImageStorage::At(uint8 MipIndex, uint16 LayerIndex)
 {
-	RE_CORE_ASSERT(MipIndex < NumMips() && LayerIndex < NumLayers());
-	return mImages[LayerIndex][MipIndex];
+	RE_CORE_ASSERT(MipIndex < mNumMips && LayerIndex < mNumLayers);
+	uint32 Index = LayerIndex * mNumMips + MipIndex;
+	return mImages[Index];
 }
 
 Ref<Texture> FTextureStorage::CreateTexture(bool bForceSRGB)

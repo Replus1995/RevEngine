@@ -11,9 +11,13 @@ namespace Rev
 {
 void SceneRenderProxy::Init()
 {
-	mCameraUB = FRHIResourceFactory::CreateUniformBuffer(sizeof(FCameraUniform), UL::BCamera);
-	mModelUB = FRHIResourceFactory::CreateUniformBuffer(sizeof(FModelUniform), UL::BModel);
-	mForwardLightUB = FRHIResourceFactory::CreateUniformBuffer(sizeof(FForwardLightUniform), UL::BForwardLight);
+	mCameraUB = FRHIResourceFactory::CreateUniformBuffer(sizeof(FCameraUniform));
+	mModelUB = FRHIResourceFactory::CreateUniformBuffer(sizeof(FModelUniform));
+	mForwardLightUB = FRHIResourceFactory::CreateUniformBuffer(sizeof(FForwardLightUniform));
+
+	RenderCmd::BindUniformBuffer(mCameraUB, UL::BCamera);
+	RenderCmd::BindUniformBuffer(mModelUB, UL::BModel);
+	RenderCmd::BindUniformBuffer(mForwardLightUB, UL::BForwardLight);
 }
 
 void SceneRenderProxy::Release()
@@ -67,7 +71,7 @@ void SceneRenderProxy::Prepare(const Ref<Scene>& scene)
 
 void SceneRenderProxy::DrawScene()
 {
-	mCameraUB->UpdateLayerData(&mCameraData, sizeof(FCameraUniform));
+	mCameraUB->UpdateSubData(&mCameraData, sizeof(FCameraUniform));
 
 	uint32 LightCount = Math::Min<uint32>(mLightProxies.size(), UNIFORM_MAX_FORWARD_LIGHTS);
 	for (uint32 i = 0; i < LightCount; i++)
@@ -75,7 +79,7 @@ void SceneRenderProxy::DrawScene()
 		mForwardLightData.Lights[i] = mLightProxies[i].GetUnifiedLight();
 	}
 	mForwardLightData.LightCount = LightCount;
-	mForwardLightUB->UpdateLayerData(&mForwardLightData, sizeof(FForwardLightUniform));
+	mForwardLightUB->UpdateSubData(&mForwardLightData, sizeof(FForwardLightUniform));
 
 	DrawMeshes(EMaterialDomain::MD_Surface, BM_Opaque);
 }
@@ -84,7 +88,7 @@ void SceneRenderProxy::DrawMeshes(EMaterialDomain InDomain, EBlendMode InBlend)
 {
 	for (StaticMeshRenderProxy& proxy : mStaticMeshProxies)
 	{
-		mModelUB->UpdateLayerData(&proxy.GetMatrix(), sizeof(FModelUniform));
+		mModelUB->UpdateSubData(&proxy.GetMatrix(), sizeof(FModelUniform));
 		proxy.DrawPrimitives(InDomain, InBlend);
 	}
 }

@@ -20,7 +20,16 @@ public:
 	virtual void SetBlendMode(EBlendMode InMode) override;
 	virtual void SetCullFaceMode(ECullFaceMode InMode) override;
 
-	virtual void DrawVertices(const Ref<FRHIVertexArray>& InVertexArray, EDrawMode InDrawMode) override;
+	virtual void Bind(const Ref<FRHIVertexBuffer>& InVertexBuffer) override;
+	virtual void Bind(const Ref<FRHIIndexBuffer>& InIndexBuffer) override;
+	virtual void Bind(const Ref<FRHIVertexArray>& InVertexArray) override;
+
+	virtual void Bind(const Ref<FRHIShaderProgram>& InProgram) override;
+	virtual void Bind(const Ref<FRHIUniformBuffer>& InUniformBuffer, uint32 InUnit) override;
+	virtual void Bind(const Ref<FRHITexture>& InTexture, uint32 InUnit) override;
+	virtual void Bind(const Ref<FRHIRenderTarget>& InRenderTarget) override;
+
+	virtual void Draw(const Ref<FRHIVertexArray>& InVertexArray, EDrawMode InDrawMode) override;
 
 private:
 	GLenum TranslateDrawMode(EDrawMode InDrawMode);

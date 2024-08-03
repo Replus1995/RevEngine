@@ -63,16 +63,36 @@ void RenderCmd::SetCullFaceMode(ECullFaceMode InMode)
 	sContext->SetCullFaceMode(InMode);
 }
 
+void RenderCmd::BindProgram(const Ref<FRHIShaderProgram>& InProgram)
+{
+	sContext->Bind(InProgram);
+}
+
+void RenderCmd::BindUniformBuffer(const Ref<FRHIUniformBuffer>& InUniformBuffer, uint32 InUnit)
+{
+	sContext->Bind(InUniformBuffer, InUnit);
+}
+
+void RenderCmd::BindTexture(const Ref<FRHITexture>& InTexture, uint32 InUnit)
+{
+	sContext->Bind(InTexture, InUnit);
+}
+
+void RenderCmd::BindRenderTarget(const Ref<FRHIRenderTarget>& InRenderTarget)
+{
+	sContext->Bind(InRenderTarget);
+}
+
 void RenderCmd::DrawPrimitive(const FMeshPrimitive* InPrimitive)
 {
 	if(!InPrimitive)
 		return;
-	sContext->DrawVertices(InPrimitive->VertexData, InPrimitive->DrawMode);
+	sContext->Draw(InPrimitive->VertexData, InPrimitive->DrawMode);
 }
 
-void RenderCmd::DrawVertices(const Ref<FRHIVertexArray>& InVertexArray, EDrawMode InDrawMode)
+void RenderCmd::Draw(const Ref<FRHIVertexArray>& InVertexArray, EDrawMode InDrawMode)
 {
-	sContext->DrawVertices(InVertexArray, InDrawMode);
+	sContext->Draw(InVertexArray, InDrawMode);
 }
 
 }

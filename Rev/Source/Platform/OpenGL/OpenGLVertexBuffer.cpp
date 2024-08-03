@@ -27,17 +27,7 @@ FOpenGLVertexBuffer::~FOpenGLVertexBuffer()
 	glDeleteBuffers(1, &mHandle);
 }
 
-void FOpenGLVertexBuffer::Bind() const
-{
-	glBindBuffer(GL_ARRAY_BUFFER, mHandle);
-}
-
-void FOpenGLVertexBuffer::Unbind() const
-{
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
-void FOpenGLVertexBuffer::UpdateLayerData(const void* data, uint32 size, uint32 offset)
+void FOpenGLVertexBuffer::UpdateSubData(const void* data, uint32 size, uint32 offset)
 {
 	RE_CORE_ASSERT(size + offset <= mSize);
 
@@ -72,17 +62,7 @@ FOpenGLIndexBuffer::~FOpenGLIndexBuffer()
 	glDeleteBuffers(1, &mHandle);
 }
 
-void FOpenGLIndexBuffer::Bind() const
-{
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mHandle);
-}
-
-void FOpenGLIndexBuffer::Unbind() const
-{
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-}
-
-void FOpenGLIndexBuffer::UpdateLayerData(const void* data, uint32 count, uint32 offset)
+void FOpenGLIndexBuffer::UpdateSubData(const void* data, uint32 count, uint32 offset)
 {
 	RE_CORE_ASSERT(count + offset <= mCount);
 
@@ -123,24 +103,14 @@ FOpenGLVertexArray::~FOpenGLVertexArray()
 	glDeleteVertexArrays(1, &mHandle);
 }
 
-void FOpenGLVertexArray::Bind() const
+void FOpenGLVertexArray::AddVertexBuffer(const Ref<FRHIVertexBuffer>& InVertexBuffer)
 {
-	glBindVertexArray(mHandle);
-}
-
-void FOpenGLVertexArray::Unbind() const
-{
-	glBindVertexArray(0);
-}
-
-void FOpenGLVertexArray::AddVertexBuffer(const std::shared_ptr<FRHIVertexBuffer>& vertexBuffer)
-{
-	RE_CORE_ASSERT(vertexBuffer->GetLayout().GetElements().size(), "Unknown vertex buffer layout!");
+	RE_CORE_ASSERT(InVertexBuffer && InVertexBuffer->GetLayout().GetElements().size(), "Unknown vertex buffer layout!");
 
 	glBindVertexArray(mHandle);
-	vertexBuffer->Bind();
+	glBindBuffer(GL_ARRAY_BUFFER, *(const GLuint*)InVertexBuffer->GetNativeHandle());
 
-	const auto& layout = vertexBuffer->GetLayout();
+	const auto& layout = InVertexBuffer->GetLayout();
 	for (const auto& element : layout)
 	{
 		switch (element.Type)
@@ -195,14 +165,14 @@ void FOpenGLVertexArray::AddVertexBuffer(const std::shared_ptr<FRHIVertexBuffer>
 		}
 	}
 
-	mVertexBuffers.push_back(vertexBuffer);
+	mVertexBuffers.push_back(InVertexBuffer);
 }
 
-void FOpenGLVertexArray::SetIndexBuffer(const std::shared_ptr<FRHIIndexBuffer>& indexBuffer)
+void FOpenGLVertexArray::SetIndexBuffer(const Ref<FRHIIndexBuffer>& InIndexBuffer)
 {
 	glBindVertexArray(mHandle);
-	indexBuffer->Bind();
-	mIndexBuffer = indexBuffer;
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *(const GLuint*)InIndexBuffer->GetNativeHandle());
+	mIndexBuffer = InIndexBuffer;
 }
 
 }

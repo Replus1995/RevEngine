@@ -9,7 +9,7 @@ class FOpenGLSampler : public FRHISampler
 public:
 	FOpenGLSampler(const FSamplerDesc& InDesc, GLenum InTexDataType, bool bHasMip);
 	virtual ~FOpenGLSampler();
-	virtual void* GetNativeHandle() override { return &mHandle; }
+	virtual const void* GetNativeHandle() const override { return &mHandle; }
 	virtual void SetFilterMode(ESamplerFilterMode InMode) override;
 	virtual void SetAnisotropicMode(ESamplerAnisotropicMode InMode) override;
 	virtual void SetWarpU(ESamplerWarpMode InMode) override;

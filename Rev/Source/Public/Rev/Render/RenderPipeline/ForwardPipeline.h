@@ -14,9 +14,9 @@ public:
 	FForwardPipeline();
 	virtual ~FForwardPipeline();
 
-	virtual void BeginPipeline(uint32 InWidth, uint32 InHeight);
-	virtual void RunPipeline(SceneRenderProxy& InSceneProxy);
-	virtual void EndPipeline();
+	virtual void BeginPipeline(uint32 InWidth, uint32 InHeight, SceneRenderProxy* InSceneProxy) override;
+	virtual void RunPipeline() override;
+	virtual void EndPipeline() override;
 
 protected:
 	Ref<FRHIRenderTarget> mLinearScreenTarget = nullptr;

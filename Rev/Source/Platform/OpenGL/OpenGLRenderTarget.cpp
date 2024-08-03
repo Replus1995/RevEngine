@@ -21,38 +21,6 @@ FOpenGLRenderTarget::~FOpenGLRenderTarget()
 	ReleaseResource();
 }
 
-void FOpenGLRenderTarget::Bind()
-{
-	if (mAttachmentsDirty)
-	{
-		std::vector<GLenum> ColorAttachPoints;
-		for (uint8 i = 0; i < RTA_MaxColorAttachments; i++)
-		{
-			if (mColorAttachments[i].Texture)
-			{
-				ColorAttachPoints.push_back(GL_COLOR_ATTACHMENT0 + i);
-			}
-		}
-		if (!ColorAttachPoints.empty())
-		{
-			glNamedFramebufferDrawBuffers(mHandle, ColorAttachPoints.size(), ColorAttachPoints.data());
-		}
-		else
-		{
-			glNamedFramebufferDrawBuffer(mHandle, GL_NONE);
-		}
-
-		mAttachmentsDirty = false;
-	}
-	glBindFramebuffer(GL_FRAMEBUFFER, mHandle);
-	
-}
-
-void FOpenGLRenderTarget::Unbind()
-{
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
 void FOpenGLRenderTarget::ResizeTargets(uint16 InWidth, uint16 InHeight)
 {
 	if(IsEmptyTarget())
@@ -216,7 +184,7 @@ void FOpenGLRenderTarget::Attach(ERenderTargetAttachment Index, const Ref<FRHITe
 
 	RE_CORE_ASSERT(AttachPoint != 0);
 
-	GLuint TexHandle = *(GLuint*)InTexture->GetNativeHandle();
+	GLuint TexHandle = *(const GLuint*)InTexture->GetNativeHandle();
 	if (InArrayIndex < 0)
 	{
 		glNamedFramebufferTexture(mHandle, AttachPoint, TexHandle, InMipLevel);
@@ -257,6 +225,31 @@ void FOpenGLRenderTarget::DetachAll()
 		Detach((ERenderTargetAttachment)i);
 	}
 	Detach(RTA_DepthStencilAttachment);
+}
+
+void FOpenGLRenderTarget::FlushAttach()
+{
+	if (mAttachmentsDirty)
+	{
+		std::vector<GLenum> ColorAttachPoints;
+		for (uint8 i = 0; i < RTA_MaxColorAttachments; i++)
+		{
+			if (mColorAttachments[i].Texture)
+			{
+				ColorAttachPoints.push_back(GL_COLOR_ATTACHMENT0 + i);
+			}
+		}
+		if (!ColorAttachPoints.empty())
+		{
+			glNamedFramebufferDrawBuffers(mHandle, ColorAttachPoints.size(), ColorAttachPoints.data());
+		}
+		else
+		{
+			glNamedFramebufferDrawBuffer(mHandle, GL_NONE);
+		}
+
+		mAttachmentsDirty = false;
+	}
 }
 
 bool FOpenGLRenderTarget::IsEmptyTarget() const

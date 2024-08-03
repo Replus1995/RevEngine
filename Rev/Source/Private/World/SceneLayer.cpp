@@ -63,8 +63,8 @@ void SceneLayer::OnUpdate(float dt)
 	uint32 WinWidth = Application::GetApp().GetWindow()->GetWidth();
 	uint32 WinHeight = Application::GetApp().GetWindow()->GetHeight();
 
-	mRenderPipeline->BeginPipeline(WinWidth, WinHeight);
-	mRenderPipeline->RunPipeline(mSceneProxy);
+	mRenderPipeline->BeginPipeline(WinWidth, WinHeight, &mSceneProxy);
+	mRenderPipeline->RunPipeline();
 	mRenderPipeline->EndPipeline();
 }
 

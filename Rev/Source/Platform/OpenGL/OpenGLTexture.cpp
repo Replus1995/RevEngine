@@ -19,7 +19,7 @@ const FRHISampler* FOpenGLTexture::GetSampler() const
 void FOpenGLTexture::Bind(uint32 InUnit) const
 {
 	glBindTextureUnit(InUnit, mHandle);
-	glBindSampler(InUnit, *(GLuint*)mSampler->GetNativeHandle());
+	glBindSampler(InUnit, *(const GLuint*)mSampler->GetNativeHandle());
 }
 
 void FOpenGLTexture::ClearMipData(uint8 InMipLevel)

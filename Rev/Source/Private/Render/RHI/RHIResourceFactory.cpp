@@ -91,12 +91,12 @@ Ref<FRHIVertexArray> FRHIResourceFactory::CreateVertexData()
 	return nullptr;
 }
 
-Ref<FRHIUniformBuffer> FRHIResourceFactory::CreateUniformBuffer(uint32 InSize, uint32 InBinding)
+Ref<FRHIUniformBuffer> FRHIResourceFactory::CreateUniformBuffer(uint32 InSize)
 {
 	switch (GetRenderAPI())
 	{
 	case ERenderAPI::None:    RE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
-	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLUniformBuffer>(InSize, InBinding);
+	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLUniformBuffer>(InSize);
 	}
 
 	RE_CORE_ASSERT(false, "Unknown RenderAPI!");

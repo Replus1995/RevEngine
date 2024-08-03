@@ -16,7 +16,7 @@ public:
 	static Ref<FRHIIndexBuffer> CreateIndexBuffer(uint32 InStride, uint32 InCount); //Dynamic Data
 	static Ref<FRHIIndexBuffer> CreateIndexBuffer(const void* InIndices, uint32 InStride, uint32 InCount); //Static Data
 	static Ref<FRHIVertexArray> CreateVertexData();
-	static Ref<FRHIUniformBuffer> CreateUniformBuffer(uint32 InSize, uint32 InBinding);
+	static Ref<FRHIUniformBuffer> CreateUniformBuffer(uint32 InSize);
 
 	//static Ref<FRHISampler> CreateSampler(const FSamplerDesc& InDesc);
 	static Ref<FRHITexture> CreateTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc);

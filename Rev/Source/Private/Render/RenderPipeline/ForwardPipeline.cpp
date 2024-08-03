@@ -13,15 +13,16 @@ FForwardPipeline::~FForwardPipeline()
 {
 }
 
-void FForwardPipeline::BeginPipeline(uint32 InWidth, uint32 InHeight)
+void FForwardPipeline::BeginPipeline(uint32 InWidth, uint32 InHeight, SceneRenderProxy* InSceneProxy)
 {
-	FRenderPipeline::BeginPipeline(InWidth, InHeight);
+	FRenderPipeline::BeginPipeline(InWidth, InHeight, InSceneProxy);
 	if (!mLinearScreenTarget)
 	{
 		std::vector<FColorTargetDesc> vColorDesc;
 		vColorDesc.push_back({ PF_R8G8B8A8, Math::FLinearColor(0, 0, 0, 1) });
 		FRenderTargetDesc Desc = FRenderTargetDesc::Make2D(InWidth, InHeight, vColorDesc.data(), vColorDesc.size(), {PF_DepthStencil});
 		mLinearScreenTarget = FRHIResourceFactory::CreateRenderTarget(Desc);
+		mLinearScreenTarget->GetTargetTexture(RTA_ColorAttachment0)->Bind(UL::SLinearScreenTex);
 		mForwardSurfacePass.SetRenderTarget(mLinearScreenTarget);
 	}
 	else
@@ -30,19 +31,12 @@ void FForwardPipeline::BeginPipeline(uint32 InWidth, uint32 InHeight)
 	}
 }
 
-void FForwardPipeline::RunPipeline(SceneRenderProxy& InSceneProxy)
+void FForwardPipeline::RunPipeline()
 {
-	FRenderPipeline::RunPipeline(InSceneProxy);
+	FRenderPipeline::RunPipeline();
 
-	mForwardSurfacePass.BeginPass();
-	mForwardSurfacePass.RunPass(InSceneProxy);
-	mForwardSurfacePass.EndPass();
-
-	mLinearScreenTarget->GetTargetTexture(RTA_ColorAttachment0)->Bind(UL::SLinearScreenTex);
-
-	mGammaCorrectPass.BeginPass();
-	mGammaCorrectPass.RunPass();
-	mGammaCorrectPass.EndPass();
+	RunPass(&mForwardSurfacePass);
+	RunPass(&mGammaCorrectPass);
 
 }
 

@@ -23,7 +23,7 @@ FPostPass::~FPostPass()
 
 void FPostPass::DrawQuad()
 {
-	RenderCmd::DrawVertices(GetVertexData(), DM_Triangles);
+	RenderCmd::Draw(GetVertexData(), DM_Triangles);
 }
 
 void FPostPass::CreateVertexData()

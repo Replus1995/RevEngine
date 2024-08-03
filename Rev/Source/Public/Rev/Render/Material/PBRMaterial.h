@@ -1,6 +1,7 @@
 #pragma once
 #include "Rev/Render/Material/SurfaceMaterial.h"
 #include "Rev/Render/Texture/Texture.h"
+#include "Rev/Math/Maths.h"
 
 namespace Rev
 {

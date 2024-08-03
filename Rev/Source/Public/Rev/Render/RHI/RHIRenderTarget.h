@@ -115,9 +115,6 @@ public:
 	virtual ~FRHIRenderTarget() = default;
 	const FRenderTargetDesc& GetDesc() const { return mDesc; };
 
-	virtual void Bind() = 0;
-	virtual void Unbind() = 0;
-
 	virtual void ResizeTargets(uint16 InWidth, uint16 InHeight) = 0;
 	virtual void ClearTarget(ERenderTargetAttachment Index) = 0;
 	virtual void ClearTargets() = 0;
@@ -127,6 +124,7 @@ public:
 	virtual void Attach(ERenderTargetAttachment Index, const Ref<FRHITexture>& InTexture, uint8 InMipLevel = 0, int32 InArrayIndex = -1) = 0;
 	virtual void Detach(ERenderTargetAttachment Index) = 0;
 	virtual void DetachAll() = 0;
+	virtual void FlushAttach() = 0;
 
 protected:
 	FRHIRenderTarget(const FRenderTargetDesc& InDesc) : mDesc(InDesc) {}

@@ -63,6 +63,7 @@ FSTBImage2D& FSTBImage2D::operator=(FSTBImage2D&& Other) noexcept
 	Other.mChannels = 0;
 	Other.mPixelDepth = 8;
 	Other.mFormat = PF_Unknown;
+	return *this;
 }
 
 bool FSTBImage2D::SameSizeAndFormat(const FSTBImage2D& InA, const FSTBImage2D& InB)

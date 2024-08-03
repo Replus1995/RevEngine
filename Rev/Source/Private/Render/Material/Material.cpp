@@ -1,5 +1,6 @@
 #include "Rev/Render/Material/Material.h"
 #include "Rev/Render/Material/MaterialUniform.h"
+#include "Rev/Render/RenderCmd.h"
 
 namespace Rev
 {
@@ -20,14 +21,12 @@ Material::~Material()
 
 void Material::PreDraw()
 {
-	if(mProgram)
-		mProgram->Bind();
+	RenderCmd::BindProgram(mProgram);
 }
 
 void Material::PostDraw()
 {
-	if (mProgram)
-		mProgram->Unbind();
+	//RenderCmd::BindProgram(nullptr);
 }
 
 }

@@ -10,6 +10,7 @@
 #include "OpenGLVertexBuffer.h"
 #include "OpenGLUniformBuffer.h"
 #include "OpenGLTexture.h"
+#include "OpenGLRenderTarget.h"
 
 #include <GLFW/glfw3.h>
 
@@ -140,14 +141,58 @@ void FOpenGLContext::SetCullFaceMode(ECullFaceMode InMode)
 	}
 }
 
-void FOpenGLContext::DrawVertices(const Ref<FRHIVertexArray>& InVertexArray, EDrawMode InDrawMode)
+void FOpenGLContext::Bind(const Ref<FRHIVertexBuffer>& InVertexBuffer)
+{
+	GLuint VertexBufferName = InVertexBuffer ? *(const GLuint*)InVertexBuffer->GetNativeHandle() : 0;
+	glBindBuffer(GL_ARRAY_BUFFER, VertexBufferName);
+}
+
+void FOpenGLContext::Bind(const Ref<FRHIIndexBuffer>& InIndexBuffer)
+{
+	GLuint IndexBufferName = InIndexBuffer ? *(const GLuint*)InIndexBuffer->GetNativeHandle() : 0;
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IndexBufferName);
+}
+
+void FOpenGLContext::Bind(const Ref<FRHIVertexArray>& InVertexArray)
+{
+	GLuint VertexArrayName = InVertexArray ? *(const GLuint*)InVertexArray->GetNativeHandle() : 0;
+	glBindVertexArray(VertexArrayName);
+}
+
+void FOpenGLContext::Bind(const Ref<FRHIShaderProgram>& InProgram)
+{
+	GLuint ProgramName = InProgram ? *(const GLuint*)InProgram->GetNativeHandle() : 0;
+	glUseProgram(ProgramName);
+}
+
+void FOpenGLContext::Bind(const Ref<FRHIUniformBuffer>& InUniformBuffer, uint32 InUnit)
+{
+	GLuint UniformBufferName = InUniformBuffer ? *(const GLuint*)InUniformBuffer->GetNativeHandle() : 0;
+	glBindBufferBase(GL_UNIFORM_BUFFER, InUnit, UniformBufferName);
+}
+
+void FOpenGLContext::Bind(const Ref<FRHITexture>& InTexture, uint32 InUnit)
+{
+	GLuint TextureName = InTexture ? *(const GLuint*)InTexture->GetNativeHandle() : 0;
+	GLuint SamplerName = InTexture ? *(const GLuint*)InTexture->GetSampler()->GetNativeHandle() : 0;
+	glBindTextureUnit(InUnit, TextureName);
+	glBindSampler(InUnit, SamplerName);
+}
+
+void FOpenGLContext::Bind(const Ref<FRHIRenderTarget>& InRenderTarget)
+{
+	GLuint RenderTargetName = InRenderTarget ? *(const GLuint*)InRenderTarget->GetNativeHandle() : 0;
+	glBindFramebuffer(GL_FRAMEBUFFER, RenderTargetName);
+}
+
+void FOpenGLContext::Draw(const Ref<FRHIVertexArray>& InVertexArray, EDrawMode InDrawMode)
 {
 	if(!InVertexArray)
 		return;
 	GLenum DrawMode = TranslateDrawMode(InDrawMode);
 	uint32 IndexCount = InVertexArray->GetIndexBuffer()->GetCount();
 	GLenum IndexType = TranslateIndexType(InVertexArray->GetIndexBuffer()->GetStride());
-	InVertexArray->Bind();
+	Bind(InVertexArray);
 	glDrawElements(DrawMode, IndexCount, IndexType, nullptr);
 }
 

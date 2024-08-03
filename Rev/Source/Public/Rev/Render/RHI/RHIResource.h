@@ -10,7 +10,7 @@ protected:
 	FRHIResource() = default;
 public:
 	virtual ~FRHIResource() = default;
-	virtual void* GetNativeHandle() = 0;
+	virtual const void* GetNativeHandle() const = 0;
 };
 
 }
