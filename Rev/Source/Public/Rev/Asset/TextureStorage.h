@@ -14,9 +14,8 @@ struct FImageStorage
 public:
 	FImageStorage() = default;
 	~FImageStorage() = default;
-
 	FImageStorage(const FImageStorage& Other) = delete;
-
+	FImageStorage(FImageStorage&& Other) noexcept;
 
 	uint8 NumMips();
 	uint16 NumLayers();
@@ -32,6 +31,11 @@ private:
 struct FTextureStorage
 {
 public:
+	FTextureStorage() = default;
+	~FTextureStorage() = default;
+	FTextureStorage(const FTextureStorage& Other) = delete;
+	FTextureStorage(FTextureStorage&& Other) noexcept;
+
 	std::string Name;
 	FSamplerDesc SamplerDesc;
 	FTextureDesc TextureDesc;

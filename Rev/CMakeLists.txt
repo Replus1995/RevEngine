@@ -9,7 +9,7 @@ SHARED
     ${REV_SRC_FILES}
 )
 
-set_target_properties(Rev PROPERTIES UNITY_BUILD OFF)
+set_target_properties(Rev PROPERTIES UNITY_BUILD TRUE)
 
 target_compile_definitions(Rev
 PUBLIC

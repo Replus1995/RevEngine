@@ -4,6 +4,14 @@
 namespace Rev
 {
 
+FImageStorage::FImageStorage(FImageStorage&& Other) noexcept
+	: mImages(std::move(Other).mImages)
+	, mNumMips(Other.mNumMips)
+	, mNumLayers(Other.mNumLayers)
+{
+}
+
+
 uint8 FImageStorage::NumMips()
 {
 	return mNumMips;
@@ -26,6 +34,14 @@ FBuffer& FImageStorage::At(uint8 MipIndex, uint16 LayerIndex)
 	RE_CORE_ASSERT(MipIndex < mNumMips && LayerIndex < mNumLayers);
 	uint32 Index = LayerIndex * mNumMips + MipIndex;
 	return mImages[Index];
+}
+
+FTextureStorage::FTextureStorage(FTextureStorage&& Other) noexcept
+	: Name(Other.Name)
+	, SamplerDesc(std::move(Other.SamplerDesc))
+	, TextureDesc(std::move(Other.TextureDesc))
+	, ImageData(std::move(Other.ImageData))
+{
 }
 
 Ref<Texture> FTextureStorage::CreateTexture(bool bForceSRGB)
