@@ -1,11 +1,11 @@
-#include "OpenGLVertexBuffer.h"
+#include "OpenGLBuffer.h"
 #include "Rev/Core/Assert.h"
 #include <glad/gl.h>
 
 namespace Rev
 {
-/*Vertex Buffer*/
 
+/*Vertex Buffer*/
 FOpenGLVertexBuffer::FOpenGLVertexBuffer(uint32 size)
 	: mSize(size)
 {
@@ -71,7 +71,6 @@ void FOpenGLIndexBuffer::UpdateSubData(const void* data, uint32 count, uint32 of
 }
 
 /*Vertex Array*/
-
 static GLenum ConvertToOpenGLDataType(EVertexElementType type)
 {
 	switch (type)
@@ -173,6 +172,23 @@ void FOpenGLVertexArray::SetIndexBuffer(const Ref<FRHIIndexBuffer>& InIndexBuffe
 	glBindVertexArray(mHandle);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *(const GLuint*)InIndexBuffer->GetNativeHandle());
 	mIndexBuffer = InIndexBuffer;
+}
+
+/*Uniform Buffer*/
+FOpenGLUniformBuffer::FOpenGLUniformBuffer(uint32 size)
+{
+	glCreateBuffers(1, &mHandle);
+	glNamedBufferData(mHandle, size, nullptr, GL_DYNAMIC_DRAW); // TODO: investigate usage hint
+}
+
+FOpenGLUniformBuffer::~FOpenGLUniformBuffer()
+{
+	glDeleteBuffers(1, &mHandle);
+}
+
+void FOpenGLUniformBuffer::UpdateSubData(const void* data, uint32 size, uint32 offset)
+{
+	glNamedBufferSubData(mHandle, offset, size, data);
 }
 
 }

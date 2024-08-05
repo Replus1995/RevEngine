@@ -7,8 +7,7 @@
 #include "Rev/Render/Material/SurfaceMaterial.h"
 
 #include "OpenGLShader.h"
-#include "OpenGLVertexBuffer.h"
-#include "OpenGLUniformBuffer.h"
+#include "OpenGLBuffer.h"
 #include "OpenGLTexture.h"
 #include "OpenGLRenderTarget.h"
 

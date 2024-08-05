@@ -3,8 +3,7 @@
 #include "Rev/Core/Assert.h"
 
 //OpenGL impl headers
-#include "OpenGL/OpenGLVertexBuffer.h"
-#include "OpenGL/OpenGLUniformBuffer.h"
+#include "OpenGL/OpenGLBuffer.h"
 #include "OpenGL/OpenGLSampler.h"
 #include "OpenGL/OpenGLTexture.h"
 #include "OpenGL/OpenGLRenderTarget.h"
