@@ -24,7 +24,9 @@ void FForwardPipeline::BeginPipeline(uint32 InWidth, uint32 InHeight, SceneRende
 		FRenderTargetDesc Desc = FRenderTargetDesc::Make2D(InWidth, InHeight, vColorDesc.data(), vColorDesc.size(), {PF_DepthStencil});
 		mLinearScreenTarget = FRHIResourceFactory::CreateRenderTarget(Desc);
 		mLinearScreenTarget->GetTargetTexture(RTA_ColorAttachment0)->Bind(UL::SLinearScreenTex);
+
 		mForwardSurfacePass.SetRenderTarget(mLinearScreenTarget);
+		mSkyBoxPass.SetRenderTarget(mLinearScreenTarget);
 	}
 	else
 	{

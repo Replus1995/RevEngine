@@ -135,7 +135,7 @@ FTextureStorage FAssetLibrary::ImportTextureCube(const FPath& InPathPX, const FP
 	Result.Name = "CubeTexture";
 	Result.TextureDesc = FTextureDesc::MakeCube(images[0].Width(), images[0].Height(), images[0].Format(), false);
 	Result.ImageData.Resize(1, 6);
-	uint32 ImageDataSize = images[0].Width() * images[0].Height() * images[0].Channels() * images[0].PixelDepth();
+	uint32 ImageDataSize = images[0].Width() * images[0].Height() * images[0].Channels() * images[0].PixelDepth() / 8;
 	for (uint16 i = 0; i < 6; i++)
 	{
 		FBuffer& ImageBuffer = Result.ImageData.At(0, i);

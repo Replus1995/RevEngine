@@ -103,12 +103,12 @@ ExampleLayer::ExampleLayer()
 	{
 		//CubeMap
 		auto CubeTexStorage = FAssetLibrary::ImportTextureCube(
-			"/Game/Assets/Textures/right.jpg", 
-			"/Game/Assets/Textures/left.jpg",
-			"/Game/Assets/Textures/top.jpg",
-			"/Game/Assets/Textures/botton.jpg",
-			"/Game/Assets/Textures/front.jpg",
-			"/Game/Assets/Textures/back.jpg");
+			"/Game/Assets/Textures/Skybox/right.jpg", 
+			"/Game/Assets/Textures/Skybox/left.jpg",
+			"/Game/Assets/Textures/Skybox/top.jpg",
+			"/Game/Assets/Textures/Skybox/bottom.jpg",
+			"/Game/Assets/Textures/Skybox/front.jpg",
+			"/Game/Assets/Textures/Skybox/back.jpg");
 		auto CubeTex = CubeTexStorage.CreateTexture();
 		if (CubeTex)
 		{ 

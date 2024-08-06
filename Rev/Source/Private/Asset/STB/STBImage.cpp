@@ -126,14 +126,14 @@ FSTBImage2D FSTBImage::ImportImage2D(const FPath& InPath)
 	{
 		if (uint16* data = stbi_load_16(NativePathC, &ImgWidth, &ImgHeight, &ImgChannels, 0); data)
 		{
-			return FSTBImage2D((uint8*)data, ImgWidth, ImgHeight, ImgChannels, b16Bit);
+			return FSTBImage2D((uint8*)data, ImgWidth, ImgHeight, ImgChannels, 16);
 		}
 	}
 	else
 	{
 		if (uint8* data = stbi_load(NativePathC, &ImgWidth, &ImgHeight, &ImgChannels, 0); data)
 		{
-			return FSTBImage2D(data, ImgWidth, ImgHeight, ImgChannels, b16Bit);
+			return FSTBImage2D(data, ImgWidth, ImgHeight, ImgChannels, 8);
 		}
 	}
 
