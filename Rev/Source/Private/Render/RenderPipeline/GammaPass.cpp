@@ -4,8 +4,6 @@
 #include "Rev/Render/RenderCmd.h"
 #include "Rev/Render/Material/Material.h"
 
-
-
 namespace Rev
 {
 
@@ -26,16 +24,11 @@ public:
 			{ "/Engine/Shaders/GammaCorrectFS" }
 		);
 	}
-	virtual void PreDraw() override
-	{
-		RenderCmd::SetCullFaceMode(CFM_Back);
-		Material::PreDraw();
-	}
 };
 
 
 FGammaCorrectPass::FGammaCorrectPass()
-	: FPostPass("GammaCorrectPass")
+	: FFullScreenPass("GammaCorrectPass")
 {
 }
 
@@ -45,7 +38,7 @@ FGammaCorrectPass::~FGammaCorrectPass()
 
 void FGammaCorrectPass::BeginPass()
 {
-	FPostPass::BeginPass();
+	FFullScreenPass::BeginPass();
 	if (!mMaterial)
 	{
 		mMaterial = CreateRef<GammaCorrectMaterial>();

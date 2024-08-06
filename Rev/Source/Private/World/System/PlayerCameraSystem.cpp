@@ -53,6 +53,7 @@ void PlayerCameraSystem::FillCameraUniform(FCameraUniform& OutUniform) const
 		OutUniform.ViewMatrix = Math::FMatrix4(1.0f);
 		OutUniform.Position = Math::FVector4(0, 0, 0, 1);
 	}
+	OutUniform.InvProjViewMatrix = (OutUniform.ProjMatrix * OutUniform.ViewMatrix).Inverse();
 }
 
 bool PlayerCameraSystem::SetPlayerCamera(Entity e)

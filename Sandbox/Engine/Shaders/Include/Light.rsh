@@ -1,8 +1,30 @@
-#include "/Engine/Shaders/Global.rsh"
+#include "/Engine/Shaders/Include/Global.rsh"
+
+#define UNIFORM_MAX_FORWARD_LIGHTS 32
+struct UnifiedLight
+{
+    uint Type;
+    int ShadowIndex;
+    float Intensity;
+    vec4 Pos;
+    vec4 Dir;
+    vec4 Color;
+    vec4 Params;
+};
+
+layout(std140, binding = UBO_BINDING_LIGHTS) uniform ForwardLightUniformBuffer
+{
+	uint LightCount;
+	UnifiedLight Lights[UNIFORM_MAX_FORWARD_LIGHTS];
+} ub_ForwardLight;
 
 #define LIGHT_KIND_DIRECTIONAL 1
 #define LIGHT_KIND_SPOT 2
 #define LIGHT_KIND_POINT 3
+
+//PBR const
+const vec3 kDielectric = vec3(0.04);
+const vec3 kAmbientFactor = vec3(0.3);
 
 //copies of UE4
 //NdH = dot(Normal, HalfDir)

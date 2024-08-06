@@ -15,7 +15,7 @@ public:
 	~StaticMeshRenderProxy();
 
 	void Prepare(const Ref<StaticMesh>& InMesh, const Math::FTransform& InTransform);
-	void DrawPrimitives(EMaterialDomain InDomain, EBlendMode InBlend, const Ref<FRHIShaderProgram>& InProgram = nullptr);
+	void DrawPrimitives(EBlendMode InBlend, const Ref<FRHIShaderProgram>& InProgram = nullptr) const;
 	const Math::FMatrix4& GetMatrix() const { return mModelMat; }
 private:
 	Ref<StaticMesh> mStaticMesh;

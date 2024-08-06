@@ -10,7 +10,7 @@ public:
 	Skybox();
 	virtual ~Skybox();
 
-	const Ref<Texture>& GetEnvironmentTexture();
+	const Ref<Texture>& GetEnvironmentTexture() const;
 	void SetEnvironmentTexture(const Ref<Texture>& InTexture);
 
 private:

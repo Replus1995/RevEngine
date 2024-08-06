@@ -2,6 +2,7 @@
 #include "Rev/Core/Base.h"
 #include "Rev/Render/RenderPipeline/RenderPipeline.h"
 #include "Rev/Render/RenderPipeline/SurfacePass.h"
+#include "Rev/Render/RenderPipeline/SkyboxPass.h"
 #include "Rev/Render/RenderPipeline/GammaPass.h"
 #include "Rev/Render/RHI/RHIRenderTarget.h"
 
@@ -21,6 +22,7 @@ public:
 protected:
 	Ref<FRHIRenderTarget> mLinearScreenTarget = nullptr;
 	FForwardSurfacePass mForwardSurfacePass;
+	FSkyboxPass mSkyBoxPass;
 	FGammaCorrectPass mGammaCorrectPass;
 };
 

@@ -1,6 +1,7 @@
 #include "Rev/Render/RenderPipeline/ForwardPipeline.h"
 #include "Rev/Render/RHI/RHIResourceFactory.h"
 #include "Rev/Render/UniformLayout.h"
+#include "Rev/Render/RenderCmd.h"
 
 namespace Rev
 {
@@ -36,6 +37,9 @@ void FForwardPipeline::RunPipeline()
 	FRenderPipeline::RunPipeline();
 
 	RunPass(&mForwardSurfacePass);
+
+	RenderCmd::SetCullFaceMode(CFM_Back);
+	RunPass(&mSkyBoxPass);
 	RunPass(&mGammaCorrectPass);
 
 }

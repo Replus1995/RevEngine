@@ -1,0 +1,20 @@
+#version 460 core
+#pragma shader_stage(fragment)
+#extension GL_ARB_separate_shader_objects : enable
+#extension GL_GOOGLE_include_directive : enable
+
+layout(location = 0, binding = 11) uniform samplerCube s_EnviornmentTex;
+
+layout(location = 0) in Vertex
+{
+    vec3 WorldPos;
+    vec2 TexCoord0;
+} IN;
+
+layout(location = 0) out vec4 o_Color;
+
+void main()
+{
+	o_Color.rgb = texture(s_EnviornmentTex, IN.WorldPos).rgb;
+    o_Color.a = 1.0;
+}

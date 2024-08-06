@@ -6,7 +6,7 @@ namespace Rev
 
 struct SkyComponent
 {
-	Skybox Sky;
+	Skybox Skybox;
 
 	SkyComponent() = default;
 	SkyComponent(const SkyComponent& Other) = default;

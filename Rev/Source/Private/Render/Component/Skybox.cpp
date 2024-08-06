@@ -14,7 +14,7 @@ Skybox::~Skybox()
 {
 }
 
-const Ref<Texture>& Skybox::GetEnvironmentTexture()
+const Ref<Texture>& Skybox::GetEnvironmentTexture() const
 {
 	return mEnvTex;
 }

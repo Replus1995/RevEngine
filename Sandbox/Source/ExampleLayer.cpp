@@ -9,6 +9,7 @@
 #include <Rev/Render/RHI/RHIShaderLibrary.h>
 #include <Rev/Core/FileSystem.h>
 #include <Rev/Asset/AssetLibrary.h>
+#include <Rev/Asset/TextureStorage.h>
 
 #include <filesystem>
 
@@ -96,6 +97,25 @@ ExampleLayer::ExampleLayer()
 		if (camSys)
 		{
 			camSys->SetPlayerCamera(camEntity);
+		}
+	}
+
+	{
+		//CubeMap
+		auto CubeTexStorage = FAssetLibrary::ImportTextureCube(
+			"/Game/Assets/Textures/right.jpg", 
+			"/Game/Assets/Textures/left.jpg",
+			"/Game/Assets/Textures/top.jpg",
+			"/Game/Assets/Textures/botton.jpg",
+			"/Game/Assets/Textures/front.jpg",
+			"/Game/Assets/Textures/back.jpg");
+		auto CubeTex = CubeTexStorage.CreateTexture();
+		if (CubeTex)
+		{ 
+			//Enviornment
+			auto  skyEntity = mScene->CreateEntity();
+			auto& skyComp = skyEntity.AddComponent<SkyComponent>();
+			skyComp.Skybox.SetEnvironmentTexture(CubeTex);
 		}
 	}
 }

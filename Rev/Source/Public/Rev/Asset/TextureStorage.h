@@ -41,7 +41,7 @@ public:
 	FTextureDesc TextureDesc;
 	FImageStorage ImageData;
 
-	Ref<Texture> CreateTexture(bool bForceSRGB = false);
+	REV_API Ref<Texture> CreateTexture(bool bForceSRGB = false);
 private:
 	Ref<Texture> mCache = nullptr;
 };

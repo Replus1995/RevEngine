@@ -16,7 +16,7 @@ layout(location = 0) out Vertex
 
 void main(void)
 {
-    gl_Position = vec4(a_Position * 2.0, 1.0);
+    gl_Position = vec4(a_Position.x * 2.0, a_Position.y * 2.0, 1.0, 1.0);
     OUT.WorldPos = (ub_Camera.InvProjViewMat * vec4(a_Position * 2.0, 1.0)).xyz;
     OUT.TexCoord0 =  a_TexCoord0;
 }

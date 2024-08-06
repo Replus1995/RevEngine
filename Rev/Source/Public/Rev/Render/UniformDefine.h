@@ -12,6 +12,7 @@ struct FCameraUniform
 {
 	Math::FMatrix4 ProjMatrix;
 	Math::FMatrix4 ViewMatrix;
+	Math::FMatrix4 InvProjViewMatrix;
 	Math::FVector4 Position;
 };
 

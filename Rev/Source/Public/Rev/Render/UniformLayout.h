@@ -35,11 +35,14 @@ constexpr IndexType SNormalTex				= LPbrStart + 2;
 constexpr IndexType SOcclusionTex			= LPbrStart + 3;
 constexpr IndexType SEmissiveTex			= LPbrStart + 4;
 
+constexpr IndexType SEnviornmentTex = 11;
+
 //Uniform Buffer Binding
 constexpr IndexType BCamera = 0;
-constexpr IndexType BModel = 1;
-constexpr IndexType BShadow = 2;
-constexpr IndexType BForwardLight = 3;
+constexpr IndexType BScene = 1;
+constexpr IndexType BModel = 2;
+constexpr IndexType BShadow = 3;
+constexpr IndexType BForwardLight = 4;
 
 
 }

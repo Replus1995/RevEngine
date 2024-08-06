@@ -11,12 +11,13 @@ public:
 	SkyRenderProxy();
 	~SkyRenderProxy();
 
-	void Prepare(const Skybox& InSkybox);
+	void Prepare(const Skybox* InSkybox);
+	void Cleanup();
 
-	const Skybox& GetSkybox() const { return mSkybox; }
+	const Skybox* GetSkybox() const { return mSkybox; }
 
 private:
-	Skybox mSkybox;
+	const Skybox* mSkybox;
 };
 
 }

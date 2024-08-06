@@ -1,4 +1,4 @@
-#include "Rev/Render/RenderPipeline/PostPass.h"
+#include "Rev/Render/RenderPipeline/FullScreenPass.h"
 #include "Rev/Render/RHI/RHIRenderTarget.h"
 #include "Rev/Render/RHI/RHIBuffer.h"
 #include "Rev/Render/RenderCmd.h"
@@ -12,33 +12,28 @@ namespace Rev
 
 static Ref<FRHIVertexArray> sPostPassVertexData = nullptr;
 
-FPostPass::FPostPass(std::string_view InName)
+FFullScreenPass::FFullScreenPass(std::string_view InName)
 	: FRenderPass(InName)
 {
 }
 
-FPostPass::~FPostPass()
+FFullScreenPass::~FFullScreenPass()
 {
 }
 
-void FPostPass::DrawQuad()
+void FFullScreenPass::DrawQuad()
 {
-	RenderCmd::Draw(GetVertexData(), DM_Triangles);
+	RenderCmd::Draw(sPostPassVertexData, DM_Triangles);
 }
 
-void FPostPass::CreateVertexData()
+void FFullScreenPass::CreatePrimitive()
 {
 	sPostPassVertexData = FPlaneGeometry::MakeVertexData();
 }
 
-void FPostPass::DestroyVertexData()
+void FFullScreenPass::DestroyPrimitive()
 {
 	sPostPassVertexData.reset();
-}
-
-const Ref<FRHIVertexArray>& FPostPass::GetVertexData()
-{
-	return sPostPassVertexData;
 }
 
 }

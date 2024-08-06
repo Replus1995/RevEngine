@@ -5,7 +5,6 @@
 namespace Rev
 {
 
-class SceneRenderProxy;
 class FForwardSurfacePass : public FRenderPass
 {
 public:

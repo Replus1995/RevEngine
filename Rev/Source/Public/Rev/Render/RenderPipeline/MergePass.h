@@ -1,11 +1,11 @@
 #pragma once
 #include "Rev/Core/Base.h"
-#include "Rev/Render/RenderPipeline/PostPass.h"
+#include "Rev/Render/RenderPipeline/FullScreenPass.h"
 
 namespace Rev
 {
 class FRHIShaderProgram;
-class FMergePass : public FPostPass
+class FMergePass : public FFullScreenPass
 {
 public:
 	FMergePass();

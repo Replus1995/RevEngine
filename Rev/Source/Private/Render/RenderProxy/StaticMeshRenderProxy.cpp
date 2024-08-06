@@ -24,13 +24,13 @@ void StaticMeshRenderProxy::Prepare(const Ref<StaticMesh>& InMesh, const Math::F
 	mModelMat = InTransform.ToMatrix();
 }
 
-void StaticMeshRenderProxy::DrawPrimitives(EMaterialDomain InDomain, EBlendMode InBlend, const Ref<FRHIShaderProgram>& InProgram)
+void StaticMeshRenderProxy::DrawPrimitives(EBlendMode InBlend, const Ref<FRHIShaderProgram>& InProgram) const
 {
 	bool bUseProgramOverride = InProgram != nullptr;
 	for (uint32 i = 0; i < mStaticMesh->GetMaterialCount(); i++)
 	{
 		auto& pMat = mStaticMesh->GetMaterial(i);
-		if (!pMat || pMat->GetDomain() != InDomain || pMat->BlendMode != InBlend)
+		if (!pMat || pMat->BlendMode != InBlend)
 			continue;
 
 		auto vPrimitives = mStaticMesh->GetPrimitive(i);

@@ -5,6 +5,7 @@
 #include "Rev/Render/Renderer.h"
 #include "Rev/Render/RHI/RHIResourceFactory.h"
 #include "Rev/Render/UniformLayout.h"
+#include "Rev/Render/Texture/Texture.h"
 
 
 namespace Rev
@@ -66,30 +67,50 @@ void SceneRenderProxy::Prepare(const Ref<Scene>& scene)
 			mLightProxies.emplace_back(std::move(proxy));
 		}
 		//TODO: Collect spot/point lights
+
+		uint32 LightCount = Math::Min<uint32>(mLightProxies.size(), UNIFORM_MAX_FORWARD_LIGHTS);
+		for (uint32 i = 0; i < LightCount; i++)
+		{
+			mForwardLightData.Lights[i] = mLightProxies[i].GetUnifiedLight();
+		}
+		mForwardLightData.LightCount = LightCount;
 	}
-}
-
-void SceneRenderProxy::DrawScene()
-{
-	mCameraUB->UpdateSubData(&mCameraData, sizeof(FCameraUniform));
-
-	uint32 LightCount = Math::Min<uint32>(mLightProxies.size(), UNIFORM_MAX_FORWARD_LIGHTS);
-	for (uint32 i = 0; i < LightCount; i++)
 	{
-		mForwardLightData.Lights[i] = mLightProxies[i].GetUnifiedLight();
-	}
-	mForwardLightData.LightCount = LightCount;
-	mForwardLightUB->UpdateSubData(&mForwardLightData, sizeof(FForwardLightUniform));
+		//Sky
+		auto SkyGroup = scene->mRegistry.group<SkyComponent>();
+		if (!SkyGroup.empty())
+		{
+			auto Entity = SkyGroup[0];
+			auto SkyComp = SkyGroup.get<SkyComponent>(Entity);
+			mSkyProxy.Prepare(&SkyComp.Skybox);
+		}
 
-	DrawMeshes(EMaterialDomain::MD_Surface, BM_Opaque);
+		if (mSkyProxy.GetSkybox())
+		{
+			mSkyProxy.GetSkybox()->GetEnvironmentTexture()->GetResource()->Bind(UL::SEnviornmentTex);
+		}
+	}
 }
 
-void SceneRenderProxy::DrawMeshes(EMaterialDomain InDomain, EBlendMode InBlend)
+void SceneRenderProxy::Cleanup()
 {
-	for (StaticMeshRenderProxy& proxy : mStaticMeshProxies)
+	mSkyProxy.Cleanup();
+}
+
+void SceneRenderProxy::DrawScene() const
+{
+	//Update uniform buffer
+	mCameraUB->UpdateSubData(&mCameraData, sizeof(FCameraUniform));
+	mForwardLightUB->UpdateSubData(&mForwardLightData, sizeof(FForwardLightUniform));
+	DrawMeshes(BM_Opaque);
+}
+
+void SceneRenderProxy::DrawMeshes(EBlendMode InBlend) const
+{
+	for (const StaticMeshRenderProxy& proxy : mStaticMeshProxies)
 	{
 		mModelUB->UpdateSubData(&proxy.GetMatrix(), sizeof(FModelUniform));
-		proxy.DrawPrimitives(InDomain, InBlend);
+		proxy.DrawPrimitives(InBlend);
 	}
 }
 
