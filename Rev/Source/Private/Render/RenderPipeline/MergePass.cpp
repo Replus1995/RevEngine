@@ -6,7 +6,7 @@ namespace Rev
 {
 
 FMergePass::FMergePass()
-	: FFullScreenPass("MergePass")
+	: FRenderPass("MergePass")
 {
 }
 
@@ -20,13 +20,13 @@ void FMergePass::BeginPass()
 	{
 		mMergeProgram = FRHIShaderLibrary::GetInstance().CreateGraphicsProgram("FMergeProgram", "/Engine/Shaders/PostVS", "/Engine/Shaders/PBR/MergePS");
 	}
-	FFullScreenPass::BeginPass();
+	FRenderPass::BeginPass();
 	RenderCmd::BindProgram(mMergeProgram);
 }
 
 void FMergePass::EndPass()
 {
-	FFullScreenPass::EndPass();
+	FRenderPass::EndPass();
 }
 
 }

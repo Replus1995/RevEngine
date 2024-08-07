@@ -13,11 +13,16 @@ layout(std140, binding = UBO_BINDING_CAMERA) uniform CameraUniformBuffer
 
 layout(std140, binding = UBO_BINDING_SCENE) uniform SceneUniformBuffer
 {
-    float ViewWidth;
-    float ViewHeight;
+    float ScreenWidth;
+    float ScreenHeight;
 } ub_Scene;
 
 layout(std140, binding = UBO_BINDING_MODEL) uniform ModelUniformBuffer
 {
     mat4 ModelMat;
 } ub_Model;
+
+vec2 GetScreenCoord(in vec4 InFragCoord)
+{
+    return vec2(InFragCoord.x / ub_Scene.ScreenWidth, InFragCoord.y / ub_Scene.ScreenHeight);
+}

@@ -6,17 +6,14 @@
 #include "/Engine/Shaders/Include/Global.rsh"
 
 layout(location = 0) in vec3 a_Position;
-layout(location = 1) in vec2 a_TexCoord0;
 
 layout(location = 0) out Vertex
 {
     vec3 WorldPos;
-    vec2 TexCoord0;
 } OUT;
 
 void main(void)
 {
-    gl_Position = vec4(a_Position * 2.0, 1.0);
-    OUT.WorldPos = (ub_Camera.InvProjViewMat * vec4(a_Position * 2.0, 1.0)).xyz;
-    OUT.TexCoord0 =  a_TexCoord0;
+    gl_Position = vec4(a_Position, 1.0);
+    OUT.WorldPos = (ub_Camera.InvProjViewMat * vec4(a_Position, 1.0)).xyz;
 }

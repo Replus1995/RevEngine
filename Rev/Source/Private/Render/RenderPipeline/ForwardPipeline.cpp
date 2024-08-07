@@ -23,10 +23,10 @@ void FForwardPipeline::BeginPipeline(uint32 InWidth, uint32 InHeight, SceneRende
 		vColorDesc.push_back({ PF_R8G8B8A8, Math::FLinearColor(0, 0, 0, 1) });
 		FRenderTargetDesc Desc = FRenderTargetDesc::Make2D(InWidth, InHeight, vColorDesc.data(), vColorDesc.size(), {PF_DepthStencil});
 		mLinearScreenTarget = FRHIResourceFactory::CreateRenderTarget(Desc);
-		mLinearScreenTarget->GetTargetTexture(RTA_ColorAttachment0)->Bind(UL::SLinearScreenTex);
+
 
 		mForwardSurfacePass.SetRenderTarget(mLinearScreenTarget);
-		mSkyBoxPass.SetRenderTarget(mLinearScreenTarget);
+		RenderCmd::BindTexture(mLinearScreenTarget->GetTargetTexture(RTA_ColorAttachment0), UL::SLinearScreenTex);
 	}
 	else
 	{
@@ -41,7 +41,6 @@ void FForwardPipeline::RunPipeline()
 	RunPass(&mForwardSurfacePass);
 
 	RenderCmd::SetCullFaceMode(CFM_Back);
-	RunPass(&mSkyBoxPass);
 	RunPass(&mGammaCorrectPass);
 
 }

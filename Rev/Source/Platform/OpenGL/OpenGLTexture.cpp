@@ -16,12 +16,6 @@ const FRHISampler* FOpenGLTexture::GetSampler() const
 	return mSampler.get();
 }
 
-void FOpenGLTexture::Bind(uint32 InUnit) const
-{
-	glBindTextureUnit(InUnit, mHandle);
-	glBindSampler(InUnit, *(const GLuint*)mSampler->GetNativeHandle());
-}
-
 void FOpenGLTexture::ClearMipData(uint8 InMipLevel)
 {
 	RE_CORE_ASSERT(InMipLevel < mDesc.NumMips, "MipLevel out of range");

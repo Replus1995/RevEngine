@@ -14,7 +14,6 @@ public:
 	virtual ~FOpenGLTexture() = default;
 	virtual const void* GetNativeHandle() const override { return &mHandle; }
 	virtual const FRHISampler* GetSampler() const override;
-	virtual void Bind(uint32 InUnit) const override;
 	virtual void ClearMipData(uint8 InMipLevel) override;
 
 	const FOpenGLFormatData& GetOpenGLFormatData() const{ return mFormatData; }

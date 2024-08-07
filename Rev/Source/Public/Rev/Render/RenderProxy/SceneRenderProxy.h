@@ -27,15 +27,15 @@ public:
 	const std::vector<LightRenderProxy>& GetLightProxies() const { return mLightProxies; }
 	const SkyRenderProxy& GetSkyProxy() const { return mSkyProxy; }
 
-protected:
-	void DrawMeshes(EBlendMode InBlend) const;
+	void SyncResource() const;
+	void DrawStaticMeshes(EBlendMode InBlend) const;
+	void DrawSkybox() const;
 
 protected:
-	FCameraUniform mCameraData;
-	Ref<FRHIUniformBuffer> mCameraUB;
-	Ref<FRHIUniformBuffer> mModelUB;
-	FForwardLightUniform mForwardLightData;
-	Ref<FRHIUniformBuffer> mForwardLightUB;
+	TUniform<FCameraUniform, UL::BCamera> uCamera;
+	TUniform<FSceneUniform, UL::BScene> uScene;
+	TUniform<FModelUniform, UL::BModel> uModel;
+	TUniform<FForwardLightUniform, UL::BForwardLight> uForwardLight;
 
 	std::vector<StaticMeshRenderProxy> mStaticMeshProxies;
 	std::vector<LightRenderProxy> mLightProxies;

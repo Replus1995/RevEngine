@@ -1,6 +1,5 @@
 #include "Rev/Render/RenderPipeline/RenderPipeline.h"
 #include "Rev/Render/RenderPipeline/RenderPass.h"
-#include "Rev/Render/RenderPipeline/FullScreenPass.h"
 #include "Rev/Core/Assert.h"
 
 namespace Rev
@@ -42,16 +41,6 @@ void FRenderPipeline::EndPipeline()
 const FRenderPipeline* FRenderPipeline::GetCurrentPipeline()
 {
 	return sCurrentPipeline;
-}
-
-void FRenderPipeline::Init()
-{
-	FFullScreenPass::CreatePrimitive();
-}
-
-void FRenderPipeline::Shutdown()
-{
-	FFullScreenPass::DestroyPrimitive();
 }
 
 void FRenderPipeline::RunPass(FRenderPass* Pass)

@@ -4,20 +4,21 @@
 
 namespace Rev
 {
-
+class Material;
 class SkyRenderProxy
 {
 public:
 	SkyRenderProxy();
 	~SkyRenderProxy();
 
-	void Prepare(const Skybox* InSkybox);
+	void Prepare(const Skybox& InSkybox);
 	void Cleanup();
-
-	const Skybox* GetSkybox() const { return mSkybox; }
+	void SyncResource() const;
+	void DrawSkybox() const;
 
 private:
-	const Skybox* mSkybox;
+	Skybox mSkybox;
+	Ref<Material> mSkyboxMat;
 };
 
 }

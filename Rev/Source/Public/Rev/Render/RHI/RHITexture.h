@@ -135,7 +135,6 @@ public:
 	EPixelFormat GetFormat() const { return mDesc.Format; }
 
 	virtual const FRHISampler* GetSampler() const = 0;
-	virtual void Bind(uint32 InUnit) const = 0;
 
 	//Depth < 0 means updaing all 2d mips in this layer
 	//Depth = FaceIndex for CubeMap

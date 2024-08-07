@@ -19,8 +19,6 @@ public:
 	SceneRenderProxy* GetSceneProxy() const { return mSceneProxy; }
 
 	static const FRenderPipeline* GetCurrentPipeline();
-	static void Init();
-	static void Shutdown();
 protected:
 	void RunPass(FRenderPass* Pass);
 

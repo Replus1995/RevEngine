@@ -55,7 +55,7 @@ public:
             Ref<FRHIIndexBuffer> boxIndices = FRHIResourceFactory::CreateIndexBuffer(sBoxIndices, sizeof(uint32), boxIndicesCount);
 
             FMeshPrimitive boxMeshPrim;
-            boxMeshPrim.VertexData = FRHIResourceFactory::CreateVertexData();
+            boxMeshPrim.VertexData = FRHIResourceFactory::CreateVertexArray();
             boxMeshPrim.VertexData->AddVertexBuffer(boxVertices);
             boxMeshPrim.VertexData->SetIndexBuffer(boxIndices);
 

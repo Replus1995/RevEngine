@@ -45,7 +45,7 @@ FMeshPrimitive FMeshPrimitiveStorage::CreateVertexData()
 	if (ColorData.Empty())
 		FillColorData(Math::FLinearColor(1));
 
-	Ref<FRHIVertexArray> VertexArr = FRHIResourceFactory::CreateVertexData();
+	Ref<FRHIVertexArray> VertexArr = FRHIResourceFactory::CreateVertexArray();
 	//Position
 	{
 		Ref<FRHIVertexBuffer> PositionBuffer = FRHIResourceFactory::CreateVertexBuffer(PositonData.DataAs<float>(), PositonData.Size());

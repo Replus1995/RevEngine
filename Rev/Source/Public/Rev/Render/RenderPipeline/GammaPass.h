@@ -1,11 +1,11 @@
 #pragma once
 #include "Rev/Core/Base.h"
-#include "Rev/Render/RenderPipeline/FullScreenPass.h"
+#include "Rev/Render/RenderPipeline/RenderPass.h"
 
 namespace Rev
 {
 class Material;
-class FGammaCorrectPass : public FFullScreenPass
+class FGammaCorrectPass : public FRenderPass
 {
 public:
 	FGammaCorrectPass();

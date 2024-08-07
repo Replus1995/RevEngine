@@ -78,7 +78,7 @@ Ref<FRHIIndexBuffer> FRHIResourceFactory::CreateIndexBuffer(const void* InIndice
 	return nullptr;
 }
 
-Ref<FRHIVertexArray> FRHIResourceFactory::CreateVertexData()
+Ref<FRHIVertexArray> FRHIResourceFactory::CreateVertexArray()
 {
 	switch (GetRenderAPI())
 	{

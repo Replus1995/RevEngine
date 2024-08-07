@@ -7,25 +7,25 @@
 #include "Rev/Render/UniformLayout.h"
 #include "Rev/Render/Texture/Texture.h"
 
+#include "Rev/Core/Application.h"
+#include "Rev/Core/Window.h"
 
 namespace Rev
 {
 void SceneRenderProxy::Init()
 {
-	mCameraUB = FRHIResourceFactory::CreateUniformBuffer(sizeof(FCameraUniform));
-	mModelUB = FRHIResourceFactory::CreateUniformBuffer(sizeof(FModelUniform));
-	mForwardLightUB = FRHIResourceFactory::CreateUniformBuffer(sizeof(FForwardLightUniform));
-
-	RenderCmd::BindUniformBuffer(mCameraUB, UL::BCamera);
-	RenderCmd::BindUniformBuffer(mModelUB, UL::BModel);
-	RenderCmd::BindUniformBuffer(mForwardLightUB, UL::BForwardLight);
+	uCamera.Create();
+	uScene.Create();
+	uModel.Create();
+	uForwardLight.Create();
 }
 
 void SceneRenderProxy::Release()
 {
-	mForwardLightUB.reset();
-	mModelUB.reset();
-	mCameraUB.reset();
+	uForwardLight.Destory();
+	uModel.Destory();
+	uScene.Destory();
+	uCamera.Destory();
 }
 
 void SceneRenderProxy::Prepare(const Ref<Scene>& scene)
@@ -33,12 +33,18 @@ void SceneRenderProxy::Prepare(const Ref<Scene>& scene)
 	if(!scene) return;
 
 	{
-		//Update Scene Uniform
+		//Update Camera Uniform
 		PlayerCameraSystem* pSystem = scene->GetSystem<PlayerCameraSystem>();
 		if (pSystem)
 		{
-			pSystem->FillCameraUniform(mCameraData);
+			pSystem->FillCameraUniform(uCamera.Data);
 		}
+	}
+	{
+		//Update Scene Uniform;
+		auto pWindow = Application::GetApp().GetWindow();
+		uScene.Data.ScreenWidth = pWindow->GetWidth();
+		uScene.Data.ScreenHeight = pWindow->GetHeight();
 	}
 	{
 		//Collect static meshes
@@ -71,9 +77,9 @@ void SceneRenderProxy::Prepare(const Ref<Scene>& scene)
 		uint32 LightCount = Math::Min<uint32>(mLightProxies.size(), UNIFORM_MAX_FORWARD_LIGHTS);
 		for (uint32 i = 0; i < LightCount; i++)
 		{
-			mForwardLightData.Lights[i] = mLightProxies[i].GetUnifiedLight();
+			uForwardLight.Data.Lights[i] = mLightProxies[i].GetUnifiedLight();
 		}
-		mForwardLightData.LightCount = LightCount;
+		uForwardLight.Data.LightCount = LightCount;
 	}
 	{
 		//Sky
@@ -82,13 +88,9 @@ void SceneRenderProxy::Prepare(const Ref<Scene>& scene)
 		{
 			auto Entity = SkyGroup[0];
 			auto SkyComp = SkyGroup.get<SkyComponent>(Entity);
-			mSkyProxy.Prepare(&SkyComp.Skybox);
+			mSkyProxy.Prepare(SkyComp.Skybox);
 		}
 
-		if (mSkyProxy.GetSkybox())
-		{
-			mSkyProxy.GetSkybox()->GetEnvironmentTexture()->GetResource()->Bind(UL::SEnviornmentTex);
-		}
 	}
 }
 
@@ -99,19 +101,33 @@ void SceneRenderProxy::Cleanup()
 
 void SceneRenderProxy::DrawScene() const
 {
-	//Update uniform buffer
-	mCameraUB->UpdateSubData(&mCameraData, sizeof(FCameraUniform));
-	mForwardLightUB->UpdateSubData(&mForwardLightData, sizeof(FForwardLightUniform));
-	DrawMeshes(BM_Opaque);
+	SyncResource();
+	DrawStaticMeshes(BM_Opaque);
+	DrawSkybox();
 }
 
-void SceneRenderProxy::DrawMeshes(EBlendMode InBlend) const
+void SceneRenderProxy::SyncResource() const
+{
+	//Should run on render thread
+	//Update uniform buffer
+	uCamera.Upload();
+	uScene.Upload();
+	uForwardLight.Upload();
+	mSkyProxy.SyncResource();
+}
+
+void SceneRenderProxy::DrawStaticMeshes(EBlendMode InBlend) const
 {
 	for (const StaticMeshRenderProxy& proxy : mStaticMeshProxies)
 	{
-		mModelUB->UpdateSubData(&proxy.GetMatrix(), sizeof(FModelUniform));
+		uModel.Upload(&proxy.GetMatrix(), sizeof(Math::FMatrix4));
 		proxy.DrawPrimitives(InBlend);
 	}
+}
+
+void SceneRenderProxy::DrawSkybox() const
+{
+	mSkyProxy.DrawSkybox();
 }
 
 }

@@ -2,6 +2,7 @@
 #include "Rev/Render/RHI/RHIResourceFactory.h"
 #include "Rev/Render/RHI/RHIShaderLibrary.h"
 #include "Rev/Render/RenderCmd.h"
+#include "Rev/Render/Renderer.h"
 #include "Rev/Render/Material/Material.h"
 
 namespace Rev
@@ -28,7 +29,7 @@ public:
 
 
 FGammaCorrectPass::FGammaCorrectPass()
-	: FFullScreenPass("GammaCorrectPass")
+	: FRenderPass("GammaCorrectPass")
 {
 }
 
@@ -38,7 +39,7 @@ FGammaCorrectPass::~FGammaCorrectPass()
 
 void FGammaCorrectPass::BeginPass()
 {
-	FFullScreenPass::BeginPass();
+	FRenderPass::BeginPass();
 	if (!mMaterial)
 	{
 		mMaterial = CreateRef<GammaCorrectMaterial>();
@@ -50,7 +51,7 @@ void FGammaCorrectPass::RunPass()
 {
 	ClearRenderTarget();
 	mMaterial->PreDraw();
-	DrawQuad();
+	Renderer::DrawScreenQuad();
 	mMaterial->PostDraw();
 }
 

@@ -2,7 +2,9 @@
 #include "Rev/Render/RHI/RHIShaderLibrary.h"
 #include "Rev/Render/RHI/RHITexture.h"
 #include "Rev/Render/UniformLayout.h"
+#include "Rev/Render/RenderCmd.h"
 #include "Rev/Asset/AssetLibrary.h"
+
 
 
 namespace Rev
@@ -56,15 +58,15 @@ void PBRMaterial::PreDraw()
 	//FAssetLibrary::GetDefaultNormalTexture()->GetResource()->Bind(1);
 	
 	if (BaseColorTexture)
-		BaseColorTexture->GetResource()->Bind(UL::SBaseColorTex);
+		RenderCmd::BindTexture(BaseColorTexture->GetResource(), UL::SBaseColorTex);
 	if (MetallicRoughnessTexture)
-		MetallicRoughnessTexture->GetResource()->Bind(UL::SMetallicRoughnessTex);
+		RenderCmd::BindTexture(MetallicRoughnessTexture->GetResource(), UL::SMetallicRoughnessTex);
 	if (NormalTexture)
-		NormalTexture->GetResource()->Bind(UL::SNormalTex);
+		RenderCmd::BindTexture(NormalTexture->GetResource(), UL::SNormalTex);
 	if (OcclusionTexture)
-		OcclusionTexture->GetResource()->Bind(UL::SOcclusionTex);
+		RenderCmd::BindTexture(OcclusionTexture->GetResource(), UL::SOcclusionTex);
 	if (EmissiveTexture)
-		EmissiveTexture->GetResource()->Bind(UL::SEmissiveTex);
+		RenderCmd::BindTexture(EmissiveTexture->GetResource(), UL::SEmissiveTex);
 }
 
 }

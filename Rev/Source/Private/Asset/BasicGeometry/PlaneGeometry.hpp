@@ -51,7 +51,7 @@ public:
         constexpr uint32 planeIndicesCount = sizeof(sPlaneIndices) / sizeof(uint32);
         Ref<FRHIIndexBuffer> planeIndices = FRHIResourceFactory::CreateIndexBuffer(sPlaneIndices, sizeof(uint32), planeIndicesCount);
 
-        Ref<FRHIVertexArray> Result = FRHIResourceFactory::CreateVertexData();
+        Ref<FRHIVertexArray> Result = FRHIResourceFactory::CreateVertexArray();
         Result->AddVertexBuffer(planeVertices);
         Result->SetIndexBuffer(planeIndices);
         return Result;
