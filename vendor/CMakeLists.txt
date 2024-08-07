@@ -26,3 +26,8 @@ set(PHYSFS_BUILD_DOCS OFF CACHE BOOL "Disable physfs build docs")
 add_subdirectory(physfs ${CMAKE_CURRENT_BINARY_DIR}/physfs)
 group_target(physfs-static "vendor")
 #========Compile From Source========#
+
+#========PreCompiled========#
+include(GLFW/glfw3.cmake)
+include(OpenMesh/OpenMesh.cmake)
+#========PreCompiled========#

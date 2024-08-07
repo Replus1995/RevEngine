@@ -37,13 +37,11 @@ PRIVATE
     ${VENDOR_ROOT}/jsonhpp
     ${VENDOR_ROOT}/stb
     ${VENDOR_ROOT}/tinygltf
-    ${VENDOR_ROOT}/GLFW/include
 )
 
 target_link_directories(Rev
 PUBLIC
 PRIVATE
-    ${VENDOR_ROOT}/GLFW/lib
     $ENV{VULKAN_SDK}/Lib
 )
 
