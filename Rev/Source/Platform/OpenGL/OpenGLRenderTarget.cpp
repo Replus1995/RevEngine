@@ -74,42 +74,72 @@ void FOpenGLRenderTarget::ClearTarget(ERenderTargetAttachment Index)
 			case GL_BYTE:
 			{
 				const float ColorSacle = 128.0f;
-				GLint IntClearColor[4] = { LinearClearColor.R * ColorSacle, LinearClearColor.G * ColorSacle, LinearClearColor.B * ColorSacle, LinearClearColor.A * ColorSacle };
+				GLint IntClearColor[4] = { 
+					GLint(LinearClearColor.R * ColorSacle), 
+					GLint(LinearClearColor.G * ColorSacle), 
+					GLint(LinearClearColor.B * ColorSacle), 
+					GLint(LinearClearColor.A * ColorSacle)
+				};
 				glClearNamedFramebufferiv(mHandle, GL_COLOR, Index, IntClearColor);
 				break;
 			}
 			case GL_UNSIGNED_BYTE:
 			{
 				const float ColorSacle = 255.0f;
-				GLuint IntClearColor[4] = { LinearClearColor.R * ColorSacle, LinearClearColor.G * ColorSacle, LinearClearColor.B * ColorSacle, LinearClearColor.A * ColorSacle };
+				GLuint IntClearColor[4] = { 
+					GLuint(LinearClearColor.R * ColorSacle), 
+					GLuint(LinearClearColor.G * ColorSacle), 
+					GLuint(LinearClearColor.B * ColorSacle), 
+					GLuint(LinearClearColor.A * ColorSacle)
+				};
 				glClearNamedFramebufferuiv(mHandle, GL_COLOR, Index, IntClearColor);
 				break;
 			}
 			case GL_SHORT:
 			{
 				const float ColorSacle = 32767.0f;
-				GLint IntClearColor[4] = { LinearClearColor.R * ColorSacle, LinearClearColor.G * ColorSacle, LinearClearColor.B * ColorSacle, LinearClearColor.A * ColorSacle };
+				GLint IntClearColor[4] = {
+					GLint(LinearClearColor.R * ColorSacle),
+					GLint(LinearClearColor.G * ColorSacle),
+					GLint(LinearClearColor.B * ColorSacle),
+					GLint(LinearClearColor.A * ColorSacle)
+				};
 				glClearNamedFramebufferiv(mHandle, GL_COLOR, Index, IntClearColor);
 				break;
 			}
 			case GL_UNSIGNED_SHORT:
 			{
 				const float ColorSacle = 65535.0f;
-				GLuint IntClearColor[4] = { LinearClearColor.R * ColorSacle, LinearClearColor.G * ColorSacle, LinearClearColor.B * ColorSacle, LinearClearColor.A * ColorSacle };
+				GLuint IntClearColor[4] = {
+					GLuint(LinearClearColor.R * ColorSacle),
+					GLuint(LinearClearColor.G * ColorSacle),
+					GLuint(LinearClearColor.B * ColorSacle),
+					GLuint(LinearClearColor.A * ColorSacle)
+				};
 				glClearNamedFramebufferuiv(mHandle, GL_COLOR, Index, IntClearColor);
 				break;
 			}
 			case GL_INT:
 			{
 				const double ColorSacle = 2147483647.0f;
-				GLint IntClearColor[4] = { (double)LinearClearColor.R * ColorSacle, (double)LinearClearColor.G * ColorSacle, (double)LinearClearColor.B * ColorSacle, (double)LinearClearColor.A * ColorSacle };
+				GLint IntClearColor[4] = {
+					GLint(LinearClearColor.R * ColorSacle),
+					GLint(LinearClearColor.G * ColorSacle),
+					GLint(LinearClearColor.B * ColorSacle),
+					GLint(LinearClearColor.A * ColorSacle)
+				};
 				glClearNamedFramebufferiv(mHandle, GL_COLOR, Index, IntClearColor);
 				break;
 			}
 			case GL_UNSIGNED_INT:
 			{
 				const double ColorSacle = 4294967295.0f;
-				GLuint IntClearColor[4] = { (double)LinearClearColor.R * ColorSacle, (double)LinearClearColor.G * ColorSacle, (double)LinearClearColor.B * ColorSacle, (double)LinearClearColor.A * ColorSacle };
+				GLuint IntClearColor[4] = {
+					GLuint(LinearClearColor.R * ColorSacle),
+					GLuint(LinearClearColor.G * ColorSacle),
+					GLuint(LinearClearColor.B * ColorSacle),
+					GLuint(LinearClearColor.A * ColorSacle)
+				};
 				glClearNamedFramebufferuiv(mHandle, GL_COLOR, Index, IntClearColor);
 				break;
 			}
