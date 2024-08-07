@@ -10,13 +10,18 @@ layout(location = 1) in vec2 a_TexCoord0;
 
 layout(location = 0) out Vertex
 {
-    vec3 WorldPos;
     vec2 TexCoord0;
+    vec3 ViewDir;
 } OUT;
 
 void main(void)
 {
-    gl_Position = vec4(a_Position.x * 2.0, a_Position.y * 2.0, 1.0, 1.0);
-    OUT.WorldPos = (ub_Camera.InvProjViewMat * vec4(a_Position * 2.0, 1.0)).xyz;
     OUT.TexCoord0 =  a_TexCoord0;
+    vec3 Pos = a_Position * 2.0;
+    mat4 InvProjMat = inverse(ub_Camera.ProjMat);
+    Pos.xy *= vec2(InvProjMat[0][0], InvProjMat[1][1]);
+    Pos.z = -1.0f;
+
+    OUT.ViewDir = transpose(mat3(ub_Camera.ViewMat)) * normalize(Pos);
+    gl_Position = vec4(a_Position.xy * 2.0, 1.0, 1.0);
 }

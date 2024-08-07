@@ -31,12 +31,14 @@ public:
 	virtual void PreDraw() override
 	{
 		RenderCmd::EnableDepthWrite(false);
+		RenderCmd::SetDepthTestMode(DTM_LessEqual);
 		Material::PreDraw();
 	}
 
 	virtual void PostDraw() override
 	{
 		Material::PostDraw();
+		RenderCmd::SetDepthTestMode(DTM_Less);
 		RenderCmd::EnableDepthWrite(true);
 	}
 };

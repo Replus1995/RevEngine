@@ -96,6 +96,42 @@ void FOpenGLContext::EnableDepthWrite(bool bEnable)
 	glDepthMask(bEnable ? GL_TRUE : GL_FALSE);
 }
 
+void FOpenGLContext::SetDepthTestMode(EDepthTestMode InMode)
+{
+	GLenum DepthFunc = GL_LESS;
+	switch (InMode)
+	{
+	case Rev::DTM_Never:
+		DepthFunc = GL_NEVER;
+		break;
+	/*case Rev::DTM_Less:
+		DepthFunc = GL_LESS;
+		break;*/
+	case Rev::DTM_Equal:
+		DepthFunc = GL_EQUAL;
+		break;
+	case Rev::DTM_Greater:
+		DepthFunc = GL_GREATER;
+		break;
+	case Rev::DTM_NotEqual:
+		DepthFunc = GL_NOTEQUAL;
+		break;
+	case Rev::DTM_LessEqual:
+		DepthFunc = GL_LEQUAL;
+		break;
+	case Rev::DTM_GreaterEqual:
+		DepthFunc = GL_GEQUAL;
+		break;
+	case Rev::DTM_Always:
+		DepthFunc = GL_ALWAYS;
+		break;
+	default:
+		break;
+	}
+
+	glDepthFunc(DepthFunc);
+}
+
 void FOpenGLContext::SetBlendMode(EBlendMode InMode)
 {
 	switch (InMode)

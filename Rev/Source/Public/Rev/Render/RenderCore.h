@@ -47,6 +47,18 @@ enum ECullFaceMode : uint8
 	CFM_BackAndFront
 };
 
+enum EDepthTestMode : uint8
+{
+	DTM_Never = 0,
+	DTM_Less,
+	DTM_Equal,
+	DTM_Greater,
+	DTM_NotEqual,
+	DTM_LessEqual,
+	DTM_GreaterEqual,
+	DTM_Always
+};
+
 }
 
 #define REV_MAX_DIRECTIONAL_LIGHTS 4

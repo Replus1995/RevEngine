@@ -17,6 +17,7 @@ public:
 
 	virtual void EnableDepthTest(bool bEnable) override;
 	virtual void EnableDepthWrite(bool bEnable) override;
+	virtual void SetDepthTestMode(EDepthTestMode InMode) override;
 	virtual void SetBlendMode(EBlendMode InMode) override;
 	virtual void SetCullFaceMode(ECullFaceMode InMode) override;
 

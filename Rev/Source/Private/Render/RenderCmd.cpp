@@ -53,6 +53,11 @@ void RenderCmd::EnableDepthWrite(bool bEnable)
 	sContext->EnableDepthWrite(bEnable);
 }
 
+void RenderCmd::SetDepthTestMode(EDepthTestMode InMode)
+{
+	sContext->SetDepthTestMode(InMode);
+}
+
 void RenderCmd::SetBlendMode(EBlendMode InMode)
 {
 	sContext->SetBlendMode(InMode);

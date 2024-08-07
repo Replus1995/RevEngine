@@ -28,6 +28,7 @@ public:
 
 	virtual void EnableDepthTest(bool bEnable) = 0;
 	virtual void EnableDepthWrite(bool bEnable) = 0;
+	virtual void SetDepthTestMode(EDepthTestMode InMode) = 0;
 	virtual void SetBlendMode(EBlendMode InMode) = 0;
 	virtual void SetCullFaceMode(ECullFaceMode InMode) = 0;
 

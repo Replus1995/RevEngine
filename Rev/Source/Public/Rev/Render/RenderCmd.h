@@ -24,6 +24,7 @@ public:
 
 	static void EnableDepthTest(bool bEnable);
 	static void EnableDepthWrite(bool bEnable);
+	static void SetDepthTestMode(EDepthTestMode InMode);
 	static void SetBlendMode(EBlendMode InMode);
 	static void SetCullFaceMode(ECullFaceMode InMode);
 
