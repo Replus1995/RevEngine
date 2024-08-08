@@ -85,13 +85,9 @@ struct FForwardLightUniform
 	alignas(16) FUnifiedLight Lights[UNIFORM_MAX_FORWARD_LIGHTS];
 };
 
-struct FDeferredLightUniform
+struct alignas(16) FDirectionalLightUniform
 {
-
-};
-
-struct FLightUniform
-{
+	uint32 Count = 0;
 	struct {
 		Math::FVector4 Direction;
 		Math::FVector4 Color;
@@ -99,8 +95,12 @@ struct FLightUniform
 		int32 ShadowIndex;
 		uint32 ShadowCount;
 		float Padding;
-	} Directional[REV_MAX_DIRECTIONAL_LIGHTS];
+	} Lights[REV_MAX_DIRECTIONAL_LIGHTS];
+};
 
+struct alignas(16) FSpotLightUniform
+{
+	uint32 Count = 0;
 	struct {
 		Math::FVector4 Position;
 		Math::FVector4 Direction;
@@ -109,8 +109,12 @@ struct FLightUniform
 		int32 ShadowIndex;
 		float Radius;
 		float Angle;
-	} Spot[REV_MAX_SPOT_LIGHTS];
+	} Lights[REV_MAX_SPOT_LIGHTS];
+};
 
+struct alignas(16) FPointLightUniform
+{
+	uint32 Count = 0;
 	struct {
 		Math::FVector4 Position;
 		Math::FVector4 Color;
@@ -118,10 +122,7 @@ struct FLightUniform
 		int32 ShadowIndex;
 		float Radius;
 		float Padding;
-	} Point[REV_MAX_POINT_LIGHTS];
-
-	uint32 DirectionalCount = 0;
-	uint32 SpotCount = 0;
-	uint32 PointCount = 0;
+	} Lights[REV_MAX_POINT_LIGHTS];
 };
+
 }

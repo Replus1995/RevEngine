@@ -24,7 +24,6 @@ public:
 	void DrawScene() const;
 
 	const std::vector<StaticMeshRenderProxy>& GetStaticMeshProxies() const { return mStaticMeshProxies; }
-	const std::vector<LightRenderProxy>& GetLightProxies() const { return mLightProxies; }
 	const SkyRenderProxy& GetSkyProxy() const { return mSkyProxy; }
 
 	void SyncResource() const;
