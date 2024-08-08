@@ -46,7 +46,7 @@ void FOpenGLContext::Init()
 	case EWindowType::GLFW:
 	{
 		int version = gladLoadGL(glfwGetProcAddress);
-		RE_CORE_TRACE("[OpenGLRHI] Version {0}.{1}", GLAD_VERSION_MAJOR(version), GLAD_VERSION_MINOR(version));
+		RE_CORE_TRACE("[OpenGLRHI] OpenGL Version {0}.{1}", GLAD_VERSION_MAJOR(version), GLAD_VERSION_MINOR(version));
 		break;
 	}
 	default:
