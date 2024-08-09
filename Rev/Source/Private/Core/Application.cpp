@@ -4,8 +4,8 @@
 #include "Rev/Core/Clock.h"
 #include "Rev/Core/Input.h"
 #include "Rev/Render/RenderCore.h"
-#include "Rev/Render/Renderer.h"
 #include "Rev/Render/RenderCmd.h"
+#include "Rev/Render/RenderUtils.h"
 #include "Rev/Asset/AssetLibrary.h"
 
 namespace Rev
@@ -29,14 +29,16 @@ namespace Rev
 		mWindow = std::unique_ptr<Window>(Window::Create());
 		mWindow->SetEventCallback(RE_BIND_EVENT_FN(Application::OnEvent, this));
 
-		Renderer::Init();
+		RenderCmd::Init();
+		RenderUtils::Init();
 		FAssetLibrary::Init();
 	}
 
 	Application::~Application()
 	{
 		FAssetLibrary::Shutdown();
-		Renderer::Shutdown();
+		RenderUtils::Shutdown();
+		RenderCmd::Shutdown();
 	}
 
 	void Application::Run()
@@ -107,7 +109,6 @@ namespace Rev
 			return false;
 		}
 		mMinimized = false;
-		Renderer::ResizeWindow(e.GetWidth(), e.GetHeight());
 		return false;
 	}
 }

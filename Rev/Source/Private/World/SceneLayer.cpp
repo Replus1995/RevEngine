@@ -1,11 +1,11 @@
 #include "Rev/World/SceneLayer.h"
 #include "Rev/World/Scene.h"
 #include "Rev/Render/RenderCmd.h"
-#include "Rev/Render/Renderer.h"
 #include "Rev/Core/Application.h"
 #include "Rev/Core/Window.h"
 
-#include "Rev/Render/RenderPipeline/ForwardPipeline.h"
+#include "Rev/Render/Renderer/ForwardRenderer.h"
+
 
 namespace Rev
 {
@@ -33,12 +33,13 @@ void SceneLayer::OnAttach()
 	{
 		mScene->OnRuntimeStart();
 	}
-	mRenderPipeline = CreateRef<FForwardPipeline>();
+	mRenderer = CreateRef<FForwardRenderer>(CreateRef<FRenderContext>());
+	mRenderer->GetContext()->SceneProxy = &mSceneProxy;
 }
 
 void SceneLayer::OnDetach()
 {
-	mRenderPipeline.reset();
+	mRenderer.reset();
 	if (mScene)
 	{
 		mScene->OnRuntimeStop();
@@ -63,9 +64,14 @@ void SceneLayer::OnUpdate(float dt)
 	uint32 WinWidth = Application::GetApp().GetWindow()->GetWidth();
 	uint32 WinHeight = Application::GetApp().GetWindow()->GetHeight();
 
-	mRenderPipeline->BeginPipeline(WinWidth, WinHeight, &mSceneProxy);
-	mRenderPipeline->RunPipeline();
-	mRenderPipeline->EndPipeline();
+	RenderCmd::SetViewport(0, 0, WinWidth, WinHeight); //to be optimized
+
+	mRenderer->GetContext()->Width = WinWidth;
+	mRenderer->GetContext()->Height = WinHeight;
+
+	mRenderer->BeginFrame();
+	mRenderer->DrawFrame();
+	mRenderer->EndFrame();
 }
 
 void SceneLayer::OnEvent(Event& event)

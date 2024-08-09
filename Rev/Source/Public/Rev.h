@@ -14,7 +14,6 @@
 
 //Render
 #include "Rev/Render/RenderCore.h"
-#include "Rev/Render/Renderer.h"
 
 //-------------EntryPoint-------------//
 #include "Rev/Core/EntryPoint.h"

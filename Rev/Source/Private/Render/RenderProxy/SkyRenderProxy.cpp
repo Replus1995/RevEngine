@@ -1,7 +1,7 @@
 #include "Rev/Render/RenderProxy/SkyRenderProxy.h"
 #include "Rev/Render/UniformLayout.h"
 #include "Rev/Render/RenderCmd.h"
-#include "Rev/Render/Renderer.h"
+#include "Rev/Render/RenderUtils.h"
 #include "Rev/Render/Texture/Texture.h"
 #include "Rev/Render/Material/Material.h"
 #include "Rev/Render/RHI/RHIShaderLibrary.h"
@@ -82,7 +82,7 @@ void SkyRenderProxy::DrawSkybox() const
 	if (auto& EnvTex = mSkybox.GetEnvironmentTexture(); EnvTex)
 	{
 		mSkyboxMat->PreDraw();
-		Renderer::DrawScreenQuad();
+		RenderUtils::DrawScreenQuad();
 		mSkyboxMat->PostDraw();
 	}
 }

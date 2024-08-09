@@ -1,6 +1,6 @@
 #pragma once
 #include "Rev/Core/Base.h"
-#include "Rev/Render/RenderPipeline/RenderPass.h"
+#include "Rev/Render/RenderPass/RenderPass.h"
 
 namespace Rev
 {

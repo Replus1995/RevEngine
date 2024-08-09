@@ -1,12 +1,11 @@
 #pragma once
 #include "Rev/Core/Layer.h"
 #include "Rev/Events/ApplicationEvent.h"
-//#include "Rev/Render/Resource/FrameBuffer.h"
 #include "Rev/Render/RenderProxy/SceneRenderProxy.h"
 
 namespace Rev
 {
-class FRenderPipeline;
+
 class REV_API SceneLayer : public Layer
 {
 public:
@@ -22,7 +21,7 @@ public:
 protected:
 	Ref<Scene> mScene;
 	SceneRenderProxy mSceneProxy;
-	Ref<FRenderPipeline> mRenderPipeline;
+	Ref<class FRenderer> mRenderer;
 };
 
 }

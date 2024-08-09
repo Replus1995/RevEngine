@@ -3,7 +3,6 @@
 #include "Rev/Render/Material/SurfaceMaterial.h"
 #include "Rev/Render/RenderProxy/SceneRenderProxy.h"
 #include "Rev/Render/RenderCmd.h"
-#include "Rev/Render/Renderer.h"
 #include "Rev/Render/UniformLayout.h"
 
 

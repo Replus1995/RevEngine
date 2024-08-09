@@ -1,8 +1,8 @@
-#include "Rev/Render/RenderPipeline/GammaPass.h"
+#include "Rev/Render/RenderPass/GammaPass.h"
 #include "Rev/Render/RHI/RHIResourceFactory.h"
 #include "Rev/Render/RHI/RHIShaderLibrary.h"
 #include "Rev/Render/RenderCmd.h"
-#include "Rev/Render/Renderer.h"
+#include "Rev/Render/RenderUtils.h"
 #include "Rev/Render/Material/Material.h"
 
 namespace Rev
@@ -51,7 +51,7 @@ void FGammaCorrectPass::RunPass()
 {
 	ClearRenderTarget();
 	mMaterial->PreDraw();
-	Renderer::DrawScreenQuad();
+	RenderUtils::DrawScreenQuad();
 	mMaterial->PostDraw();
 }
 
