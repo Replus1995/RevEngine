@@ -59,7 +59,7 @@ public:
 	bool AddSystem()
 	{
 		size_t hash = typeid(TSystem).hash_code();
-		return AddSystem(hash, std::move(std::make_unique<TSystem>(mRegistry)));
+		return AddSystem(hash, std::move(CreateScope<TSystem>(this)));
 	}
 
 

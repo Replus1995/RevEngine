@@ -57,9 +57,7 @@ void SceneLayer::OnUpdate(float dt)
 	if(Application::GetApp().Minimized())
 		return;
 
-	//Render Scene
 	mSceneProxy->Prepare(mScene);
-	//mSceneProxy.DrawScene();
 
 	uint32 WinWidth = Application::GetApp().GetWindow()->GetWidth();
 	uint32 WinHeight = Application::GetApp().GetWindow()->GetHeight();
@@ -72,6 +70,8 @@ void SceneLayer::OnUpdate(float dt)
 	mRenderer->BeginFrame();
 	mRenderer->DrawFrame();
 	mRenderer->EndFrame();
+
+	mSceneProxy->Cleanup();
 }
 
 void SceneLayer::OnEvent(Event& event)

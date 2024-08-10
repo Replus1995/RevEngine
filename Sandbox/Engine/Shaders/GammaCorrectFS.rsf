@@ -18,6 +18,7 @@ void main()
 {
     vec2 ScreenCoord = GetScreenCoord(gl_FragCoord);
 	o_Color.rgb = texture(s_LinearScreenTex, ScreenCoord).rgb;
+    //o_Color.rgb /= (o_Color.rgb + vec3(1.0));
     o_Color.rgb = pow(o_Color.rgb, vec3(1.0/2.2));
     //o_Color.rgb = vec3(1);
     o_Color.a = 1.0;

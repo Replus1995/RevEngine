@@ -21,7 +21,7 @@ layout(std140, binding = UBO_BINDING_DIRECTIONAL_LIGHT) uniform DirectionalLight
 
 //PBR const
 const vec3 kDielectric = vec3(0.04);
-const vec3 kAmbientFactor = vec3(0.3);
+const vec3 kAmbientFactor = vec3(0.03);
 
 //copies of UE4
 //NdH = dot(Normal, HalfDir)
@@ -109,7 +109,7 @@ vec3 ComputeLightPBR(
     float G = G_SchlickGGX(Roughness, NdV, NdL);
 
     vec3 kd = mix(vec3(1.0) - F, vec3(0.0), Metallic);
-    vec3 diffuseBRDF = kd * BaseColor;
+    vec3 diffuseBRDF = kd * BaseColor / PI;
     vec3 specularBRDF = (F * D * G) / max(EPSILON, 4.0 * NdL * NdV);
 
     return (diffuseBRDF + specularBRDF) * Radiance * NdL;

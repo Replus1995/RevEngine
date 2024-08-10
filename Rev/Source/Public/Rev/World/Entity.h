@@ -30,17 +30,24 @@ public:
 		return component;
 	}
 
-	template<typename T>
-	T& GetComponent()
+	template<typename... T>
+	auto& GetComponent()
 	{
-		RE_CORE_ASSERT(HasComponent<T>(), "Entity does not have component!");
-		return mScene->mRegistry.get<T>(mHandle);
+		RE_CORE_ASSERT(HasComponent<T...>(), "Entity does not have component!");
+		return mScene->mRegistry.get<T...>(mHandle);
 	}
 
-	template<typename T>
-	bool HasComponent()
+	template<typename... T>
+	const auto& GetComponent() const
 	{
-		return mScene->mRegistry.any_of<T>(mHandle);
+		RE_CORE_ASSERT(HasComponent<T...>(), "Entity does not have component!");
+		return mScene->mRegistry.get<T...>(mHandle);
+	}
+
+	template<typename... T>
+	bool HasComponent() const
+	{
+		return mScene->mRegistry.any_of<T...>(mHandle);
 	}
 
 	template<typename T>

@@ -1,33 +1,32 @@
 #pragma once
 #include "Rev/Core/Base.h"
-#include <entt/entt.hpp>
 
-#define DECLARE_SYSTEM(sysClass)									\
-public:																\
-	sysClass(entt::registry& reg) : ISystem(reg) {}					\
-	virtual Scope<ISystem> Duplicate(entt::registry& reg) override	\
-	{																\
-		return std::make_unique<sysClass>(reg);						\
-	}																\
+#define DECLARE_SYSTEM(SysClass)										\
+public:																	\
+	SysClass(FScene* InScene) : ISystem(InScene) {}						\
+	virtual Rev::Scope<ISystem> Duplicate(FScene* InScene) override		\
+	{																	\
+		return Rev::CreateScope<SysClass>(InScene);						\
+	}																	\
 private:
 	
 
 namespace Rev
 {
-
+class FScene;
 class ISystem
 {
 public:
 	virtual ~ISystem() = default;
-	virtual Scope<ISystem> Duplicate(entt::registry& reg) = 0;
+	virtual Scope<ISystem> Duplicate(FScene* InScene) = 0;
 
 	virtual void OnInit(){};
 	virtual void OnUpdate(float dt){};
 	virtual void OnDestroy(){};
 
 protected:
-	ISystem(entt::registry& reg) : mRegistry(reg) {}
-	entt::registry& mRegistry;
+	ISystem(FScene* InScene) : mScene(InScene) {}
+	FScene* mScene = nullptr;
 };
 
 }
