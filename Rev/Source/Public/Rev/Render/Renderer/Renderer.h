@@ -8,7 +8,7 @@ struct FRenderContext
 {
 	uint32 Width;
 	uint32 Height;
-	class SceneRenderProxy* SceneProxy;
+	class FSceneProxy* SceneProxy;
 };
 
 class FRenderer

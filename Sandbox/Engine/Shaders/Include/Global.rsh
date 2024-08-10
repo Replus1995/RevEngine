@@ -3,6 +3,12 @@
 
 #include "/Engine/Shaders/Include/Bindings.rsh"
 
+layout(std140, binding = UBO_BINDING_SCENE) uniform SceneUniformBuffer
+{
+    float ScreenWidth;
+    float ScreenHeight;
+} ub_Scene;
+
 layout(std140, binding = UBO_BINDING_CAMERA) uniform CameraUniformBuffer
 {
     mat4 ProjMat;
@@ -10,12 +16,6 @@ layout(std140, binding = UBO_BINDING_CAMERA) uniform CameraUniformBuffer
     mat4 InvProjViewMat;
     vec4 Pos;
 } ub_Camera;
-
-layout(std140, binding = UBO_BINDING_SCENE) uniform SceneUniformBuffer
-{
-    float ScreenWidth;
-    float ScreenHeight;
-} ub_Scene;
 
 layout(std140, binding = UBO_BINDING_MODEL) uniform ModelUniformBuffer
 {

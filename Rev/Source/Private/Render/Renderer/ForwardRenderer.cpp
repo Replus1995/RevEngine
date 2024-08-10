@@ -2,7 +2,7 @@
 #include "Rev/Render/RHI/RHIResourceFactory.h"
 #include "Rev/Render/UniformLayout.h"
 #include "Rev/Render/RenderCmd.h"
-#include "Rev/Render/RenderProxy/SceneRenderProxy.h"
+#include "Rev/Render/RenderProxy/SceneProxy.h"
 
 namespace Rev
 {
@@ -49,6 +49,7 @@ void FForwardRenderer::DrawFrame()
 
 	mForwardSurfacePass.BeginPass();
 	mForwardSurfacePass.ClearRenderTarget();
+	mContext->SceneProxy->SyncResource();
 	mContext->SceneProxy->DrawScene();
 	mForwardSurfacePass.EndPass();
 

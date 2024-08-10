@@ -27,7 +27,7 @@ ExampleLayer::ExampleLayer()
 	FPath TestPath("/Game/Assets/Shaders/Common.vs.glsl");
 
 	//Create Sandbox Scene
-	mScene = CreateRef<Rev::Scene>();
+	mScene = CreateRef<Rev::FScene>();
 
 	/*{
 		auto pBoxMat = CreateRef<ExampleMaterial>();

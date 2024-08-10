@@ -14,7 +14,7 @@ SceneLayer::SceneLayer(const std::string& name)
 {
 }
 
-SceneLayer::SceneLayer(const Ref<Scene>& scene, const std::string& name)
+SceneLayer::SceneLayer(const Ref<FScene>& scene, const std::string& name)
 	: Layer(name)
 	, mScene(scene)
 {
@@ -28,13 +28,13 @@ SceneLayer::~SceneLayer()
 
 void SceneLayer::OnAttach()
 {
-	mSceneProxy.Init();
+	mSceneProxy = CreateScope<FSceneProxy>();
 	if (mScene)
 	{
 		mScene->OnRuntimeStart();
 	}
 	mRenderer = CreateRef<FForwardRenderer>(CreateRef<FRenderContext>());
-	mRenderer->GetContext()->SceneProxy = &mSceneProxy;
+	mRenderer->GetContext()->SceneProxy = mSceneProxy.get();
 }
 
 void SceneLayer::OnDetach()
@@ -44,7 +44,7 @@ void SceneLayer::OnDetach()
 	{
 		mScene->OnRuntimeStop();
 	}
-	mSceneProxy.Release();
+	mSceneProxy->FreeResource();
 }
 
 void SceneLayer::OnUpdate(float dt)
@@ -58,7 +58,7 @@ void SceneLayer::OnUpdate(float dt)
 		return;
 
 	//Render Scene
-	mSceneProxy.Prepare(mScene);
+	mSceneProxy->Prepare(mScene);
 	//mSceneProxy.DrawScene();
 
 	uint32 WinWidth = Application::GetApp().GetWindow()->GetWidth();

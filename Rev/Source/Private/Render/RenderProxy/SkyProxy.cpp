@@ -1,10 +1,11 @@
-#include "Rev/Render/RenderProxy/SkyRenderProxy.h"
+#include "Rev/Render/RenderProxy/SkyProxy.h"
 #include "Rev/Render/UniformLayout.h"
 #include "Rev/Render/RenderCmd.h"
 #include "Rev/Render/RenderUtils.h"
 #include "Rev/Render/Texture/Texture.h"
 #include "Rev/Render/Material/Material.h"
 #include "Rev/Render/RHI/RHIShaderLibrary.h"
+#include "Rev/World/Scene.h"
 
 
 namespace Rev
@@ -45,25 +46,30 @@ public:
 };
 
 
-SkyRenderProxy::SkyRenderProxy()
+FSkyProxy::FSkyProxy()
 {
 }
 
-SkyRenderProxy::~SkyRenderProxy()
+FSkyProxy::~FSkyProxy()
 {
 }
 
-void SkyRenderProxy::Prepare(const Skybox& InSkybox)
+void FSkyProxy::Prepare(const Ref<FScene>& Scene)
 {
-	mSkybox = InSkybox;
+	auto EntityView = Scene->EntityView<SkyComponent>();
+	if (!EntityView.empty())
+	{
+		const SkyComponent& SkyComp = EntityView.get<SkyComponent>(EntityView[0]);
+		mSkybox = SkyComp.Skybox;
+	}
 }
 
-void SkyRenderProxy::Cleanup()
+void FSkyProxy::Cleanup()
 {
 	mSkybox = {};
 }
 
-void SkyRenderProxy::SyncResource() const
+void FSkyProxy::SyncResource() const
 {
 	if (auto& EnvTex = mSkybox.GetEnvironmentTexture(); EnvTex)
 	{
@@ -71,13 +77,13 @@ void SkyRenderProxy::SyncResource() const
 	}
 	if (!mSkyboxMat)
 	{
-		SkyRenderProxy* pThis = const_cast<SkyRenderProxy*>(this);
+		FSkyProxy* pThis = const_cast<FSkyProxy*>(this);
 		pThis->mSkyboxMat = CreateRef<SkyboxMaterial>();
 		pThis->mSkyboxMat->Compile();
 	}
 }
 
-void SkyRenderProxy::DrawSkybox() const
+void FSkyProxy::DrawSkybox() const
 {
 	if (auto& EnvTex = mSkybox.GetEnvironmentTexture(); EnvTex)
 	{

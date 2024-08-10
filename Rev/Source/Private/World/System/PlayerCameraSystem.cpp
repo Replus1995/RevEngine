@@ -56,7 +56,7 @@ void PlayerCameraSystem::FillCameraUniform(FCameraUniform& OutUniform) const
 	OutUniform.InvProjViewMatrix = (OutUniform.ProjMatrix * OutUniform.ViewMatrix).Inverse();
 }
 
-bool PlayerCameraSystem::SetPlayerCamera(Entity e)
+bool PlayerCameraSystem::SetPlayerCamera(FEntity e)
 {
 	if (e.HasComponent<CameraComponent>())
 	{

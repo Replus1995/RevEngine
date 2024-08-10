@@ -77,40 +77,34 @@ void main(void)
     float NdV = max(dot(Normal, ViewDir), 0.0);
     vec3 F0 = mix(kDielectric, BaseColor.rgb, Metallic);
 
-    vec3 LightColor = vec3(0.0);
-    for(uint i = 0; i < ub_ForwardLight.LightCount; i++)
+    vec3 FinalLightColor = vec3(0.0);
+    for(uint i = 0; i < ub_DirectionalLight.Count; i++)
     {
-        vec4 res = PreComputeLight(IN.WorldPos, ub_ForwardLight.Lights[i]);
-        vec3 LightDir = res.xyz;
-        float Radiance = res.w;
+        vec3 LightDir = -ub_DirectionalLight.Lights[i].Direction.xyz;
+        float Radiance = ub_DirectionalLight.Lights[i].Intensity;
+        /*
         if(Radiance == 0.0)
         {
             continue;
         }
-
-        vec3 HalfDir = normalize(LightDir + ViewDir);
-        float NdL = max(dot(Normal, LightDir), 0.0);
-        float NdH = max(dot(Normal, HalfDir), 0.0);
-        float HdV = max(dot(HalfDir, ViewDir), 0.0);
-
-        vec3 F = F_Schlick(F0, HdV);
-		float D = D_GGX(Roughness, NdH);
-        float G = G_SchlickGGX(Roughness, NdV, NdL);
-
-        vec3 kd = mix(vec3(1.0) - F, vec3(0.0), Metallic);
-        vec3 diffuseBRDF = kd * BaseColor.rgb;
-        vec3 specularBRDF = (F * D * G) / max(EPSILON, 4.0 * NdL * NdV);
-
+        */
+        
+        vec3 LightColor = ComputeLightPBR(BaseColor.rgb, Roughness, Metallic, Normal, ViewDir, LightDir, NdV, F0, Radiance);
+        LightColor *= ub_DirectionalLight.Lights[i].Color.rgb;
         //TODO: Shadow
 
-        LightColor += (diffuseBRDF + specularBRDF) * Radiance * NdL;
+        //LightColor += (diffuseBRDF + specularBRDF) * Radiance * NdL;
+        FinalLightColor += LightColor;
     }
 
-    //TODO: IBL Lighting
-
-    vec3 Ambient = kAmbientFactor * BaseColor.rgb * Occlution;
-
-    o_Color.rgb = Ambient + LightColor + Emissive;
+    vec3 AmbientColor = vec3(0.0);
+    {
+        vec3 F = F_Schlick(F0, NdV);
+		vec3 kd = mix(vec3(1.0) - F, vec3(0.0), Metallic);
+		AmbientColor = kd * BaseColor.rgb * kAmbientFactor;
+        //TODO: IBL Lighting
+    }
+    o_Color.rgb = AmbientColor * Occlution + FinalLightColor + Emissive;
     //o_Color.rgb = pow(o_Color.rgb, vec3(1.0/2.2)); //Gamma Correction
     o_Color.a = BaseColor.a;
 }

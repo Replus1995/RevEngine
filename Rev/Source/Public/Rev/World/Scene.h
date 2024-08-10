@@ -10,13 +10,13 @@ namespace Rev
 {
 
 class Camera;
-class Entity;
+class FEntity;
 class ISystem;
-class REV_API Scene
+class REV_API FScene
 {
 public:
-	Scene();
-	~Scene();
+	FScene();
+	~FScene();
 
 	void OnRuntimeStart();
 	void OnRuntimeStop();
@@ -34,19 +34,26 @@ public:
 	bool IsPaused() const { return mIsPaused; }
 	void SetPaused(bool paused) { mIsPaused = paused; }
 
-	Entity CreateEntity(const std::string& name = std::string());
-	Entity CreateEntityWithUUID(UUID uuid, const std::string& name = std::string());
-	void DestroyEntity(Entity entity);
-	Entity DuplicateEntity(Entity entity);
+	FEntity CreateEntity(const std::string& name = std::string());
+	FEntity CreateEntityWithUUID(UUID uuid, const std::string& name = std::string());
+	void DestroyEntity(FEntity entity);
+	FEntity DuplicateEntity(FEntity entity);
 
-	Entity FindEntityByName(std::string_view name);
-	Entity FindEntityByUUID(UUID uuid);
+	FEntity FindEntityByName(std::string_view name);
+	FEntity FindEntityByUUID(UUID uuid);
 
-	template<typename... Components>
-	auto GetAllEntitiesWith()
+	template<typename... TComponents>
+	auto EntityView()
 	{
-		return mRegistry.view<Components...>();
+		return mRegistry.view<TComponents...>();
 	}
+
+	template<typename... TComponents>
+	auto EntityGroup()
+	{
+		return mRegistry.group<TComponents...>();
+	}
+
 
 	template<class TSystem>
 	bool AddSystem()
@@ -97,10 +104,8 @@ private:
 	std::unordered_map<UUID, entt::entity> mEntityMap;
 	std::map<size_t, Scope<ISystem>> mSystemMap;
 
-	friend class Entity;
-	friend class SceneRenderProxy;
-	//friend class SceneSerializer;
-	//friend class SceneHierarchyPanel;
+	friend class FEntity;
+	friend class FSceneProxy;
 };
 
 }

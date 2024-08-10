@@ -18,28 +18,32 @@ public:
 	T Data;
 	Ref<FRHIUniformBuffer> Resource;
 
-	void Create()
-	{
-		Resource = FRHIResourceFactory::CreateUniformBuffer(sizeof(T));
-		RenderCmd::BindUniformBuffer(Resource, Binding);
-	}
+	TUniform() = default;
+	TUniform(const TUniform<T, Binding>&) = delete;
 
-	void Destory()
+	void FreeResource()
 	{
 		Resource.reset();
 	}
 
 	void Upload(uint32 InSize = 0, uint32 InOffset = 0) const
 	{
-		uint32 UploadSize = InSize > 0 ? InSize : sizeof(T);
-		Resource->UpdateSubData(&(Data), UploadSize, InOffset);
+		Upload(&Data, InSize, InOffset);
 	}
 
 	void Upload(const void* InData, uint32 InSize = 0, uint32 InOffset = 0) const
 	{
+		if (!Resource)
+		{
+			TUniform<T, Binding>* pThis = const_cast<TUniform<T, Binding>*>(this);
+			pThis->Resource = FRHIResourceFactory::CreateUniformBuffer(sizeof(T));
+			RenderCmd::BindUniformBuffer(Resource, Binding);
+		}
 		uint32 UploadSize = InSize > 0 ? InSize : sizeof(T);
-		Resource->UpdateSubData(InData, UploadSize, InOffset);
+		const void* UploadData = InData ? InData : &Data;
+		Resource->UpdateSubData(UploadData, UploadSize, InOffset);
 	}
+
 };
 
 struct FCameraUniform
@@ -68,40 +72,22 @@ struct FShadowUniform
 	Math::FVector4 LightParams; //X = ViewCount
 };
 
-struct FUnifiedLight
-{
-	uint32 Type; //ELightKind 
-	int32 ShadowIndex;
-	float Intensity;
-	alignas(16) Math::FVector4 Position;
-	Math::FVector4 Direction;
-	Math::FVector4 Color;
-	Math::FVector4 Params;
-};
-
-struct FForwardLightUniform
-{
-	uint32 LightCount = 0;
-	alignas(16) FUnifiedLight Lights[UNIFORM_MAX_FORWARD_LIGHTS];
-};
-
-struct alignas(16) FDirectionalLightUniform
+struct FDirectionalLightUniform
 {
 	uint32 Count = 0;
-	struct {
+	struct alignas(16) Info {
 		Math::FVector4 Direction;
 		Math::FVector4 Color;
 		float Intensity;
 		int32 ShadowIndex;
 		uint32 ShadowCount;
-		float Padding;
-	} Lights[REV_MAX_DIRECTIONAL_LIGHTS];
+	}  Lights[REV_MAX_DIRECTIONAL_LIGHTS];
 };
 
-struct alignas(16) FSpotLightUniform
+struct FSpotLightUniform
 {
 	uint32 Count = 0;
-	struct {
+	struct alignas(16) Info {
 		Math::FVector4 Position;
 		Math::FVector4 Direction;
 		Math::FVector4 Color;
@@ -112,10 +98,10 @@ struct alignas(16) FSpotLightUniform
 	} Lights[REV_MAX_SPOT_LIGHTS];
 };
 
-struct alignas(16) FPointLightUniform
+struct FPointLightUniform
 {
 	uint32 Count = 0;
-	struct {
+	struct alignas(16) Info {
 		Math::FVector4 Position;
 		Math::FVector4 Color;
 		float Intensity;

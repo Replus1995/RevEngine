@@ -1,7 +1,4 @@
 #include "Rev/Render/RenderPass/SurfacePass.h"
-#include "Rev/Render/RenderProxy/SceneRenderProxy.h"
-#include "Rev/Render/RHI/RHIResourceFactory.h"
-#include "Rev/Core/Assert.h"
 
 namespace Rev
 {

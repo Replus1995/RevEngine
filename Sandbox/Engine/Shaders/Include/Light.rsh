@@ -1,26 +1,23 @@
 #include "/Engine/Shaders/Include/Global.rsh"
 
-#define UNIFORM_MAX_FORWARD_LIGHTS 32
-struct UnifiedLight
-{
-    uint Type;
-    int ShadowIndex;
-    float Intensity;
-    vec4 Pos;
-    vec4 Dir;
+#define REV_MAX_DIRECTIONAL_LIGHTS 4
+#define REV_MAX_POINT_LIGHTS 16
+#define REV_MAX_SPOT_LIGHTS 16
+
+struct DirectionalLightInfo {
+    vec4 Direction;
     vec4 Color;
-    vec4 Params;
+    float Intensity;
+    int ShadowIndex;
+    uint ShadowCount;
 };
 
-layout(std140, binding = UBO_BINDING_LIGHTS) uniform ForwardLightUniformBuffer
+layout(std140, binding = UBO_BINDING_DIRECTIONAL_LIGHT) uniform DirectionalLightUniform
 {
-	uint LightCount;
-	UnifiedLight Lights[UNIFORM_MAX_FORWARD_LIGHTS];
-} ub_ForwardLight;
+	uint Count;
+	DirectionalLightInfo Lights[REV_MAX_DIRECTIONAL_LIGHTS];
+} ub_DirectionalLight;
 
-#define LIGHT_KIND_DIRECTIONAL 1
-#define LIGHT_KIND_SPOT 2
-#define LIGHT_KIND_POINT 3
 
 //PBR const
 const vec3 kDielectric = vec3(0.04);
@@ -97,8 +94,30 @@ float Specular_CookTorrance(in float NdL, in float NdV, in float NdH, in float r
     return D * G;
 }
 
+vec3 ComputeLightPBR(
+    in vec3 BaseColor, in float Roughness, in float Metallic, 
+    in vec3 Normal, in vec3 ViewDir, in vec3 LightDir, 
+    in float NdV, in vec3 F0, in float Radiance)
+{
+    vec3 HalfDir = normalize(LightDir + ViewDir);
+    float NdL = max(dot(Normal, LightDir), 0.0);
+    float NdH = max(dot(Normal, HalfDir), 0.0);
+    float HdV = max(dot(HalfDir, ViewDir), 0.0);
+
+    vec3 F = F_Schlick(F0, HdV);
+    float D = D_GGX(Roughness, NdH);
+    float G = G_SchlickGGX(Roughness, NdV, NdL);
+
+    vec3 kd = mix(vec3(1.0) - F, vec3(0.0), Metallic);
+    vec3 diffuseBRDF = kd * BaseColor;
+    vec3 specularBRDF = (F * D * G) / max(EPSILON, 4.0 * NdL * NdV);
+
+    return (diffuseBRDF + specularBRDF) * Radiance * NdL;
+}
+
 //Out.xyz : FinalLightDir
 //Out.w : Radiance
+/*
 vec4 PreComputeLight(in vec3 InWorldPos, in UnifiedLight InLightData)
 {
     vec4 Result = vec4(0.0);
@@ -126,3 +145,4 @@ vec4 PreComputeLight(in vec3 InWorldPos, in UnifiedLight InLightData)
     }
     return Result;
 }
+*/

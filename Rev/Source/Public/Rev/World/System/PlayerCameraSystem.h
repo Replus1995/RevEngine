@@ -16,11 +16,11 @@ public:
 	virtual void OnDestroy() override;
 
 	void FillCameraUniform(FCameraUniform& OutUniform) const;
-	bool SetPlayerCamera(Entity e);
+	bool SetPlayerCamera(FEntity e);
 	void SetPlayerCameraController(const Ref<CameraController>& c);
 	
 private:
-	Entity mCamEntity;
+	FEntity mCamEntity;
 	Ref<CameraController> mCamController;
 };
 

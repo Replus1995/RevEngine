@@ -5,15 +5,17 @@
 namespace Rev
 {
 class Material;
-class SkyRenderProxy
+class FScene;
+class FSkyProxy
 {
 public:
-	SkyRenderProxy();
-	~SkyRenderProxy();
+	FSkyProxy();
+	~FSkyProxy();
 
-	void Prepare(const Skybox& InSkybox);
+	void Prepare(const Ref<FScene>& Scene);
 	void Cleanup();
 	void SyncResource() const;
+
 	void DrawSkybox() const;
 
 private:
