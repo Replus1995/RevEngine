@@ -126,7 +126,9 @@ struct FTextureDesc
 class REV_API FRHITexture : public FRHIResource
 {
 public:
+	FRHITexture(const FTextureDesc& InDesc) : mDesc(InDesc) {}
 	virtual ~FRHITexture() = default;
+
 	const FTextureDesc& GetDesc() const { return mDesc; }
 	uint16 GetWidth() const { return mDesc.Width; }
 	uint16 GetHeight() const { return mDesc.Height; }
@@ -142,8 +144,7 @@ public:
 	virtual void ClearLayerData(uint8 InMipLevel = 0, uint16 InArrayIndex = 0, int32 InDepth = -1) = 0;
 	virtual void ClearMipData(uint8 InMipLevel = 0) = 0;
 	void ClearAllData(); //Clear all mips and all layers of texture
-protected:
-	FRHITexture(const FTextureDesc& InDesc) : mDesc(InDesc) {}
+
 protected:
 	FTextureDesc mDesc;
 };

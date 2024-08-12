@@ -65,7 +65,9 @@ struct FSamplerDesc
 class FRHISampler : public FRHIResource
 {
 public:
+	FRHISampler(const FSamplerDesc& InDesc) : mDesc(InDesc) {}
 	virtual ~FRHISampler() = default;
+
 	const FSamplerDesc& GetDesc() const { return mDesc; }
 
 	virtual void SetFilterMode(ESamplerFilterMode InMode) = 0;
@@ -74,8 +76,7 @@ public:
 	virtual void SetWarpV(ESamplerWarpMode InMode) = 0;
 	virtual void SetWarpW(ESamplerWarpMode InMode) = 0;
 	virtual void SetBorderColor(const Math::FLinearColor& InColor) = 0;
-protected:
-	FRHISampler(const FSamplerDesc& InDesc) : mDesc(InDesc) {}
+
 protected:
 	FSamplerDesc mDesc;
 };

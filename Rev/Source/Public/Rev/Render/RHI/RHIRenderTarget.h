@@ -31,6 +31,7 @@ enum ERenderTargetAttachment : uint8
 	RTA_MaxColorAttachments = 8,
 	RTA_DepthAttachment = 9,
 	RTA_DepthStencilAttachment = 10,
+	RTA_EmptyAttachment = 16
 };
 
 struct FColorTargetDesc
