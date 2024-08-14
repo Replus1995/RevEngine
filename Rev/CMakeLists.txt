@@ -19,7 +19,7 @@ PUBLIC
     NOMINMAX #spdlog
     _SCL_SECURE_NO_WARNINGS #spdlog
 PRIVATE
-    RE_BUILD_DLL
+    REV_BUILD_DLL
     GLFW_INCLUDE_NONE
 )
 
@@ -48,7 +48,7 @@ PRIVATE
 if(WIN32)
     target_compile_definitions(Rev
     PUBLIC
-        RE_PLATFORM_WINDOWS
+        REV_PLATFORM_WINDOWS
     )
 
     target_link_libraries(Rev

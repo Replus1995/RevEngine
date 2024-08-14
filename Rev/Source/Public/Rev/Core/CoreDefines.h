@@ -1,6 +1,6 @@
 #pragma once
-#ifdef RE_PLATFORM_WINDOWS
-#ifdef RE_BUILD_DLL
+#ifdef REV_PLATFORM_WINDOWS
+#ifdef REV_BUILD_DLL
 #define REV_API __declspec(dllexport)
 #else
 #define REV_API __declspec(dllimport)
@@ -10,7 +10,7 @@
 #endif
 
 #ifdef RE_DEBUG
-#if defined(RE_PLATFORM_WINDOWS)
+#if defined(REV_PLATFORM_WINDOWS)
 #define RE_DEBUGBREAK() __debugbreak()
 #else
 #error "Platform doesn't support debugbreak yet!"

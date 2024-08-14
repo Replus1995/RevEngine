@@ -5,7 +5,7 @@
 #include "Rev/Core/Application.h"
 #include <type_traits>
 
-#ifdef RE_PLATFORM_WINDOWS
+#ifdef REV_PLATFORM_WINDOWS
 
 namespace Rev
 {

@@ -33,7 +33,7 @@ project "Sandbox"
 
         defines
         {
-            "RE_PLATFORM_WINDOWS"
+            "REV_PLATFORM_WINDOWS"
         }
 
     filter "configurations:Debug"

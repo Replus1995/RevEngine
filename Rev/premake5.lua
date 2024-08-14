@@ -58,8 +58,8 @@ project "Rev"
 
         defines
         {
-            "RE_PLATFORM_WINDOWS",
-            "RE_BUILD_DLL",
+            "REV_PLATFORM_WINDOWS",
+            "REV_BUILD_DLL",
             "GLFW_INCLUDE_NONE"
         }
 

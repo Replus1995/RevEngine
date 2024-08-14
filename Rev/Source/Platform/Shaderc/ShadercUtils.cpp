@@ -75,9 +75,9 @@ const char* FShadercUtils::GetCacheDirectory()
 	switch (GetRenderAPI())
 	{
 	case Rev::ERenderAPI::OpenGL:
-		return "ShaderCache/OpenGL";
+		return "Cache/Shaders/OpenGL";
 	case Rev::ERenderAPI::Vulkan:
-		return "ShaderCache/Vulkan";
+		return "Cache/Shaders/Vulkan";
 	default:
 		RE_CORE_ASSERT(0, "Unknow Render API");
 		break;
