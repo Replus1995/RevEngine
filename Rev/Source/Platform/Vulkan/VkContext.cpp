@@ -7,11 +7,34 @@
 
 #include <GLFW/glfw3.h>
 
+#include "VkAllocator.h"
+
 namespace Rev
 {
 
 void FVkContext::Init()
 {
+	std::vector<const char*> RequiredExtensions;
+
+	Window* pWnd = Application::GetApp().GetWindow();
+	RE_CORE_ASSERT(pWnd, "[FVkContext] Invalid window!");
+	switch (pWnd->GetType())
+	{
+	case EWindowType::GLFW:
+	{
+		uint32 glfwExtensionCount = 0;
+		const char** glfwExtensions;
+		glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+
+		for (uint32 i = 0; i < glfwExtensionCount; i++) {
+			RequiredExtensions.emplace_back(glfwExtensions[i]);
+		}
+
+		break;
+	}
+	default:
+		RE_CORE_ASSERT(false, "[FVkContext] Unknown window type!");
+	}
 
     VkApplicationInfo AppInfo{};
     AppInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -26,34 +49,37 @@ void FVkContext::Init()
     VkInstanceCreateInfo InstanceCreateInfo{};
     InstanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     InstanceCreateInfo.pApplicationInfo = &AppInfo;
-
-	Window* pWnd = Application::GetApp().GetWindow();
-	RE_CORE_ASSERT(pWnd, "[FVkContext] Invalid window!");
-	switch (pWnd->GetType())
-	{
-	case EWindowType::GLFW:
-	{
-		uint32_t glfwExtensionCount = 0;
-		const char** glfwExtensions;
-		glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-
-		InstanceCreateInfo.enabledExtensionCount = glfwExtensionCount;
-		InstanceCreateInfo.ppEnabledExtensionNames = glfwExtensions;
-		break;
-	}
-	default:
-		RE_CORE_ASSERT(false, "[FVkContext] Unknown window type!");
-	}
-
+	InstanceCreateInfo.enabledExtensionCount = RequiredExtensions.size();
+	InstanceCreateInfo.ppEnabledExtensionNames = RequiredExtensions.data();
 	InstanceCreateInfo.enabledLayerCount = 0; //TODO: debug layer
 
 	if (vkCreateInstance(&InstanceCreateInfo, nullptr, &mInstance) != VK_SUCCESS) {
 		throw std::runtime_error("[FVkContext] Vulkan create instance failed!");
 	}
-
-
-
-
 }
+
+void FVkContext::Cleanup()
+{
+	vkDestroyInstance(mInstance, nullptr);
+}
+
+void FVkContext::QueryExtensionSupport()
+{
+	uint32 ExtensionCount = 0;
+	vkEnumerateInstanceExtensionProperties(nullptr, &ExtensionCount, nullptr);
+	std::vector<VkExtensionProperties> Extensions(ExtensionCount);
+	vkEnumerateInstanceExtensionProperties(nullptr, &ExtensionCount, Extensions.data());
+
+	RE_CORE_INFO("[FVkContext] Vulkan available extensions:");
+	for (const auto& Ext : Extensions) {
+		RE_CORE_INFO("{}", Ext.extensionName);
+	}
+}
+
+std::vector<const char*> FVkContext::CheckValidationLayerSupport(const std::vector<const char*>& InValidationLayers)
+{
+	return std::vector<const char*>();
+}
+
 
 }

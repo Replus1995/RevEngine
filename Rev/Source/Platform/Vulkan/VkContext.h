@@ -36,6 +36,10 @@ public:
 	virtual void Draw(const Ref<FRHIVertexArray>& InVertexArray, EDrawMode InDrawMode) override;
 
 private:
+	void QueryExtensionSupport();
+	std::vector<const char*> CheckValidationLayerSupport(const std::vector<const char*>& InValidationLayers);
+
+private:
 	VkInstance mInstance;
 };
 
