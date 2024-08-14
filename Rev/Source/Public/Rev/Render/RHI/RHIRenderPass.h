@@ -26,19 +26,6 @@ public:
 	//preserved ?
 };
 
-class FRHISubPass
-{
-public:
-	FRHISubPass(const FSubPassDesc& InDesc) : mDesc(InDesc) {}
-	virtual ~FRHISubPass() = default;
-	const FSubPassDesc& GetDesc() const { return mDesc; }
-
-protected:
-	FSubPassDesc mDesc;
-	class FRHIRenderPass* mParentPass;
-	Ref<FRHIPipeline> mPipeline;
-};
-
 struct FSubPassDependencyDesc
 {
 public:
@@ -48,16 +35,6 @@ public:
 	//DstStageMask
 	//SrcAccessMask
 	//DstAccessMask
-};
-
-class FRHISubPassDependency
-{
-public:
-	FRHISubPassDependency(const FSubPassDependencyDesc& InDesc) : mDesc(InDesc) {}
-	virtual ~FRHISubPassDependency() = default;
-
-protected:
-	FSubPassDependencyDesc mDesc;
 };
 
 enum EAttachmentLoadOp : uint8
@@ -91,6 +68,8 @@ struct FRenderPassDesc
 public:
 	uint32 AttachmentCount = 0;
 	FRenderPassAttachmentDesc Attachments[RTA_MaxColorAttachments + 1];
+	std::vector<FSubPassDesc> SubPasses;
+	std::vector<FSubPassDependencyDesc> Dependencies;
 };
 
 class FRHIRenderPass
