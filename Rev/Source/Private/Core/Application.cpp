@@ -22,7 +22,7 @@ namespace Rev
 		RE_CORE_ASSERT(!sInstance, "Application already exists!");
 		sInstance = this;
 
-		sRenderAPI = ERenderAPI::OpenGL;
+		sRenderAPI = ERenderAPI::Vulkan;
 
 		Input::InitState();
 

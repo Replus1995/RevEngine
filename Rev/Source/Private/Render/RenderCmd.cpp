@@ -25,6 +25,7 @@ void RenderCmd::Shutdown()
 {
 	FRHIShaderLibrary::GetInstance().ClearShadersCache();
 	FRHIShaderLibrary::ReleaseInstance();
+	sContext->Cleanup();
 	sContext.reset();
 }
 

@@ -68,6 +68,10 @@ void FOpenGLContext::Init()
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 }
 
+void FOpenGLContext::Cleanup()
+{
+}
+
 void FOpenGLContext::SetViewport(uint32 x, uint32 y, uint32 width, uint32 height)
 {
 	glViewport(x, y, width, height);
