@@ -115,10 +115,14 @@ void FVkContext::Init()
 		throw std::runtime_error("[FVkContext] Vulkan create instance failed!");
 	}
 
+
+	mDevice.PickPhysicalDevice(this);
+	mDevice.CreateLogicalDevice();
 }
 
 void FVkContext::Cleanup()
 {
+	mDevice.Cleanup();
 	vkDestroyInstance(mInstance, nullptr);
 }
 

@@ -2,6 +2,7 @@
 #include "Rev/Render/RHI/RHIContext.h"
 #include <vector>
 #include <vulkan/vulkan.h>
+#include "VkDevice.h"
 
 namespace Rev
 {
@@ -35,6 +36,8 @@ public:
 
 	virtual void Draw(const Ref<FRHIVertexArray>& InVertexArray, EDrawMode InDrawMode) override;
 
+	const VkInstance& GetInstance() const { return mInstance; }
+
 private:
 	static void CheckExtensionSupport(const std::vector<const char*>& InExtensionNames);
 	static void CheckLayerSupport(const std::vector<const char*>& InLayerNames);
@@ -42,8 +45,8 @@ private:
 	std::vector<const char*> GetEnabledLayers();
 
 private:
-	VkInstance mInstance;
-
+	VkInstance mInstance = VK_NULL_HANDLE;
+	FVkDevice mDevice;
 };
 
 }
