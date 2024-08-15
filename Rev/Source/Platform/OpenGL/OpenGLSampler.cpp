@@ -140,7 +140,7 @@ GLenum FOpenGLSampler::TranslateFilterMode(ESamplerFilterMode InMode, bool bMipM
 			return GL_LINEAR;
 		}
 	}
-	RE_CORE_ASSERT(false, "Invalid filter mode");
+	REV_CORE_ASSERT(false, "Invalid filter mode");
 	return GLenum(0);
 }
 

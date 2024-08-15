@@ -19,11 +19,11 @@ Ref<TRHIResource> CreateRHIResource(Args&&... args)
 {
 	switch (GetRenderAPI())
 	{
-	case ERenderAPI::None:    RE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
+	case ERenderAPI::None:    REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
 	case ERenderAPI::OpenGL:  return CreateRef<TRHIResource>(std::forward<Args>(args)...);
 	}
 
-	RE_CORE_ASSERT(false, "Unknown RenderAPI!");
+	REV_CORE_ASSERT(false, "Unknown RenderAPI!");
 	return nullptr;
 }
 
@@ -34,11 +34,11 @@ Ref<FRHIVertexBuffer> FRHIResourceFactory::CreateVertexBuffer(uint32 InSize)
 {
 	switch (GetRenderAPI())
 	{
-	case ERenderAPI::None:    RE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
+	case ERenderAPI::None:    REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
 	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLVertexBuffer>(InSize);
 	}
 
-	RE_CORE_ASSERT(false, "Unknown RenderAPI!");
+	REV_CORE_ASSERT(false, "Unknown RenderAPI!");
 	return nullptr;
 }
 
@@ -46,11 +46,11 @@ Ref<FRHIVertexBuffer> FRHIResourceFactory::CreateVertexBuffer(const float* InVer
 {
 	switch (GetRenderAPI())
 	{
-	case ERenderAPI::None:    RE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
+	case ERenderAPI::None:    REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
 	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLVertexBuffer>(InVertices, InSize);
 	}
 
-	RE_CORE_ASSERT(false, "Unknown RenderAPI!");
+	REV_CORE_ASSERT(false, "Unknown RenderAPI!");
 	return nullptr;
 }
 
@@ -58,11 +58,11 @@ Ref<FRHIIndexBuffer> FRHIResourceFactory::CreateIndexBuffer(uint32 InStride, uin
 {
 	switch (GetRenderAPI())
 	{
-	case ERenderAPI::None:    RE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
+	case ERenderAPI::None:    REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
 	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLIndexBuffer>(InStride, InCount);
 	}
 
-	RE_CORE_ASSERT(false, "Unknown RenderAPI!");
+	REV_CORE_ASSERT(false, "Unknown RenderAPI!");
 	return nullptr;
 }
 
@@ -70,11 +70,11 @@ Ref<FRHIIndexBuffer> FRHIResourceFactory::CreateIndexBuffer(const void* InIndice
 {
 	switch (GetRenderAPI())
 	{
-	case ERenderAPI::None:    RE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
+	case ERenderAPI::None:    REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
 	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLIndexBuffer>(InIndices, InStride, InCount);
 	}
 
-	RE_CORE_ASSERT(false, "Unknown RenderAPI!");
+	REV_CORE_ASSERT(false, "Unknown RenderAPI!");
 	return nullptr;
 }
 
@@ -82,11 +82,11 @@ Ref<FRHIVertexArray> FRHIResourceFactory::CreateVertexArray()
 {
 	switch (GetRenderAPI())
 	{
-	case ERenderAPI::None:    RE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
+	case ERenderAPI::None:    REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
 	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLVertexArray>();
 	}
 
-	RE_CORE_ASSERT(false, "Unknown RenderAPI!");
+	REV_CORE_ASSERT(false, "Unknown RenderAPI!");
 	return nullptr;
 }
 
@@ -94,11 +94,11 @@ Ref<FRHIUniformBuffer> FRHIResourceFactory::CreateUniformBuffer(uint32 InSize)
 {
 	switch (GetRenderAPI())
 	{
-	case ERenderAPI::None:    RE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
+	case ERenderAPI::None:    REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
 	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLUniformBuffer>(InSize);
 	}
 
-	RE_CORE_ASSERT(false, "Unknown RenderAPI!");
+	REV_CORE_ASSERT(false, "Unknown RenderAPI!");
 	return nullptr;
 }
 
@@ -119,11 +119,11 @@ Ref<FRHITexture> FRHIResourceFactory::CreateTexture(const FTextureDesc& InDesc, 
 {
 	switch (GetRenderAPI())
 	{
-	case ERenderAPI::None:    RE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
+	case ERenderAPI::None:    REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
 	case ERenderAPI::OpenGL:  return CreateOpenGLTexture(InDesc, InSamplerDesc);
 	}
 
-	RE_CORE_ASSERT(false, "Unknown RenderAPI!");
+	REV_CORE_ASSERT(false, "Unknown RenderAPI!");
 	return nullptr;
 }
 
@@ -131,11 +131,11 @@ Ref<FRHIRenderTarget> FRHIResourceFactory::CreateRenderTarget(const FRenderTarge
 {
 	switch (GetRenderAPI())
 	{
-	case ERenderAPI::None:    RE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
+	case ERenderAPI::None:    REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
 	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLRenderTarget>(InDesc);
 	}
 
-	RE_CORE_ASSERT(false, "Unknown RenderAPI!");
+	REV_CORE_ASSERT(false, "Unknown RenderAPI!");
 	return nullptr;
 }
 }

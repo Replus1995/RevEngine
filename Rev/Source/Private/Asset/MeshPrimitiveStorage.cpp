@@ -134,7 +134,7 @@ bool FMeshPrimitiveStorage::GetVertexIndices(uint32 TriIndex, uint32& A, uint32&
 		break;
 	}
 	default:
-		RE_CORE_ASSERT(false, "Unknow index type.");
+		REV_CORE_ASSERT(false, "Unknow index type.");
 		break;
 	}
 

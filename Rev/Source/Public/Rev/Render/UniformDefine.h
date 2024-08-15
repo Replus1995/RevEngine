@@ -5,8 +5,7 @@
 #include "Rev/Render/RenderCmd.h"
 #include "Rev/Render/UniformLayout.h"
 #include "Rev/Render/RHI/RHIBuffer.h"
-
-#define UNIFORM_MAX_FORWARD_LIGHTS 32
+#include "Rev/Render/RHI/RHIResourceFactory.h"
 
 namespace Rev
 {

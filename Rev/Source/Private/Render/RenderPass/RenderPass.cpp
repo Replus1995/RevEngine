@@ -36,7 +36,7 @@ void FRenderPass::SetRenderTarget(const Ref<FRHIRenderTarget>& InTarget)
 {
 	if (mInPass)
 	{
-		RE_CORE_ASSERT(false, "Never set render target in pass.")
+		REV_CORE_ASSERT(false, "Never set render target in pass.")
 		return;
 	}
 	mRenderTarget = InTarget;

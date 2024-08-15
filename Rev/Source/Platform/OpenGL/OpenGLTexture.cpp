@@ -18,7 +18,7 @@ const FRHISampler* FOpenGLTexture::GetSampler() const
 
 void FOpenGLTexture::ClearMipData(uint8 InMipLevel)
 {
-	RE_CORE_ASSERT(InMipLevel < mDesc.NumMips, "MipLevel out of range");
+	REV_CORE_ASSERT(InMipLevel < mDesc.NumMips, "MipLevel out of range");
 	FClearColorBuffer ColorBuffer;
 	FillClearColor(ColorBuffer);
 	glClearTexImage(mHandle, InMipLevel, mFormatData.DataFormat, mFormatData.DataType, (const void*)ColorBuffer.Data());
@@ -106,7 +106,7 @@ Ref<FOpenGLTexture> CreateOpenGLTexture(const FTextureDesc& InDesc, const FSampl
 	default:
 		break;
 	}
-	RE_CORE_ASSERT(false, "Unsupported Texture Dimension!");
+	REV_CORE_ASSERT(false, "Unsupported Texture Dimension!");
 	return nullptr;
 }
 

@@ -21,7 +21,7 @@ uint32 VertexElementSize(EVertexElementType type)
 	case EVertexElementType::Bool:     return 1;
 	}
 
-	RE_CORE_ASSERT(false, "Unknown BufferElementType!");
+	REV_CORE_ASSERT(false, "Unknown BufferElementType!");
 	return 0;
 }
 
@@ -42,7 +42,7 @@ uint32 VertexComponentCount(EVertexElementType type)
 	case EVertexElementType::Bool:    return 1;
 	}
 
-	RE_CORE_ASSERT(false, "Unknown ShaderDataType!");
+	REV_CORE_ASSERT(false, "Unknown ShaderDataType!");
 	return 0;
 }
 

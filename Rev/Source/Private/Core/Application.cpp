@@ -19,7 +19,7 @@ namespace Rev
 	Application* Application::sInstance = nullptr;
 	Application::Application()
 	{
-		RE_CORE_ASSERT(!sInstance, "Application already exists!");
+		REV_CORE_ASSERT(!sInstance, "Application already exists!");
 		sInstance = this;
 
 		sRenderAPI = ERenderAPI::Vulkan;

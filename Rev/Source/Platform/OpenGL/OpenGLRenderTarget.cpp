@@ -10,8 +10,8 @@ FOpenGLRenderTarget::FOpenGLRenderTarget(const FRenderTargetDesc& InDesc)
 {
 	if (!IsEmptyTarget())
 	{
-		RE_CORE_ASSERT(InDesc.Width > 0 && InDesc.Width <= sMaxRenderTargetSize, "Invalid render target width");
-		RE_CORE_ASSERT(InDesc.Height > 0 && InDesc.Height <= sMaxRenderTargetSize, "Invalid render target height");
+		REV_CORE_ASSERT(InDesc.Width > 0 && InDesc.Width <= sMaxRenderTargetSize, "Invalid render target width");
+		REV_CORE_ASSERT(InDesc.Height > 0 && InDesc.Height <= sMaxRenderTargetSize, "Invalid render target height");
 	}
 	CreateResource();
 }
@@ -28,7 +28,7 @@ void FOpenGLRenderTarget::ResizeTargets(uint16 InWidth, uint16 InHeight)
 
 	if (InWidth == 0 || InHeight == 0 || InWidth > sMaxRenderTargetSize || InHeight > sMaxRenderTargetSize)
 	{
-		RE_CORE_WARN("Attempted to rezize framebuffer to {0}, {1} failed", InWidth, InHeight);
+		REV_CORE_WARN("Attempted to rezize framebuffer to {0}, {1} failed", InWidth, InHeight);
 		return;
 	}
 	if (mDesc.Width == InWidth && mDesc.Height == InHeight)
@@ -147,7 +147,7 @@ void FOpenGLRenderTarget::ClearTarget(ERenderTargetAttachment Index)
 				glClearNamedFramebufferfv(mHandle, GL_COLOR, Index, &LinearClearColor.R);
 				break;
 			default:
-				RE_CORE_ASSERT(false, "Unknown render target texture data type");
+				REV_CORE_ASSERT(false, "Unknown render target texture data type");
 				break;
 			}
 		}
@@ -199,7 +199,7 @@ void FOpenGLRenderTarget::Attach(ERenderTargetAttachment Index, const Ref<FRHITe
 		return;
 	if (InTexture->GetDesc().bSRGB)
 	{
-		RE_CORE_ERROR("SRGB texture is not allowed to be attached as render target");
+		REV_CORE_ERROR("SRGB texture is not allowed to be attached as render target");
 		return;
 	}
 
@@ -212,7 +212,7 @@ void FOpenGLRenderTarget::Attach(ERenderTargetAttachment Index, const Ref<FRHITe
 	else if (Index == RTA_DepthStencilAttachment)
 		AttachPoint = GL_DEPTH_STENCIL_ATTACHMENT;
 
-	RE_CORE_ASSERT(AttachPoint != 0);
+	REV_CORE_ASSERT(AttachPoint != 0);
 
 	GLuint TexHandle = *(const GLuint*)InTexture->GetNativeHandle();
 	if (InArrayIndex < 0)
@@ -222,7 +222,7 @@ void FOpenGLRenderTarget::Attach(ERenderTargetAttachment Index, const Ref<FRHITe
 	}
 	else
 	{
-		RE_CORE_ASSERT(InArrayIndex < InTexture->GetArraySize(), "ArrayIndex out of range");
+		REV_CORE_ASSERT(InArrayIndex < InTexture->GetArraySize(), "ArrayIndex out of range");
 		glNamedFramebufferTextureLayer(mHandle, AttachPoint, TexHandle, InMipLevel, InArrayIndex);
 		TargetAttachment.ArrayIndex = InArrayIndex;
 	}
@@ -331,7 +331,7 @@ void FOpenGLRenderTarget::CreateResource()
 		//Depth Only
 		glNamedFramebufferDrawBuffer(mHandle, GL_NONE);
 	}
-	RE_CORE_ASSERT(glCheckNamedFramebufferStatus(mHandle, GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "OpenGL RenderTarget Incomplete!");
+	REV_CORE_ASSERT(glCheckNamedFramebufferStatus(mHandle, GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "OpenGL RenderTarget Incomplete!");
 }
 
 void FOpenGLRenderTarget::ReleaseResource()
@@ -356,7 +356,7 @@ void FOpenGLRenderTarget::ReleaseResource()
 
 Ref<FOpenGLTexture> FOpenGLRenderTarget::CreateColorTexture(const FColorTargetDesc& InDesc)
 {
-	RE_CORE_ASSERT(!IsEmptyTarget());
+	REV_CORE_ASSERT(!IsEmptyTarget());
 	if(InDesc.Format == PF_Unknown)
 		return nullptr;
 	FTextureDesc TexDesc ((ETextureDimension)mDesc.Dimension, InDesc.Format, false, mDesc.Width, mDesc.Height, 0, mDesc.ArraySize, InDesc.ClearColor, 1, mDesc.NumSamples);
@@ -365,7 +365,7 @@ Ref<FOpenGLTexture> FOpenGLRenderTarget::CreateColorTexture(const FColorTargetDe
 
 Ref<FOpenGLTexture> FOpenGLRenderTarget::CreateDepthStencilTexture(const FDepthStencilTargetDesc& InDesc)
 {
-	RE_CORE_ASSERT(!IsEmptyTarget());
+	REV_CORE_ASSERT(!IsEmptyTarget());
 	if (InDesc.Format != PF_ShadowDepth && InDesc.Format != PF_DepthStencil)
 		return nullptr;
 	FTextureDesc TexDesc((ETextureDimension)mDesc.Dimension, InDesc.Format, false, mDesc.Width, mDesc.Height, 0, mDesc.ArraySize, { InDesc.ClearDepth, InDesc.ClearStencil }, 1, mDesc.NumSamples);

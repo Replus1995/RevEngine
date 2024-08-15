@@ -22,7 +22,7 @@ const Ref<FRHIShader>& FRHIGraphicsShaders::operator[](ERHIShaderStage Stage) co
 	default:
 		break;
 	}
-	RE_CORE_ASSERT(false, "GraphicsShaders index out of range");
+	REV_CORE_ASSERT(false, "GraphicsShaders index out of range");
 	return VertexShader;
 }
 

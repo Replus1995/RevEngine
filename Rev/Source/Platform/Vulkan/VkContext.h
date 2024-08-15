@@ -1,6 +1,6 @@
 #pragma once
 #include "Rev/Render/RHI/RHIContext.h"
-
+#include <vector>
 #include <vulkan/vulkan.h>
 
 namespace Rev
@@ -17,11 +17,11 @@ public:
 	virtual void SetClearColor(const Math::FLinearColor& color) override;
 	virtual void ClearBackBuffer() override;
 
-	virtual void EnableDepthTest(bool bEnable) override;
+	/*virtual void EnableDepthTest(bool bEnable) override;
 	virtual void EnableDepthWrite(bool bEnable) override;
 	virtual void SetDepthTestMode(EDepthTestMode InMode) override;
 	virtual void SetBlendMode(EBlendMode InMode) override;
-	virtual void SetCullFaceMode(ECullFaceMode InMode) override;
+	virtual void SetCullFaceMode(ECullFaceMode InMode) override;*/
 
 //Resource
 	virtual void Bind(const Ref<FRHIVertexBuffer>& InVertexBuffer) override;
@@ -36,11 +36,14 @@ public:
 	virtual void Draw(const Ref<FRHIVertexArray>& InVertexArray, EDrawMode InDrawMode) override;
 
 private:
-	void QueryExtensionSupport();
-	std::vector<const char*> CheckValidationLayerSupport(const std::vector<const char*>& InValidationLayers);
+	static void CheckExtensionSupport(const std::vector<const char*>& InExtensionNames);
+	static void CheckLayerSupport(const std::vector<const char*>& InLayerNames);
+	std::vector<const char*> GetEnabledExtensions();
+	std::vector<const char*> GetEnabledLayers();
 
 private:
 	VkInstance mInstance;
+
 };
 
 }

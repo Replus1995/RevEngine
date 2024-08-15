@@ -7,7 +7,7 @@ namespace Rev
 FOpenGLTextureCube::FOpenGLTextureCube(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc)
 	: FOpenGLTexture(InDesc, InSamplerDesc)
 {
-	RE_CORE_ASSERT(InDesc.Dimension == ETextureDimension::TextureCube);
+	REV_CORE_ASSERT(InDesc.Dimension == ETextureDimension::TextureCube);
 	CreateResource();
 }
 
@@ -19,19 +19,19 @@ FOpenGLTextureCube::~FOpenGLTextureCube()
 void FOpenGLTextureCube::UpdateLayerData(const void* InData, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex, int32 InDepth)
 {
 	//Update one mip of one face of one cube texture at a time
-	RE_CORE_ASSERT(InArrayIndex == 0, "ArrayIndex must be 0 for cube texture");
-	RE_CORE_ASSERT(InMipLevel < mDesc.NumMips, "MipLevel out of range");
+	REV_CORE_ASSERT(InArrayIndex == 0, "ArrayIndex must be 0 for cube texture");
+	REV_CORE_ASSERT(InMipLevel < mDesc.NumMips, "MipLevel out of range");
 
 	auto [MipWidth, MipHeight] = CalculateMipSize2D(InMipLevel);
 	if (InDepth < 0)
 	{
-		RE_CORE_ASSERT(InSize == MipWidth * MipWidth * 6 * mFormatData.PixelSize, "Data size mismatch");
+		REV_CORE_ASSERT(InSize == MipWidth * MipWidth * 6 * mFormatData.PixelSize, "Data size mismatch");
 		glTextureSubImage3D(mHandle, InMipLevel, 0, 0, 0, MipWidth, MipHeight, 6, mFormatData.DataFormat, mFormatData.DataType, InData);
 	}
 	else
 	{
-		RE_CORE_ASSERT(InDepth < TCF_Count, "Depth for cube must be in range 0~5");
-		RE_CORE_ASSERT(InSize == MipWidth * MipWidth * mFormatData.PixelSize, "Data size mismatch");
+		REV_CORE_ASSERT(InDepth < TCF_Count, "Depth for cube must be in range 0~5");
+		REV_CORE_ASSERT(InSize == MipWidth * MipWidth * mFormatData.PixelSize, "Data size mismatch");
 		uint32 CubeFaceIndex = InDepth;
 		glTextureSubImage3D(mHandle, InMipLevel, 0, 0, CubeFaceIndex, MipWidth, MipHeight, 1, mFormatData.DataFormat, mFormatData.DataType, InData);
 	}
@@ -39,8 +39,8 @@ void FOpenGLTextureCube::UpdateLayerData(const void* InData, uint32 InSize, uint
 
 void FOpenGLTextureCube::ClearLayerData(uint8 InMipLevel, uint16 InArrayIndex, int32 InDepth)
 {
-	RE_CORE_ASSERT(InArrayIndex == 0, "ArrayIndex must be 0 for cube texture");
-	RE_CORE_ASSERT(InMipLevel < mDesc.NumMips, "MipLevel out of range");
+	REV_CORE_ASSERT(InArrayIndex == 0, "ArrayIndex must be 0 for cube texture");
+	REV_CORE_ASSERT(InMipLevel < mDesc.NumMips, "MipLevel out of range");
 
 	FClearColorBuffer ColorBuffer;
 	FillClearColor(ColorBuffer);
@@ -51,7 +51,7 @@ void FOpenGLTextureCube::ClearLayerData(uint8 InMipLevel, uint16 InArrayIndex, i
 	}
 	else
 	{
-		RE_CORE_ASSERT(InDepth < TCF_Count, "Depth for cube must be in range 0~5");
+		REV_CORE_ASSERT(InDepth < TCF_Count, "Depth for cube must be in range 0~5");
 		uint32 CubeFaceIndex = InDepth;
 		glClearTexSubImage(mHandle, InMipLevel, 0, 0, CubeFaceIndex, MipWidth, MipHeight, 1, mFormatData.DataFormat, mFormatData.DataType, (const void*)ColorBuffer.Data());
 	}

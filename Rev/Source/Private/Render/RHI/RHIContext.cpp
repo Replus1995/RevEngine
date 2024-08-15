@@ -12,16 +12,16 @@ namespace Rev
 		switch (GetRenderAPI())
 		{
 		case Rev::ERenderAPI::None:
-			RE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!");
+			REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!");
 			return nullptr;
 		case Rev::ERenderAPI::OpenGL:
 			return CreateScope<FOpenGLContext>();
 		case Rev::ERenderAPI::Vulkan:
-			RE_CORE_ASSERT(false, "ERenderAPI::Vulkan is currently not supported!");
+			REV_CORE_ASSERT(false, "ERenderAPI::Vulkan is currently not supported!");
 			return nullptr;
 		}
 
-		RE_CORE_ASSERT(false, "Unknown RenderAPI!");
+		REV_CORE_ASSERT(false, "Unknown RenderAPI!");
 		return nullptr;
 	}
 }

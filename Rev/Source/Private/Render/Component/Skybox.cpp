@@ -21,7 +21,7 @@ const Ref<Texture>& Skybox::GetEnvironmentTexture() const
 
 void Skybox::SetEnvironmentTexture(const Ref<Texture>& InTexture)
 {
-	RE_CORE_ASSERT(InTexture && InTexture->GetResource()->GetDesc().Dimension == ETextureDimension::TextureCube)
+	REV_CORE_ASSERT(InTexture && InTexture->GetResource()->GetDesc().Dimension == ETextureDimension::TextureCube)
 	mEnvTex = InTexture;
 }
 

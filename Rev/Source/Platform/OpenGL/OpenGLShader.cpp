@@ -46,7 +46,7 @@ GLenum FOpenGLShader::TranslateShaderStage(ERHIShaderStage InStage)
 	default:
 		break;
 	}
-	RE_CORE_ASSERT(false);
+	REV_CORE_ASSERT(false);
 	return 0;
 }
 
@@ -79,7 +79,7 @@ FOpenGLShaderProgram::FOpenGLShaderProgram(const std::string& InName, const FRHI
 
 		std::vector<GLchar> infoLog(maxLength);
 		glGetProgramInfoLog(ProgramHandle, maxLength, &maxLength, infoLog.data());
-		RE_CORE_ERROR("Shader linking failed ({0}):\n{1}", InName.c_str(), infoLog.data());
+		REV_CORE_ERROR("Shader linking failed ({0}):\n{1}", InName.c_str(), infoLog.data());
 
 		glDeleteProgram(ProgramHandle);
 	}

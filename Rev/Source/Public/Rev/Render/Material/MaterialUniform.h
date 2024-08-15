@@ -55,7 +55,7 @@ public:
 
 	virtual void Upload(const Ref<FRHIShaderProgram>& program)
 	{
-		RE_CORE_ASSERT(program);
+		REV_CORE_ASSERT(program);
 		if(mLocation == uint16(-1))
 			mLocation = program->GetUniformLocation(GetProgramName(mName));
 		program->SetUniform(mLocation, mValue);

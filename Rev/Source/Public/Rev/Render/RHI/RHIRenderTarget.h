@@ -76,7 +76,7 @@ struct FRenderTargetDesc
 		, DepthStencilTarget(InDepthStencilTarget)
 		, NumSamples(InNumSamples)
 	{
-		RE_CORE_ASSERT(InNumColorTargets <= RTA_MaxColorAttachments);
+		REV_CORE_ASSERT(InNumColorTargets <= RTA_MaxColorAttachments);
 		NumColorTargets = InNumColorTargets;
 		for (size_t i = 0; i < InNumColorTargets; i++)
 		{

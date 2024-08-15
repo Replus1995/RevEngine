@@ -7,7 +7,7 @@ namespace Rev
 FOpenGLTexture3D::FOpenGLTexture3D(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc)
 	: FOpenGLTexture(InDesc, InSamplerDesc)
 {
-	RE_CORE_ASSERT(InDesc.Dimension == ETextureDimension::Texture3D);
+	REV_CORE_ASSERT(InDesc.Dimension == ETextureDimension::Texture3D);
 	CreateResource();
 }
 
@@ -19,27 +19,27 @@ FOpenGLTexture3D::~FOpenGLTexture3D()
 void FOpenGLTexture3D::UpdateLayerData(const void* InData, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex, int32 InDepth)
 {
 	//Update one mip at a time
-	RE_CORE_ASSERT(InArrayIndex == 0, "ArrayIndex must be 0 for 3d texture");
-	RE_CORE_ASSERT(InMipLevel < mDesc.NumMips, "MipLevel out of range");
+	REV_CORE_ASSERT(InArrayIndex == 0, "ArrayIndex must be 0 for 3d texture");
+	REV_CORE_ASSERT(InMipLevel < mDesc.NumMips, "MipLevel out of range");
 
 	auto [MipWidth, MipHeight, MipDepth] = CalculateMipSize3D(InMipLevel);
 	if (InDepth < 0)
 	{
-		RE_CORE_ASSERT(InSize == MipWidth * MipWidth * MipDepth * mFormatData.PixelSize, "Data size mismatch");
+		REV_CORE_ASSERT(InSize == MipWidth * MipWidth * MipDepth * mFormatData.PixelSize, "Data size mismatch");
 		glTextureSubImage3D(mHandle, InMipLevel, 0, 0, 0, MipWidth, MipHeight, MipDepth, mFormatData.DataFormat, mFormatData.DataType, InData);
 	}
 	else
 	{
-		RE_CORE_ASSERT(InDepth < MipDepth, "Depth out of range");
-		RE_CORE_ASSERT(InSize == MipWidth * MipWidth * mFormatData.PixelSize, "Data size mismatch");
+		REV_CORE_ASSERT(InDepth < MipDepth, "Depth out of range");
+		REV_CORE_ASSERT(InSize == MipWidth * MipWidth * mFormatData.PixelSize, "Data size mismatch");
 		glTextureSubImage3D(mHandle, InMipLevel, 0, 0, InDepth, MipWidth, MipHeight, 1, mFormatData.DataFormat, mFormatData.DataType, InData);
 	}
 }
 
 void FOpenGLTexture3D::ClearLayerData(uint8 InMipLevel, uint16 InArrayIndex, int32 InDepth)
 {
-	RE_CORE_ASSERT(InArrayIndex == 0, "ArrayIndex must be 0 for 3d texture");
-	RE_CORE_ASSERT(InMipLevel < mDesc.NumMips, "MipLevel out of range");
+	REV_CORE_ASSERT(InArrayIndex == 0, "ArrayIndex must be 0 for 3d texture");
+	REV_CORE_ASSERT(InMipLevel < mDesc.NumMips, "MipLevel out of range");
 
 	FClearColorBuffer ColorBuffer;
 	FillClearColor(ColorBuffer);
@@ -50,7 +50,7 @@ void FOpenGLTexture3D::ClearLayerData(uint8 InMipLevel, uint16 InArrayIndex, int
 	}
 	else
 	{
-		RE_CORE_ASSERT(InDepth < MipDepth, "Depth out of range");
+		REV_CORE_ASSERT(InDepth < MipDepth, "Depth out of range");
 		glClearTexSubImage(mHandle, InMipLevel, 0, 0, InDepth, MipWidth, MipHeight, 1, mFormatData.DataFormat, mFormatData.DataType, (const void*)ColorBuffer.Data());
 	}
 }

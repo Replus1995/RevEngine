@@ -92,7 +92,7 @@ FBufferView::FBufferView(const FBuffer& InBuffer, uint64 InOffset, uint64 InSize
 	, mOffset(InOffset)
 	, mSize(InSize)
 {
-	RE_CORE_ASSERT(mOffset + mSize <= InBuffer.Size());
+	REV_CORE_ASSERT(mOffset + mSize <= InBuffer.Size());
 }
 
 FBufferView::~FBufferView()

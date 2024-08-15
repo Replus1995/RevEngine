@@ -7,7 +7,7 @@ namespace Rev
 FOpenGLTexture2D::FOpenGLTexture2D(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc)
 	: FOpenGLTexture(InDesc, InSamplerDesc)
 {
-	RE_CORE_ASSERT(InDesc.Dimension == ETextureDimension::Texture2D);
+	REV_CORE_ASSERT(InDesc.Dimension == ETextureDimension::Texture2D);
 	CreateResource();
 }
 
@@ -20,24 +20,24 @@ void FOpenGLTexture2D::UpdateLayerData(const void* InData, uint32 InSize, uint8 
 {
 	if (mDesc.NumSamples != 1)
 	{
-		RE_CORE_ERROR("Updating multisample texture is not allowed");
+		REV_CORE_ERROR("Updating multisample texture is not allowed");
 		return;
 	}
-	RE_CORE_ASSERT(InDepth <= 0, "Depth must be 0(-1) for 2d texture");
-	RE_CORE_ASSERT(InArrayIndex == 0, "ArrayIndex must be 0 for 2d texture");
-	RE_CORE_ASSERT(InMipLevel < mDesc.NumMips, "MipLevel out of range");
+	REV_CORE_ASSERT(InDepth <= 0, "Depth must be 0(-1) for 2d texture");
+	REV_CORE_ASSERT(InArrayIndex == 0, "ArrayIndex must be 0 for 2d texture");
+	REV_CORE_ASSERT(InMipLevel < mDesc.NumMips, "MipLevel out of range");
 
 	auto [MipWidth, MipHeight] = CalculateMipSize2D(InMipLevel);
-	RE_CORE_ASSERT(InSize == MipWidth * MipWidth * mFormatData.PixelSize, "Data size mismatch");
+	REV_CORE_ASSERT(InSize == MipWidth * MipWidth * mFormatData.PixelSize, "Data size mismatch");
 
 	glTextureSubImage2D(mHandle, InMipLevel, 0, 0, MipWidth, MipHeight, mFormatData.DataFormat, mFormatData.DataType, InData);
 }
 
 void FOpenGLTexture2D::ClearLayerData(uint8 InMipLevel, uint16 InArrayIndex, int32 InDepth)
 {
-	RE_CORE_ASSERT(InDepth <= 0, "Depth must be 0(-1) for 2d texture");
-	RE_CORE_ASSERT(InArrayIndex == 0, "ArrayIndex must be 0 for 2d texture");
-	RE_CORE_ASSERT(InMipLevel < mDesc.NumMips, "MipLevel out of range");
+	REV_CORE_ASSERT(InDepth <= 0, "Depth must be 0(-1) for 2d texture");
+	REV_CORE_ASSERT(InArrayIndex == 0, "ArrayIndex must be 0 for 2d texture");
+	REV_CORE_ASSERT(InMipLevel < mDesc.NumMips, "MipLevel out of range");
 
 	FClearColorBuffer ColorBuffer;
 	FillClearColor(ColorBuffer);
@@ -54,7 +54,7 @@ void FOpenGLTexture2D::CreateResource()
 	}
 	else
 	{
-		RE_CORE_ASSERT(mDesc.NumSamples > 1 && mDesc.NumMips == 1);
+		REV_CORE_ASSERT(mDesc.NumSamples > 1 && mDesc.NumMips == 1);
 		glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE, 1, &mHandle);
 		glTexStorage2DMultisample(mHandle, mDesc.NumSamples, mFormatData.InternalFormat, GetWidth(), GetHeight(), GL_TRUE);
 	}

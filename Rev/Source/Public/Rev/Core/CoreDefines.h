@@ -9,15 +9,15 @@
 #error Rev only supprt windows!
 #endif
 
-#ifdef RE_DEBUG
+#ifdef REV_DEBUG
 #if defined(REV_PLATFORM_WINDOWS)
-#define RE_DEBUGBREAK() __debugbreak()
+#define REV_DEBUGBREAK() __debugbreak()
 #else
 #error "Platform doesn't support debugbreak yet!"
 #endif
-#define RE_ENABLE_ASSERTS
+#define REV_ENABLE_ASSERTS
 #else
-#define RE_DEBUGBREAK()
+#define REV_DEBUGBREAK()
 #endif
 
 #ifndef FORCEINLINE
@@ -49,5 +49,5 @@
 #endif
 
 #define BIT(x) (1 << x)
-#define RE_EXPAND_MACRO(x) x
-#define RE_STRINGIFY_MACRO(x) #x
+#define REV_EXPAND_MACRO(x) x
+#define REV_STRINGIFY_MACRO(x) #x

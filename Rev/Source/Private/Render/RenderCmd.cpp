@@ -13,7 +13,7 @@ static Scope<FRHIContext> sContext;
 
 void RenderCmd::Init()
 {
-	RE_CORE_ASSERT(!sContext, "RenderCmd already initialized!");
+	REV_CORE_ASSERT(!sContext, "RenderCmd already initialized!");
 	sContext = FRHIContext::Create();
 	sContext->Init();
 	FRHIShaderLibrary::CreateInstance();

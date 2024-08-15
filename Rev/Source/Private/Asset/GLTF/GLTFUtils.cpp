@@ -6,8 +6,6 @@
 
 #define TINYGLTF_USE_CPP14
 #define TINYGLTF_IMPLEMENTATION
-#define STB_IMAGE_IMPLEMENTATION
-#define STB_IMAGE_WRITE_IMPLEMENTATION
 #define STBI_MSC_SECURE_CRT
 #include <tiny_gltf.h>
 
@@ -37,7 +35,7 @@ FBuffer UnpackTightBuffer(const uint8* InDataMem, const tinygltf::BufferView& In
 
 FBuffer LoadBufferData(const tinygltf::Accessor& InAccessor, const tinygltf::Model& InModel, size_t DstStride)
 {
-	RE_CORE_ASSERT(InAccessor.bufferView >= 0 && InAccessor.bufferView < InModel.bufferViews.size());
+	REV_CORE_ASSERT(InAccessor.bufferView >= 0 && InAccessor.bufferView < InModel.bufferViews.size());
 	const tinygltf::BufferView& RefBufferView = InModel.bufferViews[InAccessor.bufferView];
 	const tinygltf::Buffer& RefBuffer = InModel.buffers[RefBufferView.buffer];
 	const uint8* DataMem = RefBuffer.data.data() + RefBufferView.byteOffset + InAccessor.byteOffset;
@@ -162,7 +160,7 @@ EPixelFormat FGLTFUtils::TranslateImageFormat(const tinygltf::Image& InImage)
 		break;
 	}
 
-	RE_CORE_WARN("[GLTF] Unsupported image format.");
+	REV_CORE_WARN("[GLTF] Unsupported image format.");
 	return PF_Unknown;
 }
 
@@ -223,7 +221,7 @@ FSamplerDesc FGLTFUtils::TranslateSampler(const tinygltf::Sampler& InSampler)
 
 Math::FLinearColor FGLTFUtils::TranslateColor(const std::vector<double>& InColor)
 {
-	RE_CORE_ASSERT(InColor.size() == 4);
+	REV_CORE_ASSERT(InColor.size() == 4);
 	Math::FLinearColor Result(0, 0, 0, 1);
 	for (size_t i = 0; i < InColor.size(); i++)
 	{
@@ -234,7 +232,7 @@ Math::FLinearColor FGLTFUtils::TranslateColor(const std::vector<double>& InColor
 
 Math::FVector3 FGLTFUtils::TranslateVector3(const std::vector<double>& InVector3)
 {
-	RE_CORE_ASSERT(InVector3.size() == 3);
+	REV_CORE_ASSERT(InVector3.size() == 3);
 	Math::FVector3 Result(0, 0, 0);
 	for (size_t i = 0; i < InVector3.size(); i++)
 	{
@@ -251,36 +249,36 @@ Ref<FMeshPrimitiveStorage> FGLTFUtils::ImportMeshPrimitive(const tinygltf::Primi
 
 	for (auto& [attrName, attrIndex] : InPrimitive.attributes)
 	{
-		RE_CORE_ASSERT(attrIndex >= 0 && attrIndex < InModel.accessors.size());
+		REV_CORE_ASSERT(attrIndex >= 0 && attrIndex < InModel.accessors.size());
 		const tinygltf::Accessor& RefAccessor = InModel.accessors[attrIndex];
 		if (attrName.compare("POSITION") == 0)
 		{
-			RE_CORE_ASSERT(RefAccessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT);
-			RE_CORE_ASSERT(RefAccessor.type == TINYGLTF_TYPE_VEC3);
+			REV_CORE_ASSERT(RefAccessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT);
+			REV_CORE_ASSERT(RefAccessor.type == TINYGLTF_TYPE_VEC3);
 			OutStorage->PositonData = LoadBufferData<float, 3>(RefAccessor, InModel);
 		}
 		else if (attrName.compare("COLOR") == 0)
 		{
-			RE_CORE_ASSERT(RefAccessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT);
-			RE_CORE_ASSERT(RefAccessor.type == TINYGLTF_TYPE_VEC4);
+			REV_CORE_ASSERT(RefAccessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT);
+			REV_CORE_ASSERT(RefAccessor.type == TINYGLTF_TYPE_VEC4);
 			OutStorage->ColorData = LoadBufferData<float, 4>(RefAccessor, InModel);
 		}
 		else if (attrName.compare("TEXCOORD_0") == 0)
 		{
-			RE_CORE_ASSERT(RefAccessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT);
-			RE_CORE_ASSERT(RefAccessor.type == TINYGLTF_TYPE_VEC2);
+			REV_CORE_ASSERT(RefAccessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT);
+			REV_CORE_ASSERT(RefAccessor.type == TINYGLTF_TYPE_VEC2);
 			OutStorage->TexCoordData = LoadBufferData<float, 2>(RefAccessor, InModel);
 		}
 		else if (attrName.compare("NORMAL") == 0)
 		{
-			RE_CORE_ASSERT(RefAccessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT);
-			RE_CORE_ASSERT(RefAccessor.type == TINYGLTF_TYPE_VEC3);
+			REV_CORE_ASSERT(RefAccessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT);
+			REV_CORE_ASSERT(RefAccessor.type == TINYGLTF_TYPE_VEC3);
 			OutStorage->NormalData = LoadBufferData<float, 3>(RefAccessor, InModel);
 		}
 		else if (attrName.compare("TANGENT") == 0)
 		{
-			RE_CORE_ASSERT(RefAccessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT);
-			RE_CORE_ASSERT(RefAccessor.type == TINYGLTF_TYPE_VEC4);
+			REV_CORE_ASSERT(RefAccessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT);
+			REV_CORE_ASSERT(RefAccessor.type == TINYGLTF_TYPE_VEC4);
 			OutStorage->TangentData = LoadBufferData<float, 3>(RefAccessor, InModel);
 		}
 	}
@@ -288,9 +286,9 @@ Ref<FMeshPrimitiveStorage> FGLTFUtils::ImportMeshPrimitive(const tinygltf::Primi
 
 	{
 		//Load Index Data
-		RE_CORE_ASSERT(InPrimitive.indices >= 0 && InPrimitive.indices < InModel.accessors.size());
+		REV_CORE_ASSERT(InPrimitive.indices >= 0 && InPrimitive.indices < InModel.accessors.size());
 		const tinygltf::Accessor&  RefAccessor = InModel.accessors[InPrimitive.indices];
-		RE_CORE_ASSERT(RefAccessor.type == TINYGLTF_TYPE_SCALAR);
+		REV_CORE_ASSERT(RefAccessor.type == TINYGLTF_TYPE_SCALAR);
 		OutStorage->IndexCount = RefAccessor.count;
 		OutStorage->IndexStride = GetComponentSize(RefAccessor.componentType);
 		OutStorage->IndexData = LoadBufferData(RefAccessor, InModel, OutStorage->IndexStride);
@@ -413,26 +411,26 @@ FModelImportResult FGLTFUtils::ImportModel(const FPath& InPath, bool DumpInfo)
 	bool ret = false;
 	if (InPath.Extension().compare(".glb") == 0) {
 	
-	    RE_CORE_INFO("Reading binary glTF {0}", NativePath);
+	    REV_CORE_INFO("Reading binary glTF {0}", NativePath);
 	    // assume binary glTF.
 	    ret = ctx.LoadBinaryFromFile(&InModel, &err, &warn, NativePath.c_str());
 	}
 	else {
-	    RE_CORE_INFO("Reading ASCII glTF {0}", NativePath);
+	    REV_CORE_INFO("Reading ASCII glTF {0}", NativePath);
 	    // assume ascii glTF.
 	    ret = ctx.LoadASCIIFromFile(&InModel, &err, &warn, NativePath.c_str());
 	}
 	
 	if (!warn.empty()) {
-	    RE_CORE_WARN("glTF load warning: {}", warn);
+	    REV_CORE_WARN("glTF load warning: {}", warn);
 	}
 	
 	if (!err.empty()) {
-	    RE_CORE_ERROR("glTF load error: {}", err);
+	    REV_CORE_ERROR("glTF load error: {}", err);
 	}
 	
 	if (!ret) {
-	    RE_CORE_ERROR("glTF load failed: {}", NativePath);
+	    REV_CORE_ERROR("glTF load failed: {}", NativePath);
 		return {};
 	}
 	

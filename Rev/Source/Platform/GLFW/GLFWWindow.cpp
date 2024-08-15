@@ -11,7 +11,7 @@ static bool sGLFWInitialized = false;
 
 static void GLFWErrorCallback(int error, const char* description)
 {
-	RE_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
+	REV_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
 }
 
 GLFWWindow::GLFWWindow(const WindowProps& props)
@@ -63,12 +63,12 @@ void GLFWWindow::Init(const WindowProps& props)
 	mData.Height = props.Height;
 	mData.VSync = true;
 
-	RE_CORE_INFO("Create Window {0} ({1}, {2})", props.Title, props.Width, props.Height);
+	REV_CORE_INFO("Create Window {0} ({1}, {2})", props.Title, props.Width, props.Height);
 
 	if (!sGLFWInitialized)
 	{
 		int success = glfwInit();
-		RE_CORE_ASSERT(success, "Could not initialze GLFW!");
+		REV_CORE_ASSERT(success, "Could not initialze GLFW!");
 
 		switch (GetRenderAPI())
 		{

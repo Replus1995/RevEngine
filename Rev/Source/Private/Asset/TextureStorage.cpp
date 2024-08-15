@@ -31,7 +31,7 @@ void FImageStorage::Resize(uint8 NumMips, uint16 NumLayers)
 
 FBuffer& FImageStorage::At(uint8 MipIndex, uint16 LayerIndex)
 {
-	RE_CORE_ASSERT(MipIndex < mNumMips && LayerIndex < mNumLayers);
+	REV_CORE_ASSERT(MipIndex < mNumMips && LayerIndex < mNumLayers);
 	uint32 Index = LayerIndex * mNumMips + MipIndex;
 	return mImages[Index];
 }
@@ -52,7 +52,7 @@ Ref<Texture> FTextureStorage::CreateTexture(bool bForceSRGB)
 	TextureDesc.bSRGB = bForceSRGB ? true : TextureDesc.bSRGB;
 	if (TextureDesc.Dimension == ETextureDimension::TextureCube && ImageData.NumLayers() == 6)
 	{
-		RE_CORE_ASSERT(TextureDesc.NumMips == ImageData.NumMips());
+		REV_CORE_ASSERT(TextureDesc.NumMips == ImageData.NumMips());
 		mCache = CreateRef<Texture>(FRHIResourceFactory::CreateTexture(TextureDesc, SamplerDesc));
 		for (uint8 iCubeFace = 0; iCubeFace < 6; iCubeFace++)
 		{
@@ -66,7 +66,7 @@ Ref<Texture> FTextureStorage::CreateTexture(bool bForceSRGB)
 	}
 	else if (TextureDesc.Dimension == ETextureDimension::TextureCubeArray && ImageData.NumLayers() == 6 * TextureDesc.ArraySize)
 	{
-		RE_CORE_ASSERT(TextureDesc.NumMips == ImageData.NumMips());
+		REV_CORE_ASSERT(TextureDesc.NumMips == ImageData.NumMips());
 		mCache = CreateRef<Texture>(FRHIResourceFactory::CreateTexture(TextureDesc, SamplerDesc));
 		for (uint8 iLayer = 0; iLayer < TextureDesc.ArraySize; iLayer++)
 		{
@@ -82,8 +82,8 @@ Ref<Texture> FTextureStorage::CreateTexture(bool bForceSRGB)
 		return mCache;
 	}
 	
-	RE_CORE_ASSERT(TextureDesc.NumMips == ImageData.NumMips());
-	RE_CORE_ASSERT(TextureDesc.ArraySize == ImageData.NumLayers());
+	REV_CORE_ASSERT(TextureDesc.NumMips == ImageData.NumMips());
+	REV_CORE_ASSERT(TextureDesc.ArraySize == ImageData.NumLayers());
 
 	
 	mCache = CreateRef<Texture>(FRHIResourceFactory::CreateTexture(TextureDesc, SamplerDesc));

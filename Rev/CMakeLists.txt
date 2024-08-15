@@ -9,12 +9,12 @@ SHARED
     ${REV_SRC_FILES}
 )
 
-set_target_properties(Rev PROPERTIES UNITY_BUILD TRUE)
+set_target_properties(Rev PROPERTIES UNITY_BUILD ON)
 
 target_compile_definitions(Rev
 PUBLIC
-    $<$<CONFIG:Debug>:RE_DEBUG>
-    $<$<CONFIG:Release>:RE_RELEASE>
+    $<$<CONFIG:Debug>:REV_DEBUG>
+    $<$<CONFIG:Release>:REV_RELEASE>
     _SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING
     NOMINMAX #spdlog
     _SCL_SECURE_NO_WARNINGS #spdlog

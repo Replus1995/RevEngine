@@ -27,33 +27,33 @@ void OpenGLMessageCallback(
 {
 	switch (severity)
 	{
-	case GL_DEBUG_SEVERITY_HIGH:         RE_CORE_CRITICAL(message); return;
-	case GL_DEBUG_SEVERITY_MEDIUM:		 RE_CORE_ERROR(message); return;
-	case GL_DEBUG_SEVERITY_LOW:          RE_CORE_WARN(message); return;
-	case GL_DEBUG_SEVERITY_NOTIFICATION: RE_CORE_TRACE(message); return;
+	case GL_DEBUG_SEVERITY_HIGH:         REV_CORE_CRITICAL(message); return;
+	case GL_DEBUG_SEVERITY_MEDIUM:		 REV_CORE_ERROR(message); return;
+	case GL_DEBUG_SEVERITY_LOW:          REV_CORE_WARN(message); return;
+	case GL_DEBUG_SEVERITY_NOTIFICATION: REV_CORE_TRACE(message); return;
 	}
 
-	RE_CORE_ASSERT(false, "[OpenGLRHI] Unknown severity level!");
+	REV_CORE_ASSERT(false, "[OpenGLRHI] Unknown severity level!");
 }
 
 void FOpenGLContext::Init()
 {
 	Window* pWnd = Application::GetApp().GetWindow();
-	RE_CORE_ASSERT(pWnd, "[OpenGLRHI] Invalid window!");
+	REV_CORE_ASSERT(pWnd, "[OpenGLRHI] Invalid window!");
 
 	switch (pWnd->GetType())
 	{
 	case EWindowType::GLFW:
 	{
 		int version = gladLoadGL(glfwGetProcAddress);
-		RE_CORE_TRACE("[OpenGLRHI] OpenGL Version {0}.{1}", GLAD_VERSION_MAJOR(version), GLAD_VERSION_MINOR(version));
+		REV_CORE_TRACE("[OpenGLRHI] OpenGL Version {0}.{1}", GLAD_VERSION_MAJOR(version), GLAD_VERSION_MINOR(version));
 		break;
 	}
 	default:
-		RE_CORE_ASSERT(false, "[OpenGLRHI] Unknown window type!");
+		REV_CORE_ASSERT(false, "[OpenGLRHI] Unknown window type!");
 	}
 
-#ifdef RE_DEBUG
+#ifdef REV_DEBUG
 	glEnable(GL_DEBUG_OUTPUT);
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 	glDebugMessageCallback(OpenGLMessageCallback, nullptr);
@@ -256,7 +256,7 @@ GLenum FOpenGLContext::TranslateDrawMode(EDrawMode InDrawMode)
 	default:
 		break;
 	}
-	RE_CORE_ASSERT(false, "Unknown draw mode");
+	REV_CORE_ASSERT(false, "Unknown draw mode");
 	return 0;
 }
 
@@ -273,7 +273,7 @@ GLenum FOpenGLContext::TranslateIndexType(uint32 InStride)
 	default:
 		break;
 	}
-	RE_CORE_ASSERT(false, "Unknown index type");
+	REV_CORE_ASSERT(false, "Unknown index type");
 	return 0;
 }
 

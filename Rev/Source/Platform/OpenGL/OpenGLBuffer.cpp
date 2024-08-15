@@ -29,7 +29,7 @@ FOpenGLVertexBuffer::~FOpenGLVertexBuffer()
 
 void FOpenGLVertexBuffer::UpdateSubData(const void* data, uint32 size, uint32 offset)
 {
-	RE_CORE_ASSERT(size + offset <= mSize);
+	REV_CORE_ASSERT(size + offset <= mSize);
 
 	glBindBuffer(GL_ARRAY_BUFFER, mHandle);
 	glBufferSubData(GL_ARRAY_BUFFER, offset, size, data);
@@ -64,7 +64,7 @@ FOpenGLIndexBuffer::~FOpenGLIndexBuffer()
 
 void FOpenGLIndexBuffer::UpdateSubData(const void* data, uint32 count, uint32 offset)
 {
-	RE_CORE_ASSERT(count + offset <= mCount);
+	REV_CORE_ASSERT(count + offset <= mCount);
 
 	glBindBuffer(GL_ARRAY_BUFFER, mHandle);
 	glBufferSubData(GL_ARRAY_BUFFER, mStride * offset, mStride * count, data);
@@ -88,7 +88,7 @@ static GLenum ConvertToOpenGLDataType(EVertexElementType type)
 	case EVertexElementType::Bool:     return GL_BOOL;
 	}
 
-	RE_CORE_ASSERT(false, "Unknown ShaderDataType!");
+	REV_CORE_ASSERT(false, "Unknown ShaderDataType!");
 	return 0;
 }
 
@@ -104,7 +104,7 @@ FOpenGLVertexArray::~FOpenGLVertexArray()
 
 void FOpenGLVertexArray::AddVertexBuffer(const Ref<FRHIVertexBuffer>& InVertexBuffer)
 {
-	RE_CORE_ASSERT(InVertexBuffer && InVertexBuffer->GetLayout().GetElements().size(), "Unknown vertex buffer layout!");
+	REV_CORE_ASSERT(InVertexBuffer && InVertexBuffer->GetLayout().GetElements().size(), "Unknown vertex buffer layout!");
 
 	glBindVertexArray(mHandle);
 	glBindBuffer(GL_ARRAY_BUFFER, *(const GLuint*)InVertexBuffer->GetNativeHandle());
@@ -160,7 +160,7 @@ void FOpenGLVertexArray::AddVertexBuffer(const Ref<FRHIVertexBuffer>& InVertexBu
 			break;
 		}
 		default:
-			RE_CORE_ASSERT(false, "Unknown ShaderDataType!");
+			REV_CORE_ASSERT(false, "Unknown ShaderDataType!");
 		}
 	}
 

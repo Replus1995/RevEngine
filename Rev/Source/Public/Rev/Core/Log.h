@@ -20,15 +20,17 @@ namespace Rev
 }
 
 //Core log marcos
-#define RE_CORE_TRACE(...)		::Rev::Log::GetCoreLogger()->trace(__VA_ARGS__)
-#define RE_CORE_INFO(...)		::Rev::Log::GetCoreLogger()->info(__VA_ARGS__)
-#define RE_CORE_WARN(...)		::Rev::Log::GetCoreLogger()->warn(__VA_ARGS__)
-#define RE_CORE_ERROR(...)		::Rev::Log::GetCoreLogger()->error(__VA_ARGS__)
-#define RE_CORE_CRITICAL(...)	::Rev::Log::GetCoreLogger()->critical(__VA_ARGS__)
+#define REV_CORE_TRACE(...)		::Rev::Log::GetCoreLogger()->trace(__VA_ARGS__)
+#define REV_CORE_DEBUG(...)		::Rev::Log::GetCoreLogger()->debug(__VA_ARGS__)
+#define REV_CORE_INFO(...)		::Rev::Log::GetCoreLogger()->info(__VA_ARGS__)
+#define REV_CORE_WARN(...)		::Rev::Log::GetCoreLogger()->warn(__VA_ARGS__)
+#define REV_CORE_ERROR(...)		::Rev::Log::GetCoreLogger()->error(__VA_ARGS__)
+#define REV_CORE_CRITICAL(...)	::Rev::Log::GetCoreLogger()->critical(__VA_ARGS__)
 
 //Client log marcos
-#define RE_TRACE(...)			::Rev::Log::GetClientLogger()->trace(__VA_ARGS__)
-#define RE_INFO(...)			::Rev::Log::GetClientLogger()->info(__VA_ARGS__)
-#define RE_WARN(...)			::Rev::Log::GetClientLogger()->warn(__VA_ARGS__)
-#define RE_ERROR(...)			::Rev::Log::GetClientLogger()->error(__VA_ARGS__)
-#define RE_CRITICAL(...)		::Rev::Log::GetClientLogger()->critical(__VA_ARGS__)
+#define REV_TRACE(...)			::Rev::Log::GetClientLogger()->trace(__VA_ARGS__)
+#define REV_DEBUG(...)			::Rev::Log::GetClientLogger()->debug(__VA_ARGS__)
+#define REV_INFO(...)			::Rev::Log::GetClientLogger()->info(__VA_ARGS__)
+#define REV_WARN(...)			::Rev::Log::GetClientLogger()->warn(__VA_ARGS__)
+#define REV_ERROR(...)			::Rev::Log::GetClientLogger()->error(__VA_ARGS__)
+#define REV_CRITICAL(...)		::Rev::Log::GetClientLogger()->critical(__VA_ARGS__)

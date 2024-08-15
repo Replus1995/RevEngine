@@ -53,7 +53,7 @@ shaderc_include_result* ShaderIncluder::GetInclude(
 {
 	std::string HeaderPath(requested_source);
 	FBuffer HeaderContent = FFileSystem::LoadBinaryFile(FPath(HeaderPath));
-	RE_CORE_ASSERT(!HeaderContent.Empty(), "ShaderIncluder::GetInclude header file load failed.");
+	REV_CORE_ASSERT(!HeaderContent.Empty(), "ShaderIncluder::GetInclude header file load failed.");
 
 	auto Container = new HeaderContainer;
 	Container->Name = std::move(HeaderPath);
@@ -86,7 +86,7 @@ static shaderc_shader_kind ShaderStageToShadercKind(ERHIShaderStage InStage)
 	case ERHIShaderStage::Geometry:		return shaderc_glsl_geometry_shader;
 	case ERHIShaderStage::Compute:		return shaderc_glsl_compute_shader;
 	}
-	RE_CORE_ASSERT(false, "Unknown Shader Stage");
+	REV_CORE_ASSERT(false, "Unknown Shader Stage");
 	return (shaderc_shader_kind)0;
 }
 
@@ -101,7 +101,7 @@ static void InitCompileOptions(shaderc::CompileOptions& Options)
 		Options.SetTargetEnvironment(shaderc_target_env_vulkan, shaderc_env_version_vulkan_1_2);
 		break;
 	default:
-		RE_CORE_ASSERT(false, "Unknow Render API")
+		REV_CORE_ASSERT(false, "Unknow Render API")
 			break;
 	}
 	Options.SetIncluder(CreateScope<ShaderIncluder>());
@@ -139,15 +139,15 @@ void FShadercFactory::CompileShaders(const FShadercSource& InSource, const FRHIS
 		shaderc::SpvCompilationResult CompileResult = compiler.CompileGlslToSpv(InSource.FileContent.DataAs<char>(), InSource.FileContent.Size(), ShaderStageToShadercKind(InSource.Stage), NativeFilePath.c_str(), options);
 		if (CompileResult.GetCompilationStatus() != shaderc_compilation_status_success)
 		{
-			RE_CORE_ERROR(CompileResult.GetErrorMessage());
-			RE_CORE_ASSERT(false);
+			REV_CORE_ERROR(CompileResult.GetErrorMessage());
+			REV_CORE_ASSERT(false);
 		}
 		OutData.Stage = InSource.Stage;
 		size_t CompiledSize = CompileResult.cend() - CompileResult.cbegin();
 		OutData.Binary.Allocate(CompiledSize * sizeof(uint32_t));
 		memcpy(OutData.Binary.Data(), CompileResult.cbegin(), CompiledSize * sizeof(uint32_t));
 	}
-	RE_CORE_INFO("Shader '{0}' compile took {1} ms", OutData.Name.c_str(), timer.ElapsedMillis());
+	REV_CORE_INFO("Shader '{0}' compile took {1} ms", OutData.Name.c_str(), timer.ElapsedMillis());
 }
 
 FShadercCompiledData FShadercFactory::LoadOrCompileShader(const FPath& InPath, const FRHIShaderCompileOptions& InOptions)
@@ -164,7 +164,7 @@ FShadercCompiledData FShadercFactory::LoadOrCompileShader(const FPath& InPath, c
 		auto SourceWriteTime = fs::last_write_time(InPath.ToNative());
 		if (SourceWriteTime > CacheWriteTime)
 		{
-			RE_CORE_INFO("Shader '{0}' cache out of date.", Result.Name.c_str());
+			REV_CORE_INFO("Shader '{0}' cache out of date.", Result.Name.c_str());
 		}
 		else
 		{
@@ -179,7 +179,7 @@ FShadercCompiledData FShadercFactory::LoadOrCompileShader(const FPath& InPath, c
 		FShadercUtils::SaveShaderCompiledData(ShaderCachePath, Result);
 	}
 
-#ifdef RE_DEBUG
+#ifdef REV_DEBUG
 	FShadercUtils::DumpShaderInfo(Result);
 #endif
 

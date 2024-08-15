@@ -26,7 +26,7 @@ void FRHIShaderLibrary::ReleaseInstance()
 
 FRHIShaderLibrary& FRHIShaderLibrary::GetInstance()
 {
-	RE_CORE_ASSERT(sRHIShaderLibrary_Inst != nullptr);
+	REV_CORE_ASSERT(sRHIShaderLibrary_Inst != nullptr);
 	return *sRHIShaderLibrary_Inst;
 }
 
@@ -44,7 +44,7 @@ Ref<FRHIShaderProgram> FRHIShaderLibrary::CreateGraphicsProgram(const std::strin
 	case ERenderAPI::OpenGL:
 		return FOpenGLShaderFactory::CreateShaderProgram(InProgramName, Shaders);
 	default:
-		RE_CORE_ASSERT(false, "Unknown RenderAPI!");
+		REV_CORE_ASSERT(false, "Unknown RenderAPI!");
 		break;
 	}
 	return nullptr;
@@ -55,7 +55,7 @@ Ref<FRHIShader> FRHIShaderLibrary::LoadOrCompileShader(const FPath& InPath, cons
 	auto Binary = FShadercFactory::LoadOrCompileShader(InPath, InOptions);
 	if (Binary.Empty())
 	{
-		RE_CORE_WARN("No shader complied for {0}", InPath.ToString().c_str());
+		REV_CORE_WARN("No shader complied for {0}", InPath.ToString().c_str());
 		return {};
 	}
 
@@ -68,7 +68,7 @@ Ref<FRHIShader> FRHIShaderLibrary::LoadOrCompileShader(const FPath& InPath, cons
 		return pShader;
 	}
 	default:
-		RE_CORE_ASSERT(false, "Unknown RenderAPI!");
+		REV_CORE_ASSERT(false, "Unknown RenderAPI!");
 		break;
 	}
 	return {};

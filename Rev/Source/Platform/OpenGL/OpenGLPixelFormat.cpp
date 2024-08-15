@@ -25,7 +25,7 @@ constexpr FOpenGLFormatMapping sOpenGLFormatMappings[] = {
 
 FOpenGLFormatData FOpenGLPixelFormat::TranslatePixelFormat(EPixelFormat InFormat, bool bSRGB)
 {
-	RE_CORE_ASSERT(InFormat != EPixelFormat::PF_Unknown);
+	REV_CORE_ASSERT(InFormat != EPixelFormat::PF_Unknown);
 	if (!bSRGB)
 	{
 		return sOpenGLFormatMappings[(uint8)InFormat].OpenGLFormatData;
@@ -41,7 +41,7 @@ FOpenGLFormatData FOpenGLPixelFormat::TranslatePixelFormat(EPixelFormat InFormat
 		default:
 			break;
 		}
-		RE_CORE_ASSERT(false, "Unknown SRGB format");
+		REV_CORE_ASSERT(false, "Unknown SRGB format");
 		return { 0, 0, 0, 0 };
 	}
 }

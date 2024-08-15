@@ -126,11 +126,11 @@ FTextureStorage FAssetLibrary::ImportTextureCube(const FPath& InPathPX, const FP
 	images[4] = FSTBImage::ImportImage2D(InPathPZ);
 	images[5] = FSTBImage::ImportImage2D(InPathNZ);
 
-	RE_CORE_ASSERT(FSTBImage2D::SameSizeAndFormat(images[0], images[1]));
-	RE_CORE_ASSERT(FSTBImage2D::SameSizeAndFormat(images[0], images[2]));
-	RE_CORE_ASSERT(FSTBImage2D::SameSizeAndFormat(images[0], images[3]));
-	RE_CORE_ASSERT(FSTBImage2D::SameSizeAndFormat(images[0], images[4]));
-	RE_CORE_ASSERT(FSTBImage2D::SameSizeAndFormat(images[0], images[5]));
+	REV_CORE_ASSERT(FSTBImage2D::SameSizeAndFormat(images[0], images[1]));
+	REV_CORE_ASSERT(FSTBImage2D::SameSizeAndFormat(images[0], images[2]));
+	REV_CORE_ASSERT(FSTBImage2D::SameSizeAndFormat(images[0], images[3]));
+	REV_CORE_ASSERT(FSTBImage2D::SameSizeAndFormat(images[0], images[4]));
+	REV_CORE_ASSERT(FSTBImage2D::SameSizeAndFormat(images[0], images[5]));
 
 	Result.Name = "CubeTexture";
 	Result.TextureDesc = FTextureDesc::MakeCube(images[0].Width(), images[0].Height(), images[0].Format(), false);
