@@ -46,6 +46,8 @@ public:
 	virtual void SetClipboardText(const char* text) = 0;
 	virtual const char* GetClipboardText() = 0;
 
+	virtual void* GetNativeHandle() const = 0;
+
 	EWindowType GetType() const { return mType; }
 
 	static Scope<Window> Create(const WindowProps& props = WindowProps());

@@ -4,11 +4,11 @@
 
 namespace Rev
 {
-	class GLFWWindow : public Window
+	class FGLFWWindow : public Window
 	{
 	public:
-		GLFWWindow(const WindowProps& props);
-		virtual ~GLFWWindow();
+		FGLFWWindow(const WindowProps& props);
+		virtual ~FGLFWWindow();
 
 		void OnUpdate() override;
 
@@ -21,6 +21,8 @@ namespace Rev
 
 		virtual void SetClipboardText(const char* text) override;
 		virtual const char* GetClipboardText() override;
+
+		virtual void* GetNativeHandle() const override { return mWindow; }
 
 	private:
 		virtual void Init(const WindowProps& props);

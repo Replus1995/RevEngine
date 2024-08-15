@@ -14,24 +14,24 @@ static void GLFWErrorCallback(int error, const char* description)
 	REV_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
 }
 
-GLFWWindow::GLFWWindow(const WindowProps& props)
+FGLFWWindow::FGLFWWindow(const WindowProps& props)
 {
 	mType = EWindowType::GLFW;
 	Init(props);
 }
 
-GLFWWindow::~GLFWWindow()
+FGLFWWindow::~FGLFWWindow()
 {
 	Shutdown();
 }
 
-void GLFWWindow::OnUpdate()
+void FGLFWWindow::OnUpdate()
 {
 	glfwPollEvents();
 	glfwSwapBuffers(mWindow);
 }
 
-void GLFWWindow::SetVSync(bool enabled)
+void FGLFWWindow::SetVSync(bool enabled)
 {
 	if (enabled)
 		glfwSwapInterval(1);
@@ -41,22 +41,22 @@ void GLFWWindow::SetVSync(bool enabled)
 	mData.VSync = enabled;
 }
 
-bool GLFWWindow::IsVSync() const
+bool FGLFWWindow::IsVSync() const
 {
 	return mData.VSync;
 }
 
-void GLFWWindow::SetClipboardText(const char* text)
+void FGLFWWindow::SetClipboardText(const char* text)
 {
 	glfwSetClipboardString(mWindow, text);
 }
 
-const char* GLFWWindow::GetClipboardText()
+const char* FGLFWWindow::GetClipboardText()
 {
 	return glfwGetClipboardString(mWindow);
 }
 
-void GLFWWindow::Init(const WindowProps& props)
+void FGLFWWindow::Init(const WindowProps& props)
 {
 	mData.Title = props.Title;
 	mData.Width = props.Width;
@@ -175,7 +175,7 @@ void GLFWWindow::Init(const WindowProps& props)
 	});
 }
 
-void GLFWWindow::Shutdown()
+void FGLFWWindow::Shutdown()
 {
 	glfwDestroyWindow(mWindow);
 }

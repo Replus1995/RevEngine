@@ -37,15 +37,21 @@ public:
 	virtual void Draw(const Ref<FRHIVertexArray>& InVertexArray, EDrawMode InDrawMode) override;
 
 	const VkInstance& GetInstance() const { return mInstance; }
+	const VkSurfaceKHR& GetSurface() const { return mSurface; }
+
+private:
+	void CreateInstance();
+	void CreateSurface();
 
 private:
 	static void CheckExtensionSupport(const std::vector<const char*>& InExtensionNames);
 	static void CheckLayerSupport(const std::vector<const char*>& InLayerNames);
-	std::vector<const char*> GetEnabledExtensions();
-	std::vector<const char*> GetEnabledLayers();
+	static std::vector<const char*> GetEnabledExtensions();
+	static std::vector<const char*> GetEnabledLayers();
 
 private:
 	VkInstance mInstance = VK_NULL_HANDLE;
+	VkSurfaceKHR mSurface = VK_NULL_HANDLE;
 	FVkDevice mDevice;
 };
 

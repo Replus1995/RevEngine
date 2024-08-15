@@ -4,6 +4,7 @@
 
 //Private
 #include "OpenGL/OpenGLContext.h"
+#include "Vulkan/VkContext.h"
 
 namespace Rev
 {
@@ -17,8 +18,7 @@ namespace Rev
 		case Rev::ERenderAPI::OpenGL:
 			return CreateScope<FOpenGLContext>();
 		case Rev::ERenderAPI::Vulkan:
-			REV_CORE_ASSERT(false, "ERenderAPI::Vulkan is currently not supported!");
-			return nullptr;
+			return CreateScope<FVkContext>();
 		}
 
 		REV_CORE_ASSERT(false, "Unknown RenderAPI!");

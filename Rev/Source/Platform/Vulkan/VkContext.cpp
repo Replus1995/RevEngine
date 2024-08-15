@@ -5,9 +5,13 @@
 #include "Rev/Core/Application.h"
 #include "Rev/Core/Window.h"
 
+#if defined(REV_PLATFORM_WINDOWS)
+#include <windows.h>
+#include <vulkan/vulkan_win32.h>
+#	define GLFW_EXPOSE_NATIVE_WIN32
+#endif
 #include <GLFW/glfw3.h>
-
-#include "VkAllocator.h"
+#include <GLFW/glfw3native.h>
 
 namespace Rev
 {
@@ -81,22 +85,38 @@ void FVkContext::Init()
 	sVkEnableValidationLayers = false;
 #endif // REV_DEBUG
 
+	CreateInstance();
+	CreateSurface();
+	mDevice.PickPhysicalDevice(this);
+	mDevice.CreateLogicalDevice(this);
+}
+
+void FVkContext::Cleanup()
+{
+	mDevice.Cleanup();
+	vkDestroySurfaceKHR(mInstance, mSurface, nullptr);
+	vkDestroyInstance(mInstance, nullptr);
+}
+
+
+void FVkContext::CreateInstance()
+{
 	const std::vector<const char*> EnabledExtensions = GetEnabledExtensions();
 	const std::vector<const char*> EnabledLayers = GetEnabledLayers();
 
-    VkApplicationInfo AppInfo{};
-    AppInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-    AppInfo.pApplicationName = "RevApp";
-    AppInfo.applicationVersion = VK_MAKE_VERSION(1, 2, 0);
-    AppInfo.pEngineName = "RevEngine";
-    AppInfo.engineVersion = VK_MAKE_VERSION(1, 2, 0);
-    AppInfo.apiVersion = VK_API_VERSION_1_2;
+	VkApplicationInfo AppInfo{};
+	AppInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+	AppInfo.pApplicationName = "RevApp";
+	AppInfo.applicationVersion = VK_MAKE_VERSION(1, 2, 0);
+	AppInfo.pEngineName = "RevEngine";
+	AppInfo.engineVersion = VK_MAKE_VERSION(1, 2, 0);
+	AppInfo.apiVersion = VK_API_VERSION_1_2;
 
 	REV_CORE_TRACE("[FVkContext] Vulkan Version {0}.{1}", 1, 2);
 
-    VkInstanceCreateInfo InstanceCreateInfo{};
-    InstanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-    InstanceCreateInfo.pApplicationInfo = &AppInfo;
+	VkInstanceCreateInfo InstanceCreateInfo{};
+	InstanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+	InstanceCreateInfo.pApplicationInfo = &AppInfo;
 	InstanceCreateInfo.enabledExtensionCount = static_cast<uint32>(EnabledExtensions.size());
 	InstanceCreateInfo.ppEnabledExtensionNames = EnabledExtensions.empty() ? nullptr : EnabledExtensions.data();
 	InstanceCreateInfo.enabledLayerCount = static_cast<uint32>(EnabledLayers.size());
@@ -114,16 +134,37 @@ void FVkContext::Init()
 	if (vkCreateInstance(&InstanceCreateInfo, nullptr, &mInstance) != VK_SUCCESS) {
 		throw std::runtime_error("[FVkContext] Vulkan create instance failed!");
 	}
-
-
-	mDevice.PickPhysicalDevice(this);
-	mDevice.CreateLogicalDevice();
 }
 
-void FVkContext::Cleanup()
+void FVkContext::CreateSurface()
 {
-	mDevice.Cleanup();
-	vkDestroyInstance(mInstance, nullptr);
+	Window* pWnd = Application::GetApp().GetWindow();
+	REV_CORE_ASSERT(pWnd, "[FVkContext] Invalid window!");
+
+#if defined(REV_PLATFORM_WINDOWS)
+	HWND WindoHandle = nullptr;
+	switch (pWnd->GetType())
+	{
+	case EWindowType::GLFW:
+	{
+		WindoHandle = glfwGetWin32Window(static_cast<GLFWwindow*>(pWnd->GetNativeHandle()));
+		break;
+	}
+	default:
+		REV_CORE_ASSERT(false, "[FVkContext] Unknown window type!");
+	}
+
+	VkWin32SurfaceCreateInfoKHR SurfaceCreateInfo{};
+	SurfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+	SurfaceCreateInfo.hwnd = WindoHandle;
+	SurfaceCreateInfo.hinstance = GetModuleHandle(nullptr);
+
+	if (vkCreateWin32SurfaceKHR(mInstance, &SurfaceCreateInfo, nullptr, &mSurface) != VK_SUCCESS) {
+		throw std::runtime_error("failed to create window surface!");
+	}
+#else
+	throw std::runtime_error("[FVkContext] Unsupported platform");
+#endif
 }
 
 void FVkContext::CheckExtensionSupport(const std::vector<const char*>& InExtensionNames)
@@ -221,6 +262,7 @@ std::vector<const char*> FVkContext::GetEnabledLayers()
 	CheckLayerSupport(RequiredLayers);
 	return RequiredLayers;
 }
+
 
 
 
