@@ -1,5 +1,5 @@
 #pragma once
-#include "Rev/Render/RHI/RHISwapChain.h"
+#include "Rev/Render/RHI/RHISwapchain.h"
 #include <vector>
 #include <vulkan/vulkan.h>
 
@@ -8,13 +8,13 @@ namespace Rev
 
 class FVkContext;
 class FVkDevice;
-class FVkSwapChain : public FRHISwapChain
+class FVkSwapchain : public FRHISwapchain
 {
 public:
-	void CreateSwapChain(const FVkContext* InContext, const FVkDevice* InDevice);
+	void CreateSwapchain(const FVkContext* InContext, const FVkDevice* InDevice);
 	void Cleanup(const FVkDevice* InDevice);
 
-	const VkSwapchainKHR& GetSwapChain() const { return mSwapChain; }
+	const VkSwapchainKHR& GetSwapchain() const { return mSwapchain; }
 	const VkExtent2D& GetExtent() const { return mExtent; }
 	const VkFormat& GetFormat() const { return mFormat; }
 
@@ -25,7 +25,7 @@ private:
 	void CreateImageViews(const FVkDevice* InDevice);
 
 private:
-	VkSwapchainKHR mSwapChain;
+	VkSwapchainKHR mSwapchain;
 	VkExtent2D mExtent;
 	VkFormat mFormat;
 	std::vector<VkImage> mImages;

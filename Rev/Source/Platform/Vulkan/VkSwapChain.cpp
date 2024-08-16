@@ -11,7 +11,7 @@
 namespace Rev
 {
 
-void FVkSwapChain::CreateSwapChain(const FVkContext* InContext, const FVkDevice* InDevice)
+void FVkSwapchain::CreateSwapchain(const FVkContext* InContext, const FVkDevice* InDevice)
 {
     REV_CORE_ASSERT(InContext);
     REV_CORE_ASSERT(InDevice);
@@ -63,17 +63,17 @@ void FVkSwapChain::CreateSwapChain(const FVkContext* InContext, const FVkDevice*
     SwapChainCreateInfo.clipped = VK_TRUE;
     SwapChainCreateInfo.oldSwapchain = VK_NULL_HANDLE;
 
-    REV_VK_CHECK(vkCreateSwapchainKHR(InDevice->GetLogicalDevice(), &SwapChainCreateInfo, nullptr, &mSwapChain), "[FVkSwapChain] Failed to create swap chain!");
+    REV_VK_CHECK_THROW(vkCreateSwapchainKHR(InDevice->GetLogicalDevice(), &SwapChainCreateInfo, nullptr, &mSwapchain), "[FVkSwapChain] Failed to create swap chain!");
 
     mExtent = Extent;
     mFormat = SurfaceFormat.format;
-    vkGetSwapchainImagesKHR(InDevice->GetLogicalDevice(), mSwapChain, &ImageCount, nullptr);
+    vkGetSwapchainImagesKHR(InDevice->GetLogicalDevice(), mSwapchain, &ImageCount, nullptr);
     mImages.resize(ImageCount);
-    vkGetSwapchainImagesKHR(InDevice->GetLogicalDevice(), mSwapChain, &ImageCount, mImages.data());
+    vkGetSwapchainImagesKHR(InDevice->GetLogicalDevice(), mSwapchain, &ImageCount, mImages.data());
 
 }
 
-void FVkSwapChain::Cleanup(const FVkDevice* InDevice)
+void FVkSwapchain::Cleanup(const FVkDevice* InDevice)
 {
     REV_CORE_ASSERT(InDevice);
 
@@ -82,10 +82,10 @@ void FVkSwapChain::Cleanup(const FVkDevice* InDevice)
     }
     mImageViews.clear();
     mImages.clear();
-    vkDestroySwapchainKHR(InDevice->GetLogicalDevice(), mSwapChain, nullptr);
+    vkDestroySwapchainKHR(InDevice->GetLogicalDevice(), mSwapchain, nullptr);
 }
 
-VkSurfaceFormatKHR FVkSwapChain::ChooseSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& InAvailableFormats)
+VkSurfaceFormatKHR FVkSwapchain::ChooseSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& InAvailableFormats)
 {
     for (const auto& AvailableFormat : InAvailableFormats) {
         if (AvailableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && AvailableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
@@ -95,7 +95,7 @@ VkSurfaceFormatKHR FVkSwapChain::ChooseSurfaceFormat(const std::vector<VkSurface
     return InAvailableFormats[0];
 }
 
-VkPresentModeKHR FVkSwapChain::ChoosePresentMode(const std::vector<VkPresentModeKHR>& InAvailablePresentModes)
+VkPresentModeKHR FVkSwapchain::ChoosePresentMode(const std::vector<VkPresentModeKHR>& InAvailablePresentModes)
 {
     for (const auto& AvailablePresentMode : InAvailablePresentModes) {
         if (AvailablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
@@ -105,7 +105,7 @@ VkPresentModeKHR FVkSwapChain::ChoosePresentMode(const std::vector<VkPresentMode
     return VK_PRESENT_MODE_FIFO_KHR;
 }
 
-VkExtent2D FVkSwapChain::ChooseExtent(const VkSurfaceCapabilitiesKHR& InCapabilities)
+VkExtent2D FVkSwapchain::ChooseExtent(const VkSurfaceCapabilitiesKHR& InCapabilities)
 {
     if (InCapabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
         return InCapabilities.currentExtent;
@@ -129,7 +129,7 @@ VkExtent2D FVkSwapChain::ChooseExtent(const VkSurfaceCapabilitiesKHR& InCapabili
     }
 }
 
-void FVkSwapChain::CreateImageViews(const FVkDevice* InDevice)
+void FVkSwapchain::CreateImageViews(const FVkDevice* InDevice)
 {
     REV_CORE_ASSERT(InDevice);
     mImageViews.resize(mImages.size());
@@ -150,7 +150,7 @@ void FVkSwapChain::CreateImageViews(const FVkDevice* InDevice)
         ImageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
         ImageViewCreateInfo.subresourceRange.layerCount = 1;
 
-        REV_VK_CHECK(vkCreateImageView(InDevice->GetLogicalDevice(), &ImageViewCreateInfo, nullptr, &mImageViews[i]), "[FVkSwapChain] Failed to create image views!");
+        REV_VK_CHECK_THROW(vkCreateImageView(InDevice->GetLogicalDevice(), &ImageViewCreateInfo, nullptr, &mImageViews[i]), "[FVkSwapChain] Failed to create image views!");
     }
 }
 

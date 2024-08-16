@@ -19,6 +19,7 @@ namespace Rev
 {
 namespace
 {
+static VkDevice sVkDevice = VK_NULL_HANDLE;
 static bool sVkEnableValidationLayers = false;
 static VkDebugUtilsMessageSeverityFlagBitsEXT sVkMinMessageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT;
 
@@ -91,17 +92,59 @@ void FVkContext::Init()
 	CreateSurface();
 	mDevice.PickPhysicalDevice(this);
 	mDevice.CreateLogicalDevice(this);
-	mSwapChain.CreateSwapChain(this, &mDevice);
+	mSwapchain.CreateSwapchain(this, &mDevice);
+	InitFrameData(mFrameData, REV_VK_FRAME_OVERLAP, &mDevice);
+	sVkDevice = mDevice.GetLogicalDevice();
 }
 
 void FVkContext::Cleanup()
 {
-	mSwapChain.Cleanup(&mDevice);
+	vkDeviceWaitIdle(sVkDevice);
+
+	sVkDevice = VK_NULL_HANDLE;
+	CleanupFrameData(mFrameData, REV_VK_FRAME_OVERLAP, &mDevice);
+	mSwapchain.Cleanup(&mDevice);
 	mDevice.Cleanup();
 	vkDestroySurfaceKHR(mInstance, mSurface, nullptr);
 	vkDestroyInstance(mInstance, nullptr);
 }
 
+VkDevice FVkContext::GetVkDevice()
+{
+	return sVkDevice;
+}
+
+void FVkContext::BeginFrame()
+{
+	auto& CurFrameData = GetFrameData();
+
+	REV_VK_CHECK(vkWaitForFences(sVkDevice, 1, &CurFrameData.Fence, true, 1000000000));
+	REV_VK_CHECK(vkResetFences(sVkDevice, 1, &CurFrameData.Fence));
+
+	uint32 SwapchainImageIndex;
+	REV_VK_CHECK(vkAcquireNextImageKHR(sVkDevice, mSwapchain.GetSwapchain(), 1000000000, CurFrameData.SwapchainSemaphore, nullptr, &SwapchainImageIndex));
+
+
+
+	VkCommandBuffer CmdBuffer = CurFrameData.MainCmdBuffer;
+	REV_VK_CHECK(vkResetCommandBuffer(CmdBuffer, 0));
+
+	//begin the command buffer recording. We will use this command buffer exactly once, so we want to let vulkan know that
+	VkCommandBufferBeginInfo CmdBufferBeginInfo = {};
+	CmdBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	CmdBufferBeginInfo.pNext = nullptr;
+	CmdBufferBeginInfo.pInheritanceInfo = nullptr;
+	CmdBufferBeginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+	//start the command buffer recording
+	REV_VK_CHECK(vkBeginCommandBuffer(CmdBuffer, &CmdBufferBeginInfo));
+}
+
+void FVkContext::EndFrame()
+{
+
+	mFrameCount++;
+}
 
 void FVkContext::CreateInstance()
 {
@@ -135,7 +178,7 @@ void FVkContext::CreateInstance()
 		InstanceCreateInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&DebugMessengerCreateInfo;
 	}
 
-	REV_VK_CHECK(vkCreateInstance(&InstanceCreateInfo, nullptr, &mInstance), "[FVkContext] Failed to create vulkan instance!")
+	REV_VK_CHECK_THROW(vkCreateInstance(&InstanceCreateInfo, nullptr, &mInstance), "[FVkContext] Failed to create vulkan instance!")
 }
 
 void FVkContext::CreateSurface()
@@ -161,7 +204,7 @@ void FVkContext::CreateSurface()
 	SurfaceCreateInfo.hwnd = WindoHandle;
 	SurfaceCreateInfo.hinstance = GetModuleHandle(nullptr);
 
-	REV_VK_CHECK(vkCreateWin32SurfaceKHR(mInstance, &SurfaceCreateInfo, nullptr, &mSurface), "[FVkContext] Failed to create window surface!");
+	REV_VK_CHECK_THROW(vkCreateWin32SurfaceKHR(mInstance, &SurfaceCreateInfo, nullptr, &mSurface), "[FVkContext] Failed to create window surface!");
 #else
 	throw std::runtime_error("[FVkContext] Unsupported platform");
 #endif

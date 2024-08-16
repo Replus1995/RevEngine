@@ -5,7 +5,8 @@
 
 #include "VkDefines.h"
 #include "VkDevice.h"
-#include "VkSwapChain.h"
+#include "VkSwapchain.h"
+#include "VkFrameData.h"
 
 namespace Rev
 {
@@ -42,6 +43,12 @@ public:
 	const VkInstance& GetInstance() const { return mInstance; }
 	const VkSurfaceKHR& GetSurface() const { return mSurface; }
 
+	static VkDevice GetVkDevice();
+
+	FVkFrameData& GetFrameData() { return mFrameData[mFrameCount % REV_VK_FRAME_OVERLAP]; }
+	void BeginFrame();
+	void EndFrame();
+
 private:
 	void CreateInstance();
 	void CreateSurface();
@@ -57,7 +64,10 @@ private:
 	//VkDebugUtilsMessengerEXT mDebugMessenger = VK_NULL_HANDLE;
 	VkSurfaceKHR mSurface = VK_NULL_HANDLE;
 	FVkDevice mDevice;
-	FVkSwapChain mSwapChain;
+	FVkSwapchain mSwapchain;
+
+	uint32 mFrameCount = 0;
+	FVkFrameData mFrameData[REV_VK_FRAME_OVERLAP];
 };
 
 }

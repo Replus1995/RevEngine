@@ -4,10 +4,10 @@
 namespace Rev
 {
 
-class FRHISwapChain
+class FRHISwapchain
 {
 public:
-	virtual ~FRHISwapChain() = default;
+	virtual ~FRHISwapchain() = default;
 };
 
 }
