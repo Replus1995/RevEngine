@@ -25,6 +25,10 @@ set(PHYSFS_DISABLE_INSTALL TRUE CACHE BOOL "Disable physfs installl")
 set(PHYSFS_BUILD_DOCS OFF CACHE BOOL "Disable physfs build docs")
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/physfs ${CMAKE_CURRENT_BINARY_DIR}/physfs)
 group_target(physfs-static "vendor")
+#vk-bootstrap
+set(VK_BOOTSTRAP_VULKAN_HEADER_DIR $ENV{VULKAN_SDK}/Include)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/vk-bootstrap ${CMAKE_CURRENT_BINARY_DIR}/vk-bootstrap)
+group_target(vk-bootstrap "vendor")
 #========Compile From Source========#
 
 #========PreCompiled========#

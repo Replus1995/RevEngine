@@ -1,3 +1,6 @@
 [submodule "vendor/physfs"]
 	path = vendor/physfs
 	url = https://github.com/Replus1995/physfs.git
+[submodule "vendor/vk-bootstrap"]
+	path = vendor/vk-bootstrap
+	url = https://github.com/charles-lunarg/vk-bootstrap.git

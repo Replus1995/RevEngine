@@ -57,6 +57,7 @@ if(WIN32)
         glfw3
         Glad
         vulkan-1
+        #vk-bootstrap::vk-bootstrap
         shaderc_shared
         spirv-cross-core
         spirv-cross-glsl
