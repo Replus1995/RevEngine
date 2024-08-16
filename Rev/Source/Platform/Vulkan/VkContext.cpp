@@ -135,23 +135,7 @@ void FVkContext::CreateInstance()
 		InstanceCreateInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&DebugMessengerCreateInfo;
 	}
 
-	if (vkCreateInstance(&InstanceCreateInfo, nullptr, &mInstance) != VK_SUCCESS) {
-		throw std::runtime_error("[FVkContext] Vulkan create instance failed!");
-	}
-
-	//vkb::InstanceBuilder Builder;
-	////make the vulkan instance, with basic debug features
-	//auto BuildResult = Builder.set_app_name("Rev Vulkan Application")
-	//	.request_validation_layers(sVkEnableValidationLayers)
-	//	.set_debug_callback(VkDebugCallback)
-	//	.require_api_version(1, 3, 0)
-	//	.build();
-
-	//vkb::Instance vkb_Instance = BuildResult.value();
-
-	////grab the instance 
-	//mInstance = vkb_Instance.instance;
-	//mDebugMessenger = vkb_Instance.debug_messenger;
+	REV_VK_CHECK(vkCreateInstance(&InstanceCreateInfo, nullptr, &mInstance), "[FVkContext] Failed to create vulkan instance!")
 }
 
 void FVkContext::CreateSurface()
@@ -177,9 +161,7 @@ void FVkContext::CreateSurface()
 	SurfaceCreateInfo.hwnd = WindoHandle;
 	SurfaceCreateInfo.hinstance = GetModuleHandle(nullptr);
 
-	if (vkCreateWin32SurfaceKHR(mInstance, &SurfaceCreateInfo, nullptr, &mSurface) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create window surface!");
-	}
+	REV_VK_CHECK(vkCreateWin32SurfaceKHR(mInstance, &SurfaceCreateInfo, nullptr, &mSurface), "[FVkContext] Failed to create window surface!");
 #else
 	throw std::runtime_error("[FVkContext] Unsupported platform");
 #endif

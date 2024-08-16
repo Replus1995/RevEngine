@@ -63,14 +63,25 @@ void FVkSwapChain::CreateSwapChain(const FVkContext* InContext, const FVkDevice*
     SwapChainCreateInfo.clipped = VK_TRUE;
     SwapChainCreateInfo.oldSwapchain = VK_NULL_HANDLE;
 
-    if (vkCreateSwapchainKHR(InDevice->GetLogicalDevice(), &SwapChainCreateInfo, nullptr, &mSwapChain) != VK_SUCCESS) {
-        throw std::runtime_error("failed to create swap chain!");
-    }
+    REV_VK_CHECK(vkCreateSwapchainKHR(InDevice->GetLogicalDevice(), &SwapChainCreateInfo, nullptr, &mSwapChain), "[FVkSwapChain] Failed to create swap chain!");
+
+    mExtent = Extent;
+    mFormat = SurfaceFormat.format;
+    vkGetSwapchainImagesKHR(InDevice->GetLogicalDevice(), mSwapChain, &ImageCount, nullptr);
+    mImages.resize(ImageCount);
+    vkGetSwapchainImagesKHR(InDevice->GetLogicalDevice(), mSwapChain, &ImageCount, mImages.data());
+
 }
 
 void FVkSwapChain::Cleanup(const FVkDevice* InDevice)
 {
     REV_CORE_ASSERT(InDevice);
+
+    for (auto ImageView : mImageViews) {
+        vkDestroyImageView(InDevice->GetLogicalDevice(), ImageView, nullptr);
+    }
+    mImageViews.clear();
+    mImages.clear();
     vkDestroySwapchainKHR(InDevice->GetLogicalDevice(), mSwapChain, nullptr);
 }
 
@@ -115,6 +126,31 @@ VkExtent2D FVkSwapChain::ChooseExtent(const VkSurfaceCapabilitiesKHR& InCapabili
         actualExtent.height = std::clamp(actualExtent.height, InCapabilities.minImageExtent.height, InCapabilities.maxImageExtent.height);
 
         return actualExtent;
+    }
+}
+
+void FVkSwapChain::CreateImageViews(const FVkDevice* InDevice)
+{
+    REV_CORE_ASSERT(InDevice);
+    mImageViews.resize(mImages.size());
+    for (size_t i = 0; i < mImages.size(); i++)
+    {
+        VkImageViewCreateInfo ImageViewCreateInfo{};
+        ImageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+        ImageViewCreateInfo.image = mImages[i];
+        ImageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+        ImageViewCreateInfo.format = mFormat;
+        ImageViewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+        ImageViewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+        ImageViewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+        ImageViewCreateInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+        ImageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        ImageViewCreateInfo.subresourceRange.baseMipLevel = 0;
+        ImageViewCreateInfo.subresourceRange.levelCount = 1;
+        ImageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
+        ImageViewCreateInfo.subresourceRange.layerCount = 1;
+
+        REV_VK_CHECK(vkCreateImageView(InDevice->GetLogicalDevice(), &ImageViewCreateInfo, nullptr, &mImageViews[i]), "[FVkSwapChain] Failed to create image views!");
     }
 }
 

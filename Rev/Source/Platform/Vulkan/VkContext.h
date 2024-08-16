@@ -2,6 +2,8 @@
 #include "Rev/Render/RHI/RHIContext.h"
 #include <vector>
 #include <vulkan/vulkan.h>
+
+#include "VkDefines.h"
 #include "VkDevice.h"
 #include "VkSwapChain.h"
 
