@@ -1,7 +1,6 @@
 #include "VkDevice.h"
 #include "VkContext.h"
 #include "Rev/Core/Assert.h"
-#include <optional>
 #include <set>
 
 namespace Rev
@@ -9,20 +8,6 @@ namespace Rev
 
 namespace
 {
-
-struct FVkQueueFamilyIndices
-{
-	std::optional<uint32> GraphicsFamily;
-	std::optional<uint32> ComputeFamily;
-
-	std::optional<uint32> PresentFamily;
-
-	bool IsComplete()
-	{
-		return GraphicsFamily.has_value() && ComputeFamily.has_value() && PresentFamily.has_value();
-	}
-};
-
 
 static FVkQueueFamilyIndices FindQueueFamilies(VkPhysicalDevice InDevice, VkSurfaceKHR InSurface)
 {
@@ -78,6 +63,10 @@ static void PopulateQueueCreateInfos(std::vector<VkDeviceQueueCreateInfo>& Queue
 
 }
 
+bool FVkQueueFamilyIndices::IsComplete()
+{
+	return GraphicsFamily.has_value() && ComputeFamily.has_value() && PresentFamily.has_value();
+}
 
 void FVkDevice::PickPhysicalDevice(const FVkContext* InContext)
 {
@@ -103,6 +92,7 @@ void FVkDevice::PickPhysicalDevice(const FVkContext* InContext)
 		throw std::runtime_error("[FVkDevice] Failed to find a suitable GPU!");
 	}
 
+	mQueueFamilyIndices = FindQueueFamilies(mPhysicalDevice, InSurface);
 	mSwapChainSupport = QuerySwapChainSupport(mPhysicalDevice, InSurface);
 }
 
@@ -158,7 +148,7 @@ bool FVkDevice::PhysicalDeviceSuitable(VkPhysicalDevice InDevice, VkSurfaceKHR I
 		DeviceFeatures.geometryShader;*/
 
 	auto& RequiredExtensionNames = GetRequiredExtensions();
-	bool bExtensionSupported = CheckExtensionSupport(RequiredExtensionNames);
+	bool bExtensionSupported = CheckExtensionSupport(InDevice, RequiredExtensionNames);
 
 	FVkQueueFamilyIndices Indices = FindQueueFamilies(InDevice, InSurface);
 
@@ -171,12 +161,12 @@ bool FVkDevice::PhysicalDeviceSuitable(VkPhysicalDevice InDevice, VkSurfaceKHR I
 	return Indices.IsComplete() && bExtensionSupported && bSwapChainAdequate;
 }
 
-bool FVkDevice::CheckExtensionSupport(const std::vector<const char*>& InExtensionNames)
+bool FVkDevice::CheckExtensionSupport(VkPhysicalDevice InDevice, const std::vector<const char*>& InExtensionNames)
 {
 	uint32 AvailableExtensionCount;
-	vkEnumerateDeviceExtensionProperties(mPhysicalDevice, nullptr, &AvailableExtensionCount, nullptr);
+	vkEnumerateDeviceExtensionProperties(InDevice, nullptr, &AvailableExtensionCount, nullptr);
 	std::vector<VkExtensionProperties> AvailableExtensions(AvailableExtensionCount);
-	vkEnumerateDeviceExtensionProperties(mPhysicalDevice, nullptr, &AvailableExtensionCount, AvailableExtensions.data());
+	vkEnumerateDeviceExtensionProperties(InDevice, nullptr, &AvailableExtensionCount, AvailableExtensions.data());
 
 	std::set<std::string> ExtensionnameSet(InExtensionNames.begin(), InExtensionNames.end());
 	for (const auto& Extension : AvailableExtensions) {
@@ -216,6 +206,8 @@ FVkDeviceSwapChainSupport FVkDevice::QuerySwapChainSupport(VkPhysicalDevice InDe
 
 	return Details;
 }
+
+
 
 }
 

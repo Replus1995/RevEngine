@@ -31,12 +31,20 @@ void FGLFWWindow::OnUpdate()
 	glfwSwapBuffers(mWindow);
 }
 
+void FGLFWWindow::GetFrameSize(int32& OutWidth, int32& OutHeight) const
+{
+	glfwGetFramebufferSize(mWindow, &OutWidth, &OutHeight);
+}
+
 void FGLFWWindow::SetVSync(bool enabled)
 {
-	if (enabled)
-		glfwSwapInterval(1);
-	else
-		glfwSwapInterval(0);
+	if (GetRenderAPI() == ERenderAPI::OpenGL)
+	{
+		if (enabled)
+			glfwSwapInterval(1);
+		else
+			glfwSwapInterval(0);
+	}
 
 	mData.VSync = enabled;
 }
@@ -70,19 +78,17 @@ void FGLFWWindow::Init(const WindowProps& props)
 		int success = glfwInit();
 		REV_CORE_ASSERT(success, "Could not initialze GLFW!");
 
-		switch (GetRenderAPI())
-		{
-		case ERenderAPI::Vulkan:
-			glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-			break;
-		}
+		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
 		glfwSetErrorCallback(GLFWErrorCallback);
 		sGLFWInitialized = true;
 	}
 
 	mWindow = glfwCreateWindow((int)props.Width, (int)props.Height, mData.Title.c_str(), nullptr, nullptr);
-	glfwMakeContextCurrent(mWindow);
+
+	if (GetRenderAPI() == ERenderAPI::OpenGL)
+		glfwMakeContextCurrent(mWindow);
 
 	//int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 	//PE_CORE_ASSERT(status, "Failed to initialize Glad.");

@@ -19,7 +19,7 @@ struct WindowProps
 	}
 };
 
-enum class EWindowType : uint8_t
+enum class EWindowType : uint8
 {
 	UNKNOWN = 0,
 	GLFW = 1
@@ -35,8 +35,9 @@ public:
 
 	virtual void OnUpdate() = 0;
 
-	virtual unsigned int GetWidth() const = 0;
-	virtual unsigned int GetHeight() const = 0;
+	virtual uint32 GetWidth() const = 0;
+	virtual uint32 GetHeight() const = 0;
+	virtual void GetFrameSize(int32& OutWidth, int32& OutHeight) const = 0;
 
 	//Window attributes
 	virtual void SetEventCallback(const EventCallbackFn& callback) = 0;

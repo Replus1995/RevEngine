@@ -13,6 +13,8 @@
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
 
+//#include <VkBootstrap.h>
+
 namespace Rev
 {
 namespace
@@ -32,7 +34,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL VkDebugCallback(
 	switch (MessageSeverity)
 	{
 	case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
-		REV_CORE_DEBUG("VkDebug: {}", pCallbackData->pMessage);
+		REV_CORE_VERBOSE("VkDebug: {}", pCallbackData->pMessage);
 		break;
 	case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT:
 		REV_CORE_INFO("VkDebug: {}", pCallbackData->pMessage);
@@ -89,10 +91,12 @@ void FVkContext::Init()
 	CreateSurface();
 	mDevice.PickPhysicalDevice(this);
 	mDevice.CreateLogicalDevice(this);
+	mSwapChain.CreateSwapChain(this, &mDevice);
 }
 
 void FVkContext::Cleanup()
 {
+	mSwapChain.Cleanup(&mDevice);
 	mDevice.Cleanup();
 	vkDestroySurfaceKHR(mInstance, mSurface, nullptr);
 	vkDestroyInstance(mInstance, nullptr);
@@ -107,12 +111,12 @@ void FVkContext::CreateInstance()
 	VkApplicationInfo AppInfo{};
 	AppInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
 	AppInfo.pApplicationName = "RevApp";
-	AppInfo.applicationVersion = VK_MAKE_VERSION(1, 2, 0);
+	AppInfo.applicationVersion = VK_MAKE_VERSION(1, 3, 0);
 	AppInfo.pEngineName = "RevEngine";
-	AppInfo.engineVersion = VK_MAKE_VERSION(1, 2, 0);
-	AppInfo.apiVersion = VK_API_VERSION_1_2;
+	AppInfo.engineVersion = VK_MAKE_VERSION(1, 3, 0);
+	AppInfo.apiVersion = VK_API_VERSION_1_3;
 
-	REV_CORE_TRACE("[FVkContext] Vulkan Version {0}.{1}", 1, 2);
+	REV_CORE_TRACE("[FVkContext] Vulkan Version {0}.{1}", 1, 3);
 
 	VkInstanceCreateInfo InstanceCreateInfo{};
 	InstanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
@@ -134,6 +138,20 @@ void FVkContext::CreateInstance()
 	if (vkCreateInstance(&InstanceCreateInfo, nullptr, &mInstance) != VK_SUCCESS) {
 		throw std::runtime_error("[FVkContext] Vulkan create instance failed!");
 	}
+
+	//vkb::InstanceBuilder Builder;
+	////make the vulkan instance, with basic debug features
+	//auto BuildResult = Builder.set_app_name("Rev Vulkan Application")
+	//	.request_validation_layers(sVkEnableValidationLayers)
+	//	.set_debug_callback(VkDebugCallback)
+	//	.require_api_version(1, 3, 0)
+	//	.build();
+
+	//vkb::Instance vkb_Instance = BuildResult.value();
+
+	////grab the instance 
+	//mInstance = vkb_Instance.instance;
+	//mDebugMessenger = vkb_Instance.debug_messenger;
 }
 
 void FVkContext::CreateSurface()
@@ -243,7 +261,7 @@ std::vector<const char*> FVkContext::GetEnabledExtensions()
 
 	if (sVkEnableValidationLayers)
 	{
-		RequiredExtensions.push_back("VK_EXT_DEBUG_UTILS_EXTENSION_NAME");
+		RequiredExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 	}
 
 	CheckExtensionSupport(RequiredExtensions);

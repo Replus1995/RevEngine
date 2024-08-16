@@ -6,7 +6,7 @@ class SandBoxApp: public Rev::Application
 public:
 	SandBoxApp()
 	{
-		PushLayer(new ExampleLayer());
+		//PushLayer(new ExampleLayer());
 		//PushLayer(new Rev::ImGuiLayer());
 	};
 	~SandBoxApp() {};

@@ -12,8 +12,9 @@ namespace Rev
 
 		void OnUpdate() override;
 
-		inline unsigned int GetWidth() const override { return mData.Width; };
-		inline unsigned int GetHeight() const override { return mData.Height; };
+		inline virtual uint32 GetWidth() const override { return mData.Width; };
+		inline virtual uint32 GetHeight() const override { return mData.Height; };
+		virtual void GetFrameSize(int32& OutWidth, int32& OutHeight) const override;
 
 		inline void SetEventCallback(const EventCallbackFn& callback) override { mData.EventCallback = callback; };
 		virtual void SetVSync(bool enabled) override;

@@ -1,0 +1,123 @@
+#include "VkSwapChain.h"
+#include "Rev/Core/Assert.h"
+#include "Rev/Core/Application.h"
+#include "Rev/Core/Window.h"
+#include <set>
+#include <limits>
+#include <algorithm>
+#include "VkContext.h"
+#include "VkDevice.h"
+
+namespace Rev
+{
+
+void FVkSwapChain::CreateSwapChain(const FVkContext* InContext, const FVkDevice* InDevice)
+{
+    REV_CORE_ASSERT(InContext);
+    REV_CORE_ASSERT(InDevice);
+
+    const FVkDeviceSwapChainSupport& SwapChainSupport = InDevice->GetSwapChainSupport();
+
+    VkSurfaceFormatKHR SurfaceFormat = ChooseSurfaceFormat(SwapChainSupport.Formats);
+    VkPresentModeKHR PresentMode = ChoosePresentMode(SwapChainSupport.PresentModes);
+    VkExtent2D Extent = ChooseExtent(SwapChainSupport.Capabilities);
+
+    uint32 ImageCount = SwapChainSupport.Capabilities.minImageCount + 1;
+    if (SwapChainSupport.Capabilities.maxImageCount > 0 && ImageCount > SwapChainSupport.Capabilities.maxImageCount) {
+        ImageCount = SwapChainSupport.Capabilities.maxImageCount;
+    }
+
+    VkSwapchainCreateInfoKHR SwapChainCreateInfo{};
+    SwapChainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+    SwapChainCreateInfo.surface = InContext->GetSurface();
+    SwapChainCreateInfo.minImageCount = ImageCount;
+    SwapChainCreateInfo.imageFormat = SurfaceFormat.format;
+    SwapChainCreateInfo.imageColorSpace = SurfaceFormat.colorSpace;
+    SwapChainCreateInfo.imageExtent = Extent;
+    SwapChainCreateInfo.imageArrayLayers = 1;
+    SwapChainCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+
+    {
+        //queue families
+        const FVkQueueFamilyIndices& Indices = InDevice->GetQueueFamilyIndices();
+
+        std::set<uint32> UniqueIndexSet;
+        UniqueIndexSet.insert(Indices.GraphicsFamily.value());
+        UniqueIndexSet.insert(Indices.PresentFamily.value());
+
+        std::vector<uint32> UniqueIndices;
+        for (uint32 Index : UniqueIndexSet)
+        {
+            UniqueIndices.push_back(Index);
+        }
+
+        SwapChainCreateInfo.imageSharingMode = UniqueIndices.size() > 1 ? VK_SHARING_MODE_CONCURRENT : VK_SHARING_MODE_EXCLUSIVE;
+        SwapChainCreateInfo.queueFamilyIndexCount = UniqueIndices.size() > 1 ? UniqueIndices.size() : 0;
+        SwapChainCreateInfo.pQueueFamilyIndices = UniqueIndices.size() > 1 ? UniqueIndices.data() : nullptr;
+
+    }
+    
+    SwapChainCreateInfo.preTransform = SwapChainSupport.Capabilities.currentTransform;
+    SwapChainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+    SwapChainCreateInfo.presentMode = PresentMode;
+    SwapChainCreateInfo.clipped = VK_TRUE;
+    SwapChainCreateInfo.oldSwapchain = VK_NULL_HANDLE;
+
+    if (vkCreateSwapchainKHR(InDevice->GetLogicalDevice(), &SwapChainCreateInfo, nullptr, &mSwapChain) != VK_SUCCESS) {
+        throw std::runtime_error("failed to create swap chain!");
+    }
+}
+
+void FVkSwapChain::Cleanup(const FVkDevice* InDevice)
+{
+    REV_CORE_ASSERT(InDevice);
+    vkDestroySwapchainKHR(InDevice->GetLogicalDevice(), mSwapChain, nullptr);
+}
+
+VkSurfaceFormatKHR FVkSwapChain::ChooseSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& InAvailableFormats)
+{
+    for (const auto& AvailableFormat : InAvailableFormats) {
+        if (AvailableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && AvailableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+            return AvailableFormat;
+        }
+    }
+    return InAvailableFormats[0];
+}
+
+VkPresentModeKHR FVkSwapChain::ChoosePresentMode(const std::vector<VkPresentModeKHR>& InAvailablePresentModes)
+{
+    for (const auto& AvailablePresentMode : InAvailablePresentModes) {
+        if (AvailablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
+            return AvailablePresentMode;
+        }
+    }
+    return VK_PRESENT_MODE_FIFO_KHR;
+}
+
+VkExtent2D FVkSwapChain::ChooseExtent(const VkSurfaceCapabilitiesKHR& InCapabilities)
+{
+    if (InCapabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
+        return InCapabilities.currentExtent;
+    }
+    else {
+        Window* pWnd = Application::GetApp().GetWindow();
+        REV_CORE_ASSERT(pWnd, "[FVkSwapChain] Invalid window!");
+
+        int32 FrameWidth, FrameHeight;
+        pWnd->GetFrameSize(FrameWidth, FrameHeight);
+
+        VkExtent2D actualExtent = {
+            static_cast<uint32_t>(FrameWidth),
+            static_cast<uint32_t>(FrameHeight)
+        };
+
+        actualExtent.width = std::clamp(actualExtent.width, InCapabilities.minImageExtent.width, InCapabilities.maxImageExtent.width);
+        actualExtent.height = std::clamp(actualExtent.height, InCapabilities.minImageExtent.height, InCapabilities.maxImageExtent.height);
+
+        return actualExtent;
+    }
+}
+
+}
+
+
