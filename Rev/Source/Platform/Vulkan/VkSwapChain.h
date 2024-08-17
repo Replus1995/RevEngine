@@ -17,6 +17,8 @@ public:
 	const VkSwapchainKHR& GetSwapchain() const { return mSwapchain; }
 	const VkExtent2D& GetExtent() const { return mExtent; }
 	const VkFormat& GetFormat() const { return mFormat; }
+	const std::vector<VkImage>& GetImages() const { return mImages; }
+	const std::vector<VkImageView>& GetImageViews() const { return mImageViews; }
 
 private:
 	static VkSurfaceFormatKHR ChooseSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& InAvailableFormats);

@@ -19,8 +19,8 @@ public:
 
 //Command
 	virtual void SetViewport(uint32 x, uint32 y, uint32 width, uint32 height) override {};
-	virtual void SetClearColor(const Math::FLinearColor& color) override {};
-	virtual void ClearBackBuffer() override {};
+	virtual void SetClearColor(const Math::FLinearColor& InColor) override;
+	virtual void ClearBackBuffer() override;
 
 	virtual void EnableDepthTest(bool bEnable) override {};
 	virtual void EnableDepthWrite(bool bEnable) override {};
@@ -45,7 +45,7 @@ public:
 
 	static VkDevice GetVkDevice();
 
-	FVkFrameData& GetFrameData() { return mFrameData[mFrameCount % REV_VK_FRAME_OVERLAP]; }
+	FVkFrameData& GetFrameData() { return mFrameData[mFrameDataIndex]; }
 	void BeginFrame();
 	void EndFrame();
 
@@ -66,8 +66,10 @@ private:
 	FVkDevice mDevice;
 	FVkSwapchain mSwapchain;
 
-	uint32 mFrameCount = 0;
+	uint32 mFrameDataIndex = 0;
 	FVkFrameData mFrameData[REV_VK_FRAME_OVERLAP];
+	uint32 mCurSwapchainImageIndex = 0;
+	VkClearColorValue mFrameClearColor;
 };
 
 }

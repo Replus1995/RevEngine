@@ -14,6 +14,7 @@
 #include <GLFW/glfw3native.h>
 
 //#include <VkBootstrap.h>
+#include "VkUtils.h"
 
 namespace Rev
 {
@@ -109,6 +110,23 @@ void FVkContext::Cleanup()
 	vkDestroyInstance(mInstance, nullptr);
 }
 
+void FVkContext::SetClearColor(const Math::FLinearColor& InColor)
+{
+	for (size_t i = 0; i < 4; i++)
+	{
+		mFrameClearColor.float32[i] = InColor[i];
+	}
+}
+
+void FVkContext::ClearBackBuffer()
+{
+	auto& CurFrameData = GetFrameData();
+	VkCommandBuffer CmdBuffer = CurFrameData.MainCmdBuffer;
+
+	VkImageSubresourceRange ImageRange = FVkInit::ImageSubresourceRange(VK_IMAGE_ASPECT_COLOR_BIT);
+	vkCmdClearColorImage(CmdBuffer, mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_GENERAL, &mFrameClearColor, 1, &ImageRange);
+}
+
 VkDevice FVkContext::GetVkDevice()
 {
 	return sVkDevice;
@@ -116,34 +134,33 @@ VkDevice FVkContext::GetVkDevice()
 
 void FVkContext::BeginFrame()
 {
+	constexpr uint64 kWaitTime = 1000000000;
+
 	auto& CurFrameData = GetFrameData();
 
-	REV_VK_CHECK(vkWaitForFences(sVkDevice, 1, &CurFrameData.Fence, true, 1000000000));
+	REV_VK_CHECK(vkWaitForFences(sVkDevice, 1, &CurFrameData.Fence, true, kWaitTime));
 	REV_VK_CHECK(vkResetFences(sVkDevice, 1, &CurFrameData.Fence));
 
-	uint32 SwapchainImageIndex;
-	REV_VK_CHECK(vkAcquireNextImageKHR(sVkDevice, mSwapchain.GetSwapchain(), 1000000000, CurFrameData.SwapchainSemaphore, nullptr, &SwapchainImageIndex));
-
-
+	REV_VK_CHECK(vkAcquireNextImageKHR(sVkDevice, mSwapchain.GetSwapchain(), kWaitTime, CurFrameData.SwapchainSemaphore, nullptr, &mCurSwapchainImageIndex));
 
 	VkCommandBuffer CmdBuffer = CurFrameData.MainCmdBuffer;
 	REV_VK_CHECK(vkResetCommandBuffer(CmdBuffer, 0));
-
-	//begin the command buffer recording. We will use this command buffer exactly once, so we want to let vulkan know that
-	VkCommandBufferBeginInfo CmdBufferBeginInfo = {};
-	CmdBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-	CmdBufferBeginInfo.pNext = nullptr;
-	CmdBufferBeginInfo.pInheritanceInfo = nullptr;
-	CmdBufferBeginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-
-	//start the command buffer recording
+	VkCommandBufferBeginInfo CmdBufferBeginInfo = FVkInit::CmdBufferBeginInfo(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 	REV_VK_CHECK(vkBeginCommandBuffer(CmdBuffer, &CmdBufferBeginInfo));
+
+
+	FVkUtils::TransitionImage(CmdBuffer, mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL);
+
 }
 
 void FVkContext::EndFrame()
 {
+	auto& CurFrameData = GetFrameData();
+	VkCommandBuffer CmdBuffer = CurFrameData.MainCmdBuffer;
 
-	mFrameCount++;
+	FVkUtils::TransitionImage(CmdBuffer, mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL);
+
+	mFrameDataIndex = (mFrameDataIndex + 1) % REV_VK_FRAME_OVERLAP;
 }
 
 void FVkContext::CreateInstance()
