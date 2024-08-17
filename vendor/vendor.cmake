@@ -25,6 +25,9 @@ set(PHYSFS_DISABLE_INSTALL TRUE CACHE BOOL "Disable physfs installl")
 set(PHYSFS_BUILD_DOCS OFF CACHE BOOL "Disable physfs build docs")
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/physfs ${CMAKE_CURRENT_BINARY_DIR}/physfs)
 group_target(physfs-static "vendor")
+#cityhash
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/cityhash ${CMAKE_CURRENT_BINARY_DIR}/cityhash)
+group_target(cityhash "vendor")
 #========Compile From Source========#
 
 #========PreCompiled========#
