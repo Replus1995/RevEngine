@@ -6,6 +6,12 @@ message("========Begin Vendor========")
 #Glad
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/Glad ${CMAKE_CURRENT_BINARY_DIR}/Glad)
 group_target(Glad "vendor")
+#glfw
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "Disable glfw build docs")
+set(GLFW_INSTALL OFF CACHE BOOL "Disable glfw install")
+set(GLFW_LIBRARY_TYPE "STATIC")
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/glfw ${CMAKE_CURRENT_BINARY_DIR}/glfw)
+group_target(glfw "vendor")
 #imgui
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/imgui ${CMAKE_CURRENT_BINARY_DIR}/imgui)
 group_target(imgui "vendor")
@@ -32,13 +38,12 @@ group_target(cityhash "vendor")
 
 #========Header Only========#
 #glm
-set(GLM_BUILD_LIBRARY OFF CACHE BOOL "Build dynamic/static library")
-set(GLM_BUILD_TESTS OFF CACHE BOOL "Build the test programs")
+set(GLM_BUILD_LIBRARY OFF CACHE BOOL "Disable glm build library")
+set(GLM_BUILD_TESTS OFF CACHE BOOL "Disable glm build tests")
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/glm ${CMAKE_CURRENT_BINARY_DIR}/glm)
 #========Header Only========#
 
 #========PreCompiled========#
-include(${CMAKE_CURRENT_LIST_DIR}/GLFW/glfw3.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/OpenMesh/OpenMesh.cmake)
 #========PreCompiled========#
 

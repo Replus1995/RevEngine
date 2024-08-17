@@ -52,7 +52,7 @@ if(WIN32)
     target_link_libraries(Rev
     PRIVATE
         physfs-static
-        glfw3
+        glfw
         Glad
         vulkan-1
         shaderc_shared
