@@ -17,6 +17,9 @@ public:
 	virtual void Init() override;
 	virtual void Cleanup() override;
 
+	virtual void BeginFrame() override;
+	virtual void EndFrame() override;
+
 //Command
 	virtual void SetViewport(uint32 x, uint32 y, uint32 width, uint32 height) override {};
 	virtual void SetClearColor(const Math::FLinearColor& InColor) override;
@@ -40,14 +43,15 @@ public:
 
 	virtual void Draw(const Ref<FRHIVertexArray>& InVertexArray, EDrawMode InDrawMode) override {};
 
+
 	const VkInstance& GetInstance() const { return mInstance; }
 	const VkSurfaceKHR& GetSurface() const { return mSurface; }
 
 	static VkDevice GetVkDevice();
 
 	FVkFrameData& GetFrameData() { return mFrameData[mFrameDataIndex]; }
-	void BeginFrame();
-	void EndFrame();
+	VkCommandBuffer GetMainCmdBuffer() { return mFrameData[mFrameDataIndex].MainCmdBuffer; }
+	
 
 private:
 	void CreateInstance();

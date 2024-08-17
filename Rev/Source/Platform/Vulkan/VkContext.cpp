@@ -110,28 +110,6 @@ void FVkContext::Cleanup()
 	vkDestroyInstance(mInstance, nullptr);
 }
 
-void FVkContext::SetClearColor(const Math::FLinearColor& InColor)
-{
-	for (size_t i = 0; i < 4; i++)
-	{
-		mFrameClearColor.float32[i] = InColor[i];
-	}
-}
-
-void FVkContext::ClearBackBuffer()
-{
-	auto& CurFrameData = GetFrameData();
-	VkCommandBuffer CmdBuffer = CurFrameData.MainCmdBuffer;
-
-	VkImageSubresourceRange ImageRange = FVkInit::ImageSubresourceRange(VK_IMAGE_ASPECT_COLOR_BIT);
-	vkCmdClearColorImage(CmdBuffer, mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_GENERAL, &mFrameClearColor, 1, &ImageRange);
-}
-
-VkDevice FVkContext::GetVkDevice()
-{
-	return sVkDevice;
-}
-
 void FVkContext::BeginFrame()
 {
 	constexpr uint64 kWaitTime = 1000000000;
@@ -155,12 +133,60 @@ void FVkContext::BeginFrame()
 
 void FVkContext::EndFrame()
 {
+	//end cmd buffer
 	auto& CurFrameData = GetFrameData();
 	VkCommandBuffer CmdBuffer = CurFrameData.MainCmdBuffer;
 
 	FVkUtils::TransitionImage(CmdBuffer, mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL);
+	REV_VK_CHECK(vkEndCommandBuffer(CmdBuffer));
+
+	//submit
+	VkCommandBufferSubmitInfo CmdBufferInfo = FVkInit::CmdBufferSubmitInfo(CmdBuffer);
+	VkSemaphoreSubmitInfo WaitSemaphoreInfo = FVkInit::SemaphoreSubmitInfo(VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT_KHR, CurFrameData.SwapchainSemaphore);
+	VkSemaphoreSubmitInfo SignalSemaphoreInfo = FVkInit::SemaphoreSubmitInfo(VK_PIPELINE_STAGE_2_ALL_GRAPHICS_BIT, CurFrameData.RenderSemaphore);
+
+	VkSubmitInfo2 SubmitInfo = FVkInit::SubmitInfo(&CmdBufferInfo, &SignalSemaphoreInfo, &WaitSemaphoreInfo);
+
+	//submit command buffer to the queue and execute it.
+	//Fence will now block until the graphic commands finish execution
+	REV_VK_CHECK(vkQueueSubmit2(mDevice.GetGraphicsQueue(), 1, &SubmitInfo, CurFrameData.Fence));
+
+	//present
+	VkPresentInfoKHR PresentInfo{};
+	PresentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+	PresentInfo.pNext = nullptr;
+	PresentInfo.pSwapchains = &mSwapchain.GetSwapchain();
+	PresentInfo.swapchainCount = 1;
+	PresentInfo.pWaitSemaphores = &CurFrameData.RenderSemaphore;
+	PresentInfo.waitSemaphoreCount = 1;
+	PresentInfo.pImageIndices = &mCurSwapchainImageIndex;
+	REV_VK_CHECK(vkQueuePresentKHR(mDevice.GetGraphicsQueue(), &PresentInfo));
 
 	mFrameDataIndex = (mFrameDataIndex + 1) % REV_VK_FRAME_OVERLAP;
+	//mCurSwapchainImageIndex = 0;
+
+}
+
+void FVkContext::SetClearColor(const Math::FLinearColor& InColor)
+{
+	for (size_t i = 0; i < 4; i++)
+	{
+		mFrameClearColor.float32[i] = InColor[i];
+	}
+}
+
+void FVkContext::ClearBackBuffer()
+{
+	auto& CurFrameData = GetFrameData();
+	VkCommandBuffer CmdBuffer = CurFrameData.MainCmdBuffer;
+
+	VkImageSubresourceRange ImageRange = FVkInit::ImageSubresourceRange(VK_IMAGE_ASPECT_COLOR_BIT | VK_IMAGE_ASPECT_DEPTH_BIT);
+	vkCmdClearColorImage(CmdBuffer, mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_GENERAL, &mFrameClearColor, 1, &ImageRange);
+}
+
+VkDevice FVkContext::GetVkDevice()
+{
+	return sVkDevice;
 }
 
 void FVkContext::CreateInstance()

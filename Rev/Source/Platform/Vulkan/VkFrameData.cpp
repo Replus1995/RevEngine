@@ -41,7 +41,13 @@ void CleanupFrameData(FVkFrameData* Frames, uint32 Count, const FVkDevice* InDev
 	VkDevice Device = InDevice->GetLogicalDevice();
 
 	for (uint32 i = 0; i < Count; i++) {
+		//destroy cmd pool
 		vkDestroyCommandPool(Device, Frames[i].CmdPool, nullptr);
+
+		//destroy sync objects
+		vkDestroyFence(Device, Frames[i].Fence, nullptr);
+		vkDestroySemaphore(Device, Frames[i].RenderSemaphore, nullptr);
+		vkDestroySemaphore(Device, Frames[i].SwapchainSemaphore, nullptr);
 	}
 }
 

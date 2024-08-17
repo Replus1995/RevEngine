@@ -3,67 +3,6 @@
 namespace Rev
 {
 
-VkCommandPoolCreateInfo FVkInit::CmdPoolCreateInfo(uint32 InQueueFamily, VkCommandPoolCreateFlags InFlags)
-{
-    VkCommandPoolCreateInfo CreateInfo = {};
-    CreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-    CreateInfo.pNext = nullptr;
-    CreateInfo.queueFamilyIndex = InQueueFamily;
-    CreateInfo.flags = InFlags;
-    return CreateInfo;
-}
-
-VkCommandBufferAllocateInfo FVkInit::CmdBufferAllocateInfo(VkCommandPool InPool, uint32 InCount)
-{
-    VkCommandBufferAllocateInfo CreateInfo{};
-    CreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    CreateInfo.pNext = nullptr;
-    CreateInfo.commandPool = InPool;
-    CreateInfo.commandBufferCount = InCount;
-    CreateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    return CreateInfo;
-}
-
-VkCommandBufferBeginInfo FVkInit::CmdBufferBeginInfo(VkCommandBufferUsageFlags InFlags)
-{
-    VkCommandBufferBeginInfo CreateInfo{};
-    CreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    CreateInfo.pNext = nullptr;
-    CreateInfo.pInheritanceInfo = nullptr;
-    CreateInfo.flags = InFlags;
-    return CreateInfo;
-}
-
-VkFenceCreateInfo FVkInit::FenceCreateInfo(VkFenceCreateFlags InFlags)
-{
-    VkFenceCreateInfo CreateInfo{};
-    CreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-    CreateInfo.pNext = nullptr;
-    CreateInfo.flags = InFlags;
-    return CreateInfo;
-}
-
-VkSemaphoreCreateInfo FVkInit::SemaphoreCreateInfo(VkSemaphoreCreateFlags InFlags)
-{
-    VkSemaphoreCreateInfo CreateInfo{};
-    CreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-    CreateInfo.pNext = nullptr;
-    CreateInfo.flags = InFlags;
-    return CreateInfo;
-}
-
-VkImageSubresourceRange FVkInit::ImageSubresourceRange(VkImageAspectFlags InAspectMask)
-{
-    VkImageSubresourceRange Range{};
-    Range.aspectMask = InAspectMask;
-    Range.baseMipLevel = 0;
-    Range.levelCount = VK_REMAINING_MIP_LEVELS;
-    Range.baseArrayLayer = 0;
-    Range.layerCount = VK_REMAINING_ARRAY_LAYERS;
-
-    return Range;
-}
-
 void FVkUtils::TransitionImage(VkCommandBuffer CmdBuffer, VkImage Image, VkImageLayout CurrentLayout, VkImageLayout NextLayout)
 {
     VkImageMemoryBarrier2 ImageBarrier{};
