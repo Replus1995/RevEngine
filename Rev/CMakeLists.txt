@@ -29,7 +29,6 @@ PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/Public
     ${VENDOR_ROOT}/spdlog/include
     ${VENDOR_ROOT}/entt/single_include
-    ${VENDOR_ROOT}/glm
 PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/Private
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/Platform

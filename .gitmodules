@@ -4,3 +4,6 @@
 [submodule "vendor/cityhash"]
 	path = vendor/cityhash
 	url = https://github.com/Replus1995/cityhash.git
+[submodule "vendor/glm"]
+	path = vendor/glm
+	url = https://github.com/Replus1995/glm.git
