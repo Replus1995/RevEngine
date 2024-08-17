@@ -33,7 +33,6 @@ PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/Private
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/Platform
     $ENV{VULKAN_SDK}/Include
-    ${VENDOR_ROOT}/jsonhpp
     ${VENDOR_ROOT}/stb
     ${VENDOR_ROOT}/tinygltf
 )
