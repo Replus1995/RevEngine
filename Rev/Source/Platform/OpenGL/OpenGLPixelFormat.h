@@ -19,7 +19,4 @@ public:
 	static FOpenGLFormatData TranslatePixelFormat(EPixelFormat InFormat, bool bSRGB);
 };
 
-
-
-
 }

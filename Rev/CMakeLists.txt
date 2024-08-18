@@ -58,6 +58,7 @@ if(WIN32)
         shaderc_shared
         spirv-cross-core
         spirv-cross-glsl
+        GPUOpen::VulkanMemoryAllocator
         imgui
     )
 endif()

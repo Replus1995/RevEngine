@@ -48,6 +48,8 @@ void CleanupFrameData(FVkFrameData* Frames, uint32 Count, const FVkDevice* InDev
 		vkDestroyFence(Device, Frames[i].Fence, nullptr);
 		vkDestroySemaphore(Device, Frames[i].RenderSemaphore, nullptr);
 		vkDestroySemaphore(Device, Frames[i].SwapchainSemaphore, nullptr);
+
+		Frames[i].DeletorQueue.Flush();
 	}
 }
 

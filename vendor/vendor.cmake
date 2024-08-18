@@ -40,7 +40,9 @@ group_target(cityhash "vendor")
 #glm
 set(GLM_BUILD_LIBRARY OFF CACHE BOOL "Disable glm build library")
 set(GLM_BUILD_TESTS OFF CACHE BOOL "Disable glm build tests")
-add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/glm ${CMAKE_CURRENT_BINARY_DIR}/glm)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/glm)
+#VMA
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/VMA)
 #========Header Only========#
 
 #========PreCompiled========#

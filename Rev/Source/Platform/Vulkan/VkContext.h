@@ -1,7 +1,9 @@
 #pragma once
 #include "Rev/Render/RHI/RHIContext.h"
+#include "Rev/Core/Deleter.h"
 #include <vector>
 #include <vulkan/vulkan.h>
+#include <vk_mem_alloc.h>
 
 #include "VkDefines.h"
 #include "VkDevice.h"
@@ -47,12 +49,9 @@ public:
 	const VkInstance& GetInstance() const { return mInstance; }
 	const VkSurfaceKHR& GetSurface() const { return mSurface; }
 
-	static VkDevice GetVkDevice();
-
 	FVkFrameData& GetFrameData() { return mFrameData[mFrameDataIndex]; }
 	VkCommandBuffer GetMainCmdBuffer() { return mFrameData[mFrameDataIndex].MainCmdBuffer; }
 	
-
 private:
 	void CreateInstance();
 	void CreateSurface();
@@ -74,6 +73,9 @@ private:
 	FVkFrameData mFrameData[REV_VK_FRAME_OVERLAP];
 	uint32 mCurSwapchainImageIndex = 0;
 	VkClearColorValue mFrameClearColor;
+	FDeletorQueue mMainDeletorQueue;
+
+	VmaAllocator mAllocator;
 };
 
 }

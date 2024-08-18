@@ -13,6 +13,9 @@
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
 
+#define VMA_IMPLEMENTATION
+#include <vk_mem_alloc.h>
+
 //#include <VkBootstrap.h>
 #include "VkUtils.h"
 
@@ -20,7 +23,6 @@ namespace Rev
 {
 namespace
 {
-static VkDevice sVkDevice = VK_NULL_HANDLE;
 static bool sVkEnableValidationLayers = false;
 static VkDebugUtilsMessageSeverityFlagBitsEXT sVkMinMessageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT;
 
@@ -80,6 +82,8 @@ void PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& Create
 
 }
 
+static VkDevice sDevice = VK_NULL_HANDLE;
+static VmaAllocator sAllocator = VMA_NULL;
 
 void FVkContext::Init()
 {
@@ -95,15 +99,17 @@ void FVkContext::Init()
 	mDevice.CreateLogicalDevice(this);
 	mSwapchain.CreateSwapchain(this, &mDevice);
 	InitFrameData(mFrameData, REV_VK_FRAME_OVERLAP, &mDevice);
-	sVkDevice = mDevice.GetLogicalDevice();
+	sDevice = mDevice.GetLogicalDevice();
+	sAllocator = mAllocator;
 }
 
 void FVkContext::Cleanup()
 {
-	vkDeviceWaitIdle(sVkDevice);
-
-	sVkDevice = VK_NULL_HANDLE;
+	vkDeviceWaitIdle(sDevice);
+	sAllocator = VMA_NULL;
+	sDevice = VK_NULL_HANDLE;
 	CleanupFrameData(mFrameData, REV_VK_FRAME_OVERLAP, &mDevice);
+	mMainDeletorQueue.Flush();
 	mSwapchain.Cleanup(&mDevice);
 	mDevice.Cleanup();
 	vkDestroySurfaceKHR(mInstance, mSurface, nullptr);
@@ -113,13 +119,12 @@ void FVkContext::Cleanup()
 void FVkContext::BeginFrame()
 {
 	constexpr uint64 kWaitTime = 1000000000;
-
 	auto& CurFrameData = GetFrameData();
+	REV_VK_CHECK(vkWaitForFences(sDevice, 1, &CurFrameData.Fence, true, kWaitTime));
+	CurFrameData.DeletorQueue.Flush();
+	REV_VK_CHECK(vkResetFences(sDevice, 1, &CurFrameData.Fence));
 
-	REV_VK_CHECK(vkWaitForFences(sVkDevice, 1, &CurFrameData.Fence, true, kWaitTime));
-	REV_VK_CHECK(vkResetFences(sVkDevice, 1, &CurFrameData.Fence));
-
-	REV_VK_CHECK(vkAcquireNextImageKHR(sVkDevice, mSwapchain.GetSwapchain(), kWaitTime, CurFrameData.SwapchainSemaphore, nullptr, &mCurSwapchainImageIndex));
+	REV_VK_CHECK(vkAcquireNextImageKHR(sDevice, mSwapchain.GetSwapchain(), kWaitTime, CurFrameData.SwapchainSemaphore, nullptr, &mCurSwapchainImageIndex));
 
 	VkCommandBuffer CmdBuffer = CurFrameData.MainCmdBuffer;
 	REV_VK_CHECK(vkResetCommandBuffer(CmdBuffer, 0));
@@ -128,7 +133,7 @@ void FVkContext::BeginFrame()
 
 
 	FVkUtils::TransitionImage(CmdBuffer, mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL);
-
+	
 }
 
 void FVkContext::EndFrame()
@@ -182,11 +187,6 @@ void FVkContext::ClearBackBuffer()
 
 	VkImageSubresourceRange ImageRange = FVkInit::ImageSubresourceRange(VK_IMAGE_ASPECT_COLOR_BIT | VK_IMAGE_ASPECT_DEPTH_BIT);
 	vkCmdClearColorImage(CmdBuffer, mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_GENERAL, &mFrameClearColor, 1, &ImageRange);
-}
-
-VkDevice FVkContext::GetVkDevice()
-{
-	return sVkDevice;
 }
 
 void FVkContext::CreateInstance()
@@ -351,6 +351,14 @@ std::vector<const char*> FVkContext::GetEnabledLayers()
 
 
 
+VkDevice FVkUtils::GetDevice()
+{
+	return sDevice;
+}
 
+VmaAllocator FVkUtils::GetAllocator()
+{
+	return sAllocator;
+}
 
 }

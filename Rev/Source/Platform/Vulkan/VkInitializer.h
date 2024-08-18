@@ -19,7 +19,9 @@ public:
 	static VkSemaphoreSubmitInfo SemaphoreSubmitInfo(VkPipelineStageFlags2 InStageMask, VkSemaphore InSemaphore);
 
 	static VkSubmitInfo2 SubmitInfo(VkCommandBufferSubmitInfo* CmdBufferInfo, VkSemaphoreSubmitInfo* SignalSemaphoreInfo, VkSemaphoreSubmitInfo* WaitSemaphoreInfo);
-
+	
+	static VkImageCreateInfo ImageCreateInfo2D(VkFormat Format, VkImageUsageFlags UsageFlags, VkExtent3D Extent);
+	static VkImageViewCreateInfo ImageViewCreateInfo2D(VkFormat Format, VkImage Image, VkImageAspectFlags AspectFlags);
 	static VkImageSubresourceRange ImageSubresourceRange(VkImageAspectFlags InAspectMask);
 };
 
