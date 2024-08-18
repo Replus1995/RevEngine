@@ -13,3 +13,6 @@
 [submodule "vendor/glfw"]
 	path = vendor/glfw
 	url = https://github.com/Replus1995/glfw.git
+[submodule "vendor/VMA"]
+	path = vendor/VMA
+	url = https://github.com/Replus1995/VulkanMemoryAllocator.git
