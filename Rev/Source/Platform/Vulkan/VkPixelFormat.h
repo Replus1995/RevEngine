@@ -16,7 +16,7 @@ struct FVkFormatData
 class FVkPixelFormat
 {
 public:
-	static FVkFormatData TranslatePixelFormat(EPixelFormat InFormat, bool bSRGB);
+	static FVkFormatData TranslatePixelFormat(EPixelFormat InFormat, bool bSRGB); //packed?
 };
 
 }

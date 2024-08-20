@@ -16,6 +16,9 @@ namespace Rev
 class FVkContext : public FRHIContext
 {
 public:
+	FVkContext();
+	virtual ~FVkContext();
+
 	virtual void Init() override;
 	virtual void Cleanup() override;
 
@@ -25,6 +28,7 @@ public:
 //Command
 	virtual void SetViewport(uint32 x, uint32 y, uint32 width, uint32 height) override {};
 	virtual void SetClearColor(const Math::FLinearColor& InColor) override;
+	virtual void SetClearDepthStencil(float InDepth, uint32 InStencil);
 	virtual void ClearBackBuffer() override;
 
 	virtual void EnableDepthTest(bool bEnable) override {};
@@ -48,6 +52,7 @@ public:
 
 	const VkInstance& GetInstance() const { return mInstance; }
 	const VkSurfaceKHR& GetSurface() const { return mSurface; }
+	const VmaAllocator& GetAllocator() const { return mAllocator; }
 
 	FVkFrameData& GetFrameData() { return mFrameData[mFrameDataIndex]; }
 	VkCommandBuffer GetMainCmdBuffer() { return mFrameData[mFrameDataIndex].MainCmdBuffer; }
@@ -55,6 +60,7 @@ public:
 private:
 	void CreateInstance();
 	void CreateSurface();
+	void CreateAllocator();
 
 private:
 	static void CheckExtensionSupport(const std::vector<const char*>& InExtensionNames);
@@ -68,14 +74,20 @@ private:
 	VkSurfaceKHR mSurface = VK_NULL_HANDLE;
 	FVkDevice mDevice;
 	FVkSwapchain mSwapchain;
+	VmaAllocator mAllocator = VMA_NULL;
 
-	uint32 mFrameDataIndex = 0;
-	FVkFrameData mFrameData[REV_VK_FRAME_OVERLAP];
-	uint32 mCurSwapchainImageIndex = 0;
-	VkClearColorValue mFrameClearColor;
 	FDeletorQueue mMainDeletorQueue;
 
-	VmaAllocator mAllocator;
+	//frame data
+	uint32 mCurSwapchainImageIndex = 0;
+	uint32 mFrameDataIndex = 0;
+	FVkFrameData mFrameData[REV_VK_FRAME_OVERLAP];
+
+	VkClearColorValue mClearColor;
+	VkClearDepthStencilValue mClearDepthStencil;
+
+	VkExtent2D mDrawExtent = {0, 0};
+
 };
 
 }

@@ -82,11 +82,32 @@ void PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& Create
 
 }
 
+static VkInstance sInstance = VK_NULL_HANDLE;
 static VkDevice sDevice = VK_NULL_HANDLE;
 static VmaAllocator sAllocator = VMA_NULL;
 
+FVkContext::FVkContext()
+{
+	for (size_t i = 0; i < 4; i++)
+	{
+		mClearColor.float32[i] = 0.0f;
+		mClearColor.int32[i] = 0;
+		mClearColor.uint32[i] = 0;
+	}
+	mClearDepthStencil.depth = 1.0f;
+	mClearDepthStencil.stencil = 0;
+}
+
+FVkContext::~FVkContext()
+{
+}
+
 void FVkContext::Init()
 {
+	REV_CORE_ASSERT(sInstance == VK_NULL_HANDLE);
+	REV_CORE_ASSERT(sDevice == VK_NULL_HANDLE);
+	REV_CORE_ASSERT(sAllocator == VMA_NULL);
+
 #ifdef REV_DEBUG
 	sVkEnableValidationLayers = true;
 #else
@@ -97,8 +118,12 @@ void FVkContext::Init()
 	CreateSurface();
 	mDevice.PickPhysicalDevice(this);
 	mDevice.CreateLogicalDevice(this);
+	CreateAllocator();
+
 	mSwapchain.CreateSwapchain(this, &mDevice);
 	InitFrameData(mFrameData, REV_VK_FRAME_OVERLAP, &mDevice);
+
+	sInstance = mInstance;
 	sDevice = mDevice.GetLogicalDevice();
 	sAllocator = mAllocator;
 }
@@ -106,11 +131,15 @@ void FVkContext::Init()
 void FVkContext::Cleanup()
 {
 	vkDeviceWaitIdle(sDevice);
+	
 	sAllocator = VMA_NULL;
 	sDevice = VK_NULL_HANDLE;
-	CleanupFrameData(mFrameData, REV_VK_FRAME_OVERLAP, &mDevice);
+	sInstance = VK_NULL_HANDLE;
+
 	mMainDeletorQueue.Flush();
-	mSwapchain.Cleanup(&mDevice);
+
+	CleanupFrameData(mFrameData, REV_VK_FRAME_OVERLAP, &mDevice);
+	mSwapchain.Cleanup(this, &mDevice);
 	mDevice.Cleanup();
 	vkDestroySurfaceKHR(mInstance, mSurface, nullptr);
 	vkDestroyInstance(mInstance, nullptr);
@@ -125,6 +154,9 @@ void FVkContext::BeginFrame()
 	REV_VK_CHECK(vkResetFences(sDevice, 1, &CurFrameData.Fence));
 
 	REV_VK_CHECK(vkAcquireNextImageKHR(sDevice, mSwapchain.GetSwapchain(), kWaitTime, CurFrameData.SwapchainSemaphore, nullptr, &mCurSwapchainImageIndex));
+
+	mDrawExtent.width = mSwapchain.GetBackImage().Extent.width;
+	mDrawExtent.height = mSwapchain.GetBackImage().Extent.height;
 
 	VkCommandBuffer CmdBuffer = CurFrameData.MainCmdBuffer;
 	REV_VK_CHECK(vkResetCommandBuffer(CmdBuffer, 0));
@@ -176,8 +208,14 @@ void FVkContext::SetClearColor(const Math::FLinearColor& InColor)
 {
 	for (size_t i = 0; i < 4; i++)
 	{
-		mFrameClearColor.float32[i] = InColor[i];
+		mClearColor.float32[i] = InColor[i];
 	}
+}
+
+void FVkContext::SetClearDepthStencil(float InDepth, uint32 InStencil)
+{
+	mClearDepthStencil.depth = InDepth;
+	mClearDepthStencil.stencil = InStencil;
 }
 
 void FVkContext::ClearBackBuffer()
@@ -186,7 +224,8 @@ void FVkContext::ClearBackBuffer()
 	VkCommandBuffer CmdBuffer = CurFrameData.MainCmdBuffer;
 
 	VkImageSubresourceRange ImageRange = FVkInit::ImageSubresourceRange(VK_IMAGE_ASPECT_COLOR_BIT | VK_IMAGE_ASPECT_DEPTH_BIT);
-	vkCmdClearColorImage(CmdBuffer, mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_GENERAL, &mFrameClearColor, 1, &ImageRange);
+	vkCmdClearColorImage(CmdBuffer, mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_GENERAL, &mClearColor, 1, &ImageRange);
+	vkCmdClearDepthStencilImage(CmdBuffer, mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_GENERAL, &mClearDepthStencil, 1, &ImageRange);
 }
 
 void FVkContext::CreateInstance()
@@ -251,6 +290,18 @@ void FVkContext::CreateSurface()
 #else
 	throw std::runtime_error("[FVkContext] Unsupported platform");
 #endif
+}
+
+void FVkContext::CreateAllocator()
+{
+	VmaAllocatorCreateInfo AllocatorCreateInfo = {};
+	AllocatorCreateInfo.physicalDevice = mDevice.GetPhysicalDevice();
+	AllocatorCreateInfo.device = mDevice.GetLogicalDevice();
+	AllocatorCreateInfo.instance = mInstance;
+	AllocatorCreateInfo.flags = VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT;
+	vmaCreateAllocator(&AllocatorCreateInfo, &mAllocator);
+
+	mMainDeletorQueue.Add(FDeletor{[&](){ vmaDestroyAllocator(mAllocator); }});
 }
 
 void FVkContext::CheckExtensionSupport(const std::vector<const char*>& InExtensionNames)
@@ -350,6 +401,11 @@ std::vector<const char*> FVkContext::GetEnabledLayers()
 }
 
 
+
+VkInstance FVkUtils::GetInstance()
+{
+	return sInstance;
+}
 
 VkDevice FVkUtils::GetDevice()
 {

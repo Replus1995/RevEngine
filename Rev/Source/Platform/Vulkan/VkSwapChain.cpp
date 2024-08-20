@@ -7,6 +7,7 @@
 #include <algorithm>
 #include "VkContext.h"
 #include "VkDevice.h"
+#include "VkUtils.h"
 
 namespace Rev
 {
@@ -73,9 +74,13 @@ void FVkSwapchain::CreateSwapchain(const FVkContext* InContext, const FVkDevice*
 
 }
 
-void FVkSwapchain::Cleanup(const FVkDevice* InDevice)
+void FVkSwapchain::Cleanup(const FVkContext* InContext, const FVkDevice* InDevice)
 {
+    REV_CORE_ASSERT(InContext);
     REV_CORE_ASSERT(InDevice);
+
+    vkDestroyImageView(InDevice->GetLogicalDevice(), mBackImage.ImageView, nullptr);
+    vmaDestroyImage(InContext->GetAllocator(), mBackImage.Image, mBackImage.Allocation);
 
     for (auto ImageView : mImageViews) {
         vkDestroyImageView(InDevice->GetLogicalDevice(), ImageView, nullptr);
@@ -132,6 +137,7 @@ VkExtent2D FVkSwapchain::ChooseExtent(const VkSurfaceCapabilitiesKHR& InCapabili
 void FVkSwapchain::CreateImageViews(const FVkDevice* InDevice)
 {
     REV_CORE_ASSERT(InDevice);
+
     mImageViews.resize(mImages.size());
     for (size_t i = 0; i < mImages.size(); i++)
     {
@@ -152,6 +158,44 @@ void FVkSwapchain::CreateImageViews(const FVkDevice* InDevice)
 
         REV_VK_CHECK_THROW(vkCreateImageView(InDevice->GetLogicalDevice(), &ImageViewCreateInfo, nullptr, &mImageViews[i]), "[FVkSwapChain] Failed to create image views!");
     }
+}
+
+void FVkSwapchain::CreateBackImage(const FVkContext* InContext, const FVkDevice* InDevice)
+{
+    REV_CORE_ASSERT(InContext);
+    REV_CORE_ASSERT(InDevice);
+
+    VkExtent3D BackImageExtent = {
+        mExtent.width,
+        mExtent.height,
+        1
+    };
+
+    //hardcoding the draw format to 32 bit float
+    mBackImage.Format = VK_FORMAT_R16G16B16A16_SFLOAT;
+    mBackImage.Extent = BackImageExtent;
+
+    VkImageUsageFlags BackImageUsages{};
+    BackImageUsages |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+    BackImageUsages |= VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+    BackImageUsages |= VK_IMAGE_USAGE_STORAGE_BIT;
+    BackImageUsages |= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+
+    VkImageCreateInfo ImageCreateInfo = FVkInit::ImageCreateInfo2D(mBackImage.Format, BackImageUsages, BackImageExtent);
+
+    //for the draw image, we want to allocate it from gpu local memory
+    VmaAllocationCreateInfo ImageAllocinfo = {};
+    ImageAllocinfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+    ImageAllocinfo.requiredFlags = VkMemoryPropertyFlags(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
+    //allocate and create the image
+    vmaCreateImage(InContext->GetAllocator(), &ImageCreateInfo, &ImageAllocinfo, &mBackImage.Image, &mBackImage.Allocation, nullptr);
+
+    //build a image-view for the draw image to use for rendering
+    VkImageViewCreateInfo ImageViewCreateInfo = FVkInit::ImageViewCreateInfo2D(mBackImage.Format, mBackImage.Image, VK_IMAGE_ASPECT_COLOR_BIT);
+
+    REV_VK_CHECK(vkCreateImageView(InDevice->GetLogicalDevice(), &ImageViewCreateInfo, nullptr, &mBackImage.ImageView));
+
 }
 
 }
