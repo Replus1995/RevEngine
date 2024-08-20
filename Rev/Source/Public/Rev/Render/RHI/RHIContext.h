@@ -26,6 +26,9 @@ public:
 	virtual void BeginFrame() = 0;
 	virtual void EndFrame() = 0;
 
+	//virtual void BeginCompute() = 0;
+	//virtual void EndCompute() = 0;
+
 	virtual void SetViewport(uint32 x, uint32 y, uint32 width, uint32 height) = 0;
 	virtual void SetClearColor(const Math::FLinearColor& color) = 0;
 	virtual void ClearBackBuffer() = 0;
