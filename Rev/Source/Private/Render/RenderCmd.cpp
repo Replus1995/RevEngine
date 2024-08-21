@@ -29,6 +29,16 @@ void RenderCmd::Shutdown()
 	sContext.reset();
 }
 
+void RenderCmd::BeginFrame()
+{
+	sContext->BeginFrame();
+}
+
+void RenderCmd::EndFrame()
+{
+	sContext->EndFrame();
+}
+
 void RenderCmd::SetViewport(uint32 x, uint32 y, uint32 width, uint32 height)
 {
 	sContext->SetViewport(x, y, width, height);

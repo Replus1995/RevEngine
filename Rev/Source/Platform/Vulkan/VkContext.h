@@ -74,7 +74,7 @@ private:
 	VkSurfaceKHR mSurface = VK_NULL_HANDLE;
 	FVkDevice mDevice;
 	FVkSwapchain mSwapchain;
-	VmaAllocator mAllocator = VMA_NULL;
+	VmaAllocator mAllocator = nullptr;
 
 	FDeletorQueue mMainDeletorQueue;
 

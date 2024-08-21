@@ -38,7 +38,7 @@ static Ref<FRHIVertexArray> CreateScreenQuad()
 
 void RenderUtils::Init()
 {
-    sScreenQuad = CreateScreenQuad();
+    //sScreenQuad = CreateScreenQuad();
 }
 
 void RenderUtils::Shutdown()

@@ -28,7 +28,8 @@ FGLFWWindow::~FGLFWWindow()
 void FGLFWWindow::OnUpdate()
 {
 	glfwPollEvents();
-	glfwSwapBuffers(mWindow);
+	if (GetRenderAPI() == ERenderAPI::OpenGL)
+		glfwSwapBuffers(mWindow);
 }
 
 void FGLFWWindow::GetFrameSize(int32& OutWidth, int32& OutHeight) const

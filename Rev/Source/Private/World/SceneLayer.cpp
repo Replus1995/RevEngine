@@ -35,6 +35,9 @@ void SceneLayer::OnAttach()
 	}
 	mRenderer = CreateRef<FForwardRenderer>(CreateRef<FRenderContext>());
 	mRenderer->GetContext()->SceneProxy = mSceneProxy.get();
+
+
+	RenderCmd::SetClearColor(Math::FLinearColor(0, .5, .5));
 }
 
 void SceneLayer::OnDetach()
@@ -64,12 +67,16 @@ void SceneLayer::OnUpdate(float dt)
 
 	RenderCmd::SetViewport(0, 0, WinWidth, WinHeight); //to be optimized
 
-	mRenderer->GetContext()->Width = WinWidth;
+	/*mRenderer->GetContext()->Width = WinWidth;
 	mRenderer->GetContext()->Height = WinHeight;
 
 	mRenderer->BeginFrame();
 	mRenderer->DrawFrame();
-	mRenderer->EndFrame();
+	mRenderer->EndFrame();*/
+
+	RenderCmd::BeginFrame();
+	RenderCmd::ClearBackBuffer();
+	RenderCmd::EndFrame();
 
 	mSceneProxy->Cleanup();
 }

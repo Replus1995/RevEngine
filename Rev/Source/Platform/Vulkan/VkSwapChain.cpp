@@ -72,6 +72,7 @@ void FVkSwapchain::CreateSwapchain(const FVkContext* InContext, const FVkDevice*
     mImages.resize(ImageCount);
     vkGetSwapchainImagesKHR(InDevice->GetLogicalDevice(), mSwapchain, &ImageCount, mImages.data());
 
+    CreateBackImage(InContext, InDevice);
 }
 
 void FVkSwapchain::Cleanup(const FVkContext* InContext, const FVkDevice* InDevice)

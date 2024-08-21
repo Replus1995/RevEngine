@@ -18,7 +18,7 @@ static FVkQueueFamilyIndices FindQueueFamilies(VkPhysicalDevice InDevice, VkSurf
 	std::vector<VkQueueFamilyProperties> QueueFamilies(QueueFamilyCount);
 	vkGetPhysicalDeviceQueueFamilyProperties(InDevice, &QueueFamilyCount, QueueFamilies.data());
 
-	for (size_t i = 0; i < QueueFamilies.size(); i++)
+	for (uint32 i = 0; i < QueueFamilies.size(); i++)
 	{
 		if (QueueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
 		{
@@ -107,21 +107,31 @@ void FVkDevice::CreateLogicalDevice(const FVkContext* InContext)
 	PopulateQueueCreateInfos(QueueCreateInfos, Indices);
 
 	//physical device features
-	VkPhysicalDeviceFeatures PhysicalDeviceFeatures{};
+	VkPhysicalDeviceSynchronization2Features SyncFeatures{};
+	SyncFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES;
+	SyncFeatures.synchronization2 = true;
+	
+	//VkPhysicalDeviceFeatures PhysicalDeviceFeatures{};
+	VkPhysicalDeviceFeatures2 PhysicalDeviceFeatures{};
+	PhysicalDeviceFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+	PhysicalDeviceFeatures.features = {};
+	PhysicalDeviceFeatures.pNext = &SyncFeatures;
 
 	//extenisons
 	const std::vector<const char*> EnabledExtensions = GetRequiredExtensions();
+
 
 	//device create info
 	VkDeviceCreateInfo DeviceCreateInfo{};
 	DeviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 	DeviceCreateInfo.pQueueCreateInfos = QueueCreateInfos.data();
 	DeviceCreateInfo.queueCreateInfoCount = static_cast<uint32>(QueueCreateInfos.size());
-	DeviceCreateInfo.pEnabledFeatures = &PhysicalDeviceFeatures;
+	DeviceCreateInfo.pEnabledFeatures = nullptr;
 	DeviceCreateInfo.enabledExtensionCount = static_cast<uint32>(EnabledExtensions.size());
 	DeviceCreateInfo.ppEnabledExtensionNames = EnabledExtensions.empty() ? nullptr : EnabledExtensions.data();
 	DeviceCreateInfo.enabledLayerCount = 0;
 	DeviceCreateInfo.ppEnabledLayerNames = nullptr;
+	DeviceCreateInfo.pNext = &PhysicalDeviceFeatures;
 
 	if (vkCreateDevice(mPhysicalDevice, &DeviceCreateInfo, nullptr, &mDevice) != VK_SUCCESS) {
 		throw std::runtime_error("[FVkDevice] Failed to create logical device!");
