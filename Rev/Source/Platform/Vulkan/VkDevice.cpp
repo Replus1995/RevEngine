@@ -3,6 +3,8 @@
 #include "Rev/Core/Assert.h"
 #include <set>
 
+#include "Utils/Device.h"
+
 namespace Rev
 {
 
@@ -61,6 +63,7 @@ static void PopulateQueueCreateInfos(std::vector<VkDeviceQueueCreateInfo>& Queue
 	}
 }
 
+
 }
 
 bool FVkQueueFamilyIndices::IsComplete()
@@ -107,15 +110,7 @@ void FVkDevice::CreateLogicalDevice(const FVkContext* InContext)
 	PopulateQueueCreateInfos(QueueCreateInfos, Indices);
 
 	//physical device features
-	VkPhysicalDeviceSynchronization2Features SyncFeatures{};
-	SyncFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES;
-	SyncFeatures.synchronization2 = true;
-	
-	//VkPhysicalDeviceFeatures PhysicalDeviceFeatures{};
-	VkPhysicalDeviceFeatures2 PhysicalDeviceFeatures{};
-	PhysicalDeviceFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
-	PhysicalDeviceFeatures.features = {};
-	PhysicalDeviceFeatures.pNext = &SyncFeatures;
+	VkUtils::FVkPhysicalDeviceFeatures DeviceFeatures;
 
 	//extenisons
 	const std::vector<const char*> EnabledExtensions = GetRequiredExtensions();
@@ -131,7 +126,7 @@ void FVkDevice::CreateLogicalDevice(const FVkContext* InContext)
 	DeviceCreateInfo.ppEnabledExtensionNames = EnabledExtensions.empty() ? nullptr : EnabledExtensions.data();
 	DeviceCreateInfo.enabledLayerCount = 0;
 	DeviceCreateInfo.ppEnabledLayerNames = nullptr;
-	DeviceCreateInfo.pNext = &PhysicalDeviceFeatures;
+	DeviceCreateInfo.pNext = DeviceFeatures.Get();
 
 	if (vkCreateDevice(mPhysicalDevice, &DeviceCreateInfo, nullptr, &mDevice) != VK_SUCCESS) {
 		throw std::runtime_error("[FVkDevice] Failed to create logical device!");
