@@ -43,19 +43,36 @@ namespace Rev
 
 	void Application::Run()
 	{
-		Clock timer;
+		Clock Timer;
 
 		while (mRunning)
 		{
-			float time = timer.Elapsed();
-			float dt = time - mLastFrameTime;
-			mLastFrameTime = time;
+			int64 CurTime = Timer.ElapsedMillis();
+			int64 DeltaTime = 0;
+			bool bShouldUpdate = false;
+			if (mLastFrameTime == 0)
+			{
+				mLastFrameTime = CurTime;
+				bShouldUpdate = true;
+			}
+			else
+			{
+				DeltaTime = CurTime - mLastFrameTime;
+				if (DeltaTime >= mFrameInterval)
+				{
+					mLastFrameTime = CurTime;
+					bShouldUpdate = true;
+				}
+			}
 
 			//RenderCmd::SetClearColor(glm::vec4{ .3f, .3f, .8f, 1.0f });
 			//RenderCmd::Clear();
-
-			for (Layer* layer : mLayerStack)
-				layer->OnUpdate(dt);
+			if (bShouldUpdate)
+			{
+				float DeltaTimeSecond = DeltaTime * 0.001f * 0.001f;
+				for (Layer* layer : mLayerStack)
+					layer->OnUpdate(DeltaTimeSecond);
+			}
 
 			mWindow->OnUpdate();
 		}
@@ -64,6 +81,11 @@ namespace Rev
 	void Application::Close()
 	{
 		mRunning = false;
+	}
+
+	void Application::SetFpsLimit(uint32 InFps)
+	{
+		mFrameInterval = InFps > 0 ? 1000000 / InFps : 0;
 	}
 
 	void Application::OnEvent(Event& e)

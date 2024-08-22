@@ -140,6 +140,8 @@ void FVkContext::Cleanup()
 
 	CleanupFrameData(mFrameData, REV_VK_FRAME_OVERLAP, &mDevice);
 	mSwapchain.Cleanup(this, &mDevice);
+
+	vmaDestroyAllocator(mAllocator);
 	mDevice.Cleanup();
 	vkDestroySurfaceKHR(mInstance, mSurface, nullptr);
 	vkDestroyInstance(mInstance, nullptr);
@@ -305,8 +307,6 @@ void FVkContext::CreateAllocator()
 	AllocatorCreateInfo.instance = mInstance;
 	AllocatorCreateInfo.flags = VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT;
 	vmaCreateAllocator(&AllocatorCreateInfo, &mAllocator);
-
-	mMainDeletorQueue.Add(FDeletor{[&](){ vmaDestroyAllocator(mAllocator); }});
 }
 
 void FVkContext::CheckExtensionSupport(const std::vector<const char*>& InExtensionNames)

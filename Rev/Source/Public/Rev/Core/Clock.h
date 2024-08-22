@@ -19,12 +19,17 @@ public:
 
 	float Clock::Elapsed()
 	{
-		return std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - mStart).count() * 0.001f * 0.001f * 0.001f;
+		return ElapsedMillis() * 0.001f;
 	}
 
 	float Clock::ElapsedMillis()
 	{
-		return Elapsed() * 1000.0f;
+		return ElapsedMicros() * 0.001f;
+	}
+
+	int64 Clock::ElapsedMicros()
+	{
+		return std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - mStart).count();
 	}
 
 private:
