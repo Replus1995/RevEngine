@@ -7,7 +7,7 @@
 #include <algorithm>
 #include "VkContext.h"
 #include "VkDevice.h"
-#include "VkUtils.h"
+#include "VkInitializer.h"
 
 namespace Rev
 {

@@ -65,8 +65,6 @@ void SceneLayer::OnUpdate(float dt)
 	uint32 WinWidth = Application::GetApp().GetWindow()->GetWidth();
 	uint32 WinHeight = Application::GetApp().GetWindow()->GetHeight();
 
-	RenderCmd::SetViewport(0, 0, WinWidth, WinHeight); //to be optimized
-
 	/*mRenderer->GetContext()->Width = WinWidth;
 	mRenderer->GetContext()->Height = WinHeight;
 
@@ -75,6 +73,7 @@ void SceneLayer::OnUpdate(float dt)
 	mRenderer->EndFrame();*/
 
 	RenderCmd::BeginFrame();
+	//RenderCmd::SetViewport(0, 0, WinWidth, WinHeight);
 	RenderCmd::ClearBackBuffer();
 	RenderCmd::EndFrame();
 

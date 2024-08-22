@@ -26,7 +26,7 @@ public:
 	virtual void EndFrame() override;
 
 //Command
-	virtual void SetViewport(uint32 x, uint32 y, uint32 width, uint32 height) override {};
+	virtual void SetViewport(uint32 InX, uint32 InY, uint32 InWidth, uint32 InHeight) override;
 	virtual void SetClearColor(const Math::FLinearColor& InColor) override;
 	virtual void SetClearDepthStencil(float InDepth, uint32 InStencil);
 	virtual void ClearBackBuffer() override;

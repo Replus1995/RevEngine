@@ -2,7 +2,7 @@
 #include "Rev/Core/Assert.h"
 
 #include "VkContext.h"
-#include "VkUtils.h"
+#include "VkInitializer.h"
 
 namespace Rev
 {

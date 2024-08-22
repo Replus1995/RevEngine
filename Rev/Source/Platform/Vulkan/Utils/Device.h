@@ -1,4 +1,5 @@
 #pragma once
+#include "Rev/Core/Base.h"
 #include <vulkan/vulkan.h>
 
 namespace Rev::VkUtils

@@ -17,7 +17,9 @@
 #include <vk_mem_alloc.h>
 
 //#include <VkBootstrap.h>
-#include "VkUtils.h"
+#include "VkCore.h"
+#include "VkInitializer.h"
+#include "Utils/Image.h"
 
 namespace Rev
 {
@@ -85,6 +87,21 @@ void PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& Create
 static VkInstance sInstance = VK_NULL_HANDLE;
 static VkDevice sDevice = VK_NULL_HANDLE;
 static VmaAllocator sAllocator = VMA_NULL;
+
+VkInstance FVkCore::GetInstance()
+{
+	return sInstance;
+}
+
+VkDevice FVkCore::GetDevice()
+{
+	return sDevice;
+}
+
+VmaAllocator FVkCore::GetAllocator()
+{
+	return sAllocator;
+}
 
 FVkContext::FVkContext()
 {
@@ -165,7 +182,7 @@ void FVkContext::BeginFrame()
 	VkCommandBufferBeginInfo CmdBufferBeginInfo = FVkInit::CmdBufferBeginInfo(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 	REV_VK_CHECK(vkBeginCommandBuffer(CmdBuffer, &CmdBufferBeginInfo));
 
-	FVkUtils::TransitionImage(CmdBuffer, mSwapchain.GetBackImage().Image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL);
+	VkUtils::TransitionImage(CmdBuffer, mSwapchain.GetBackImage().Image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL);
 	
 }
 
@@ -176,10 +193,10 @@ void FVkContext::EndFrame()
 	VkCommandBuffer CmdBuffer = CurFrameData.MainCmdBuffer;
 
 
-	FVkUtils::TransitionImage(CmdBuffer, mSwapchain.GetBackImage().Image, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
-	FVkUtils::TransitionImage(CmdBuffer, mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-	FVkUtils::BlitImage(CmdBuffer, mSwapchain.GetBackImage().Image, mSwapchain.GetImages()[mCurSwapchainImageIndex], mDrawExtent, mSwapchain.GetExtent());
-	FVkUtils::TransitionImage(CmdBuffer, mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+	VkUtils::TransitionImage(CmdBuffer, mSwapchain.GetBackImage().Image, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+	VkUtils::TransitionImage(CmdBuffer, mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+	VkUtils::BlitImage(CmdBuffer, mSwapchain.GetBackImage().Image, mSwapchain.GetImages()[mCurSwapchainImageIndex], mDrawExtent, mSwapchain.GetExtent());
+	VkUtils::TransitionImage(CmdBuffer, mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 
 	REV_VK_CHECK(vkEndCommandBuffer(CmdBuffer));
 
@@ -203,11 +220,34 @@ void FVkContext::EndFrame()
 	PresentInfo.pWaitSemaphores = &CurFrameData.RenderSemaphore;
 	PresentInfo.waitSemaphoreCount = 1;
 	PresentInfo.pImageIndices = &mCurSwapchainImageIndex;
-	REV_VK_CHECK(vkQueuePresentKHR(mDevice.GetGraphicsQueue(), &PresentInfo));
+	auto PresentRes = vkQueuePresentKHR(mDevice.GetGraphicsQueue(), &PresentInfo);
+
+	if (PresentRes == VK_ERROR_OUT_OF_DATE_KHR || PresentRes == VK_SUBOPTIMAL_KHR)
+	{
+		vkDeviceWaitIdle(mDevice.GetLogicalDevice());
+		mSwapchain.Cleanup(this, &mDevice);
+		mSwapchain.CreateSwapchain(this, &mDevice);
+	}
+	else if (PresentRes != VK_SUCCESS)
+	{
+		throw std::runtime_error("[FVkContext] Failed to present swap chain image!");
+	}
 
 	mFrameDataIndex = (mFrameDataIndex + 1) % REV_VK_FRAME_OVERLAP;
 	//mCurSwapchainImageIndex = 0;
 
+}
+
+void FVkContext::SetViewport(uint32 InX, uint32 InY, uint32 InWidth, uint32 InHeight)
+{
+	VkViewport Viewport{};
+	Viewport.x = InX;
+	Viewport.y = InY;
+	Viewport.width = InWidth;
+	Viewport.height = InHeight;
+	Viewport.minDepth = 0.0f;
+	Viewport.maxDepth = 1.0f;
+	vkCmdSetViewport(GetMainCmdBuffer(), 0, 1, &Viewport);
 }
 
 void FVkContext::SetClearColor(const Math::FLinearColor& InColor)
@@ -226,11 +266,8 @@ void FVkContext::SetClearDepthStencil(float InDepth, uint32 InStencil)
 
 void FVkContext::ClearBackBuffer()
 {
-	auto& CurFrameData = GetFrameData();
-	VkCommandBuffer CmdBuffer = CurFrameData.MainCmdBuffer;
-
 	VkImageSubresourceRange ColorImageRange = FVkInit::ImageSubresourceRange(VK_IMAGE_ASPECT_COLOR_BIT);
-	vkCmdClearColorImage(CmdBuffer, mSwapchain.GetBackImage().Image, VK_IMAGE_LAYOUT_GENERAL, &mClearColor, 1, &ColorImageRange);
+	vkCmdClearColorImage(GetMainCmdBuffer(), mSwapchain.GetBackImage().Image, VK_IMAGE_LAYOUT_GENERAL, &mClearColor, 1, &ColorImageRange);
 	/*VkImageSubresourceRange DepthImageRange = FVkInit::ImageSubresourceRange(VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT);
 	vkCmdClearDepthStencilImage(CmdBuffer, mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_GENERAL, &mClearDepthStencil, 1, &DepthImageRange);*/
 }
@@ -407,19 +444,6 @@ std::vector<const char*> FVkContext::GetEnabledLayers()
 
 
 
-VkInstance FVkUtils::GetInstance()
-{
-	return sInstance;
-}
 
-VkDevice FVkUtils::GetDevice()
-{
-	return sDevice;
-}
-
-VmaAllocator FVkUtils::GetAllocator()
-{
-	return sAllocator;
-}
 
 }

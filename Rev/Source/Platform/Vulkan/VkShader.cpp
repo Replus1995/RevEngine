@@ -1,6 +1,7 @@
 #include "VkShader.h"
-#include "VkUtils.h"
 #include "Rev/Core/Assert.h"
+
+#include "VkCore.h"
 
 namespace Rev
 {
@@ -13,12 +14,12 @@ FVkShader::FVkShader(ERHIShaderStage InStage, const FBuffer& InCompiledData)
 	ShaderModuleCreateInfo.codeSize = InCompiledData.Size();
 	ShaderModuleCreateInfo.pCode = InCompiledData.DataAs<uint32_t>();
 
-	REV_VK_CHECK_THROW(vkCreateShaderModule(FVkUtils::GetDevice(), &ShaderModuleCreateInfo, nullptr, &mModule), "[FVkShader] Failed to create shader module!");
+	REV_VK_CHECK_THROW(vkCreateShaderModule(FVkCore::GetDevice(), &ShaderModuleCreateInfo, nullptr, &mModule), "[FVkShader] Failed to create shader module!");
 }
 
 FVkShader::~FVkShader()
 {
-	vkDestroyShaderModule(FVkUtils::GetDevice(), mModule, nullptr);
+	vkDestroyShaderModule(FVkCore::GetDevice(), mModule, nullptr);
 }
 
 VkShaderStageFlagBits FVkShader::TranslateShaderStage(ERHIShaderStage InStage)
