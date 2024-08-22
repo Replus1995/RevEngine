@@ -228,7 +228,7 @@ void FVkContext::ClearBackBuffer()
 	VkCommandBuffer CmdBuffer = CurFrameData.MainCmdBuffer;
 
 	VkImageSubresourceRange ColorImageRange = FVkInit::ImageSubresourceRange(VK_IMAGE_ASPECT_COLOR_BIT);
-	vkCmdClearColorImage(CmdBuffer, mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_GENERAL, &mClearColor, 1, &ColorImageRange);
+	vkCmdClearColorImage(CmdBuffer, mSwapchain.GetBackImage().Image, VK_IMAGE_LAYOUT_GENERAL, &mClearColor, 1, &ColorImageRange);
 	/*VkImageSubresourceRange DepthImageRange = FVkInit::ImageSubresourceRange(VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT);
 	vkCmdClearDepthStencilImage(CmdBuffer, mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_GENERAL, &mClearDepthStencil, 1, &DepthImageRange);*/
 }
