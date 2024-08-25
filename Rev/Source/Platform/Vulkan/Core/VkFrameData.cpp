@@ -1,8 +1,9 @@
 #include "VkFrameData.h"
 #include "Rev/Core/Assert.h"
 
-#include "VkContext.h"
-#include "VkInitializer.h"
+#include "../VkInitializer.h"
+#include "../VkContext.h"
+#include "VkDevice.h"
 
 namespace Rev
 {

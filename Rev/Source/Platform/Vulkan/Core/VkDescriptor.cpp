@@ -1,5 +1,5 @@
-#include "Descriptor.h"
-#include "Vulkan/VkCore.h"
+#include "VkDescriptor.h"
+#include "VkDefines.h"
 
 namespace Rev::VkUtils
 {

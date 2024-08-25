@@ -5,10 +5,10 @@
 #include <vulkan/vulkan.h>
 #include <vk_mem_alloc.h>
 
-#include "VkDefines.h"
-#include "VkDevice.h"
-#include "VkSwapchain.h"
-#include "VkFrameData.h"
+#include "Core/VkDefines.h"
+#include "Core/VkDevice.h"
+#include "Core/VkSwapchain.h"
+#include "Core/VkFrameData.h"
 
 namespace Rev
 {
@@ -50,6 +50,7 @@ public:
 	virtual void Draw(const Ref<FRHIVertexArray>& InVertexArray, EDrawMode InDrawMode) override {};
 
 
+
 	const VkInstance& GetInstance() const { return mInstance; }
 	const VkSurfaceKHR& GetSurface() const { return mSurface; }
 	const VmaAllocator& GetAllocator() const { return mAllocator; }
@@ -88,6 +89,14 @@ private:
 
 	VkExtent2D mDrawExtent = {0, 0};
 
+};
+
+class FVkCore
+{
+public:
+	static VkInstance GetInstance();
+	static VkDevice GetDevice();
+	static VmaAllocator GetAllocator();
 };
 
 }

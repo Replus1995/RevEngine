@@ -17,7 +17,6 @@
 #include <vk_mem_alloc.h>
 
 //#include <VkBootstrap.h>
-#include "VkCore.h"
 #include "VkInitializer.h"
 #include "Utils/Image.h"
 
@@ -87,21 +86,6 @@ void PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& Create
 static VkInstance sInstance = VK_NULL_HANDLE;
 static VkDevice sDevice = VK_NULL_HANDLE;
 static VmaAllocator sAllocator = VMA_NULL;
-
-VkInstance FVkCore::GetInstance()
-{
-	return sInstance;
-}
-
-VkDevice FVkCore::GetDevice()
-{
-	return sDevice;
-}
-
-VmaAllocator FVkCore::GetAllocator()
-{
-	return sAllocator;
-}
 
 FVkContext::FVkContext()
 {
@@ -442,8 +426,20 @@ std::vector<const char*> FVkContext::GetEnabledLayers()
 	return RequiredLayers;
 }
 
+VkInstance FVkCore::GetInstance()
+{
+	return sInstance;
+}
 
+VkDevice FVkCore::GetDevice()
+{
+	return sDevice;
+}
 
+VmaAllocator FVkCore::GetAllocator()
+{
+	return sAllocator;
+}
 
 
 }
