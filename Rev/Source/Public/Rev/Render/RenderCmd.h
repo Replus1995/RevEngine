@@ -12,6 +12,7 @@ class FRHIShaderProgram;
 class FRHIUniformBuffer;
 class FRHITexture;
 class FRHIRenderTarget;
+class FRHIContext;
 class REV_API RenderCmd
 {
 public:
@@ -40,6 +41,6 @@ public:
 	static void DrawPrimitive(const FMeshPrimitive* InPrimitive);
 	//static void DrawLines(const Ref<VertexArray>& vertexArray, uint32_t vertexCount, float lineWidth);
 
-	//b
+	static FRHIContext* GetContext();
 };
 }

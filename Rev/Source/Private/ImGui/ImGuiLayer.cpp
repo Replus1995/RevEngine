@@ -2,6 +2,7 @@
 #include "Rev/Core/Application.h"
 #include "Rev/Core/Window.h"
 #include "Rev/Core/Assert.h"
+#include "Rev/Render/RenderCmd.h"
 
 #include <imgui.h>
 #include <backends/imgui_impl_opengl3.h>
@@ -10,6 +11,8 @@
 //temp
 #include <GLFW/glfw3.h>
 #include <glad/gl.h>
+#include <Vulkan/VkContext.h>
+
 
 static ImGuiKey GlfwKeyToImGuiKey(int key)
 {
@@ -126,187 +129,257 @@ static ImGuiKey GlfwKeyToImGuiKey(int key)
 
 namespace Rev
 {
-    static void ImGuiLayer_UpdateKeyModifiers()
-    {
-        ImGuiIO& io = ImGui::GetIO();
-        io.AddKeyEvent(ImGuiMod_Ctrl, ImGui::IsKeyDown(ImGuiKey_LeftCtrl) || ImGui::IsKeyDown(ImGuiKey_RightCtrl));
-        io.AddKeyEvent(ImGuiMod_Shift, ImGui::IsKeyDown(ImGuiKey_LeftShift) || ImGui::IsKeyDown(ImGuiKey_RightShift));
-        io.AddKeyEvent(ImGuiMod_Alt, ImGui::IsKeyDown(ImGuiKey_LeftAlt) || ImGui::IsKeyDown(ImGuiKey_RightAlt));
-        io.AddKeyEvent(ImGuiMod_Super, ImGui::IsKeyDown(ImGuiKey_LeftSuper) || ImGui::IsKeyDown(ImGuiKey_RightSuper));
-    }
-    static void ImGuiLayer_SetClipboardText(void* user_data, const char* text)
-    {
-        Application::GetApp().GetWindow()->SetClipboardText(text);
-    }
-    static const char* ImGuiLayer_GetClipboardText(void* user_data)
-    {
-        return Application::GetApp().GetWindow()->GetClipboardText();
-    }
+static void ImGuiLayer_UpdateKeyModifiers()
+{
+    ImGuiIO& io = ImGui::GetIO();
+    io.AddKeyEvent(ImGuiMod_Ctrl, ImGui::IsKeyDown(ImGuiKey_LeftCtrl) || ImGui::IsKeyDown(ImGuiKey_RightCtrl));
+    io.AddKeyEvent(ImGuiMod_Shift, ImGui::IsKeyDown(ImGuiKey_LeftShift) || ImGui::IsKeyDown(ImGuiKey_RightShift));
+    io.AddKeyEvent(ImGuiMod_Alt, ImGui::IsKeyDown(ImGuiKey_LeftAlt) || ImGui::IsKeyDown(ImGuiKey_RightAlt));
+    io.AddKeyEvent(ImGuiMod_Super, ImGui::IsKeyDown(ImGuiKey_LeftSuper) || ImGui::IsKeyDown(ImGuiKey_RightSuper));
+}
+static void ImGuiLayer_SetClipboardText(void* user_data, const char* text)
+{
+    Application::GetApp().GetWindow()->SetClipboardText(text);
+}
+static const char* ImGuiLayer_GetClipboardText(void* user_data)
+{
+    return Application::GetApp().GetWindow()->GetClipboardText();
+}
+
+static VkDescriptorPool ImGuiLayer_Vulkan_Init()
+{
+    REV_CORE_ASSERT(GetRenderAPI() == ERenderAPI::Vulkan);
+
+    FVkContext* pVkContext = static_cast<FVkContext*>(RenderCmd::GetContext());
+
+    // 1: create descriptor pool for IMGUI
+    //  the size of the pool is very oversize, but it's copied from imgui demo itself.
+    VkDescriptorPoolSize PoolSizes[] = { { VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
+        { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000 },
+        { VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000 },
+        { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000 },
+        { VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000 },
+        { VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000 },
+        { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000 },
+        { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000 },
+        { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000 },
+        { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000 },
+        { VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000 } };
+
+    VkDescriptorPoolCreateInfo PoolCreateInfo{};
+    PoolCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+    PoolCreateInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
+    PoolCreateInfo.maxSets = 1000;
+    PoolCreateInfo.poolSizeCount = (uint32_t)std::size(PoolSizes);
+    PoolCreateInfo.pPoolSizes = PoolSizes;
+
+    VkDescriptorPool ImguiPool;
+    REV_VK_CHECK(vkCreateDescriptorPool(FVkCore::GetDevice(), &PoolCreateInfo, nullptr, &ImguiPool));
+
+    // this initializes imgui for Vulkan
+    ImGui_ImplVulkan_InitInfo ImguiInitInfo{};
+    ImguiInitInfo.Instance = pVkContext->GetInstance().GetInstance();
+    ImguiInitInfo.PhysicalDevice = pVkContext->GetDevice().GetPhysicalDevice();
+    ImguiInitInfo.Device = pVkContext->GetDevice().GetLogicalDevice();
+    ImguiInitInfo.Queue = pVkContext->GetDevice().GetGraphicsQueue();
+    ImguiInitInfo.DescriptorPool = ImguiPool;
+    ImguiInitInfo.MinImageCount = 3;
+    ImguiInitInfo.ImageCount = 3;
+    ImguiInitInfo.UseDynamicRendering = true;
+
+    //dynamic rendering parameters for imgui to use
+    ImguiInitInfo.PipelineRenderingCreateInfo = {};
+    ImguiInitInfo.PipelineRenderingCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO;
+    ImguiInitInfo.PipelineRenderingCreateInfo.colorAttachmentCount = 1;
+    ImguiInitInfo.PipelineRenderingCreateInfo.pColorAttachmentFormats = &pVkContext->GetSwapchain().GetFormat();
+
+    ImguiInitInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
+
+    ImGui_ImplVulkan_Init(&ImguiInitInfo);
+    ImGui_ImplVulkan_CreateFontsTexture();
+
+    return ImguiPool;
+}
+
+static void ImGuiLayer_Vulkan_Shutdown(VkDescriptorPool ImguiPool)
+{
+    ImGui_ImplVulkan_Shutdown();
+    vkDestroyDescriptorPool(FVkCore::GetDevice(), ImguiPool, nullptr);
+}
 
     
-	ImGuiLayer::ImGuiLayer()
-		: Layer("ImGuiLayer")
-	{
-	}
+ImGuiLayer::ImGuiLayer()
+	: Layer("ImGuiLayer")
+{
+}
 
-	ImGuiLayer::~ImGuiLayer()
-	{
-	}
+ImGuiLayer::~ImGuiLayer()
+{
+}
 
-	void ImGuiLayer::OnAttach()
-	{
-		ImGui::CreateContext();
-		ImGui::StyleColorsDark();
-		ImGuiIO& io = ImGui::GetIO();
-		io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
-		io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
+void ImGuiLayer::OnAttach()
+{
+	ImGui::CreateContext();
+	ImGui::StyleColorsDark();
+	ImGuiIO& io = ImGui::GetIO();
+	io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
+	io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
 
-        io.SetClipboardTextFn = ImGuiLayer_SetClipboardText;
-        io.GetClipboardTextFn = ImGuiLayer_GetClipboardText;
-        io.ClipboardUserData = nullptr;
+    io.SetClipboardTextFn = ImGuiLayer_SetClipboardText;
+    io.GetClipboardTextFn = ImGuiLayer_GetClipboardText;
+    io.ClipboardUserData = nullptr;
 
-        switch (GetRenderAPI())
-        {
-        case ERenderAPI::OpenGL:
-            ImGui_ImplOpenGL3_Init("#version 450");
-            break;
-        case ERenderAPI::Vulkan:
-            ImGui_ImplVulkan_Init("#version 450");
-            break;
-        default:
-            REV_CORE_ASSERT(false, "[ImGuiLayer] Unknown render api")
-            break;
-        }
-
-	}
-
-	void ImGuiLayer::OnDetach()
-	{
-        switch (GetRenderAPI())
-        {
-        case ERenderAPI::OpenGL:
-            ImGui_ImplOpenGL3_Shutdown();
-            break;
-        case ERenderAPI::Vulkan:
-            ImGui_ImplVulkan_Shutdown();
-            break;
-        default:
-            REV_CORE_ASSERT(false, "[ImGuiLayer] Unknown render api")
-                break;
-        }
-        ImGui::DestroyContext();
-	}
-
-	void ImGuiLayer::OnUpdate(float dt)
-	{
-		Application& app = Application::GetApp();
-
-		ImGuiIO& io = ImGui::GetIO();
-		io.DisplaySize = ImVec2(app.GetWindow()->GetWidth(), app.GetWindow()->GetHeight());
-		io.DeltaTime = 1.0f/60.0f;
-
-        switch (GetRenderAPI())
-        {
-        case ERenderAPI::OpenGL:
-            ImGui_ImplOpenGL3_NewFrame();
-            break;
-        case ERenderAPI::Vulkan:
-            ImGui_ImplVulkan_NewFrame();
-            break;
-        default:
-            REV_CORE_ASSERT(false, "[ImGuiLayer] Unknown render api")
-                break;
-        }
-
-		ImGui::NewFrame();
-
-		static bool show = true;
-		ImGui::ShowDemoWindow(&show);
-
-		ImGui::Render();
-
-        switch (GetRenderAPI())
-        {
-        case ERenderAPI::OpenGL:
-            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-            break;
-        case ERenderAPI::Vulkan:
-            ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData());
-            break;
-        default:
-            REV_CORE_ASSERT(false, "[ImGuiLayer] Unknown render api")
-            break;
-        }
-	}
-
-	void ImGuiLayer::OnEvent(Event& event)
-	{
-		EventDispatcher dispatcher(event);
-		dispatcher.Dispatch<KeyPressedEvent>(RE_BIND_EVENT_FN(ImGuiLayer::OnKeyPressed, this));
-		dispatcher.Dispatch<KeyReleasedEvent>(RE_BIND_EVENT_FN(ImGuiLayer::OnKeyReleased, this));
-		dispatcher.Dispatch<KeyTypedEvent>(RE_BIND_EVENT_FN(ImGuiLayer::OnKeyTyped, this));
-		dispatcher.Dispatch<MouseButtonPressedEvent>(RE_BIND_EVENT_FN(ImGuiLayer::OnMouseButtonPressed, this));
-		dispatcher.Dispatch<MouseButtonReleasedEvent>(RE_BIND_EVENT_FN(ImGuiLayer::OnMouseButtonReleased, this));
-		dispatcher.Dispatch<MouseScrolledEvent>(RE_BIND_EVENT_FN(ImGuiLayer::OnMouseScrolled, this));
-		dispatcher.Dispatch<MouseMovedEvent>(RE_BIND_EVENT_FN(ImGuiLayer::OnMouseMoved, this));
-		dispatcher.Dispatch<WindowResizeEvent>(RE_BIND_EVENT_FN(ImGuiLayer::OnWindowResize, this));
-	}
-
-	bool ImGuiLayer::OnKeyPressed(KeyPressedEvent& e)
-	{
-        ImGuiLayer_UpdateKeyModifiers();
-		ImGuiIO& io = ImGui::GetIO();
-        io.AddKeyEvent(GlfwKeyToImGuiKey(e.GetKeyCode()), true);
-		return false;
-	}
-	bool ImGuiLayer::OnKeyReleased(KeyReleasedEvent& e)
-	{
-        ImGuiIO& io = ImGui::GetIO();
-        io.AddKeyEvent(GlfwKeyToImGuiKey(e.GetKeyCode()), false);
-		return false;
-	}
-    bool ImGuiLayer::OnKeyTyped(KeyTypedEvent& e)
+    switch (GetRenderAPI())
     {
-        ImGuiIO& io = ImGui::GetIO();
-        io.AddInputCharacter(e.GetKeyCode());
-        return false;
+    case ERenderAPI::OpenGL:
+        ImGui_ImplOpenGL3_Init("#version 450");
+        break;
+    case ERenderAPI::Vulkan:
+        mPlatformData = ImGuiLayer_Vulkan_Init();
+        break;
+    default:
+        REV_CORE_ASSERT(false, "[ImGuiLayer] Unknown render api")
+        break;
     }
-	bool ImGuiLayer::OnMouseButtonPressed(MouseButtonPressedEvent& e)
-	{
-        ImGuiLayer_UpdateKeyModifiers();
-		int button = e.GetMouseButton();
-		ImGuiIO& io = ImGui::GetIO();
-		if (button >= 0 && button < ImGuiMouseButton_COUNT)
-			io.AddMouseButtonEvent(button, true);
-		return false;
-	}
-	bool ImGuiLayer::OnMouseButtonReleased(MouseButtonReleasedEvent& e)
-	{
-		int button = e.GetMouseButton();
-		ImGuiIO& io = ImGui::GetIO();
-		if (button >= 0 && button < ImGuiMouseButton_COUNT)
-			io.AddMouseButtonEvent(button, false);
-		return false;
-	}
-	bool ImGuiLayer::OnMouseScrolled(MouseScrolledEvent& e)
-	{
-		ImGuiIO& io = ImGui::GetIO();
-		io.AddMouseWheelEvent(e.GetXOffset(), e.GetYOffset());
-		return false;
-	}
-	bool ImGuiLayer::OnMouseMoved(MouseMovedEvent& e)
-	{
-		ImGuiIO& io = ImGui::GetIO();
-		io.AddMousePosEvent(e.GetX(), e.GetY());
-		return false;
-	}
-	bool ImGuiLayer::OnWindowResize(WindowResizeEvent& e)
-	{
-		ImGuiIO& io = ImGui::GetIO();
-		io.DisplaySize = ImVec2(e.GetWidth(), e.GetHeight());
-		io.DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
-		glViewport(0, 0, e.GetWidth(), e.GetHeight());
 
-		return false;
-	}
+}
+
+void ImGuiLayer::OnDetach()
+{
+    switch (GetRenderAPI())
+    {
+    case ERenderAPI::OpenGL:
+        ImGui_ImplOpenGL3_Shutdown();
+        break;
+    case ERenderAPI::Vulkan:
+        ImGuiLayer_Vulkan_Shutdown((VkDescriptorPool)mPlatformData);
+        mPlatformData = nullptr;
+        break;
+    default:
+        REV_CORE_ASSERT(false, "[ImGuiLayer] Unknown render api")
+            break;
+    }
+    ImGui::DestroyContext();
+}
+
+void ImGuiLayer::OnUpdate(float dt)
+{
+	Application& app = Application::GetApp();
+
+	ImGuiIO& io = ImGui::GetIO();
+	io.DisplaySize = ImVec2(app.GetWindow()->GetWidth(), app.GetWindow()->GetHeight());
+	io.DeltaTime = 1.0f/60.0f;
+
+    switch (GetRenderAPI())
+    {
+    case ERenderAPI::OpenGL:
+        ImGui_ImplOpenGL3_NewFrame();
+        break;
+    case ERenderAPI::Vulkan:
+        ImGui_ImplVulkan_NewFrame();
+        break;
+    default:
+        REV_CORE_ASSERT(false, "[ImGuiLayer] Unknown render api")
+            break;
+    }
+
+	ImGui::NewFrame();
+
+	static bool show = true;
+	ImGui::ShowDemoWindow(&show);
+
+	ImGui::Render();
+
+    switch (GetRenderAPI())
+    {
+    case ERenderAPI::OpenGL:
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        break;
+    case ERenderAPI::Vulkan:
+        // ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData());
+        break;
+    default:
+        REV_CORE_ASSERT(false, "[ImGuiLayer] Unknown render api")
+        break;
+    }
+}
+
+void ImGuiLayer::OnEvent(Event& event)
+{
+	EventDispatcher dispatcher(event);
+	dispatcher.Dispatch<KeyPressedEvent>(RE_BIND_EVENT_FN(ImGuiLayer::OnKeyPressed, this));
+	dispatcher.Dispatch<KeyReleasedEvent>(RE_BIND_EVENT_FN(ImGuiLayer::OnKeyReleased, this));
+	dispatcher.Dispatch<KeyTypedEvent>(RE_BIND_EVENT_FN(ImGuiLayer::OnKeyTyped, this));
+	dispatcher.Dispatch<MouseButtonPressedEvent>(RE_BIND_EVENT_FN(ImGuiLayer::OnMouseButtonPressed, this));
+	dispatcher.Dispatch<MouseButtonReleasedEvent>(RE_BIND_EVENT_FN(ImGuiLayer::OnMouseButtonReleased, this));
+	dispatcher.Dispatch<MouseScrolledEvent>(RE_BIND_EVENT_FN(ImGuiLayer::OnMouseScrolled, this));
+	dispatcher.Dispatch<MouseMovedEvent>(RE_BIND_EVENT_FN(ImGuiLayer::OnMouseMoved, this));
+	dispatcher.Dispatch<WindowResizeEvent>(RE_BIND_EVENT_FN(ImGuiLayer::OnWindowResize, this));
+}
+
+bool ImGuiLayer::OnKeyPressed(KeyPressedEvent& e)
+{
+    ImGuiLayer_UpdateKeyModifiers();
+	ImGuiIO& io = ImGui::GetIO();
+    io.AddKeyEvent(GlfwKeyToImGuiKey(e.GetKeyCode()), true);
+	return false;
+}
+
+bool ImGuiLayer::OnKeyReleased(KeyReleasedEvent& e)
+{
+    ImGuiIO& io = ImGui::GetIO();
+    io.AddKeyEvent(GlfwKeyToImGuiKey(e.GetKeyCode()), false);
+	return false;
+}
+
+bool ImGuiLayer::OnKeyTyped(KeyTypedEvent& e)
+{
+    ImGuiIO& io = ImGui::GetIO();
+    io.AddInputCharacter(e.GetKeyCode());
+    return false;
+}
+
+bool ImGuiLayer::OnMouseButtonPressed(MouseButtonPressedEvent& e)
+{
+    ImGuiLayer_UpdateKeyModifiers();
+	int button = e.GetMouseButton();
+	ImGuiIO& io = ImGui::GetIO();
+	if (button >= 0 && button < ImGuiMouseButton_COUNT)
+		io.AddMouseButtonEvent(button, true);
+	return false;
+}
+
+bool ImGuiLayer::OnMouseButtonReleased(MouseButtonReleasedEvent& e)
+{
+	int button = e.GetMouseButton();
+	ImGuiIO& io = ImGui::GetIO();
+	if (button >= 0 && button < ImGuiMouseButton_COUNT)
+		io.AddMouseButtonEvent(button, false);
+	return false;
+}
+
+bool ImGuiLayer::OnMouseScrolled(MouseScrolledEvent& e)
+{
+	ImGuiIO& io = ImGui::GetIO();
+	io.AddMouseWheelEvent(e.GetXOffset(), e.GetYOffset());
+	return false;
+}
+
+bool ImGuiLayer::OnMouseMoved(MouseMovedEvent& e)
+{
+	ImGuiIO& io = ImGui::GetIO();
+	io.AddMousePosEvent(e.GetX(), e.GetY());
+	return false;
+}
+
+bool ImGuiLayer::OnWindowResize(WindowResizeEvent& e)
+{
+	ImGuiIO& io = ImGui::GetIO();
+	io.DisplaySize = ImVec2(e.GetWidth(), e.GetHeight());
+	io.DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
+	glViewport(0, 0, e.GetWidth(), e.GetHeight());
+
+	return false;
+}
+
 }

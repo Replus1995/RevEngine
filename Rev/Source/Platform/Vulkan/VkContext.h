@@ -6,6 +6,7 @@
 #include <vk_mem_alloc.h>
 
 #include "Core/VkDefines.h"
+#include "Core/VkInstance.h"
 #include "Core/VkDevice.h"
 #include "Core/VkSwapchain.h"
 #include "Core/VkFrameData.h"
@@ -24,6 +25,8 @@ public:
 
 	virtual void BeginFrame() override;
 	virtual void EndFrame() override;
+
+	virtual void ImmediateSubmit(std::function<void(VkCommandBuffer)>&& Func);
 
 //Command
 	virtual void SetViewport(uint32 InX, uint32 InY, uint32 InWidth, uint32 InHeight) override;
@@ -50,29 +53,21 @@ public:
 	virtual void Draw(const Ref<FRHIVertexArray>& InVertexArray, EDrawMode InDrawMode) override {};
 
 
-
-	const VkInstance& GetInstance() const { return mInstance; }
-	const VkSurfaceKHR& GetSurface() const { return mSurface; }
+	const FVkInstance& GetInstance() const { return mInstance; }
+	const FVkDevice& GetDevice() const { return mDevice; }
+	const FVkSwapchain& GetSwapchain() const { return mSwapchain; }
 	const VmaAllocator& GetAllocator() const { return mAllocator; }
+
 
 	FVkFrameData& GetFrameData() { return mFrameData[mFrameDataIndex]; }
 	VkCommandBuffer GetMainCmdBuffer() { return mFrameData[mFrameDataIndex].MainCmdBuffer; }
 	
 private:
-	void CreateInstance();
-	void CreateSurface();
 	void CreateAllocator();
+	void CreateImmediateData();
 
 private:
-	static void CheckExtensionSupport(const std::vector<const char*>& InExtensionNames);
-	static void CheckLayerSupport(const std::vector<const char*>& InLayerNames);
-	static std::vector<const char*> GetEnabledExtensions();
-	static std::vector<const char*> GetEnabledLayers();
-
-private:
-	VkInstance mInstance = VK_NULL_HANDLE;
-	//VkDebugUtilsMessengerEXT mDebugMessenger = VK_NULL_HANDLE;
-	VkSurfaceKHR mSurface = VK_NULL_HANDLE;
+	FVkInstance mInstance;
 	FVkDevice mDevice;
 	FVkSwapchain mSwapchain;
 	VmaAllocator mAllocator = nullptr;
@@ -84,10 +79,15 @@ private:
 	uint32 mFrameDataIndex = 0;
 	FVkFrameData mFrameData[REV_VK_FRAME_OVERLAP];
 
+	//
 	VkClearColorValue mClearColor;
 	VkClearDepthStencilValue mClearDepthStencil;
-
 	VkExtent2D mDrawExtent = {0, 0};
+
+	//immediate draw
+	VkFence mImmFence;
+	VkCommandBuffer mImmCmdBuffer;
+	VkCommandPool mImmCmdPool;
 
 };
 

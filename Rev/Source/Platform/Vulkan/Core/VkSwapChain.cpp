@@ -5,17 +5,19 @@
 #include <set>
 #include <limits>
 #include <algorithm>
-#include "../VkInitializer.h"
-#include "../VkContext.h"
+#include "VkDefines.h"
+#include "VkInstance.h"
 #include "VkDevice.h"
+#include "../VkInitializer.h"
 
 namespace Rev
 {
 
-void FVkSwapchain::CreateSwapchain(const FVkContext* InContext, const FVkDevice* InDevice)
+void FVkSwapchain::CreateSwapchain(const FVkInstance* Instance, const FVkDevice* InDevice, VmaAllocator InAllocator)
 {
-    REV_CORE_ASSERT(InContext);
+    REV_CORE_ASSERT(Instance);
     REV_CORE_ASSERT(InDevice);
+    REV_CORE_ASSERT(InAllocator);
 
     const FVkDeviceSwapChainSupport& SwapChainSupport = InDevice->GetSwapChainSupport();
 
@@ -30,7 +32,7 @@ void FVkSwapchain::CreateSwapchain(const FVkContext* InContext, const FVkDevice*
 
     VkSwapchainCreateInfoKHR SwapChainCreateInfo{};
     SwapChainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-    SwapChainCreateInfo.surface = InContext->GetSurface();
+    SwapChainCreateInfo.surface = Instance->GetSurface();
     SwapChainCreateInfo.minImageCount = ImageCount;
     SwapChainCreateInfo.imageFormat = SurfaceFormat.format;
     SwapChainCreateInfo.imageColorSpace = SurfaceFormat.colorSpace;
@@ -72,16 +74,16 @@ void FVkSwapchain::CreateSwapchain(const FVkContext* InContext, const FVkDevice*
     mImages.resize(ImageCount);
     vkGetSwapchainImagesKHR(InDevice->GetLogicalDevice(), mSwapchain, &ImageCount, mImages.data());
 
-    CreateBackImage(InContext, InDevice);
+    CreateBackImage(InDevice, InAllocator);
 }
 
-void FVkSwapchain::Cleanup(const FVkContext* InContext, const FVkDevice* InDevice)
+void FVkSwapchain::Cleanup(const FVkDevice* InDevice, VmaAllocator InAllocator)
 {
-    REV_CORE_ASSERT(InContext);
     REV_CORE_ASSERT(InDevice);
+    REV_CORE_ASSERT(InAllocator);
 
     vkDestroyImageView(InDevice->GetLogicalDevice(), mBackImage.ImageView, nullptr);
-    vmaDestroyImage(InContext->GetAllocator(), mBackImage.Image, mBackImage.Allocation);
+    vmaDestroyImage(InAllocator, mBackImage.Image, mBackImage.Allocation);
 
     for (auto ImageView : mImageViews) {
         vkDestroyImageView(InDevice->GetLogicalDevice(), ImageView, nullptr);
@@ -161,10 +163,10 @@ void FVkSwapchain::CreateImageViews(const FVkDevice* InDevice)
     }
 }
 
-void FVkSwapchain::CreateBackImage(const FVkContext* InContext, const FVkDevice* InDevice)
+void FVkSwapchain::CreateBackImage(const FVkDevice* InDevice, VmaAllocator InAllocator)
 {
-    REV_CORE_ASSERT(InContext);
     REV_CORE_ASSERT(InDevice);
+    REV_CORE_ASSERT(InAllocator);
 
     VkExtent3D BackImageExtent = {
         mExtent.width,
@@ -190,7 +192,7 @@ void FVkSwapchain::CreateBackImage(const FVkContext* InContext, const FVkDevice*
     ImageAllocinfo.requiredFlags = VkMemoryPropertyFlags(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
     //allocate and create the image
-    vmaCreateImage(InContext->GetAllocator(), &ImageCreateInfo, &ImageAllocinfo, &mBackImage.Image, &mBackImage.Allocation, nullptr);
+    vmaCreateImage(InAllocator, &ImageCreateInfo, &ImageAllocinfo, &mBackImage.Image, &mBackImage.Allocation, nullptr);
 
     //build a image-view for the draw image to use for rendering
     VkImageViewCreateInfo ImageViewCreateInfo = FVkInit::ImageViewCreateInfo2D(mBackImage.Format, mBackImage.Image, VK_IMAGE_ASPECT_COLOR_BIT);

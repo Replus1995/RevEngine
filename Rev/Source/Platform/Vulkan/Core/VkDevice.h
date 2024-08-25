@@ -24,12 +24,12 @@ struct FVkDeviceSwapChainSupport
 	std::vector<VkPresentModeKHR> PresentModes;
 };
 
-class FVkContext;
+class FVkInstance;
 class FVkDevice : public FRHIDevice
 {
 public:
-	void PickPhysicalDevice(const FVkContext* InContext);
-	void CreateLogicalDevice(const FVkContext* InContext);
+	void PickPhysicalDevice(const FVkInstance* InInstance);
+	void CreateLogicalDevice(const FVkInstance* InInstance);
 	virtual void Cleanup();
 
 	const VkPhysicalDevice& GetPhysicalDevice() const { return mPhysicalDevice; }

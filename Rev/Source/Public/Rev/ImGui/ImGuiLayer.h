@@ -28,6 +28,6 @@ namespace Rev
 		bool OnMouseMoved(MouseMovedEvent& e);
 		bool OnWindowResize(WindowResizeEvent& e);
 
-
+		void* mPlatformData = nullptr;
 	};
 }

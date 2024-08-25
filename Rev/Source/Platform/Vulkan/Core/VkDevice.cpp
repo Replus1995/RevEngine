@@ -1,6 +1,6 @@
 #include "VkDevice.h"
 #include "Rev/Core/Assert.h"
-#include "../VkContext.h"
+#include "VkInstance.h"
 #include "VkDeviceFeatures.h"
 #include <set>
 
@@ -70,21 +70,21 @@ bool FVkQueueFamilyIndices::IsComplete()
 	return GraphicsFamily.has_value() && ComputeFamily.has_value() && PresentFamily.has_value();
 }
 
-void FVkDevice::PickPhysicalDevice(const FVkContext* InContext)
+void FVkDevice::PickPhysicalDevice(const FVkInstance* InInstance)
 {
-	REV_CORE_ASSERT(InContext);
-	VkInstance InInstance = InContext->GetInstance();
-	VkSurfaceKHR InSurface = InContext->GetSurface();
+	REV_CORE_ASSERT(InInstance);
+	VkInstance pInstance = InInstance->GetInstance();
+	VkSurfaceKHR pSurface = InInstance->GetSurface();
 
 	uint32 PhysicalDeviceCount = 0;
-	vkEnumeratePhysicalDevices(InInstance, &PhysicalDeviceCount, nullptr);
+	vkEnumeratePhysicalDevices(pInstance, &PhysicalDeviceCount, nullptr);
 	if (PhysicalDeviceCount == 0) {
 		throw std::runtime_error("[FVkDevice] Failed to find GPUs with Vulkan support!");
 	}
 	std::vector<VkPhysicalDevice> PhysicalDevices(PhysicalDeviceCount);
-	vkEnumeratePhysicalDevices(InInstance, &PhysicalDeviceCount, PhysicalDevices.data());
+	vkEnumeratePhysicalDevices(pInstance, &PhysicalDeviceCount, PhysicalDevices.data());
 	for (const auto& PhysicalDevice : PhysicalDevices) {
-		if (PhysicalDeviceSuitable(PhysicalDevice, InSurface)) {
+		if (PhysicalDeviceSuitable(PhysicalDevice, pSurface)) {
 			mPhysicalDevice = PhysicalDevice;
 			break;
 		}
@@ -94,17 +94,17 @@ void FVkDevice::PickPhysicalDevice(const FVkContext* InContext)
 		throw std::runtime_error("[FVkDevice] Failed to find a suitable GPU!");
 	}
 
-	mQueueFamilyIndices = FindQueueFamilies(mPhysicalDevice, InSurface);
-	mSwapChainSupport = QuerySwapChainSupport(mPhysicalDevice, InSurface);
+	mQueueFamilyIndices = FindQueueFamilies(mPhysicalDevice, pSurface);
+	mSwapChainSupport = QuerySwapChainSupport(mPhysicalDevice, pSurface);
 }
 
-void FVkDevice::CreateLogicalDevice(const FVkContext* InContext)
+void FVkDevice::CreateLogicalDevice(const FVkInstance* InInstance)
 {
-	REV_CORE_ASSERT(InContext);
+	REV_CORE_ASSERT(InInstance);
 	REV_CORE_ASSERT(mPhysicalDevice != VK_NULL_HANDLE);
-	VkSurfaceKHR InSurface = InContext->GetSurface();
+	VkSurfaceKHR pSurface = InInstance->GetSurface();
 
-	FVkQueueFamilyIndices Indices = FindQueueFamilies(mPhysicalDevice, InSurface);
+	FVkQueueFamilyIndices Indices = FindQueueFamilies(mPhysicalDevice, pSurface);
 	std::vector<VkDeviceQueueCreateInfo> QueueCreateInfos;
 	PopulateQueueCreateInfos(QueueCreateInfos, Indices);
 

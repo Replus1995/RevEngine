@@ -16,13 +16,13 @@ struct FVkBackImage
 	VkFormat Format;
 };
 
-class FVkContext;
+class FVkInstance;
 class FVkDevice;
 class FVkSwapchain : public FRHISwapchain
 {
 public:
-	void CreateSwapchain(const FVkContext* InContext, const FVkDevice* InDevice);
-	void Cleanup(const FVkContext* InContext, const FVkDevice* InDevice);
+	void CreateSwapchain(const FVkInstance* Instance, const FVkDevice* InDevice, VmaAllocator InAllocator);
+	void Cleanup(const FVkDevice* InDevice, VmaAllocator InAllocator);
 
 	const VkSwapchainKHR& GetSwapchain() const { return mSwapchain; }
 	const VkExtent2D& GetExtent() const { return mExtent; }
@@ -36,7 +36,7 @@ private:
 	static VkPresentModeKHR ChoosePresentMode(const std::vector<VkPresentModeKHR>& InAvailablePresentModes);
 	static VkExtent2D ChooseExtent(const VkSurfaceCapabilitiesKHR& InCapabilities);
 	void CreateImageViews(const FVkDevice* InDevice);
-	void CreateBackImage(const FVkContext* InContext, const FVkDevice* InDevice);
+	void CreateBackImage(const FVkDevice* InDevice, VmaAllocator InAllocator);
 
 private:
 	VkSwapchainKHR mSwapchain;

@@ -111,4 +111,9 @@ void RenderCmd::Draw(const Ref<FRHIVertexArray>& InVertexArray, EDrawMode InDraw
 	sContext->Draw(InVertexArray, InDrawMode);
 }
 
+FRHIContext* RenderCmd::GetContext()
+{
+	return sContext.get();
+}
+
 }
