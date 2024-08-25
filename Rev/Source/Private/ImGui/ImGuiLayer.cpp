@@ -1,9 +1,11 @@
 #include "Rev/ImGui/ImGuiLayer.h"
 #include "Rev/Core/Application.h"
 #include "Rev/Core/Window.h"
+#include "Rev/Core/Assert.h"
 
 #include <imgui.h>
 #include <backends/imgui_impl_opengl3.h>
+#include <backends/imgui_impl_vulkan.h>
 
 //temp
 #include <GLFW/glfw3.h>
@@ -163,13 +165,35 @@ namespace Rev
         io.GetClipboardTextFn = ImGuiLayer_GetClipboardText;
         io.ClipboardUserData = nullptr;
 
-		ImGui_ImplOpenGL3_Init("#version 410");
+        switch (GetRenderAPI())
+        {
+        case ERenderAPI::OpenGL:
+            ImGui_ImplOpenGL3_Init("#version 450");
+            break;
+        case ERenderAPI::Vulkan:
+            ImGui_ImplVulkan_Init("#version 450");
+            break;
+        default:
+            REV_CORE_ASSERT(false, "[ImGuiLayer] Unknown render api")
+            break;
+        }
 
 	}
 
 	void ImGuiLayer::OnDetach()
 	{
-        ImGui_ImplOpenGL3_Shutdown();
+        switch (GetRenderAPI())
+        {
+        case ERenderAPI::OpenGL:
+            ImGui_ImplOpenGL3_Shutdown();
+            break;
+        case ERenderAPI::Vulkan:
+            ImGui_ImplVulkan_Shutdown();
+            break;
+        default:
+            REV_CORE_ASSERT(false, "[ImGuiLayer] Unknown render api")
+                break;
+        }
         ImGui::DestroyContext();
 	}
 
@@ -181,14 +205,38 @@ namespace Rev
 		io.DisplaySize = ImVec2(app.GetWindow()->GetWidth(), app.GetWindow()->GetHeight());
 		io.DeltaTime = 1.0f/60.0f;
 
-		ImGui_ImplOpenGL3_NewFrame();
+        switch (GetRenderAPI())
+        {
+        case ERenderAPI::OpenGL:
+            ImGui_ImplOpenGL3_NewFrame();
+            break;
+        case ERenderAPI::Vulkan:
+            ImGui_ImplVulkan_NewFrame();
+            break;
+        default:
+            REV_CORE_ASSERT(false, "[ImGuiLayer] Unknown render api")
+                break;
+        }
+
 		ImGui::NewFrame();
 
 		static bool show = true;
 		ImGui::ShowDemoWindow(&show);
 
 		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+        switch (GetRenderAPI())
+        {
+        case ERenderAPI::OpenGL:
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+            break;
+        case ERenderAPI::Vulkan:
+            ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData());
+            break;
+        default:
+            REV_CORE_ASSERT(false, "[ImGuiLayer] Unknown render api")
+            break;
+        }
 	}
 
 	void ImGuiLayer::OnEvent(Event& event)
