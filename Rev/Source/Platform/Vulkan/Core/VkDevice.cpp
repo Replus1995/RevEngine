@@ -182,7 +182,8 @@ bool FVkDevice::CheckExtensionSupport(VkPhysicalDevice InDevice, const std::vect
 const std::vector<const char*>& FVkDevice::GetRequiredExtensions()
 {
 	static std::vector<const char*> RequiredExtensions = {
-		VK_KHR_SWAPCHAIN_EXTENSION_NAME
+		VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+		VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME
 	};
 
 	return RequiredExtensions;

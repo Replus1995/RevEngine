@@ -203,10 +203,38 @@ static VkDescriptorPool ImGuiLayer_Vulkan_Init()
 
 static void ImGuiLayer_Vulkan_Shutdown(VkDescriptorPool ImguiPool)
 {
+    REV_CORE_ASSERT(GetRenderAPI() == ERenderAPI::Vulkan);
+
     ImGui_ImplVulkan_Shutdown();
     vkDestroyDescriptorPool(FVkCore::GetDevice(), ImguiPool, nullptr);
 }
 
+static void ImGuiLayer_Vulkan_Draw()
+{
+    REV_CORE_ASSERT(GetRenderAPI() == ERenderAPI::Vulkan);
+
+    FVkContext* pVkContext = static_cast<FVkContext*>(RenderCmd::GetContext());
+    VkCommandBuffer CmdBuffer = pVkContext->GetMainCmdBuffer();
+    VkImageView ImageView = pVkContext->GetSwapchainImageView();
+    VkExtent2D Extent = pVkContext->GetSwapchain().GetExtent();
+
+    VkRenderingAttachmentInfo ColorAttachment = FVkInit::AttachmentInfo(ImageView, nullptr, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+    VkRenderingInfo RenderingInfo{};
+    RenderingInfo.sType = VK_STRUCTURE_TYPE_RENDERING_INFO;
+    RenderingInfo.pNext = nullptr;
+    RenderingInfo.flags = 0;
+    RenderingInfo.renderArea.extent = Extent;
+    RenderingInfo.pColorAttachments = &ColorAttachment;
+    RenderingInfo.colorAttachmentCount = 1;
+    RenderingInfo.pDepthAttachment = nullptr;
+    RenderingInfo.pStencilAttachment = nullptr;
+
+    vkCmdBeginRendering(CmdBuffer, &RenderingInfo);
+
+    ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), CmdBuffer);
+
+    vkCmdEndRendering(CmdBuffer);
+}
     
 ImGuiLayer::ImGuiLayer()
 	: Layer("ImGuiLayer")
@@ -296,7 +324,7 @@ void ImGuiLayer::OnUpdate(float dt)
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         break;
     case ERenderAPI::Vulkan:
-        // ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData());
+        ImGuiLayer_Vulkan_Draw();
         break;
     default:
         REV_CORE_ASSERT(false, "[ImGuiLayer] Unknown render api")

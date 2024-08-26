@@ -19,8 +19,9 @@ public:
 	static void Init();
 	static void Shutdown();
 
-	static void BeginFrame();
+	static void BeginFrame(bool bClearBackBuffer = true);
 	static void EndFrame();
+	static void PresentFrame();
 
 	static void SetViewport(uint32 x, uint32 y, uint32 width, uint32 height);
 	static void SetClearColor(const Math::FLinearColor& color);

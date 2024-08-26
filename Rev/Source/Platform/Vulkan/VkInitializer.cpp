@@ -145,4 +145,21 @@ VkImageSubresourceRange FVkInit::ImageSubresourceRange(VkImageAspectFlags InAspe
     return Range;
 }
 
+VkRenderingAttachmentInfo FVkInit::AttachmentInfo(VkImageView ImageView, VkClearValue* ClearValue, VkImageLayout ImageLayout)
+{
+    VkRenderingAttachmentInfo ColorAttachment{};
+    ColorAttachment.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
+    ColorAttachment.pNext = nullptr;
+
+    ColorAttachment.imageView = ImageView;
+    ColorAttachment.imageLayout = ImageLayout;
+    ColorAttachment.loadOp = ClearValue ? VK_ATTACHMENT_LOAD_OP_CLEAR : VK_ATTACHMENT_LOAD_OP_LOAD;
+    ColorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    if (ClearValue) {
+        ColorAttachment.clearValue = *ClearValue;
+    }
+
+    return ColorAttachment;
+}
+
 }

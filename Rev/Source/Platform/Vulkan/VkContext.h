@@ -10,6 +10,7 @@
 #include "Core/VkDevice.h"
 #include "Core/VkSwapchain.h"
 #include "Core/VkFrameData.h"
+#include "VkInitializer.h"
 
 namespace Rev
 {
@@ -23,8 +24,9 @@ public:
 	virtual void Init() override;
 	virtual void Cleanup() override;
 
-	virtual void BeginFrame() override;
+	virtual void BeginFrame(bool bClearBackBuffer) override;
 	virtual void EndFrame() override;
+	virtual void PresentFrame() override;
 
 	virtual void ImmediateSubmit(std::function<void(VkCommandBuffer)>&& Func);
 
@@ -61,6 +63,8 @@ public:
 
 	FVkFrameData& GetFrameData() { return mFrameData[mFrameDataIndex]; }
 	VkCommandBuffer GetMainCmdBuffer() { return mFrameData[mFrameDataIndex].MainCmdBuffer; }
+	VkImage GetSwapchainImage() { return mSwapchain.GetImages()[mCurSwapchainImageIndex]; }
+	VkImageView GetSwapchainImageView() { return mSwapchain.GetImageViews()[mCurSwapchainImageIndex]; }
 	
 private:
 	void CreateAllocator();

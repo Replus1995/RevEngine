@@ -15,6 +15,7 @@ private:
 	VkPhysicalDeviceFeatures2 mFeatures{};
 	VkPhysicalDeviceSynchronization2Features mSyncFeatures{};
 	VkPhysicalDeviceBufferDeviceAddressFeatures mBufferDeviceAddressFeatures{};
+	VkPhysicalDeviceDynamicRenderingFeatures mDynamicRenderingFeatures{};
 
 };
 

@@ -23,6 +23,9 @@ public:
 	static VkImageCreateInfo ImageCreateInfo2D(VkFormat Format, VkImageUsageFlags UsageFlags, VkExtent3D Extent);
 	static VkImageViewCreateInfo ImageViewCreateInfo2D(VkFormat Format, VkImage Image, VkImageAspectFlags AspectFlags);
 	static VkImageSubresourceRange ImageSubresourceRange(VkImageAspectFlags InAspectMask);
+
+	//dynamic rendering
+	static VkRenderingAttachmentInfo AttachmentInfo(VkImageView ImageView, VkClearValue* ClearValue, VkImageLayout ImageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 };
 
 }

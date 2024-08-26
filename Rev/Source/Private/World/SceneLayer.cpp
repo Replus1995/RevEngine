@@ -72,9 +72,9 @@ void SceneLayer::OnUpdate(float dt)
 	mRenderer->DrawFrame();
 	mRenderer->EndFrame();*/
 
-	RenderCmd::BeginFrame();
+	RenderCmd::BeginFrame(true);
 	//RenderCmd::SetViewport(0, 0, WinWidth, WinHeight);
-	RenderCmd::ClearBackBuffer();
+	//RenderCmd::ClearBackBuffer();
 	RenderCmd::EndFrame();
 
 	mSceneProxy->Cleanup();

@@ -64,7 +64,7 @@ namespace Rev
 					bShouldUpdate = true;
 				}
 			}
-
+			
 			//RenderCmd::SetClearColor(glm::vec4{ .3f, .3f, .8f, 1.0f });
 			//RenderCmd::Clear();
 			if (bShouldUpdate)
@@ -72,6 +72,7 @@ namespace Rev
 				float DeltaTimeSecond = DeltaTime * 0.001f * 0.001f;
 				for (Layer* layer : mLayerStack)
 					layer->OnUpdate(DeltaTimeSecond);
+				RenderCmd::PresentFrame();
 			}
 
 			mWindow->OnUpdate();

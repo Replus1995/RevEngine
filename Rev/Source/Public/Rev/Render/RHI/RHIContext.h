@@ -22,8 +22,9 @@ public:
 
 	virtual void Init() = 0;
 	virtual void Cleanup() = 0;
+	virtual void PresentFrame() = 0;
 
-	virtual void BeginFrame() = 0;
+	virtual void BeginFrame(bool bClearBackBuffer) = 0;
 	virtual void EndFrame() = 0;
 
 	//virtual void BeginCompute() = 0;

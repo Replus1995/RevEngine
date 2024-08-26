@@ -12,8 +12,9 @@ public:
 	virtual void Init() override;
 	virtual void Cleanup() override;
 
-	virtual void BeginFrame() override {};
+	virtual void BeginFrame(bool bClearBackBuffer) override {};
 	virtual void EndFrame() override {};
+	virtual void PresentFrame() override {};
 
 	virtual void SetViewport(uint32 x, uint32 y, uint32 width, uint32 height) override;
 	virtual void SetClearColor(const Math::FLinearColor& color) override;

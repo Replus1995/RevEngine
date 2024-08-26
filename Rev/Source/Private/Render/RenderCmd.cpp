@@ -29,14 +29,19 @@ void RenderCmd::Shutdown()
 	sContext.reset();
 }
 
-void RenderCmd::BeginFrame()
+void RenderCmd::BeginFrame(bool bClearBackBuffer)
 {
-	sContext->BeginFrame();
+	sContext->BeginFrame(bClearBackBuffer);
 }
 
 void RenderCmd::EndFrame()
 {
 	sContext->EndFrame();
+}
+
+void RenderCmd::PresentFrame()
+{
+	sContext->PresentFrame();
 }
 
 void RenderCmd::SetViewport(uint32 x, uint32 y, uint32 width, uint32 height)
