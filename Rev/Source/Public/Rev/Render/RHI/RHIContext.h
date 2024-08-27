@@ -33,13 +33,13 @@ public:
 
 	virtual void SetViewport(uint32 x, uint32 y, uint32 width, uint32 height) = 0;
 	virtual void SetClearColor(const Math::FLinearColor& color) = 0;
-	virtual void ClearBackBuffer() = 0;
+	virtual void ClearBackBuffer() = 0; //to be removed
 
-	virtual void EnableDepthTest(bool bEnable) = 0;
-	virtual void EnableDepthWrite(bool bEnable) = 0;
-	virtual void SetDepthTestMode(EDepthTestMode InMode) = 0;
-	virtual void SetBlendMode(EBlendMode InMode) = 0;
-	virtual void SetCullFaceMode(ECullFaceMode InMode) = 0;
+	virtual void EnableDepthTest(bool bEnable) = 0; //to be removed
+	virtual void EnableDepthWrite(bool bEnable) = 0; //to be removed
+	virtual void SetDepthTestMode(EDepthTestMode InMode) = 0; //to be removed
+	virtual void SetBlendMode(EBlendMode InMode) = 0; //to be removed
+	virtual void SetCullFaceMode(ECullFaceMode InMode) = 0; //to be removed
 
 	virtual void Bind(const Ref<FRHIVertexBuffer>& InVertexBuffer) = 0;
 	virtual void Bind(const Ref<FRHIIndexBuffer>& InIndexBuffer) = 0;

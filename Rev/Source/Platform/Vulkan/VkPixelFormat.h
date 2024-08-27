@@ -10,7 +10,7 @@ struct FVkFormatInfo
 	VkFormat Format;
 	VkImageAspectFlags AspectFlags;
 	//GLenum DataType;
-	uint32 PixelSize;
+	uint32 PixelSize; //byte per pixel
 };
 
 class FVkPixelFormat
