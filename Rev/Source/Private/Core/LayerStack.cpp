@@ -47,5 +47,16 @@ namespace Rev
 		}
 	}
 
+	void LayerStack::PopAll()
+	{
+		for (auto layer : mLayers)
+		{
+			layer->OnDetach();
+		}
+		mLayers.clear();
+		mLayerInsertIndex = 0;
+
+	}
+
 	
 }

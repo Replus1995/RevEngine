@@ -75,6 +75,11 @@ void FVkContext::Cleanup()
 	mInstance.Cleanup();
 }
 
+void FVkContext::Flush()
+{
+	vkDeviceWaitIdle(sDevice);
+}
+
 void FVkContext::BeginFrame(bool bClearBackBuffer)
 {
 	constexpr uint64 kWaitTime = 1000000000;

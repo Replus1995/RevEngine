@@ -18,6 +18,7 @@ class REV_API RenderCmd
 public:
 	static void Init();
 	static void Shutdown();
+	static void Flush();
 
 	static void BeginFrame(bool bClearBackBuffer = true);
 	static void EndFrame();

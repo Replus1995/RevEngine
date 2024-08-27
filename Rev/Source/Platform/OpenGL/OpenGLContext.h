@@ -11,6 +11,7 @@ class FOpenGLContext : public FRHIContext
 public:
 	virtual void Init() override;
 	virtual void Cleanup() override;
+	virtual void Flush() override {};
 
 	virtual void BeginFrame(bool bClearBackBuffer) override {};
 	virtual void EndFrame() override {};

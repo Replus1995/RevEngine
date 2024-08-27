@@ -36,6 +36,9 @@ namespace Rev
 
 	Application::~Application()
 	{
+		RenderCmd::Flush();
+
+		mLayerStack.PopAll();
 		FAssetLibrary::Shutdown();
 		RenderUtils::Shutdown();
 		RenderCmd::Shutdown();

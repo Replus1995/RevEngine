@@ -29,6 +29,11 @@ void RenderCmd::Shutdown()
 	sContext.reset();
 }
 
+void RenderCmd::Flush()
+{
+	sContext->Flush();
+}
+
 void RenderCmd::BeginFrame(bool bClearBackBuffer)
 {
 	sContext->BeginFrame(bClearBackBuffer);
