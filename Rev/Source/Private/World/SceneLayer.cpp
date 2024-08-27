@@ -37,7 +37,7 @@ void SceneLayer::OnAttach()
 	mRenderer->GetContext()->SceneProxy = mSceneProxy.get();
 
 
-	RenderCmd::SetClearColor(Math::FLinearColor(0, .5, .5));
+	RenderCmd::SetClearColor(Math::FLinearColor(0, 0, 0));
 }
 
 void SceneLayer::OnDetach()

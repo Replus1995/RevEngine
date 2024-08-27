@@ -228,6 +228,8 @@ static void ImGuiLayer_Vulkan_Draw()
     RenderingInfo.colorAttachmentCount = 1;
     RenderingInfo.pDepthAttachment = nullptr;
     RenderingInfo.pStencilAttachment = nullptr;
+    RenderingInfo.layerCount = 1;
+    RenderingInfo.viewMask = 0;
 
     vkCmdBeginRendering(CmdBuffer, &RenderingInfo);
 

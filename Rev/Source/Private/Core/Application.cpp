@@ -47,7 +47,7 @@ namespace Rev
 
 		while (mRunning)
 		{
-			int64 CurTime = Timer.ElapsedMillis();
+			int64 CurTime = Timer.ElapsedMicros();
 			int64 DeltaTime = 0;
 			bool bShouldUpdate = false;
 			if (mLastFrameTime == 0)
@@ -73,9 +73,9 @@ namespace Rev
 				for (Layer* layer : mLayerStack)
 					layer->OnUpdate(DeltaTimeSecond);
 				RenderCmd::PresentFrame();
+				mWindow->OnUpdate();
 			}
 
-			mWindow->OnUpdate();
 		}
 	}
 

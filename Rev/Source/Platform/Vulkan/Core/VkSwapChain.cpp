@@ -97,7 +97,7 @@ void FVkSwapchain::Cleanup(const FVkDevice* InDevice, VmaAllocator InAllocator)
 VkSurfaceFormatKHR FVkSwapchain::ChooseSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& InAvailableFormats)
 {
     for (const auto& AvailableFormat : InAvailableFormats) {
-        if (AvailableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && AvailableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+        if (AvailableFormat.format == VK_FORMAT_R8G8B8A8_UNORM && AvailableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
             return AvailableFormat;
         }
     }
