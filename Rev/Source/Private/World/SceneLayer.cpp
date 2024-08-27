@@ -59,11 +59,19 @@ void SceneLayer::OnUpdate(float dt)
 
 	if(Application::GetApp().Minimized())
 		return;
+}
 
+void SceneLayer::OnEvent(Event& event)
+{
+	EventDispatcher dispatcher(event);
+}
+
+void SceneLayer::OnDraw()
+{
 	mSceneProxy->Prepare(mScene);
 
-	uint32 WinWidth = Application::GetApp().GetWindow()->GetWidth();
-	uint32 WinHeight = Application::GetApp().GetWindow()->GetHeight();
+	//uint32 WinWidth = Application::GetApp().GetWindow()->GetWidth();
+	//uint32 WinHeight = Application::GetApp().GetWindow()->GetHeight();
 
 	/*mRenderer->GetContext()->Width = WinWidth;
 	mRenderer->GetContext()->Height = WinHeight;
@@ -72,17 +80,13 @@ void SceneLayer::OnUpdate(float dt)
 	mRenderer->DrawFrame();
 	mRenderer->EndFrame();*/
 
-	RenderCmd::BeginFrame(true);
+
+	//RenderCmd::BeginFrame(true);
 	//RenderCmd::SetViewport(0, 0, WinWidth, WinHeight);
 	//RenderCmd::ClearBackBuffer();
-	RenderCmd::EndFrame();
+	//RenderCmd::EndFrame();
 
 	mSceneProxy->Cleanup();
-}
-
-void SceneLayer::OnEvent(Event& event)
-{
-	EventDispatcher dispatcher(event);
 }
 
 

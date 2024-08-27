@@ -78,30 +78,30 @@ void FVkContext::Cleanup()
 void FVkContext::BeginFrame(bool bClearBackBuffer)
 {
 	constexpr uint64 kWaitTime = 1000000000;
-	auto& CurFrameData = GetFrameData();
-	REV_VK_CHECK(vkWaitForFences(sDevice, 1, &CurFrameData.Fence, true, kWaitTime));
-	CurFrameData.DeletorQueue.Flush();
-	REV_VK_CHECK(vkResetFences(sDevice, 1, &CurFrameData.Fence));
+	auto& FrameData = GetFrameData();
+	REV_VK_CHECK(vkWaitForFences(sDevice, 1, &FrameData.Fence, true, kWaitTime));
+	FrameData.DeletorQueue.Flush();
+	REV_VK_CHECK(vkResetFences(sDevice, 1, &FrameData.Fence));
 
-	REV_VK_CHECK(vkAcquireNextImageKHR(sDevice, mSwapchain.GetSwapchain(), kWaitTime, CurFrameData.SwapchainSemaphore, nullptr, &mCurSwapchainImageIndex));
+	REV_VK_CHECK(vkAcquireNextImageKHR(sDevice, mSwapchain.GetSwapchain(), kWaitTime, FrameData.SwapchainSemaphore, nullptr, &mCurSwapchainImageIndex));
 
 	mDrawExtent.width = mSwapchain.GetBackImage().Extent.width;
 	mDrawExtent.height = mSwapchain.GetBackImage().Extent.height;
 
-	VkCommandBuffer CmdBuffer = CurFrameData.MainCmdBuffer;
+	VkCommandBuffer CmdBuffer = FrameData.MainCmdBuffer;
 	REV_VK_CHECK(vkResetCommandBuffer(CmdBuffer, 0));
 	VkCommandBufferBeginInfo CmdBufferBeginInfo = FVkInit::CmdBufferBeginInfo(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 	REV_VK_CHECK(vkBeginCommandBuffer(CmdBuffer, &CmdBufferBeginInfo));
 
 	if (bClearBackBuffer)
 	{
-		VkUtils::TransitionImage(CmdBuffer, mSwapchain.GetBackImage().Image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL);
+		VkUtils::TransitionImage(CmdBuffer, GetSwapchainImage(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL);
 		ClearBackBuffer();
-		VkUtils::TransitionImage(CmdBuffer, mSwapchain.GetBackImage().Image, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+		VkUtils::TransitionImage(CmdBuffer, GetSwapchainImage(), VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 	}
 	else
 	{
-		VkUtils::TransitionImage(CmdBuffer, mSwapchain.GetBackImage().Image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+		VkUtils::TransitionImage(CmdBuffer, GetSwapchainImage(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 	}
 	
 }
@@ -109,21 +109,14 @@ void FVkContext::BeginFrame(bool bClearBackBuffer)
 void FVkContext::EndFrame()
 {
 	//end cmd buffer
-	auto& CurFrameData = GetFrameData();
-	VkCommandBuffer CmdBuffer = CurFrameData.MainCmdBuffer;
+	auto& FrameData = GetFrameData();
+	VkCommandBuffer CmdBuffer = FrameData.MainCmdBuffer;
 
 
-	VkUtils::TransitionImage(CmdBuffer, mSwapchain.GetBackImage().Image, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+	/*VkUtils::TransitionImage(CmdBuffer, mSwapchain.GetBackImage().Image, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
 	VkUtils::TransitionImage(CmdBuffer, mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 	VkUtils::BlitImage(CmdBuffer, mSwapchain.GetBackImage().Image, mSwapchain.GetImages()[mCurSwapchainImageIndex], mDrawExtent, mSwapchain.GetExtent());
-	VkUtils::TransitionImage(CmdBuffer, mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-	
-}
-
-void FVkContext::PresentFrame()
-{
-	auto& CurFrameData = GetFrameData();
-	VkCommandBuffer CmdBuffer = CurFrameData.MainCmdBuffer;
+	VkUtils::TransitionImage(CmdBuffer, mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);*/
 
 	VkUtils::TransitionImage(CmdBuffer, mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 
@@ -131,14 +124,19 @@ void FVkContext::PresentFrame()
 
 	//submit
 	VkCommandBufferSubmitInfo CmdBufferInfo = FVkInit::CmdBufferSubmitInfo(CmdBuffer);
-	VkSemaphoreSubmitInfo WaitSemaphoreInfo = FVkInit::SemaphoreSubmitInfo(VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT_KHR, CurFrameData.SwapchainSemaphore);
-	VkSemaphoreSubmitInfo SignalSemaphoreInfo = FVkInit::SemaphoreSubmitInfo(VK_PIPELINE_STAGE_2_ALL_GRAPHICS_BIT, CurFrameData.RenderSemaphore);
+	VkSemaphoreSubmitInfo WaitSemaphoreInfo = FVkInit::SemaphoreSubmitInfo(VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT_KHR, FrameData.SwapchainSemaphore);
+	VkSemaphoreSubmitInfo SignalSemaphoreInfo = FVkInit::SemaphoreSubmitInfo(VK_PIPELINE_STAGE_2_ALL_GRAPHICS_BIT, FrameData.RenderSemaphore);
 
 	VkSubmitInfo2 SubmitInfo = FVkInit::SubmitInfo(&CmdBufferInfo, &SignalSemaphoreInfo, &WaitSemaphoreInfo);
 
 	//submit command buffer to the queue and execute it.
 	//Fence will now block until the graphic commands finish execution
-	REV_VK_CHECK(vkQueueSubmit2(mDevice.GetGraphicsQueue(), 1, &SubmitInfo, CurFrameData.Fence));
+	REV_VK_CHECK(vkQueueSubmit2(mDevice.GetGraphicsQueue(), 1, &SubmitInfo, FrameData.Fence));
+}
+
+void FVkContext::PresentFrame()
+{
+	auto& FrameData = GetFrameData();
 
 	//present
 	VkPresentInfoKHR PresentInfo{};
@@ -146,7 +144,7 @@ void FVkContext::PresentFrame()
 	PresentInfo.pNext = nullptr;
 	PresentInfo.pSwapchains = &mSwapchain.GetSwapchain();
 	PresentInfo.swapchainCount = 1;
-	PresentInfo.pWaitSemaphores = &CurFrameData.RenderSemaphore;
+	PresentInfo.pWaitSemaphores = &FrameData.RenderSemaphore;
 	PresentInfo.waitSemaphoreCount = 1;
 	PresentInfo.pImageIndices = &mCurSwapchainImageIndex;
 	auto PresentRes = vkQueuePresentKHR(mDevice.GetGraphicsQueue(), &PresentInfo);
@@ -216,7 +214,7 @@ void FVkContext::SetClearDepthStencil(float InDepth, uint32 InStencil)
 void FVkContext::ClearBackBuffer()
 {
 	VkImageSubresourceRange ColorImageRange = FVkInit::ImageSubresourceRange(VK_IMAGE_ASPECT_COLOR_BIT);
-	vkCmdClearColorImage(GetMainCmdBuffer(), mSwapchain.GetBackImage().Image, VK_IMAGE_LAYOUT_GENERAL, &mClearColor, 1, &ColorImageRange);
+	vkCmdClearColorImage(GetMainCmdBuffer(), GetSwapchainImage(), VK_IMAGE_LAYOUT_GENERAL, &mClearColor, 1, &ColorImageRange);
 	/*VkImageSubresourceRange DepthImageRange = FVkInit::ImageSubresourceRange(VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT);
 	vkCmdClearDepthStencilImage(CmdBuffer, mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_GENERAL, &mClearDepthStencil, 1, &DepthImageRange);*/
 }

@@ -319,19 +319,6 @@ void ImGuiLayer::OnUpdate(float dt)
 	ImGui::ShowDemoWindow(&show);
 
 	ImGui::Render();
-
-    switch (GetRenderAPI())
-    {
-    case ERenderAPI::OpenGL:
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        break;
-    case ERenderAPI::Vulkan:
-        ImGuiLayer_Vulkan_Draw();
-        break;
-    default:
-        REV_CORE_ASSERT(false, "[ImGuiLayer] Unknown render api")
-        break;
-    }
 }
 
 void ImGuiLayer::OnEvent(Event& event)
@@ -345,6 +332,22 @@ void ImGuiLayer::OnEvent(Event& event)
 	dispatcher.Dispatch<MouseScrolledEvent>(RE_BIND_EVENT_FN(ImGuiLayer::OnMouseScrolled, this));
 	dispatcher.Dispatch<MouseMovedEvent>(RE_BIND_EVENT_FN(ImGuiLayer::OnMouseMoved, this));
 	dispatcher.Dispatch<WindowResizeEvent>(RE_BIND_EVENT_FN(ImGuiLayer::OnWindowResize, this));
+}
+
+void ImGuiLayer::OnDraw()
+{
+    switch (GetRenderAPI())
+    {
+    case ERenderAPI::OpenGL:
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        break;
+    case ERenderAPI::Vulkan:
+        ImGuiLayer_Vulkan_Draw();
+        break;
+    default:
+        REV_CORE_ASSERT(false, "[ImGuiLayer] Unknown render api")
+            break;
+    }
 }
 
 bool ImGuiLayer::OnKeyPressed(KeyPressedEvent& e)

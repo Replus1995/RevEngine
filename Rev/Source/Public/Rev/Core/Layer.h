@@ -14,6 +14,7 @@ namespace Rev
 		virtual void OnDetach() {}
 		virtual void OnUpdate(float deltaTime) {}
 		virtual void OnEvent(Event& event) {}
+		virtual void OnDraw() {}
 
 		inline const std::string& GetName() const { return mDebugName; }
 	protected:

@@ -72,8 +72,13 @@ namespace Rev
 				float DeltaTimeSecond = DeltaTime * 0.001f * 0.001f;
 				for (Layer* layer : mLayerStack)
 					layer->OnUpdate(DeltaTimeSecond);
-				RenderCmd::PresentFrame();
 				mWindow->OnUpdate();
+
+				RenderCmd::BeginFrame(true);
+				for (Layer* layer : mLayerStack)
+					layer->OnDraw();
+				RenderCmd::EndFrame();
+				RenderCmd::PresentFrame();
 			}
 
 		}
