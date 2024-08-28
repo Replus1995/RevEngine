@@ -16,6 +16,8 @@ public:
 	virtual void ClearMipData(uint8 InMipLevel) override;
 
 	const FVkFormatInfo& GetFormatInfo() const { return mFormatInfo; }
+	void Transition(VkImageLayout DstLayout);
+	void Transition(VkImageLayout SrcLayout, VkImageLayout DstLayout);
 
 protected:
 	FVkTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc);

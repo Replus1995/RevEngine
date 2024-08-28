@@ -1,7 +1,24 @@
 #include "VkTexture.h"
+#include "VkContext.h"
+#include "Utils/Image.h"
+#include "Rev/Core/Assert.h"
 
 namespace Rev
 {
+
+void FVkTexture::Transition(VkImageLayout DstLayout)
+{
+    REV_CORE_ASSERT(FVkCore::GetMainCmdBuffer());
+    VkUtils::TransitionImage(FVkCore::GetMainCmdBuffer(), mImage, mImageLayout, DstLayout);
+    mImageLayout = DstLayout;
+}
+
+void FVkTexture::Transition(VkImageLayout SrcLayout, VkImageLayout DstLayout)
+{
+    REV_CORE_ASSERT(FVkCore::GetMainCmdBuffer());
+    VkUtils::TransitionImage(FVkCore::GetMainCmdBuffer(), mImage, SrcLayout, DstLayout);
+    mImageLayout = DstLayout;
+}
 
 FVkTexture::FVkTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc)
     : FRHITexture(InDesc)

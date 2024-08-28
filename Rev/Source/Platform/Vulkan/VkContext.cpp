@@ -15,9 +15,7 @@
 namespace Rev
 {
 
-static VkInstance sInstance = VK_NULL_HANDLE;
-static VkDevice sDevice = VK_NULL_HANDLE;
-static VmaAllocator sAllocator = VMA_NULL;
+static FVkContext* sContext = nullptr;
 
 FVkContext::FVkContext()
 {
@@ -37,9 +35,7 @@ FVkContext::~FVkContext()
 
 void FVkContext::Init()
 {
-	REV_CORE_ASSERT(sInstance == VK_NULL_HANDLE);
-	REV_CORE_ASSERT(sDevice == VK_NULL_HANDLE);
-	REV_CORE_ASSERT(sAllocator == VMA_NULL);
+	REV_CORE_ASSERT(sContext == nullptr);
 
 	mInstance.CreateInstance();
 	mInstance.CreateSurface();
@@ -47,9 +43,7 @@ void FVkContext::Init()
 	mDevice.CreateLogicalDevice(&mInstance);
 	CreateAllocator();
 	
-	sInstance = mInstance.GetInstance();
-	sDevice = mDevice.GetLogicalDevice();
-	sAllocator = mAllocator;
+	sContext = this;
 
 	mSwapchain.CreateSwapchain(&mInstance, &mDevice, mAllocator);
 	InitFrameData(mFrameData, REV_VK_FRAME_OVERLAP, &mDevice);
@@ -59,16 +53,14 @@ void FVkContext::Init()
 
 void FVkContext::Cleanup()
 {
-	vkDeviceWaitIdle(sDevice);
+	vkDeviceWaitIdle(mDevice.GetLogicalDevice());
 	
 	mMainDeletorQueue.Flush();
 
 	CleanupFrameData(mFrameData, REV_VK_FRAME_OVERLAP, &mDevice);
 	mSwapchain.Cleanup(&mDevice, mAllocator);
 
-	sAllocator = VMA_NULL;
-	sDevice = VK_NULL_HANDLE;
-	sInstance = VK_NULL_HANDLE;
+	sContext = nullptr;
 
 	vmaDestroyAllocator(mAllocator);
 	mDevice.Cleanup();
@@ -77,18 +69,18 @@ void FVkContext::Cleanup()
 
 void FVkContext::Flush()
 {
-	vkDeviceWaitIdle(sDevice);
+	vkDeviceWaitIdle(mDevice.GetLogicalDevice());
 }
 
 void FVkContext::BeginFrame(bool bClearBackBuffer)
 {
 	constexpr uint64 kWaitTime = 1000000000;
 	auto& FrameData = GetFrameData();
-	REV_VK_CHECK(vkWaitForFences(sDevice, 1, &FrameData.Fence, true, kWaitTime));
+	REV_VK_CHECK(vkWaitForFences(mDevice.GetLogicalDevice(), 1, &FrameData.Fence, true, kWaitTime));
 	FrameData.DeletorQueue.Flush();
-	REV_VK_CHECK(vkResetFences(sDevice, 1, &FrameData.Fence));
+	REV_VK_CHECK(vkResetFences(mDevice.GetLogicalDevice(), 1, &FrameData.Fence));
 
-	REV_VK_CHECK(vkAcquireNextImageKHR(sDevice, mSwapchain.GetSwapchain(), kWaitTime, FrameData.SwapchainSemaphore, nullptr, &mCurSwapchainImageIndex));
+	REV_VK_CHECK(vkAcquireNextImageKHR(mDevice.GetLogicalDevice(), mSwapchain.GetSwapchain(), kWaitTime, FrameData.SwapchainSemaphore, nullptr, &mCurSwapchainImageIndex));
 
 	mDrawExtent.width = mSwapchain.GetBackImage().Extent.width;
 	mDrawExtent.height = mSwapchain.GetBackImage().Extent.height;
@@ -258,18 +250,29 @@ void FVkContext::CreateImmediateData()
 
 VkInstance FVkCore::GetInstance()
 {
-	return sInstance;
+	return sContext ? sContext->GetInstance().GetInstance() : nullptr;
 }
 
 VkDevice FVkCore::GetDevice()
 {
-	return sDevice;
+	return sContext ? sContext->GetDevice().GetLogicalDevice() : nullptr;
 }
 
 VmaAllocator FVkCore::GetAllocator()
 {
-	return sAllocator;
+	return sContext ? sContext->GetAllocator() : nullptr;
 }
+
+VkCommandBuffer FVkCore::GetMainCmdBuffer()
+{
+	return sContext ? sContext->GetMainCmdBuffer() : nullptr;
+}
+
+FVkContext* FVkCore::GetContext()
+{
+	return sContext;
+}
+
 
 
 }
