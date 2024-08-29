@@ -77,11 +77,14 @@ namespace Rev
 					layer->OnUpdate(DeltaTimeSecond);
 				mWindow->OnUpdate();
 
-				RenderCmd::BeginFrame(true);
-				for (Layer* layer : mLayerStack)
-					layer->OnDraw();
-				RenderCmd::EndFrame();
-				RenderCmd::PresentFrame();
+				if (!mMinimized)
+				{
+					RenderCmd::BeginFrame(true);
+					for (Layer* layer : mLayerStack)
+						layer->OnDraw();
+					RenderCmd::EndFrame();
+					RenderCmd::PresentFrame();
+				}
 			}
 
 		}
