@@ -4,7 +4,7 @@
 namespace Rev
 {
 
-enum EPixelFormat : uint8
+enum EPixelFormat : uint32
 {
 	PF_Unknown = 0,
 	PF_R32G32B32A32F = 1,

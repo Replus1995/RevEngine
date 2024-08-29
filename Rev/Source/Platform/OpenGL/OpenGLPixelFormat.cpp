@@ -28,7 +28,7 @@ FOpenGLFormatData FOpenGLPixelFormat::TranslatePixelFormat(EPixelFormat InFormat
 	REV_CORE_ASSERT(InFormat != EPixelFormat::PF_Unknown);
 	if (!bSRGB)
 	{
-		return sOpenGLFormatMappings[(uint8)InFormat].OpenGLFormatData;
+		return sOpenGLFormatMappings[InFormat].OpenGLFormatData;
 	}
 	else
 	{

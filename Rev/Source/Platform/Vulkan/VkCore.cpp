@@ -40,6 +40,11 @@ VkCommandBuffer FVkCore::GetMainCmdBuffer()
 	return GetContext()->GetMainCmdBuffer();
 }
 
+void FVkCore::ImmediateSubmit(std::function<void(VkCommandBuffer)>&& Func)
+{
+	GetContext()->ImmediateSubmit(std::move(Func));
+}
+
 FVkContext* FVkCore::GetContext()
 {
 	REV_CORE_ASSERT(GetRenderAPI() == ERenderAPI::Vulkan);

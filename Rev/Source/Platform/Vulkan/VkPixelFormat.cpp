@@ -11,14 +11,14 @@ struct FVkFormatMapping
 };
 
 constexpr FVkFormatMapping sVkFormatMappings[] = {
-	{ PF_Unknown,		{ VK_FORMAT_UNDEFINED, VK_IMAGE_ASPECT_NONE, 0 } },
-	/*{ PF_R32G32B32A32F, { GL_RGBA32F, GL_RGBA, GL_FLOAT, 4 * 4 } },
-	{ PF_R8G8B8A8,		{ GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, 4 } },
-	{ PF_R8,			{ GL_R8, GL_RED, GL_UNSIGNED_BYTE, 1 } },
-	{ PF_R16,			{ GL_R16, GL_RED, GL_UNSIGNED_SHORT, 2 } },
-	{ PF_RGB8,			{ GL_RGB8, GL_RGB, GL_UNSIGNED_BYTE, 3 } },
-	{ PF_DepthStencil,	{ GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, 4} },
-	{ PF_ShadowDepth,	{ GL_DEPTH_COMPONENT32F, GL_DEPTH_COMPONENT, GL_FLOAT, 4 } },*/
+	{ PF_Unknown,		{ VK_FORMAT_UNDEFINED,				VK_IMAGE_ASPECT_NONE, 0, 0 } },
+	{ PF_R32G32B32A32F, { VK_FORMAT_R32G32B32A32_SFLOAT,	VK_IMAGE_ASPECT_COLOR_BIT, 4, 4 } },
+	{ PF_R8G8B8A8,		{ VK_FORMAT_R8G8B8A8_UNORM,			VK_IMAGE_ASPECT_COLOR_BIT, 4, 1 } },
+	{ PF_R8,			{ VK_FORMAT_R8_UNORM,				VK_IMAGE_ASPECT_COLOR_BIT, 1, 1 } },
+	{ PF_R16,			{ VK_FORMAT_R16_UNORM,				VK_IMAGE_ASPECT_COLOR_BIT, 1, 2 } },
+	{ PF_RGB8,			{ VK_FORMAT_R8G8B8_UNORM,			VK_IMAGE_ASPECT_COLOR_BIT, 3, 1 } },
+	{ PF_DepthStencil,	{ VK_FORMAT_D24_UNORM_S8_UINT,		VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT, 1, 4} },
+	{ PF_ShadowDepth,	{ VK_FORMAT_D32_SFLOAT,				VK_IMAGE_ASPECT_DEPTH_BIT, 4, 1 } },
 };
 
 
@@ -27,7 +27,7 @@ FVkFormatInfo FVkPixelFormat::TranslatePixelFormat(EPixelFormat InFormat, bool b
 	REV_CORE_ASSERT(InFormat != EPixelFormat::PF_Unknown);
 	if (!bSRGB)
 	{
-		return sVkFormatMappings[(uint8)InFormat].FormatInfo;
+		return sVkFormatMappings[InFormat].FormatInfo;
 	}
 	else
 	{
@@ -41,7 +41,7 @@ FVkFormatInfo FVkPixelFormat::TranslatePixelFormat(EPixelFormat InFormat, bool b
 			break;
 		}
 		REV_CORE_ASSERT(false, "Unknown SRGB format");*/
-		return { VK_FORMAT_UNDEFINED, VK_IMAGE_ASPECT_NONE, 0 };
+		return { VK_FORMAT_UNDEFINED, VK_IMAGE_ASPECT_NONE, 0, 0 };
 	}
 }
 

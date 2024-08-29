@@ -16,14 +16,15 @@ public:
 	virtual void ClearMipData(uint8 InMipLevel) override;
 
 	const FVkFormatInfo& GetFormatInfo() const { return mFormatInfo; }
-	void Transition(VkImageLayout DstLayout);
-	void Transition(VkImageLayout SrcLayout, VkImageLayout DstLayout);
+	void Transition(VkImageLayout DstLayout, VkCommandBuffer InCmdBuffer = VK_NULL_HANDLE);
+	void Transition(VkImageLayout SrcLayout, VkImageLayout DstLayout, VkCommandBuffer InCmdBuffer = VK_NULL_HANDLE);
 
 protected:
 	FVkTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc);
 	VkExtent3D GetExtent();
 	VkExtent2D CalculateMipSize2D(uint32 InMipLevel);
 	VkExtent3D CalculateMipSize3D(uint32 InMipLevel);
+	VkClearValue GetClearValue();
 protected:
 	FVkFormatInfo mFormatInfo;
 	VkImage mImage = VK_NULL_HANDLE;

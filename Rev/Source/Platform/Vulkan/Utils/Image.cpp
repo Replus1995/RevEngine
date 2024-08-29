@@ -1,5 +1,7 @@
 #include "Image.h"
-#include "Vulkan/VkInitializer.h"
+#include "Vulkan/VkInitializer.h" 
+#include "Vulkan/VkCore.h"
+#include "Vulkan/VkBuffer.h"
 
 namespace Rev::VkUtils
 {
@@ -68,6 +70,61 @@ void BlitImage(VkCommandBuffer CmdBuffer, VkImage SrcImage, VkImage DstImage, Vk
 	BlitInfo.pRegions = &BlitRegion;
 
 	vkCmdBlitImage2(CmdBuffer, &BlitInfo);
+}
+
+void ImmediateUploadImage(VkImage Image, VkImageAspectFlags AspectMask, VkExtent3D Extent, const void* InData, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex, uint16 InArrayCount)
+{
+	FVkBuffer UploadBuffer;
+	UploadBuffer.Allocate(InSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
+	memcpy(UploadBuffer.GetMappedData(), InData, InSize);
+
+	FVkCore::ImmediateSubmit([&](VkCommandBuffer ImmCmdBuffer) {
+		TransitionImage(ImmCmdBuffer, Image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+
+		VkBufferImageCopy CopyRegion = {};
+		CopyRegion.bufferOffset = 0;
+		CopyRegion.bufferRowLength = 0;
+		CopyRegion.bufferImageHeight = 0;
+
+		CopyRegion.imageSubresource.aspectMask = AspectMask;
+		CopyRegion.imageSubresource.mipLevel = InMipLevel;
+		CopyRegion.imageSubresource.baseArrayLayer = InArrayIndex;
+		CopyRegion.imageSubresource.layerCount = InArrayCount;
+		CopyRegion.imageExtent = Extent;
+
+		// copy the buffer into the image
+		vkCmdCopyBufferToImage(ImmCmdBuffer, UploadBuffer.GetBuffer(), Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &CopyRegion);
+
+		TransitionImage(ImmCmdBuffer, Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+	});
+
+	UploadBuffer.Release();
+}
+
+void ImmediateClearImage(VkImage Image, VkImageAspectFlags AspectMask, VkClearValue InClearValue, uint8 InMipLevel, uint8 InMipCount, uint16 InArrayIndex, uint16 InArrayCount)
+{
+	bool bColorImage = AspectMask & VK_IMAGE_ASPECT_COLOR_BIT;
+	FVkCore::ImmediateSubmit([&](VkCommandBuffer ImmCmdBuffer) {
+		TransitionImage(ImmCmdBuffer, Image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL);
+
+		VkImageSubresourceRange Range{};
+		Range.aspectMask = AspectMask;
+		Range.baseMipLevel = InMipLevel;
+		Range.levelCount = InMipCount;
+		Range.baseArrayLayer = InArrayIndex;
+		Range.layerCount = InArrayCount;
+
+		if (bColorImage)
+		{
+			vkCmdClearColorImage(ImmCmdBuffer, Image, VK_IMAGE_LAYOUT_GENERAL, &InClearValue.color, 1, &Range);
+		}
+		else
+		{
+			vkCmdClearDepthStencilImage(ImmCmdBuffer, Image, VK_IMAGE_LAYOUT_GENERAL, &InClearValue.depthStencil, 1, &Range);
+		}
+
+		TransitionImage(ImmCmdBuffer, Image, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+	});
 }
 
 }

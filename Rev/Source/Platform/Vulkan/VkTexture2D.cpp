@@ -1,5 +1,7 @@
 #include "VkTexture2D.h"
-#include "VkContext.h"
+#include "VkCore.h"
+#include "VkBuffer.h"
+#include "Utils/Image.h"
 #include "Rev/Core/Assert.h"
 
 namespace Rev
@@ -23,10 +25,28 @@ FVkTexture2D::~FVkTexture2D()
 
 void FVkTexture2D::UpdateLayerData(const void* InData, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex, int32 InDepth)
 {
+    if (mDesc.NumSamples != 1)
+    {
+        REV_CORE_ERROR("Updating multisample texture is not allowed");
+        return;
+    }
+    REV_CORE_ASSERT(InDepth <= 0, "Depth must be 0(-1) for 2d texture");
+    REV_CORE_ASSERT(InArrayIndex == 0, "ArrayIndex must be 0 for 2d texture");
+    REV_CORE_ASSERT(InMipLevel < mDesc.NumMips, "MipLevel out of range");
+
+    VkExtent2D MipSize = CalculateMipSize2D(InMipLevel);
+    REV_CORE_ASSERT(InSize == MipSize.width * MipSize.height * mFormatInfo.Channels * mFormatInfo.PixelDepth, "Data size mismatch");
+
+    VkUtils::ImmediateUploadImage(mImage, mFormatInfo.AspectFlags, { MipSize.width, MipSize.height, 1 }, InData, InSize, InMipLevel, 0, 0);
 }
 
 void FVkTexture2D::ClearLayerData(uint8 InMipLevel, uint16 InArrayIndex, int32 InDepth)
 {
+    REV_CORE_ASSERT(InDepth <= 0, "Depth must be 0(-1) for 2d texture");
+    REV_CORE_ASSERT(InArrayIndex == 0, "ArrayIndex must be 0 for 2d texture");
+    REV_CORE_ASSERT(InMipLevel < mDesc.NumMips, "MipLevel out of range");
+
+    VkUtils::ImmediateClearImage(mImage, mFormatInfo.AspectFlags, GetClearValue(), InMipLevel, 1, 0, 0);
 }
 
 void FVkTexture2D::CreateResource()

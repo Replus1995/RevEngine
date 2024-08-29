@@ -16,6 +16,8 @@ public:
 	static VmaAllocator GetAllocator();
 	static VkCommandBuffer GetMainCmdBuffer();
 
+	static void ImmediateSubmit(std::function<void(VkCommandBuffer)>&& Func);
+
 private:
 	static FVkContext* GetContext();
 };
