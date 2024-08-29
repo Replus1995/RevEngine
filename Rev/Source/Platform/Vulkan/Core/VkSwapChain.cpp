@@ -42,11 +42,9 @@ void FVkSwapchain::CreateSwapchain(const FVkInstance* Instance, const FVkDevice*
 
     {
         //queue families
-        const FVkQueueFamilyIndices& Indices = InDevice->GetQueueFamilyIndices();
-
         std::set<uint32> UniqueIndexSet;
-        UniqueIndexSet.insert(Indices.GraphicsFamily.value());
-        UniqueIndexSet.insert(Indices.PresentFamily.value());
+        UniqueIndexSet.insert(InDevice->GetQueueFamily(VQK_Present));
+        UniqueIndexSet.insert(InDevice->GetQueueFamily(VQK_Graphics));
 
         std::vector<uint32> UniqueIndices;
         for (uint32 Index : UniqueIndexSet)

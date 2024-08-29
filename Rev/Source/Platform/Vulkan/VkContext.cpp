@@ -14,9 +14,6 @@
 
 namespace Rev
 {
-
-static FVkContext* sContext = nullptr;
-
 FVkContext::FVkContext()
 {
 	for (size_t i = 0; i < 4; i++)
@@ -35,15 +32,11 @@ FVkContext::~FVkContext()
 
 void FVkContext::Init()
 {
-	REV_CORE_ASSERT(sContext == nullptr);
-
 	mInstance.CreateInstance();
 	mInstance.CreateSurface();
 	mDevice.PickPhysicalDevice(&mInstance);
 	mDevice.CreateLogicalDevice(&mInstance);
 	CreateAllocator();
-	
-	sContext = this;
 
 	mSwapchain.CreateSwapchain(&mInstance, &mDevice, mAllocator);
 	InitFrameData(mFrameData, REV_VK_FRAME_OVERLAP, &mDevice);
@@ -59,8 +52,6 @@ void FVkContext::Cleanup()
 
 	CleanupFrameData(mFrameData, REV_VK_FRAME_OVERLAP, &mDevice);
 	mSwapchain.Cleanup(&mDevice, mAllocator);
-
-	sContext = nullptr;
 
 	vmaDestroyAllocator(mAllocator);
 	mDevice.Cleanup();
@@ -128,7 +119,7 @@ void FVkContext::EndFrame()
 
 	//submit command buffer to the queue and execute it.
 	//Fence will now block until the graphic commands finish execution
-	REV_VK_CHECK(vkQueueSubmit2(mDevice.GetGraphicsQueue(), 1, &SubmitInfo, FrameData.Fence));
+	REV_VK_CHECK(vkQueueSubmit2(mDevice.GetQueue(VQK_Graphics), 1, &SubmitInfo, FrameData.Fence));
 }
 
 void FVkContext::PresentFrame()
@@ -144,7 +135,7 @@ void FVkContext::PresentFrame()
 	PresentInfo.pWaitSemaphores = &FrameData.RenderSemaphore;
 	PresentInfo.waitSemaphoreCount = 1;
 	PresentInfo.pImageIndices = &mCurSwapchainImageIndex;
-	auto PresentRes = vkQueuePresentKHR(mDevice.GetGraphicsQueue(), &PresentInfo);
+	auto PresentRes = vkQueuePresentKHR(mDevice.GetQueue(VQK_Graphics), &PresentInfo);
 
 	if (PresentRes == VK_ERROR_OUT_OF_DATE_KHR || PresentRes == VK_SUBOPTIMAL_KHR)
 	{
@@ -178,7 +169,7 @@ void FVkContext::ImmediateSubmit(std::function<void(VkCommandBuffer)>&& Func)
 
 	// submit command buffer to the queue and execute it.
 	//  _renderFence will now block until the graphic commands finish execution
-	REV_VK_CHECK(vkQueueSubmit2(mDevice.GetGraphicsQueue(), 1, &SubmitInfo, mImmFence));
+	REV_VK_CHECK(vkQueueSubmit2(mDevice.GetQueue(VQK_Graphics), 1, &SubmitInfo, mImmFence));
 	REV_VK_CHECK(vkWaitForFences(mDevice.GetLogicalDevice(), 1, &mImmFence, true, 9999999999));
 }
 
@@ -229,7 +220,7 @@ void FVkContext::CreateAllocator()
 
 void FVkContext::CreateImmediateData()
 {
-	VkCommandPoolCreateInfo CmdPoolCreateInfo = FVkInit::CmdPoolCreateInfo(mDevice.GetQueueFamilyIndices().GraphicsFamily.value(), VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
+	VkCommandPoolCreateInfo CmdPoolCreateInfo = FVkInit::CmdPoolCreateInfo(mDevice.GetQueueFamily(VQK_Graphics), VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
 	REV_VK_CHECK(vkCreateCommandPool(mDevice.GetLogicalDevice(), &CmdPoolCreateInfo, nullptr, &mImmCmdPool));
 
 	// allocate the command buffer for immediate submits
@@ -246,33 +237,5 @@ void FVkContext::CreateImmediateData()
 		vkDestroyFence(mDevice.GetLogicalDevice(), mImmFence, nullptr); 
 	} });
 }
-
-
-VkInstance FVkCore::GetInstance()
-{
-	return sContext ? sContext->GetInstance().GetInstance() : nullptr;
-}
-
-VkDevice FVkCore::GetDevice()
-{
-	return sContext ? sContext->GetDevice().GetLogicalDevice() : nullptr;
-}
-
-VmaAllocator FVkCore::GetAllocator()
-{
-	return sContext ? sContext->GetAllocator() : nullptr;
-}
-
-VkCommandBuffer FVkCore::GetMainCmdBuffer()
-{
-	return sContext ? sContext->GetMainCmdBuffer() : nullptr;
-}
-
-FVkContext* FVkCore::GetContext()
-{
-	return sContext;
-}
-
-
 
 }

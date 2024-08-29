@@ -10,6 +10,32 @@ namespace Rev
 namespace
 {
 
+struct FVkQueueFamilyIndices
+{
+public:
+	std::optional<uint32>& operator[](uint8 Kind)
+	{
+		return mValues[Kind];
+	}
+
+	const std::optional<uint32>& operator[](uint8 Kind) const
+	{
+		return mValues[Kind];
+	}
+
+	bool IsComplete()
+	{
+		bool bComplete = true;
+		for (uint8 i = 0; i < VQK_Count; i++)
+		{
+			bComplete &= mValues[i].has_value();
+		}
+		return bComplete;
+	}
+private:
+	std::optional<uint32> mValues[VQK_Count];
+};
+
 static FVkQueueFamilyIndices FindQueueFamilies(VkPhysicalDevice InDevice, VkSurfaceKHR InSurface)
 {
 	FVkQueueFamilyIndices Indices;
@@ -23,18 +49,18 @@ static FVkQueueFamilyIndices FindQueueFamilies(VkPhysicalDevice InDevice, VkSurf
 	{
 		if (QueueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
 		{
-			Indices.GraphicsFamily = i;
+			Indices[VQK_Graphics] = i;
 		}
 		if (QueueFamilies[i].queueFlags & VK_QUEUE_COMPUTE_BIT)
 		{
-			Indices.ComputeFamily = i;
+			Indices[VQK_Compute] = i;
 		}
 
 		VkBool32 bPresentSupport = false;
 		vkGetPhysicalDeviceSurfaceSupportKHR(InDevice, i, InSurface, &bPresentSupport);
 		if (bPresentSupport)
 		{
-			Indices.PresentFamily = i;
+			Indices[VQK_Present] = i;
 		}
 
 		if (Indices.IsComplete())
@@ -44,11 +70,11 @@ static FVkQueueFamilyIndices FindQueueFamilies(VkPhysicalDevice InDevice, VkSurf
 	return Indices;
 }
 
-static void PopulateQueueCreateInfos(std::vector<VkDeviceQueueCreateInfo>& QueueCreateInfos, const FVkQueueFamilyIndices& Indices)
+static void PopulateQueueCreateInfos(std::vector<VkDeviceQueueCreateInfo>& QueueCreateInfos, const uint32* QueueFamilies)
 {
 	std::set<uint32> UniqueQueueFamilies;
-	UniqueQueueFamilies.insert(Indices.GraphicsFamily.value());
-	UniqueQueueFamilies.insert(Indices.PresentFamily.value());
+	UniqueQueueFamilies.insert(QueueFamilies[VQK_Graphics]);
+	UniqueQueueFamilies.insert(QueueFamilies[VQK_Present]);
 
 	float QueuePriority = 1.0f;
 	for (auto QueueFamily : UniqueQueueFamilies)
@@ -62,12 +88,6 @@ static void PopulateQueueCreateInfos(std::vector<VkDeviceQueueCreateInfo>& Queue
 	}
 }
 
-
-}
-
-bool FVkQueueFamilyIndices::IsComplete()
-{
-	return GraphicsFamily.has_value() && ComputeFamily.has_value() && PresentFamily.has_value();
 }
 
 void FVkDevice::PickPhysicalDevice(const FVkInstance* InInstance)
@@ -94,7 +114,11 @@ void FVkDevice::PickPhysicalDevice(const FVkInstance* InInstance)
 		throw std::runtime_error("[FVkDevice] Failed to find a suitable GPU!");
 	}
 
-	mQueueFamilyIndices = FindQueueFamilies(mPhysicalDevice, pSurface);
+	FVkQueueFamilyIndices Indices = FindQueueFamilies(mPhysicalDevice, pSurface);
+	for (uint8 i = 0; i < VQK_Count; i++)
+	{
+		mQueueFamilies[i] = Indices[i].value();
+	}
 	mSwapChainSupport = QuerySwapChainSupport(mPhysicalDevice, pSurface);
 }
 
@@ -104,9 +128,8 @@ void FVkDevice::CreateLogicalDevice(const FVkInstance* InInstance)
 	REV_CORE_ASSERT(mPhysicalDevice != VK_NULL_HANDLE);
 	VkSurfaceKHR pSurface = InInstance->GetSurface();
 
-	FVkQueueFamilyIndices Indices = FindQueueFamilies(mPhysicalDevice, pSurface);
 	std::vector<VkDeviceQueueCreateInfo> QueueCreateInfos;
-	PopulateQueueCreateInfos(QueueCreateInfos, Indices);
+	PopulateQueueCreateInfos(QueueCreateInfos, mQueueFamilies);
 
 	//physical device features
 	FVkPhysicalDeviceFeatures Features;
@@ -131,8 +154,8 @@ void FVkDevice::CreateLogicalDevice(const FVkInstance* InInstance)
 		throw std::runtime_error("[FVkDevice] Failed to create logical device!");
 	}
 
-	vkGetDeviceQueue(mDevice, Indices.GraphicsFamily.value(), 0, &mGraphicsQueue);
-	vkGetDeviceQueue(mDevice, Indices.PresentFamily.value(), 0, &mPresentQueue);
+	vkGetDeviceQueue(mDevice, mQueueFamilies[VQK_Graphics], 0, &mQueues[VQK_Graphics]);
+	vkGetDeviceQueue(mDevice, mQueueFamilies[VQK_Present], 0, &mQueues[VQK_Present]);
 
 }
 

@@ -1,7 +1,6 @@
 #include "VkShader.h"
+#include "VkCore.h"
 #include "Rev/Core/Assert.h"
-
-#include "VkContext.h"
 
 namespace Rev
 {

@@ -12,7 +12,7 @@ void InitFrameData(FVkFrameData* Frames, uint32 Count, const FVkDevice* InDevice
 {
 	REV_CORE_ASSERT(InDevice);
 	VkDevice Device = InDevice->GetLogicalDevice();
-	uint32 GraphicsFamily = InDevice->GetQueueFamilyIndices().GraphicsFamily.value();
+	uint32 GraphicsFamily = InDevice->GetQueueFamily(VQK_Graphics);
 
 	VkCommandPoolCreateInfo CmdPoolCreateInfo = FVkInit::CmdPoolCreateInfo(GraphicsFamily, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
 	for (uint32 i = 0; i < Count; i++) {

@@ -7,14 +7,12 @@
 namespace Rev
 {
 
-struct FVkQueueFamilyIndices
+enum EVkQueueKind : uint8
 {
-	std::optional<uint32> GraphicsFamily;
-	std::optional<uint32> ComputeFamily;
-
-	std::optional<uint32> PresentFamily;
-
-	bool IsComplete();
+	VQK_Present = 0,
+	VQK_Graphics = 1,
+	VQK_Compute = 2,
+	VQK_Count = 3
 };
 
 struct FVkDeviceSwapChainSupport
@@ -35,11 +33,10 @@ public:
 	const VkPhysicalDevice& GetPhysicalDevice() const { return mPhysicalDevice; }
 	const VkDevice& GetLogicalDevice() const { return mDevice; }
 
-	const FVkQueueFamilyIndices& GetQueueFamilyIndices() const { return mQueueFamilyIndices; }
-	const FVkDeviceSwapChainSupport& GetSwapChainSupport() const { return mSwapChainSupport; }
+	VkQueue GetQueue(EVkQueueKind InKind) const { return mQueues[InKind]; }
+	uint32 GetQueueFamily(EVkQueueKind InKind) const { return mQueueFamilies[InKind]; }
 
-	const VkQueue& GetGraphicsQueue() const { return mGraphicsQueue; }
-	const VkQueue& GetPresentQueue() const { return mPresentQueue; }
+	const FVkDeviceSwapChainSupport& GetSwapChainSupport() const { return mSwapChainSupport; }
 
 private:
 	static bool PhysicalDeviceSuitable(VkPhysicalDevice InDevice, VkSurfaceKHR InSurface);
@@ -51,12 +48,10 @@ private:
 	VkPhysicalDevice mPhysicalDevice = VK_NULL_HANDLE;
 	VkDevice mDevice = VK_NULL_HANDLE;
 
-	FVkQueueFamilyIndices mQueueFamilyIndices;
+	uint32 mQueueFamilies[VQK_Count];
+	VkQueue mQueues[VQK_Count];
+
 	FVkDeviceSwapChainSupport mSwapChainSupport;
-
-	VkQueue mGraphicsQueue = VK_NULL_HANDLE;
-	VkQueue mPresentQueue = VK_NULL_HANDLE;
-
 };
 
 }

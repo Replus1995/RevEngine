@@ -11,7 +11,7 @@
 //temp
 #include <GLFW/glfw3.h>
 #include <glad/gl.h>
-#include <Vulkan/VkContext.h>
+#include <Vulkan/VkCore.h>
 
 
 static ImGuiKey GlfwKeyToImGuiKey(int key)
@@ -178,10 +178,10 @@ static VkDescriptorPool ImGuiLayer_Vulkan_Init()
 
     // this initializes imgui for Vulkan
     ImGui_ImplVulkan_InitInfo ImguiInitInfo{};
-    ImguiInitInfo.Instance = pVkContext->GetInstance().GetInstance();
-    ImguiInitInfo.PhysicalDevice = pVkContext->GetDevice().GetPhysicalDevice();
-    ImguiInitInfo.Device = pVkContext->GetDevice().GetLogicalDevice();
-    ImguiInitInfo.Queue = pVkContext->GetDevice().GetGraphicsQueue();
+    ImguiInitInfo.Instance = FVkCore::GetInstance();
+    ImguiInitInfo.PhysicalDevice = FVkCore::GetPhysicalDevice();
+    ImguiInitInfo.Device = FVkCore::GetDevice();
+    ImguiInitInfo.Queue = FVkCore::GetQueue(VQK_Graphics);
     ImguiInitInfo.DescriptorPool = ImguiPool;
     ImguiInitInfo.MinImageCount = 3;
     ImguiInitInfo.ImageCount = 3;

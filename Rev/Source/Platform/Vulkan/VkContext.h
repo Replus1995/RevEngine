@@ -93,18 +93,7 @@ private:
 	VkFence mImmFence;
 	VkCommandBuffer mImmCmdBuffer;
 	VkCommandPool mImmCmdPool;
-
 };
 
-class FVkCore
-{
-public:
-	static VkInstance GetInstance();
-	static VkDevice GetDevice();
-	static VmaAllocator GetAllocator();
-	static VkCommandBuffer GetMainCmdBuffer();
-
-	static FVkContext* GetContext();
-};
 
 }
