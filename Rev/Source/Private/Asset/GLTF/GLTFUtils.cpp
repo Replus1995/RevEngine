@@ -257,12 +257,12 @@ Ref<FMeshPrimitiveStorage> FGLTFUtils::ImportMeshPrimitive(const tinygltf::Primi
 			REV_CORE_ASSERT(RefAccessor.type == TINYGLTF_TYPE_VEC3);
 			OutStorage->PositonData = LoadBufferData<float, 3>(RefAccessor, InModel);
 		}
-		else if (attrName.compare("COLOR") == 0)
+		/*else if (attrName.compare("COLOR") == 0)
 		{
 			REV_CORE_ASSERT(RefAccessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT);
 			REV_CORE_ASSERT(RefAccessor.type == TINYGLTF_TYPE_VEC4);
 			OutStorage->ColorData = LoadBufferData<float, 4>(RefAccessor, InModel);
-		}
+		}*/
 		else if (attrName.compare("TEXCOORD_0") == 0)
 		{
 			REV_CORE_ASSERT(RefAccessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT);

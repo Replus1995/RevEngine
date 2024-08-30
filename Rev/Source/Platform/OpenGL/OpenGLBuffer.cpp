@@ -7,7 +7,7 @@ namespace Rev
 
 /*Vertex Buffer*/
 FOpenGLVertexBuffer::FOpenGLVertexBuffer(uint32 size)
-	: mSize(size)
+	: FRHIVertexBuffer(size)
 {
 	glCreateBuffers(1, &mHandle);
 	glBindBuffer(GL_ARRAY_BUFFER, mHandle);
@@ -15,7 +15,7 @@ FOpenGLVertexBuffer::FOpenGLVertexBuffer(uint32 size)
 }
 
 FOpenGLVertexBuffer::FOpenGLVertexBuffer(const float* vertices, uint32 size)
-	: mSize(size)
+	: FRHIVertexBuffer(size)
 {
 	glCreateBuffers(1, &mHandle);
 	glBindBuffer(GL_ARRAY_BUFFER, mHandle);
@@ -37,8 +37,7 @@ void FOpenGLVertexBuffer::UpdateSubData(const void* data, uint32 size, uint32 of
 
 /*Index Buffer*/
 FOpenGLIndexBuffer::FOpenGLIndexBuffer(uint32 stride, uint32 count)
-	: mStride(stride)
-	, mCount(count)
+	: FRHIIndexBuffer(stride, count)
 {
 	glCreateBuffers(1, &mHandle);
 	glBindBuffer(GL_ARRAY_BUFFER, mHandle);
@@ -46,8 +45,7 @@ FOpenGLIndexBuffer::FOpenGLIndexBuffer(uint32 stride, uint32 count)
 }
 
 FOpenGLIndexBuffer::FOpenGLIndexBuffer(const void* indices, uint32 stride, uint32 count)
-	: mStride(stride)
-	, mCount(count)
+	: FRHIIndexBuffer(stride, count)
 {
 	glCreateBuffers(1, &mHandle);
 

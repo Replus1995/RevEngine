@@ -18,7 +18,6 @@ public:
 	FBuffer NormalData;		//size = VertexCount * 3 * sizeof(float)
 	FBuffer TangentData;	//size = VertexCount * 4 * sizeof(float)
 	FBuffer TexCoordData;	//size = VertexCount * 2 * sizeof(float)
-	FBuffer ColorData;		//size = VertexCount * 4 * sizeof(float)
 
 	//FBuffer WeightData; //size = VertexCount * 4 * sizeof(float)
 	//FBuffer WeightIndexData; //size = VertexCount * 4 * sizeof(int)
@@ -40,7 +39,6 @@ protected:
 	void CalculateNormals();
 	Math::FVector4 CalculateTangent(uint32 a, uint32 b, uint32 c) const;
 	void CalculateTangents();
-	void FillColorData(const Math::FLinearColor& InColor);
 };
 
 }

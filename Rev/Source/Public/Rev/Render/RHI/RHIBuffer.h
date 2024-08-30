@@ -81,6 +81,7 @@ private:
 class REV_API FRHIVertexBuffer : public FRHIResource
 {
 public:
+	FRHIVertexBuffer(uint32 InSize) : mSize(InSize) {}
 	virtual ~FRHIVertexBuffer() = default;
 	/**
 	* @brief Update vertex buffer data
@@ -90,14 +91,18 @@ public:
 	*/
 	virtual void UpdateSubData(const void* Data, uint32 Size, uint32 Offset = 0) = 0;
 
-	virtual const FVertexBufferLayout& GetLayout() const = 0;
-	virtual void SetLayout(const FVertexBufferLayout& Layout) = 0;
-	virtual uint32 GetCapacity() const = 0;
+	const FVertexBufferLayout& GetLayout() const { return mLayout; }
+	void SetLayout(const FVertexBufferLayout& InLayout) { mLayout = InLayout; }
+	uint32 GetCapacity() const { return mSize; }
+protected:
+	uint32 mSize;
+	FVertexBufferLayout mLayout;
 };
 
 class REV_API FRHIIndexBuffer : public FRHIResource
 {
 public:
+	FRHIIndexBuffer(uint32 InStride, uint32 InCount) : mStride(InStride), mCount(InCount) {}
 	virtual ~FRHIIndexBuffer() = default;
 	/**
 	* @brief Update index buffer data
@@ -107,9 +112,12 @@ public:
 	*/
 	virtual void UpdateSubData(const void* Data, uint32 Count, uint32 Offset = 0) = 0;
 
-	virtual uint32 GetStride() const = 0;
-	virtual uint32 GetCount() const = 0;
-	virtual uint32 GetCapacity() const = 0;
+	uint32 GetStride() const { return mStride; };
+	uint32 GetCount() const { return mCount; }
+	uint32 GetCapacity() const { return mStride * mCount; };
+protected:
+	uint32 mStride = 0;
+	uint32 mCount = 0;
 };
 
 class REV_API FRHIVertexArray : public FRHIResource

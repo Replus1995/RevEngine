@@ -74,8 +74,7 @@ void BlitImage(VkCommandBuffer CmdBuffer, VkImage SrcImage, VkImage DstImage, Vk
 
 void ImmediateUploadImage(VkImage Image, VkImageAspectFlags AspectMask, VkExtent3D Extent, const void* InData, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex, uint16 InArrayCount)
 {
-	FVkBuffer UploadBuffer;
-	UploadBuffer.Allocate(InSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
+	FVkStageBuffer UploadBuffer(InSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
 	memcpy(UploadBuffer.GetMappedData(), InData, InSize);
 
 	FVkCore::ImmediateSubmit([&](VkCommandBuffer ImmCmdBuffer) {
@@ -97,8 +96,6 @@ void ImmediateUploadImage(VkImage Image, VkImageAspectFlags AspectMask, VkExtent
 
 		TransitionImage(ImmCmdBuffer, Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 	});
-
-	UploadBuffer.Release();
 }
 
 void ImmediateClearImage(VkImage Image, VkImageAspectFlags AspectMask, VkClearValue InClearValue, uint8 InMipLevel, uint8 InMipCount, uint16 InArrayIndex, uint16 InArrayCount)

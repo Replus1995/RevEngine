@@ -206,7 +206,7 @@ void FVkInstance::CheckLayerSupport(const std::vector<const char*>& InLayerNames
 
 std::vector<const char*> FVkInstance::GetEnabledExtensions()
 {
-	std::vector<const char*> RequiredExtensions;
+	std::vector<const char*> RequiredExtensions = {};
 
 	Window* pWnd = Application::GetApp().GetWindow();
 	REV_CORE_ASSERT(pWnd, "[FVkInstance] Invalid window!");

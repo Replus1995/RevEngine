@@ -20,7 +20,6 @@ FMeshPrimitiveStorage::FMeshPrimitiveStorage(FMeshPrimitiveStorage&& InStorage) 
 	NormalData = std::move(InStorage.NormalData);
 	TangentData = std::move(InStorage.TangentData);
 	TexCoordData = std::move(InStorage.TexCoordData);
-	ColorData = std::move(InStorage.ColorData);
 
 	//WeightData = std::move(InStorage.WeightData);
 	//WeightIndexData = std::move(InStorage.WeightIndexData);
@@ -42,8 +41,6 @@ FMeshPrimitive FMeshPrimitiveStorage::CreateVertexData()
 		CalculateNormals();
 	if (TangentData.Empty())
 		CalculateTangents();
-	if (ColorData.Empty())
-		FillColorData(Math::FLinearColor(1));
 
 	Ref<FRHIVertexArray> VertexArr = FRHIResourceFactory::CreateVertexArray();
 	//Position
@@ -77,14 +74,6 @@ FMeshPrimitive FMeshPrimitiveStorage::CreateVertexData()
 			{"TexCoord0", EVertexElementType::Float2,  3}
 			});
 		VertexArr->AddVertexBuffer(TexCoordBuffer);
-	}
-	//Color
-	{
-		Ref<FRHIVertexBuffer> ColorBuffer = FRHIResourceFactory::CreateVertexBuffer(ColorData.DataAs<float>(), ColorData.Size());
-		ColorBuffer->SetLayout({
-			{"Color", EVertexElementType::Float4,  4}
-			});
-		VertexArr->AddVertexBuffer(ColorBuffer);
 	}
 
 	Ref<FRHIIndexBuffer> IndexBuffer = FRHIResourceFactory::CreateIndexBuffer(IndexData.Data(), IndexStride, IndexCount);
@@ -229,17 +218,6 @@ void FMeshPrimitiveStorage::CalculateTangents()
 		Tangents[i].W = handedness;
 	}
 }
-
-void FMeshPrimitiveStorage::FillColorData(const Math::FLinearColor& InColor)
-{
-	ColorData.Allocate(VertexCount * sizeof(Math::FLinearColor));
-	Math::FLinearColor* Colors = TangentData.DataAs<Math::FLinearColor>();
-	for (uint32 i = 0; i < VertexCount; i++)
-	{
-		Colors[i] = InColor;
-	}
-}
-
 
 }
 
