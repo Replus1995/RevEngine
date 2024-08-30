@@ -18,10 +18,10 @@ public:
 	virtual void ClearTargets() override;
 	virtual const Ref<FRHITexture> GetTargetTexture(ERenderTargetAttachment Index) const override;
 
-	virtual void Attach(ERenderTargetAttachment Index, const Ref<FRHITexture>& InTexture, uint8 InMipLevel, int32 InArrayIndex) override;
+	/*virtual void Attach(ERenderTargetAttachment Index, const Ref<FRHITexture>& InTexture, uint8 InMipLevel, int32 InArrayIndex) override;
 	virtual void Detach(ERenderTargetAttachment Index) override;
 	virtual void DetachAll() override;
-	virtual void FlushAttach() override;
+	virtual void FlushAttach() override;*/
 
 protected:
 	bool IsEmptyTarget() const;

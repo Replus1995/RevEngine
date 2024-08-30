@@ -193,94 +193,94 @@ const Ref<FRHITexture> FOpenGLRenderTarget::GetTargetTexture(ERenderTargetAttach
 	return nullptr;
 }
 
-void FOpenGLRenderTarget::Attach(ERenderTargetAttachment Index, const Ref<FRHITexture>& InTexture, uint8 InMipLevel, int32 InArrayIndex)
-{
-	if(!InTexture)
-		return;
-	if (InTexture->GetDesc().bSRGB)
-	{
-		REV_CORE_ERROR("SRGB texture is not allowed to be attached as render target");
-		return;
-	}
-
-	FAttachment& TargetAttachment = Index < RTA_MaxColorAttachments ? mColorAttachments[Index] : mDepthStencilAttachment;
-	GLenum AttachPoint = 0;
-	if (Index < RTA_MaxColorAttachments)
-		AttachPoint = GL_COLOR_ATTACHMENT0 + Index;
-	else if (Index == RTA_DepthAttachment)
-		AttachPoint = GL_DEPTH_ATTACHMENT;
-	else if (Index == RTA_DepthStencilAttachment)
-		AttachPoint = GL_DEPTH_STENCIL_ATTACHMENT;
-
-	REV_CORE_ASSERT(AttachPoint != 0);
-
-	GLuint TexHandle = *(const GLuint*)InTexture->GetNativeHandle();
-	if (InArrayIndex < 0)
-	{
-		glNamedFramebufferTexture(mHandle, AttachPoint, TexHandle, InMipLevel);
-		TargetAttachment.ArrayIndex = -1;
-	}
-	else
-	{
-		REV_CORE_ASSERT(InArrayIndex < InTexture->GetArraySize(), "ArrayIndex out of range");
-		glNamedFramebufferTextureLayer(mHandle, AttachPoint, TexHandle, InMipLevel, InArrayIndex);
-		TargetAttachment.ArrayIndex = InArrayIndex;
-	}
-	TargetAttachment.MipLevel = InMipLevel;
-	TargetAttachment.Texture = std::static_pointer_cast<FOpenGLTexture>(InTexture);
-	mAttachmentsDirty = true;
-}
-
-void FOpenGLRenderTarget::Detach(ERenderTargetAttachment Index)
-{
-	FAttachment& TargetAttachment = Index < RTA_MaxColorAttachments ? mColorAttachments[Index] : mDepthStencilAttachment;
-	GLenum AttachPoint = 0;
-	if (Index < RTA_MaxColorAttachments)
-		AttachPoint = GL_COLOR_ATTACHMENT0 + Index;
-	else if (Index == RTA_DepthAttachment)
-		AttachPoint = GL_DEPTH_ATTACHMENT;
-	else if (Index == RTA_DepthStencilAttachment)
-		AttachPoint = GL_DEPTH_STENCIL_ATTACHMENT;
-
-	if (AttachPoint != 0)
-	{
-		glNamedFramebufferTexture(mHandle, AttachPoint, 0, 0);
-	}
-}
-
-void FOpenGLRenderTarget::DetachAll()
-{
-	for (uint8 i = 0; i < RTA_MaxColorAttachments; i++)
-	{
-		Detach((ERenderTargetAttachment)i);
-	}
-	Detach(RTA_DepthStencilAttachment);
-}
-
-void FOpenGLRenderTarget::FlushAttach()
-{
-	if (mAttachmentsDirty)
-	{
-		std::vector<GLenum> ColorAttachPoints;
-		for (uint8 i = 0; i < RTA_MaxColorAttachments; i++)
-		{
-			if (mColorAttachments[i].Texture)
-			{
-				ColorAttachPoints.push_back(GL_COLOR_ATTACHMENT0 + i);
-			}
-		}
-		if (!ColorAttachPoints.empty())
-		{
-			glNamedFramebufferDrawBuffers(mHandle, ColorAttachPoints.size(), ColorAttachPoints.data());
-		}
-		else
-		{
-			glNamedFramebufferDrawBuffer(mHandle, GL_NONE);
-		}
-
-		mAttachmentsDirty = false;
-	}
-}
+//void FOpenGLRenderTarget::Attach(ERenderTargetAttachment Index, const Ref<FRHITexture>& InTexture, uint8 InMipLevel, int32 InArrayIndex)
+//{
+//	if(!InTexture)
+//		return;
+//	if (InTexture->GetDesc().bSRGB)
+//	{
+//		REV_CORE_ERROR("SRGB texture is not allowed to be attached as render target");
+//		return;
+//	}
+//
+//	FAttachment& TargetAttachment = Index < RTA_MaxColorAttachments ? mColorAttachments[Index] : mDepthStencilAttachment;
+//	GLenum AttachPoint = 0;
+//	if (Index < RTA_MaxColorAttachments)
+//		AttachPoint = GL_COLOR_ATTACHMENT0 + Index;
+//	else if (Index == RTA_DepthAttachment)
+//		AttachPoint = GL_DEPTH_ATTACHMENT;
+//	else if (Index == RTA_DepthStencilAttachment)
+//		AttachPoint = GL_DEPTH_STENCIL_ATTACHMENT;
+//
+//	REV_CORE_ASSERT(AttachPoint != 0);
+//
+//	GLuint TexHandle = *(const GLuint*)InTexture->GetNativeHandle();
+//	if (InArrayIndex < 0)
+//	{
+//		glNamedFramebufferTexture(mHandle, AttachPoint, TexHandle, InMipLevel);
+//		TargetAttachment.ArrayIndex = -1;
+//	}
+//	else
+//	{
+//		REV_CORE_ASSERT(InArrayIndex < InTexture->GetArraySize(), "ArrayIndex out of range");
+//		glNamedFramebufferTextureLayer(mHandle, AttachPoint, TexHandle, InMipLevel, InArrayIndex);
+//		TargetAttachment.ArrayIndex = InArrayIndex;
+//	}
+//	TargetAttachment.MipLevel = InMipLevel;
+//	TargetAttachment.Texture = std::static_pointer_cast<FOpenGLTexture>(InTexture);
+//	mAttachmentsDirty = true;
+//}
+//
+//void FOpenGLRenderTarget::Detach(ERenderTargetAttachment Index)
+//{
+//	FAttachment& TargetAttachment = Index < RTA_MaxColorAttachments ? mColorAttachments[Index] : mDepthStencilAttachment;
+//	GLenum AttachPoint = 0;
+//	if (Index < RTA_MaxColorAttachments)
+//		AttachPoint = GL_COLOR_ATTACHMENT0 + Index;
+//	else if (Index == RTA_DepthAttachment)
+//		AttachPoint = GL_DEPTH_ATTACHMENT;
+//	else if (Index == RTA_DepthStencilAttachment)
+//		AttachPoint = GL_DEPTH_STENCIL_ATTACHMENT;
+//
+//	if (AttachPoint != 0)
+//	{
+//		glNamedFramebufferTexture(mHandle, AttachPoint, 0, 0);
+//	}
+//}
+//
+//void FOpenGLRenderTarget::DetachAll()
+//{
+//	for (uint8 i = 0; i < RTA_MaxColorAttachments; i++)
+//	{
+//		Detach((ERenderTargetAttachment)i);
+//	}
+//	Detach(RTA_DepthStencilAttachment);
+//}
+//
+//void FOpenGLRenderTarget::FlushAttach()
+//{
+//	if (mAttachmentsDirty)
+//	{
+//		std::vector<GLenum> ColorAttachPoints;
+//		for (uint8 i = 0; i < RTA_MaxColorAttachments; i++)
+//		{
+//			if (mColorAttachments[i].Texture)
+//			{
+//				ColorAttachPoints.push_back(GL_COLOR_ATTACHMENT0 + i);
+//			}
+//		}
+//		if (!ColorAttachPoints.empty())
+//		{
+//			glNamedFramebufferDrawBuffers(mHandle, ColorAttachPoints.size(), ColorAttachPoints.data());
+//		}
+//		else
+//		{
+//			glNamedFramebufferDrawBuffer(mHandle, GL_NONE);
+//		}
+//
+//		mAttachmentsDirty = false;
+//	}
+//}
 
 bool FOpenGLRenderTarget::IsEmptyTarget() const
 {

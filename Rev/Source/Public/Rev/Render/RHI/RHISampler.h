@@ -6,13 +6,21 @@
 namespace Rev
 {
 
-enum ESamplerFilterMode
+enum ESamplerFilterMode : uint8
 {
 	SF_Nearest = 0,
 	SF_Bilinear,
 	SF_Trilinear,
 	SF_AnisotropicNearest,
 	SF_AnisotropicLinear,
+};
+
+enum ESamplerWarpMode : uint8
+{
+	SW_Repeat = 0,
+	SW_Clamp,
+	SW_Mirror,
+	SW_Border
 };
 
 enum ESamplerAnisotropicMode
@@ -24,21 +32,14 @@ enum ESamplerAnisotropicMode
 	SA_16X = 16
 };
 
-enum ESamplerWarpMode
-{
-	SW_Repeat = 0,
-	SW_Clamp,
-	SW_Mirror,
-	SW_Border
-};
 
 struct FSamplerDesc
 {
 	ESamplerFilterMode Filter = SF_Nearest;
-	ESamplerAnisotropicMode Anisotropic = SA_None;
 	ESamplerWarpMode WarpU = SW_Repeat;
 	ESamplerWarpMode WarpV = SW_Repeat;
 	ESamplerWarpMode WarpW = SW_Repeat;
+	ESamplerAnisotropicMode Anisotropic = SA_None;
 	Math::FLinearColor BorderColor = Math::FLinearColor(0,0,0,1); //Move to other place
 };
 
@@ -70,12 +71,12 @@ public:
 
 	const FSamplerDesc& GetDesc() const { return mDesc; }
 
-	virtual void SetFilterMode(ESamplerFilterMode InMode) = 0;
+	/*virtual void SetFilterMode(ESamplerFilterMode InMode) = 0;
 	virtual void SetAnisotropicMode(ESamplerAnisotropicMode InMode) = 0;
 	virtual void SetWarpU(ESamplerWarpMode InMode) = 0;
 	virtual void SetWarpV(ESamplerWarpMode InMode) = 0;
 	virtual void SetWarpW(ESamplerWarpMode InMode) = 0;
-	virtual void SetBorderColor(const Math::FLinearColor& InColor) = 0;
+	virtual void SetBorderColor(const Math::FLinearColor& InColor) = 0;*/
 
 protected:
 	FSamplerDesc mDesc;

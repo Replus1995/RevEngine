@@ -31,8 +31,8 @@ protected:
 	VkImageView mImageView = VK_NULL_HANDLE;
 	VkImageLayout mImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 	VmaAllocation mAllocation = VK_NULL_HANDLE;
+	Ref<FVkSampler> mSampler = nullptr;
 };
-
 
 Ref<FVkTexture> CreateVkTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc);
 

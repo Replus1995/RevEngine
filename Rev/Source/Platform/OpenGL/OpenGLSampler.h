@@ -10,12 +10,12 @@ public:
 	FOpenGLSampler(const FSamplerDesc& InDesc, GLenum InTexDataType, bool bHasMip);
 	virtual ~FOpenGLSampler();
 	virtual const void* GetNativeHandle() const override { return &mHandle; }
-	virtual void SetFilterMode(ESamplerFilterMode InMode) override;
+	/*virtual void SetFilterMode(ESamplerFilterMode InMode) override;
 	virtual void SetAnisotropicMode(ESamplerAnisotropicMode InMode) override;
 	virtual void SetWarpU(ESamplerWarpMode InMode) override;
 	virtual void SetWarpV(ESamplerWarpMode InMode) override;
 	virtual void SetWarpW(ESamplerWarpMode InMode) override;
-	virtual void SetBorderColor(const Math::FLinearColor& InColor) override;
+	virtual void SetBorderColor(const Math::FLinearColor& InColor) override;*/
 
 private:
 	void FullUpdateState();

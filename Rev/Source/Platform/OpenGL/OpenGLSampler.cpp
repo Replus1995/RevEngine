@@ -18,71 +18,71 @@ FOpenGLSampler::~FOpenGLSampler()
 	glDeleteSamplers(1, &mHandle);
 }
 
-void FOpenGLSampler::SetFilterMode(ESamplerFilterMode InMode)
-{
-	if (mDesc.Filter != InMode)
-	{
-		mDesc.Filter = InMode;
-		glSamplerParameteri(mHandle, GL_TEXTURE_MIN_FILTER, TranslateFilterMode(mDesc.Filter, mHasMip));
-		glSamplerParameteri(mHandle, GL_TEXTURE_MAG_FILTER, TranslateFilterMode(mDesc.Filter, false));
-	}
-}
-
-void FOpenGLSampler::SetAnisotropicMode(ESamplerAnisotropicMode InMode)
-{
-	if (mDesc.Anisotropic != InMode)
-	{
-		mDesc.Anisotropic = InMode;
-		if (UseAnisotropicFilter(mDesc))
-			glSamplerParameteri(mHandle, GL_TEXTURE_MAX_ANISOTROPY, mDesc.Anisotropic);
-		else
-			glSamplerParameteri(mHandle, GL_TEXTURE_MAX_ANISOTROPY, 1.0f);
-	}
-}
-
-void FOpenGLSampler::SetWarpU(ESamplerWarpMode InMode)
-{
-	if (mDesc.WarpU != InMode)
-	{
-		mDesc.WarpU = InMode;
-		glSamplerParameteri(mHandle, GL_TEXTURE_WRAP_S, TranslateWarpMode(mDesc.WarpU));
-		if (UseBorderWarp(mDesc))
-			glSamplerParameterfv(mHandle, GL_TEXTURE_BORDER_COLOR, mDesc.BorderColor.Data());
-	}
-}
-
-void FOpenGLSampler::SetWarpV(ESamplerWarpMode InMode)
-{
-	if (mDesc.WarpV != InMode)
-	{
-		mDesc.WarpV = InMode;
-		glSamplerParameteri(mHandle, GL_TEXTURE_WRAP_T, TranslateWarpMode(mDesc.WarpV));
-		if (UseBorderWarp(mDesc))
-			glSamplerParameterfv(mHandle, GL_TEXTURE_BORDER_COLOR, mDesc.BorderColor.Data());
-	}
-}
-
-void FOpenGLSampler::SetWarpW(ESamplerWarpMode InMode)
-{
-	if (mDesc.WarpW != InMode)
-	{
-		mDesc.WarpW = InMode;
-		glSamplerParameteri(mHandle, GL_TEXTURE_WRAP_R, TranslateWarpMode(mDesc.WarpW));
-		if (UseBorderWarp(mDesc))
-			glSamplerParameterfv(mHandle, GL_TEXTURE_BORDER_COLOR, mDesc.BorderColor.Data());
-	}
-}
-
-void FOpenGLSampler::SetBorderColor(const Math::FLinearColor& InColor)
-{
-	if (mDesc.BorderColor != InColor)
-	{
-		mDesc.BorderColor = InColor;
-		if (UseBorderWarp(mDesc))
-			glSamplerParameterfv(mHandle, GL_TEXTURE_BORDER_COLOR, mDesc.BorderColor.Data());
-	}
-	
-}
+//void FOpenGLSampler::SetFilterMode(ESamplerFilterMode InMode)
+//{
+//	if (mDesc.Filter != InMode)
+//	{
+//		mDesc.Filter = InMode;
+//		glSamplerParameteri(mHandle, GL_TEXTURE_MIN_FILTER, TranslateFilterMode(mDesc.Filter, mHasMip));
+//		glSamplerParameteri(mHandle, GL_TEXTURE_MAG_FILTER, TranslateFilterMode(mDesc.Filter, false));
+//	}
+//}
+//
+//void FOpenGLSampler::SetAnisotropicMode(ESamplerAnisotropicMode InMode)
+//{
+//	if (mDesc.Anisotropic != InMode)
+//	{
+//		mDesc.Anisotropic = InMode;
+//		if (UseAnisotropicFilter(mDesc))
+//			glSamplerParameteri(mHandle, GL_TEXTURE_MAX_ANISOTROPY, mDesc.Anisotropic);
+//		else
+//			glSamplerParameteri(mHandle, GL_TEXTURE_MAX_ANISOTROPY, 1.0f);
+//	}
+//}
+//
+//void FOpenGLSampler::SetWarpU(ESamplerWarpMode InMode)
+//{
+//	if (mDesc.WarpU != InMode)
+//	{
+//		mDesc.WarpU = InMode;
+//		glSamplerParameteri(mHandle, GL_TEXTURE_WRAP_S, TranslateWarpMode(mDesc.WarpU));
+//		if (UseBorderWarp(mDesc))
+//			glSamplerParameterfv(mHandle, GL_TEXTURE_BORDER_COLOR, mDesc.BorderColor.Data());
+//	}
+//}
+//
+//void FOpenGLSampler::SetWarpV(ESamplerWarpMode InMode)
+//{
+//	if (mDesc.WarpV != InMode)
+//	{
+//		mDesc.WarpV = InMode;
+//		glSamplerParameteri(mHandle, GL_TEXTURE_WRAP_T, TranslateWarpMode(mDesc.WarpV));
+//		if (UseBorderWarp(mDesc))
+//			glSamplerParameterfv(mHandle, GL_TEXTURE_BORDER_COLOR, mDesc.BorderColor.Data());
+//	}
+//}
+//
+//void FOpenGLSampler::SetWarpW(ESamplerWarpMode InMode)
+//{
+//	if (mDesc.WarpW != InMode)
+//	{
+//		mDesc.WarpW = InMode;
+//		glSamplerParameteri(mHandle, GL_TEXTURE_WRAP_R, TranslateWarpMode(mDesc.WarpW));
+//		if (UseBorderWarp(mDesc))
+//			glSamplerParameterfv(mHandle, GL_TEXTURE_BORDER_COLOR, mDesc.BorderColor.Data());
+//	}
+//}
+//
+//void FOpenGLSampler::SetBorderColor(const Math::FLinearColor& InColor)
+//{
+//	if (mDesc.BorderColor != InColor)
+//	{
+//		mDesc.BorderColor = InColor;
+//		if (UseBorderWarp(mDesc))
+//			glSamplerParameterfv(mHandle, GL_TEXTURE_BORDER_COLOR, mDesc.BorderColor.Data());
+//	}
+//	
+//}
 
 void FOpenGLSampler::FullUpdateState()
 {

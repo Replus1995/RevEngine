@@ -3,6 +3,7 @@
 #include "Utils/Image.h"
 #include "Rev/Core/Assert.h"
 
+#include "VkSampler.h"
 #include "VkTexture2D.h"
 
 namespace Rev
@@ -10,7 +11,7 @@ namespace Rev
 
 const FRHISampler* FVkTexture::GetSampler() const
 {
-	return nullptr;
+	return mSampler.get();
 }
 
 void FVkTexture::ClearMipData(uint8 InMipLevel)
@@ -40,6 +41,7 @@ FVkTexture::FVkTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSampler
     , mFormatInfo(FVkPixelFormat::TranslatePixelFormat(InDesc.Format, InDesc.bSRGB))
 {
 	REV_CORE_ASSERT(mFormatInfo.AspectFlags != VK_IMAGE_ASPECT_NONE);
+	mSampler = CreateVkSampler(InSamplerDesc);
 }
 
 VkExtent3D FVkTexture::GetExtent()

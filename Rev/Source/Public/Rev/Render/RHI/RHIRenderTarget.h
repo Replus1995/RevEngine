@@ -122,10 +122,10 @@ public:
 	virtual const Ref<FRHITexture> GetTargetTexture(ERenderTargetAttachment Index) const = 0;
 
 	//Use textures created by user
-	virtual void Attach(ERenderTargetAttachment Index, const Ref<FRHITexture>& InTexture, uint8 InMipLevel = 0, int32 InArrayIndex = -1) = 0;
+	/*virtual void Attach(ERenderTargetAttachment Index, const Ref<FRHITexture>& InTexture, uint8 InMipLevel = 0, int32 InArrayIndex = -1) = 0;
 	virtual void Detach(ERenderTargetAttachment Index) = 0;
 	virtual void DetachAll() = 0;
-	virtual void FlushAttach() = 0;
+	virtual void FlushAttach() = 0;*/
 
 protected:
 	FRHIRenderTarget(const FRenderTargetDesc& InDesc) : mDesc(InDesc) {}
