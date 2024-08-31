@@ -1,12 +1,12 @@
-#include "Image.h"
-#include "Vulkan/VkInitializer.h" 
-#include "Vulkan/VkCore.h"
-#include "Vulkan/VkBuffer.h"
+#include "VkUtils.h"
+#include "VkInitializer.h" 
+#include "VkCore.h"
+#include "VkBuffer.h"
 
-namespace Rev::VkUtils
+namespace Rev
 {
 
-void TransitionImage(VkCommandBuffer CmdBuffer, VkImage Image, VkImageLayout CurrentLayout, VkImageLayout NextLayout)
+void FVkUtils::TransitionImage(VkCommandBuffer CmdBuffer, VkImage Image, VkImageLayout CurrentLayout, VkImageLayout NextLayout)
 {
 	VkImageMemoryBarrier2 ImageBarrier{};
 	ImageBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2;
@@ -33,7 +33,7 @@ void TransitionImage(VkCommandBuffer CmdBuffer, VkImage Image, VkImageLayout Cur
 	vkCmdPipelineBarrier2(CmdBuffer, &DependencyInfo);
 }
 
-void BlitImage(VkCommandBuffer CmdBuffer, VkImage SrcImage, VkImage DstImage, VkExtent2D SrcExtent, VkExtent2D DstExtent)
+void FVkUtils::BlitImage(VkCommandBuffer CmdBuffer, VkImage SrcImage, VkImage DstImage, VkExtent2D SrcExtent, VkExtent2D DstExtent)
 {
 	VkImageBlit2 BlitRegion{};
 	BlitRegion.sType = VK_STRUCTURE_TYPE_IMAGE_BLIT_2;
@@ -72,7 +72,7 @@ void BlitImage(VkCommandBuffer CmdBuffer, VkImage SrcImage, VkImage DstImage, Vk
 	vkCmdBlitImage2(CmdBuffer, &BlitInfo);
 }
 
-void ImmediateUploadImage(VkImage Image, VkImageAspectFlags AspectMask, VkExtent3D Extent, const void* InData, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex, uint16 InArrayCount)
+void FVkUtils::ImmediateUploadImage(VkImage Image, VkImageAspectFlags AspectMask, VkExtent3D Extent, const void* InData, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex, uint16 InArrayCount)
 {
 	FVkStageBuffer UploadBuffer(InSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
 	memcpy(UploadBuffer.GetMappedData(), InData, InSize);
@@ -98,7 +98,7 @@ void ImmediateUploadImage(VkImage Image, VkImageAspectFlags AspectMask, VkExtent
 	});
 }
 
-void ImmediateClearImage(VkImage Image, VkImageAspectFlags AspectMask, VkClearValue InClearValue, uint8 InMipLevel, uint8 InMipCount, uint16 InArrayIndex, uint16 InArrayCount)
+void FVkUtils::ImmediateClearImage(VkImage Image, VkImageAspectFlags AspectMask, VkClearValue InClearValue, uint8 InMipLevel, uint8 InMipCount, uint16 InArrayIndex, uint16 InArrayCount)
 {
 	bool bColorImage = AspectMask & VK_IMAGE_ASPECT_COLOR_BIT;
 	FVkCore::ImmediateSubmit([&](VkCommandBuffer ImmCmdBuffer) {
@@ -121,6 +121,20 @@ void ImmediateClearImage(VkImage Image, VkImageAspectFlags AspectMask, VkClearVa
 		}
 
 		TransitionImage(ImmCmdBuffer, Image, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+	});
+}
+
+void FVkUtils::ImmediateUploadBuffer(VkBuffer DstBuffer, const void* InData, uint32 InSize, uint32 InOffset)
+{
+	FVkStageBuffer UploadBuffer(InSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
+	memcpy(UploadBuffer.GetMappedData(), InData, InSize);
+
+	FVkCore::ImmediateSubmit([&](VkCommandBuffer ImmCmdBuffer) {
+		VkBufferCopy CopyInfo{};
+		CopyInfo.dstOffset = InOffset;
+		CopyInfo.srcOffset = 0;
+		CopyInfo.size = InSize;
+		vkCmdCopyBuffer(ImmCmdBuffer, UploadBuffer.GetBuffer(), DstBuffer, 1, &CopyInfo);
 	});
 }
 

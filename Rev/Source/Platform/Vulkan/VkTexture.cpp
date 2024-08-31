@@ -1,6 +1,6 @@
 ﻿#include "VkTexture.h"
 #include "VkCore.h"
-#include "Utils/Image.h"
+#include "VkUtils.h"
 #include "Rev/Core/Assert.h"
 
 #include "VkSampler.h"
@@ -17,14 +17,14 @@ const FRHISampler* FVkTexture::GetSampler() const
 void FVkTexture::ClearMipData(uint8 InMipLevel)
 {
 	REV_CORE_ASSERT(InMipLevel < mDesc.NumMips, "MipLevel out of range");
-	VkUtils::ImmediateClearImage(mImage, mFormatInfo.AspectFlags, GetClearValue(), InMipLevel, 1, 0, 0);
+	FVkUtils::ImmediateClearImage(mImage, mFormatInfo.AspectFlags, GetClearValue(), InMipLevel, 1, 0, 0);
 }
 
 void FVkTexture::Transition(VkImageLayout DstLayout, VkCommandBuffer InCmdBuffer)
 {
 	VkCommandBuffer CmdBuffer = InCmdBuffer ? InCmdBuffer : FVkCore::GetMainCmdBuffer();
 	REV_CORE_ASSERT(CmdBuffer);
-	VkUtils::TransitionImage(CmdBuffer, mImage, mImageLayout, DstLayout);
+	FVkUtils::TransitionImage(CmdBuffer, mImage, mImageLayout, DstLayout);
 	mImageLayout = DstLayout;
 }
 
@@ -32,7 +32,7 @@ void FVkTexture::Transition(VkImageLayout SrcLayout, VkImageLayout DstLayout, Vk
 {
 	VkCommandBuffer CmdBuffer = InCmdBuffer ? InCmdBuffer : FVkCore::GetMainCmdBuffer();
     REV_CORE_ASSERT(CmdBuffer);
-    VkUtils::TransitionImage(CmdBuffer, mImage, SrcLayout, DstLayout);
+    FVkUtils::TransitionImage(CmdBuffer, mImage, SrcLayout, DstLayout);
     mImageLayout = DstLayout;
 }
 

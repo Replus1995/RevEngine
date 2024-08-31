@@ -1,5 +1,6 @@
 #include "VkBuffer.h"
 #include "VkCore.h"
+#include "VkUtils.h"
 
 namespace Rev
 {
@@ -92,6 +93,12 @@ FVkVertexBuffer::~FVkVertexBuffer()
 {
 }
 
+void FVkVertexBuffer::UpdateSubData(const void* Data, uint32 Size, uint32 Offset)
+{
+	REV_CORE_ASSERT(Size + Offset <= mSize);
+	FVkUtils::ImmediateUploadBuffer(mBuffer, Data, Size, Offset);
+}
+
 FVkIndexBuffer::FVkIndexBuffer(uint32 InStride, uint32 InCount, const void* InData)
 	: FRHIIndexBuffer(InStride, InCount)
 {
@@ -101,6 +108,12 @@ FVkIndexBuffer::FVkIndexBuffer(uint32 InStride, uint32 InCount, const void* InDa
 
 FVkIndexBuffer::~FVkIndexBuffer()
 {
+}
+
+void FVkIndexBuffer::UpdateSubData(const void* Data, uint32 Count, uint32 Offset)
+{
+	REV_CORE_ASSERT(Count + Offset <= mCount);
+	FVkUtils::ImmediateUploadBuffer(mBuffer, Data, Count * mStride, Offset * mStride);
 }
 
 }
