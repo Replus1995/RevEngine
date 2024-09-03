@@ -4,7 +4,7 @@
 
 //Private
 #include "OpenGL/OpenGLContext.h"
-#include "Vulkan/VkContext.h"
+#include "VulkanRHI/VkContext.h"
 
 namespace Rev
 {

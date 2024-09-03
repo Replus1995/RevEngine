@@ -1,6 +1,5 @@
 #include "Rev/Core/Buffer.h"
 #include "Rev/Core/Assert.h"
-#include "Buffer.h"
 
 namespace Rev
 {

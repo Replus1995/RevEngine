@@ -11,7 +11,7 @@
 //temp
 #include <GLFW/glfw3.h>
 #include <glad/gl.h>
-#include <Vulkan/VkCore.h>
+#include <VulkanRHI/VkCore.h>
 
 
 static ImGuiKey GlfwKeyToImGuiKey(int key)

@@ -36,6 +36,8 @@ FVkBuffer& FVkBuffer::operator=(FVkBuffer&& Other) noexcept
 	Other.mBuffer = VK_NULL_HANDLE;
 	Other.mAllocation = nullptr;
 	Other.mAllocationInfo = {};
+
+	return *this;
 }
 
 void FVkBuffer::Allocate(uint64 Size, VkBufferUsageFlags BufferUsage, VmaMemoryUsage MemoryUsage)
