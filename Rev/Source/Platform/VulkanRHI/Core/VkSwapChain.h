@@ -7,7 +7,7 @@
 namespace Rev
 {
 
-struct FVkBackImage
+struct FVulkanBackImage
 {
 	VkImage Image;
 	VkImageView ImageView;
@@ -16,27 +16,27 @@ struct FVkBackImage
 	VkFormat Format;
 };
 
-class FVkInstance;
-class FVkDevice;
-class FVkSwapchain : public FRHISwapchain
+class FVulkanInstance;
+class FVulkanDevice;
+class FVulkanSwapchain : public FRHISwapchain
 {
 public:
-	void CreateSwapchain(const FVkInstance* Instance, const FVkDevice* InDevice, VmaAllocator InAllocator);
-	void Cleanup(const FVkDevice* InDevice, VmaAllocator InAllocator);
+	void CreateSwapchain(const FVulkanInstance* Instance, const FVulkanDevice* InDevice, VmaAllocator InAllocator);
+	void Cleanup(const FVulkanDevice* InDevice, VmaAllocator InAllocator);
 
 	const VkSwapchainKHR& GetSwapchain() const { return mSwapchain; }
 	const VkExtent2D& GetExtent() const { return mExtent; }
 	const VkFormat& GetFormat() const { return mFormat; }
 	const std::vector<VkImage>& GetImages() const { return mImages; }
 	const std::vector<VkImageView>& GetImageViews() const { return mImageViews; }
-	const FVkBackImage& GetBackImage() const { return mBackImage; }
+	const FVulkanBackImage& GetBackImage() const { return mBackImage; }
 
 private:
 	static VkSurfaceFormatKHR ChooseSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& InAvailableFormats);
 	static VkPresentModeKHR ChoosePresentMode(const std::vector<VkPresentModeKHR>& InAvailablePresentModes);
 	static VkExtent2D ChooseExtent(const VkSurfaceCapabilitiesKHR& InCapabilities);
-	void CreateImageViews(const FVkDevice* InDevice);
-	void CreateBackImage(const FVkDevice* InDevice, VmaAllocator InAllocator);
+	void CreateImageViews(const FVulkanDevice* InDevice);
+	void CreateBackImage(const FVulkanDevice* InDevice, VmaAllocator InAllocator);
 
 private:
 	VkSwapchainKHR mSwapchain;
@@ -45,7 +45,7 @@ private:
 	std::vector<VkImage> mImages;
 	std::vector<VkImageView> mImageViews;
 	//back image
-	FVkBackImage mBackImage;
+	FVulkanBackImage mBackImage;
 };
 
 }

@@ -6,7 +6,7 @@
 namespace Rev
 {
 
-class FVkUtils
+class FVulkanUtils
 {
 public:
 	static void TransitionImage(VkCommandBuffer CmdBuffer, VkImage Image, VkImageLayout CurrentLayout, VkImageLayout NextLayout);

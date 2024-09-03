@@ -5,50 +5,50 @@
 namespace Rev
 {
 
-VkInstance FVkCore::GetInstance()
+VkInstance FVulkanCore::GetInstance()
 {
 	return GetContext()->GetInstance().GetInstance();
 }
 
-VkPhysicalDevice FVkCore::GetPhysicalDevice()
+VkPhysicalDevice FVulkanCore::GetPhysicalDevice()
 {
 	return GetContext()->GetDevice().GetPhysicalDevice();
 }
 
-VkDevice FVkCore::GetDevice()
+VkDevice FVulkanCore::GetDevice()
 {
 	return GetContext()->GetDevice().GetLogicalDevice();
 }
 
-VkQueue FVkCore::GetQueue(EVkQueueKind InKind)
+VkQueue FVulkanCore::GetQueue(EVulkanQueueKind InKind)
 {
 	return GetContext()->GetDevice().GetQueue(InKind);
 }
 
-uint32 FVkCore::GetQueueFamily(EVkQueueKind InKind)
+uint32 FVulkanCore::GetQueueFamily(EVulkanQueueKind InKind)
 {
 	return GetContext()->GetDevice().GetQueueFamily(InKind);
 }
 
-VmaAllocator FVkCore::GetAllocator()
+VmaAllocator FVulkanCore::GetAllocator()
 {
 	return GetContext()->GetAllocator();
 }
 
-VkCommandBuffer FVkCore::GetMainCmdBuffer()
+VkCommandBuffer FVulkanCore::GetMainCmdBuffer()
 {
 	return GetContext()->GetMainCmdBuffer();
 }
 
-void FVkCore::ImmediateSubmit(std::function<void(VkCommandBuffer)>&& Func)
+void FVulkanCore::ImmediateSubmit(std::function<void(VkCommandBuffer)>&& Func)
 {
 	GetContext()->ImmediateSubmit(std::move(Func));
 }
 
-FVkContext* FVkCore::GetContext()
+FVulkanContext* FVulkanCore::GetContext()
 {
 	REV_CORE_ASSERT(GetRenderAPI() == ERenderAPI::Vulkan);
-	return static_cast<FVkContext*>(RenderCmd::GetContext());
+	return static_cast<FVulkanContext*>(RenderCmd::GetContext());
 }
 
 

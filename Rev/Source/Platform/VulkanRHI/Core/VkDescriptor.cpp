@@ -4,7 +4,7 @@
 namespace Rev::VkUtils
 {
 
-void FVkDescriptorLayoutBuilder::Add(uint32 InBinding, VkDescriptorType InType)
+void FVulkanDescriptorLayoutBuilder::Add(uint32 InBinding, VkDescriptorType InType)
 {
     VkDescriptorSetLayoutBinding NewBinding{};
     NewBinding.binding = InBinding;
@@ -14,12 +14,12 @@ void FVkDescriptorLayoutBuilder::Add(uint32 InBinding, VkDescriptorType InType)
     Bindings.push_back(NewBinding);
 }
 
-void FVkDescriptorLayoutBuilder::Clear()
+void FVulkanDescriptorLayoutBuilder::Clear()
 {
     Bindings.clear();
 }
 
-VkDescriptorSetLayout FVkDescriptorLayoutBuilder::Build(VkDevice InDevice, VkShaderStageFlags InShaderStages, VkDescriptorSetLayoutCreateFlags InFlags, void* pNext)
+VkDescriptorSetLayout FVulkanDescriptorLayoutBuilder::Build(VkDevice InDevice, VkShaderStageFlags InShaderStages, VkDescriptorSetLayoutCreateFlags InFlags, void* pNext)
 {
     for (auto& Binding : Bindings) {
         Binding.stageFlags |= InShaderStages;
@@ -38,7 +38,7 @@ VkDescriptorSetLayout FVkDescriptorLayoutBuilder::Build(VkDevice InDevice, VkSha
     return set;
 }
 
-void FVkDescriptorAllocator::Init(VkDevice InDevice, const std::vector<VkDescriptorPoolSize>& InPoolSizes)
+void FVulkanDescriptorAllocator::Init(VkDevice InDevice, const std::vector<VkDescriptorPoolSize>& InPoolSizes)
 {
     uint32 MaxSets = 0;
     for (auto& PoolSize : InPoolSizes)
@@ -56,17 +56,17 @@ void FVkDescriptorAllocator::Init(VkDevice InDevice, const std::vector<VkDescrip
     vkCreateDescriptorPool(InDevice, &CreateInfo, nullptr, &Pool);
 }
 
-void FVkDescriptorAllocator::Reset(VkDevice InDevice)
+void FVulkanDescriptorAllocator::Reset(VkDevice InDevice)
 {
     vkResetDescriptorPool(InDevice, Pool, 0);
 }
 
-void FVkDescriptorAllocator::Cleanup(VkDevice InDevice)
+void FVulkanDescriptorAllocator::Cleanup(VkDevice InDevice)
 {
     vkDestroyDescriptorPool(InDevice, Pool, nullptr);
 }
 
-VkDescriptorSet FVkDescriptorAllocator::Allocate(VkDevice InDevice, VkDescriptorSetLayout InLayout)
+VkDescriptorSet FVulkanDescriptorAllocator::Allocate(VkDevice InDevice, VkDescriptorSetLayout InLayout)
 {
     VkDescriptorSetAllocateInfo AllocateInfo{};
     AllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;

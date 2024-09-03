@@ -6,7 +6,7 @@
 namespace Rev
 {
 
-void FVkUtils::TransitionImage(VkCommandBuffer CmdBuffer, VkImage Image, VkImageLayout CurrentLayout, VkImageLayout NextLayout)
+void FVulkanUtils::TransitionImage(VkCommandBuffer CmdBuffer, VkImage Image, VkImageLayout CurrentLayout, VkImageLayout NextLayout)
 {
 	VkImageMemoryBarrier2 ImageBarrier{};
 	ImageBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2;
@@ -21,7 +21,7 @@ void FVkUtils::TransitionImage(VkCommandBuffer CmdBuffer, VkImage Image, VkImage
 	ImageBarrier.newLayout = NextLayout;
 
 	VkImageAspectFlags AspectMask = (NextLayout == VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL) ? VK_IMAGE_ASPECT_DEPTH_BIT : VK_IMAGE_ASPECT_COLOR_BIT;
-	ImageBarrier.subresourceRange = FVkInit::ImageSubresourceRange(AspectMask);
+	ImageBarrier.subresourceRange = FVulkanInit::ImageSubresourceRange(AspectMask);
 	ImageBarrier.image = Image;
 
 	VkDependencyInfo DependencyInfo{};
@@ -33,7 +33,7 @@ void FVkUtils::TransitionImage(VkCommandBuffer CmdBuffer, VkImage Image, VkImage
 	vkCmdPipelineBarrier2(CmdBuffer, &DependencyInfo);
 }
 
-void FVkUtils::BlitImage(VkCommandBuffer CmdBuffer, VkImage SrcImage, VkImage DstImage, VkExtent2D SrcExtent, VkExtent2D DstExtent)
+void FVulkanUtils::BlitImage(VkCommandBuffer CmdBuffer, VkImage SrcImage, VkImage DstImage, VkExtent2D SrcExtent, VkExtent2D DstExtent)
 {
 	VkImageBlit2 BlitRegion{};
 	BlitRegion.sType = VK_STRUCTURE_TYPE_IMAGE_BLIT_2;
@@ -72,12 +72,12 @@ void FVkUtils::BlitImage(VkCommandBuffer CmdBuffer, VkImage SrcImage, VkImage Ds
 	vkCmdBlitImage2(CmdBuffer, &BlitInfo);
 }
 
-void FVkUtils::ImmediateUploadImage(VkImage Image, VkImageAspectFlags AspectMask, VkExtent3D Extent, const void* InData, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex, uint16 InArrayCount)
+void FVulkanUtils::ImmediateUploadImage(VkImage Image, VkImageAspectFlags AspectMask, VkExtent3D Extent, const void* InData, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex, uint16 InArrayCount)
 {
-	FVkStageBuffer UploadBuffer(InSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
+	FVulkanStageBuffer UploadBuffer(InSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
 	memcpy(UploadBuffer.GetMappedData(), InData, InSize);
 
-	FVkCore::ImmediateSubmit([&](VkCommandBuffer ImmCmdBuffer) {
+	FVulkanCore::ImmediateSubmit([&](VkCommandBuffer ImmCmdBuffer) {
 		TransitionImage(ImmCmdBuffer, Image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
 		VkBufferImageCopy CopyRegion = {};
@@ -98,10 +98,10 @@ void FVkUtils::ImmediateUploadImage(VkImage Image, VkImageAspectFlags AspectMask
 	});
 }
 
-void FVkUtils::ImmediateClearImage(VkImage Image, VkImageAspectFlags AspectMask, VkClearValue InClearValue, uint8 InMipLevel, uint8 InMipCount, uint16 InArrayIndex, uint16 InArrayCount)
+void FVulkanUtils::ImmediateClearImage(VkImage Image, VkImageAspectFlags AspectMask, VkClearValue InClearValue, uint8 InMipLevel, uint8 InMipCount, uint16 InArrayIndex, uint16 InArrayCount)
 {
 	bool bColorImage = AspectMask & VK_IMAGE_ASPECT_COLOR_BIT;
-	FVkCore::ImmediateSubmit([&](VkCommandBuffer ImmCmdBuffer) {
+	FVulkanCore::ImmediateSubmit([&](VkCommandBuffer ImmCmdBuffer) {
 		TransitionImage(ImmCmdBuffer, Image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL);
 
 		VkImageSubresourceRange Range{};
@@ -124,12 +124,12 @@ void FVkUtils::ImmediateClearImage(VkImage Image, VkImageAspectFlags AspectMask,
 	});
 }
 
-void FVkUtils::ImmediateUploadBuffer(VkBuffer DstBuffer, const void* InData, uint32 InSize, uint32 InOffset)
+void FVulkanUtils::ImmediateUploadBuffer(VkBuffer DstBuffer, const void* InData, uint32 InSize, uint32 InOffset)
 {
-	FVkStageBuffer UploadBuffer(InSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
+	FVulkanStageBuffer UploadBuffer(InSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
 	memcpy(UploadBuffer.GetMappedData(), InData, InSize);
 
-	FVkCore::ImmediateSubmit([&](VkCommandBuffer ImmCmdBuffer) {
+	FVulkanCore::ImmediateSubmit([&](VkCommandBuffer ImmCmdBuffer) {
 		VkBufferCopy CopyInfo{};
 		CopyInfo.dstOffset = InOffset;
 		CopyInfo.srcOffset = 0;

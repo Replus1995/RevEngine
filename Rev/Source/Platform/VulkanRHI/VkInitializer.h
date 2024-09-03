@@ -5,7 +5,7 @@
 namespace Rev
 {
 
-class FVkInit
+class FVulkanInit
 {
 	//provide simple functions to make vulkan init info
 public:

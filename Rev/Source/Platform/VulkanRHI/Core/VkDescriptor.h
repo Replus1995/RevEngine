@@ -6,7 +6,7 @@
 namespace Rev::VkUtils
 {
 
-struct FVkDescriptorLayoutBuilder
+struct FVulkanDescriptorLayoutBuilder
 {
 public:
 	std::vector<VkDescriptorSetLayoutBinding> Bindings;
@@ -17,7 +17,7 @@ public:
 
 };
 
-struct FVkDescriptorAllocator
+struct FVulkanDescriptorAllocator
 {
 public:
     VkDescriptorPool Pool;

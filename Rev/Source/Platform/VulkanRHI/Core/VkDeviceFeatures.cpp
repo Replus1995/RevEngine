@@ -3,7 +3,7 @@
 namespace Rev
 {
 
-FVkPhysicalDeviceFeatures::FVkPhysicalDeviceFeatures()
+FVulkanPhysicalDeviceFeatures::FVulkanPhysicalDeviceFeatures()
 {
 	mDynamicRenderingFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES;
 	mDynamicRenderingFeatures.dynamicRendering = VK_TRUE;

@@ -7,8 +7,8 @@
 namespace Rev
 {
 
-class FVkDevice;
-struct FVkFrameData
+class FVulkanDevice;
+struct FVulkanFrameData
 {
 public:
 	VkCommandPool CmdPool;
@@ -19,7 +19,7 @@ public:
 	FDeletorQueue DeletorQueue;
 };
 
-void InitFrameData(FVkFrameData* Frames, uint32 Count, const FVkDevice* InDevice);
-void CleanupFrameData(FVkFrameData* Frames, uint32 Count, const FVkDevice* InDevice);
+void InitFrameData(FVulkanFrameData* Frames, uint32 Count, const FVulkanDevice* InDevice);
+void CleanupFrameData(FVulkanFrameData* Frames, uint32 Count, const FVulkanDevice* InDevice);
 
 }

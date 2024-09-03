@@ -5,11 +5,11 @@
 namespace Rev
 {
 
-FVkBuffer::FVkBuffer()
+FVulkanBuffer::FVulkanBuffer()
 {
 }
 
-FVkBuffer::FVkBuffer(FVkBuffer&& Other) noexcept
+FVulkanBuffer::FVulkanBuffer(FVulkanBuffer&& Other) noexcept
 	: mBuffer(Other.mBuffer)
 	, mAllocation(Other.mAllocation)
 	, mAllocationInfo(Other.mAllocationInfo)
@@ -19,7 +19,7 @@ FVkBuffer::FVkBuffer(FVkBuffer&& Other) noexcept
 	Other.mAllocationInfo = {};
 }
 
-FVkBuffer::~FVkBuffer()
+FVulkanBuffer::~FVulkanBuffer()
 {
 	if (mBuffer)
 	{
@@ -27,7 +27,7 @@ FVkBuffer::~FVkBuffer()
 	}
 }
 
-FVkBuffer& FVkBuffer::operator=(FVkBuffer&& Other) noexcept
+FVulkanBuffer& FVulkanBuffer::operator=(FVulkanBuffer&& Other) noexcept
 {
 	mBuffer = Other.mBuffer;
 	mAllocation = Other.mAllocation;
@@ -40,7 +40,7 @@ FVkBuffer& FVkBuffer::operator=(FVkBuffer&& Other) noexcept
 	return *this;
 }
 
-void FVkBuffer::Allocate(uint64 Size, VkBufferUsageFlags BufferUsage, VmaMemoryUsage MemoryUsage)
+void FVulkanBuffer::Allocate(uint64 Size, VkBufferUsageFlags BufferUsage, VmaMemoryUsage MemoryUsage)
 {
 	if (mBuffer)
 	{
@@ -59,27 +59,27 @@ void FVkBuffer::Allocate(uint64 Size, VkBufferUsageFlags BufferUsage, VmaMemoryU
 	AllocInfo.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT;
 
 	// allocate the buffer
-	REV_VK_CHECK(vmaCreateBuffer(FVkCore::GetAllocator(), &BufferCreateInfo, &AllocInfo, &mBuffer, &mAllocation, &mAllocationInfo));
+	REV_VK_CHECK(vmaCreateBuffer(FVulkanCore::GetAllocator(), &BufferCreateInfo, &AllocInfo, &mBuffer, &mAllocation, &mAllocationInfo));
 }
 
-void FVkBuffer::Release()
+void FVulkanBuffer::Release()
 {
-	vmaDestroyBuffer(FVkCore::GetAllocator(), mBuffer, mAllocation);
+	vmaDestroyBuffer(FVulkanCore::GetAllocator(), mBuffer, mAllocation);
 	mBuffer = VK_NULL_HANDLE;
 	mAllocation = nullptr;
 	mAllocationInfo = {};
 }
 
-FVkStageBuffer::FVkStageBuffer(uint64 Size, VkBufferUsageFlags BufferUsage, VmaMemoryUsage MemoryUsage)
+FVulkanStageBuffer::FVulkanStageBuffer(uint64 Size, VkBufferUsageFlags BufferUsage, VmaMemoryUsage MemoryUsage)
 {
 	Allocate(Size, BufferUsage, MemoryUsage);
 }
 
-FVkStageBuffer::~FVkStageBuffer()
+FVulkanStageBuffer::~FVulkanStageBuffer()
 {
 }
 
-FVkVertexBuffer::FVkVertexBuffer(uint32 InSize, const float* InData)
+FVulkanVertexBuffer::FVulkanVertexBuffer(uint32 InSize, const float* InData)
 	: FRHIVertexBuffer(InSize)
 {
 	VkBufferUsageFlags BufferUsage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT;
@@ -88,17 +88,17 @@ FVkVertexBuffer::FVkVertexBuffer(uint32 InSize, const float* InData)
 	VkBufferDeviceAddressInfo DeviceAddressInfo{};
 	DeviceAddressInfo.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
 	DeviceAddressInfo.buffer = mBuffer;
-	mDeviceAddress = vkGetBufferDeviceAddress(FVkCore::GetDevice(), &DeviceAddressInfo);
+	mDeviceAddress = vkGetBufferDeviceAddress(FVulkanCore::GetDevice(), &DeviceAddressInfo);
 }
 
-FVkVertexBuffer::~FVkVertexBuffer()
+FVulkanVertexBuffer::~FVulkanVertexBuffer()
 {
 }
 
-void FVkVertexBuffer::UpdateSubData(const void* Data, uint32 Size, uint32 Offset)
+void FVulkanVertexBuffer::UpdateSubData(const void* Data, uint32 Size, uint32 Offset)
 {
 	REV_CORE_ASSERT(Size + Offset <= mSize);
-	FVkUtils::ImmediateUploadBuffer(mBuffer, Data, Size, Offset);
+	FVulkanUtils::ImmediateUploadBuffer(mBuffer, Data, Size, Offset);
 }
 
 FVkIndexBuffer::FVkIndexBuffer(uint32 InStride, uint32 InCount, const void* InData)
@@ -115,7 +115,7 @@ FVkIndexBuffer::~FVkIndexBuffer()
 void FVkIndexBuffer::UpdateSubData(const void* Data, uint32 Count, uint32 Offset)
 {
 	REV_CORE_ASSERT(Count + Offset <= mCount);
-	FVkUtils::ImmediateUploadBuffer(mBuffer, Data, Count * mStride, Offset * mStride);
+	FVulkanUtils::ImmediateUploadBuffer(mBuffer, Data, Count * mStride, Offset * mStride);
 }
 
 }

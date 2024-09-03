@@ -78,7 +78,7 @@ void PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& Create
 }
 
 
-void FVkInstance::CreateInstance()
+void FVulkanInstance::CreateInstance()
 {
 #ifdef REV_DEBUG
 	sVkEnableValidationLayers = true;
@@ -119,7 +119,7 @@ void FVkInstance::CreateInstance()
 	REV_VK_CHECK_THROW(vkCreateInstance(&InstanceCreateInfo, nullptr, &mInstance), "[FVkInstance] Failed to create vulkan instance!")
 }
 
-void FVkInstance::CreateSurface()
+void FVulkanInstance::CreateSurface()
 {
 	Window* pWnd = Application::GetApp().GetWindow();
 	REV_CORE_ASSERT(pWnd, "[FVkInstance] Invalid window!");
@@ -148,13 +148,13 @@ void FVkInstance::CreateSurface()
 #endif
 }
 
-void FVkInstance::Cleanup()
+void FVulkanInstance::Cleanup()
 {
 	vkDestroySurfaceKHR(mInstance, mSurface, nullptr);
 	vkDestroyInstance(mInstance, nullptr);
 }
 
-void FVkInstance::CheckExtensionSupport(const std::vector<const char*>& InExtensionNames)
+void FVulkanInstance::CheckExtensionSupport(const std::vector<const char*>& InExtensionNames)
 {
 	uint32 AvailableExtensionCount = 0;
 	vkEnumerateInstanceExtensionProperties(nullptr, &AvailableExtensionCount, nullptr);
@@ -179,7 +179,7 @@ void FVkInstance::CheckExtensionSupport(const std::vector<const char*>& InExtens
 #endif
 }
 
-void FVkInstance::CheckLayerSupport(const std::vector<const char*>& InLayerNames)
+void FVulkanInstance::CheckLayerSupport(const std::vector<const char*>& InLayerNames)
 {
 	uint32 AvailableLayerCount = 0;
 	vkEnumerateInstanceLayerProperties(&AvailableLayerCount, nullptr);
@@ -204,7 +204,7 @@ void FVkInstance::CheckLayerSupport(const std::vector<const char*>& InLayerNames
 #endif
 }
 
-std::vector<const char*> FVkInstance::GetEnabledExtensions()
+std::vector<const char*> FVulkanInstance::GetEnabledExtensions()
 {
 	std::vector<const char*> RequiredExtensions = {};
 
@@ -237,7 +237,7 @@ std::vector<const char*> FVkInstance::GetEnabledExtensions()
 	return RequiredExtensions;
 }
 
-std::vector<const char*> FVkInstance::GetEnabledLayers()
+std::vector<const char*> FVulkanInstance::GetEnabledLayers()
 {
 	std::vector<const char*> RequiredLayers = {};
 

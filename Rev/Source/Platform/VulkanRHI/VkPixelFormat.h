@@ -5,7 +5,7 @@
 namespace Rev
 {
 
-struct FVkFormatInfo
+struct FVulkanFormatInfo
 {
 	VkFormat Format;
 	VkImageAspectFlags AspectFlags;
@@ -16,7 +16,7 @@ struct FVkFormatInfo
 class FVkPixelFormat
 {
 public:
-	static FVkFormatInfo TranslatePixelFormat(EPixelFormat InFormat, bool bSRGB); //packed?
+	static FVulkanFormatInfo TranslatePixelFormat(EPixelFormat InFormat, bool bSRGB); //packed?
 };
 
 }

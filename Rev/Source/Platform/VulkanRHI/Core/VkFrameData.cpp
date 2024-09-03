@@ -8,24 +8,24 @@
 namespace Rev
 {
 
-void InitFrameData(FVkFrameData* Frames, uint32 Count, const FVkDevice* InDevice)
+void InitFrameData(FVulkanFrameData* Frames, uint32 Count, const FVulkanDevice* InDevice)
 {
 	REV_CORE_ASSERT(InDevice);
 	VkDevice Device = InDevice->GetLogicalDevice();
 	uint32 GraphicsFamily = InDevice->GetQueueFamily(VQK_Graphics);
 
-	VkCommandPoolCreateInfo CmdPoolCreateInfo = FVkInit::CmdPoolCreateInfo(GraphicsFamily, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
+	VkCommandPoolCreateInfo CmdPoolCreateInfo = FVulkanInit::CmdPoolCreateInfo(GraphicsFamily, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
 	for (uint32 i = 0; i < Count; i++) {
 
 		REV_VK_CHECK_THROW(vkCreateCommandPool(Device, &CmdPoolCreateInfo, nullptr, &Frames[i].CmdPool), "[FVkFrameData] Failed to create command pool!");
 
 		// allocate the default command buffer that we will use for rendering
-		VkCommandBufferAllocateInfo CmdBufferAllocInfo = FVkInit::CmdBufferAllocateInfo(Frames[i].CmdPool, 1);
+		VkCommandBufferAllocateInfo CmdBufferAllocInfo = FVulkanInit::CmdBufferAllocateInfo(Frames[i].CmdPool, 1);
 		REV_VK_CHECK_THROW(vkAllocateCommandBuffers(Device, &CmdBufferAllocInfo, &Frames[i].MainCmdBuffer), "[FVkFrameData] Failed to allocate main command buffer!");
 	}
 
-	VkFenceCreateInfo FenceCreateInfo = FVkInit::FenceCreateInfo(VK_FENCE_CREATE_SIGNALED_BIT);
-	VkSemaphoreCreateInfo SemaphoreCreateInf = FVkInit::SemaphoreCreateInfo();
+	VkFenceCreateInfo FenceCreateInfo = FVulkanInit::FenceCreateInfo(VK_FENCE_CREATE_SIGNALED_BIT);
+	VkSemaphoreCreateInfo SemaphoreCreateInf = FVulkanInit::SemaphoreCreateInfo();
 
 	for (uint32 i = 0; i < Count; i++) {
 		REV_VK_CHECK_THROW(vkCreateFence(Device, &FenceCreateInfo, nullptr, &Frames[i].Fence), "[FVkFrameData] Failed to create fence!");
@@ -36,7 +36,7 @@ void InitFrameData(FVkFrameData* Frames, uint32 Count, const FVkDevice* InDevice
 
 }
 
-void CleanupFrameData(FVkFrameData* Frames, uint32 Count, const FVkDevice* InDevice)
+void CleanupFrameData(FVulkanFrameData* Frames, uint32 Count, const FVulkanDevice* InDevice)
 {
 	REV_CORE_ASSERT(InDevice);
 	VkDevice Device = InDevice->GetLogicalDevice();

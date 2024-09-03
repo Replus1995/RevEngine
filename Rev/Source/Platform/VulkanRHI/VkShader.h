@@ -7,11 +7,11 @@
 namespace Rev
 {
 
-class FVkShader : public FRHIShader
+class FVulkanShader : public FRHIShader
 {
 public:
-	FVkShader(ERHIShaderStage InStage, const FBuffer& InCompiledData);
-	virtual ~FVkShader();
+	FVulkanShader(ERHIShaderStage InStage, const FBuffer& InCompiledData);
+	virtual ~FVulkanShader();
 	virtual const void* GetNativeHandle() const override { return mModule; }
 
 private:
@@ -21,11 +21,11 @@ private:
 	//VkPipelineShaderStageCreateInfo mStageCreateInfo;
 };
 
-class FVkShaderProgram : public FRHIShaderProgram
+class FVulkanShaderProgram : public FRHIShaderProgram
 {
 public:
-	FVkShaderProgram(const std::string& InName, const FRHIGraphicsShaders& InShaders);
-	virtual ~FVkShaderProgram();
+	FVulkanShaderProgram(const std::string& InName, const FRHIGraphicsShaders& InShaders);
+	virtual ~FVulkanShaderProgram();
 	virtual const void* GetNativeHandle() const override { return &mHandle; }
 
 	virtual uint16 GetUniformLocation(std::string_view name) override;

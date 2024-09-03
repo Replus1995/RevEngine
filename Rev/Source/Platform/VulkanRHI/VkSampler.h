@@ -5,11 +5,11 @@
 namespace Rev
 {
 
-class FVkSampler : public FRHISampler
+class FVulkanSampler : public FRHISampler
 {
 public:
-	FVkSampler(const FSamplerDesc& InDesc);
-	virtual ~FVkSampler();
+	FVulkanSampler(const FSamplerDesc& InDesc);
+	virtual ~FVulkanSampler();
 	virtual const void* GetNativeHandle() const override { return mSampler; }
 
 private:
@@ -24,6 +24,6 @@ private:
 	VkSampler mSampler = VK_NULL_HANDLE;
 };
 
-Ref<FVkSampler> CreateVkSampler(const FSamplerDesc& InSamplerDesc); //create or get from cache
+Ref<FVulkanSampler> CreateVkSampler(const FSamplerDesc& InSamplerDesc); //create or get from cache
 
 }

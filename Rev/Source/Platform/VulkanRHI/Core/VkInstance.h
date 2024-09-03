@@ -6,7 +6,7 @@
 namespace Rev
 {
 
-class FVkInstance
+class FVulkanInstance
 {
 public:
 	void CreateInstance();

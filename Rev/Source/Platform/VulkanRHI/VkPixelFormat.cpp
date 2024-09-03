@@ -7,7 +7,7 @@ namespace Rev
 struct FVkFormatMapping
 {
 	EPixelFormat RevFormat;
-	FVkFormatInfo FormatInfo;
+	FVulkanFormatInfo FormatInfo;
 };
 
 constexpr FVkFormatMapping sVkFormatMappings[] = {
@@ -22,7 +22,7 @@ constexpr FVkFormatMapping sVkFormatMappings[] = {
 };
 
 
-FVkFormatInfo FVkPixelFormat::TranslatePixelFormat(EPixelFormat InFormat, bool bSRGB)
+FVulkanFormatInfo FVkPixelFormat::TranslatePixelFormat(EPixelFormat InFormat, bool bSRGB)
 {
 	REV_CORE_ASSERT(InFormat != EPixelFormat::PF_Unknown);
 	if (!bSRGB)

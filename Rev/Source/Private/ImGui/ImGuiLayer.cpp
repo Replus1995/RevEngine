@@ -150,7 +150,7 @@ static VkDescriptorPool ImGuiLayer_Vulkan_Init()
 {
     REV_CORE_ASSERT(GetRenderAPI() == ERenderAPI::Vulkan);
 
-    FVkContext* pVkContext = static_cast<FVkContext*>(RenderCmd::GetContext());
+    FVulkanContext* pVkContext = static_cast<FVulkanContext*>(RenderCmd::GetContext());
 
     // 1: create descriptor pool for IMGUI
     //  the size of the pool is very oversize, but it's copied from imgui demo itself.
@@ -174,14 +174,14 @@ static VkDescriptorPool ImGuiLayer_Vulkan_Init()
     PoolCreateInfo.pPoolSizes = PoolSizes;
 
     VkDescriptorPool ImguiPool;
-    REV_VK_CHECK(vkCreateDescriptorPool(FVkCore::GetDevice(), &PoolCreateInfo, nullptr, &ImguiPool));
+    REV_VK_CHECK(vkCreateDescriptorPool(FVulkanCore::GetDevice(), &PoolCreateInfo, nullptr, &ImguiPool));
 
     // this initializes imgui for Vulkan
     ImGui_ImplVulkan_InitInfo ImguiInitInfo{};
-    ImguiInitInfo.Instance = FVkCore::GetInstance();
-    ImguiInitInfo.PhysicalDevice = FVkCore::GetPhysicalDevice();
-    ImguiInitInfo.Device = FVkCore::GetDevice();
-    ImguiInitInfo.Queue = FVkCore::GetQueue(VQK_Graphics);
+    ImguiInitInfo.Instance = FVulkanCore::GetInstance();
+    ImguiInitInfo.PhysicalDevice = FVulkanCore::GetPhysicalDevice();
+    ImguiInitInfo.Device = FVulkanCore::GetDevice();
+    ImguiInitInfo.Queue = FVulkanCore::GetQueue(VQK_Graphics);
     ImguiInitInfo.DescriptorPool = ImguiPool;
     ImguiInitInfo.MinImageCount = 3;
     ImguiInitInfo.ImageCount = 3;
@@ -206,19 +206,19 @@ static void ImGuiLayer_Vulkan_Shutdown(VkDescriptorPool ImguiPool)
     REV_CORE_ASSERT(GetRenderAPI() == ERenderAPI::Vulkan);
 
     ImGui_ImplVulkan_Shutdown();
-    vkDestroyDescriptorPool(FVkCore::GetDevice(), ImguiPool, nullptr);
+    vkDestroyDescriptorPool(FVulkanCore::GetDevice(), ImguiPool, nullptr);
 }
 
 static void ImGuiLayer_Vulkan_Draw()
 {
     REV_CORE_ASSERT(GetRenderAPI() == ERenderAPI::Vulkan);
 
-    FVkContext* pVkContext = static_cast<FVkContext*>(RenderCmd::GetContext());
+    FVulkanContext* pVkContext = static_cast<FVulkanContext*>(RenderCmd::GetContext());
     VkCommandBuffer CmdBuffer = pVkContext->GetMainCmdBuffer();
     VkImageView ImageView = pVkContext->GetSwapchainImageView();
     VkExtent2D Extent = pVkContext->GetSwapchain().GetExtent();
 
-    VkRenderingAttachmentInfo ColorAttachment = FVkInit::AttachmentInfo(ImageView, nullptr, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+    VkRenderingAttachmentInfo ColorAttachment = FVulkanInit::AttachmentInfo(ImageView, nullptr, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
     VkRenderingInfo RenderingInfo{};
     RenderingInfo.sType = VK_STRUCTURE_TYPE_RENDERING_INFO;
     RenderingInfo.pNext = nullptr;

@@ -15,11 +15,11 @@
 namespace Rev
 {
 
-class FVkContext : public FRHIContext
+class FVulkanContext : public FRHIContext
 {
 public:
-	FVkContext();
-	virtual ~FVkContext();
+	FVulkanContext();
+	virtual ~FVulkanContext();
 
 	virtual void Init() override;
 	virtual void Cleanup() override;
@@ -56,13 +56,13 @@ public:
 	virtual void Draw(const Ref<FRHIVertexArray>& InVertexArray, EDrawMode InDrawMode) override {};
 
 
-	const FVkInstance& GetInstance() const { return mInstance; }
-	const FVkDevice& GetDevice() const { return mDevice; }
-	const FVkSwapchain& GetSwapchain() const { return mSwapchain; }
+	const FVulkanInstance& GetInstance() const { return mInstance; }
+	const FVulkanDevice& GetDevice() const { return mDevice; }
+	const FVulkanSwapchain& GetSwapchain() const { return mSwapchain; }
 	const VmaAllocator& GetAllocator() const { return mAllocator; }
 
 
-	FVkFrameData& GetFrameData() { return mFrameData[mFrameDataIndex]; }
+	FVulkanFrameData& GetFrameData() { return mFrameData[mFrameDataIndex]; }
 	VkCommandBuffer GetMainCmdBuffer() { return mFrameData[mFrameDataIndex].MainCmdBuffer; }
 	VkImage GetSwapchainImage() { return mSwapchain.GetImages()[mCurSwapchainImageIndex]; }
 	VkImageView GetSwapchainImageView() { return mSwapchain.GetImageViews()[mCurSwapchainImageIndex]; }
@@ -72,9 +72,9 @@ private:
 	void CreateImmediateData();
 
 private:
-	FVkInstance mInstance;
-	FVkDevice mDevice;
-	FVkSwapchain mSwapchain;
+	FVulkanInstance mInstance;
+	FVulkanDevice mDevice;
+	FVulkanSwapchain mSwapchain;
 	VmaAllocator mAllocator = nullptr;
 
 	FDeletorQueue mMainDeletorQueue;
@@ -82,7 +82,7 @@ private:
 	//frame data
 	uint32 mCurSwapchainImageIndex = 0;
 	uint32 mFrameDataIndex = 0;
-	FVkFrameData mFrameData[REV_VK_FRAME_OVERLAP];
+	FVulkanFrameData mFrameData[REV_VK_FRAME_OVERLAP];
 
 	//
 	VkClearColorValue mClearColor;

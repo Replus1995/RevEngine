@@ -90,7 +90,7 @@ static void PopulateQueueCreateInfos(std::vector<VkDeviceQueueCreateInfo>& Queue
 
 }
 
-void FVkDevice::PickPhysicalDevice(const FVkInstance* InInstance)
+void FVulkanDevice::PickPhysicalDevice(const FVulkanInstance* InInstance)
 {
 	REV_CORE_ASSERT(InInstance);
 	VkInstance pInstance = InInstance->GetInstance();
@@ -122,7 +122,7 @@ void FVkDevice::PickPhysicalDevice(const FVkInstance* InInstance)
 	mSwapChainSupport = QuerySwapChainSupport(mPhysicalDevice, pSurface);
 }
 
-void FVkDevice::CreateLogicalDevice(const FVkInstance* InInstance)
+void FVulkanDevice::CreateLogicalDevice(const FVulkanInstance* InInstance)
 {
 	REV_CORE_ASSERT(InInstance);
 	REV_CORE_ASSERT(mPhysicalDevice != VK_NULL_HANDLE);
@@ -132,7 +132,7 @@ void FVkDevice::CreateLogicalDevice(const FVkInstance* InInstance)
 	PopulateQueueCreateInfos(QueueCreateInfos, mQueueFamilies);
 
 	//physical device features
-	FVkPhysicalDeviceFeatures Features;
+	FVulkanPhysicalDeviceFeatures Features;
 
 	//extenisons
 	const std::vector<const char*> EnabledExtensions = GetRequiredExtensions();
@@ -159,12 +159,12 @@ void FVkDevice::CreateLogicalDevice(const FVkInstance* InInstance)
 
 }
 
-void FVkDevice::Cleanup()
+void FVulkanDevice::Cleanup()
 {
 	vkDestroyDevice(mDevice, nullptr);
 }
 
-bool FVkDevice::PhysicalDeviceSuitable(VkPhysicalDevice InDevice, VkSurfaceKHR InSurface)
+bool FVulkanDevice::PhysicalDeviceSuitable(VkPhysicalDevice InDevice, VkSurfaceKHR InSurface)
 {
 	/*VkPhysicalDeviceProperties DeviceProperties;
 	VkPhysicalDeviceFeatures DeviceFeatures;
@@ -181,14 +181,14 @@ bool FVkDevice::PhysicalDeviceSuitable(VkPhysicalDevice InDevice, VkSurfaceKHR I
 
 	bool bSwapChainAdequate = false;
 	if (bExtensionSupported) {
-		FVkDeviceSwapChainSupport SwapChainSupport = QuerySwapChainSupport(InDevice, InSurface);
+		FVulkanDeviceSwapChainSupport SwapChainSupport = QuerySwapChainSupport(InDevice, InSurface);
 		bSwapChainAdequate = !SwapChainSupport.Formats.empty() && !SwapChainSupport.PresentModes.empty();
 	}
 
 	return Indices.IsComplete() && bExtensionSupported && bSwapChainAdequate;
 }
 
-bool FVkDevice::CheckExtensionSupport(VkPhysicalDevice InDevice, const std::vector<const char*>& InExtensionNames)
+bool FVulkanDevice::CheckExtensionSupport(VkPhysicalDevice InDevice, const std::vector<const char*>& InExtensionNames)
 {
 	uint32 AvailableExtensionCount;
 	vkEnumerateDeviceExtensionProperties(InDevice, nullptr, &AvailableExtensionCount, nullptr);
@@ -202,7 +202,7 @@ bool FVkDevice::CheckExtensionSupport(VkPhysicalDevice InDevice, const std::vect
 	return ExtensionnameSet.empty();
 }
 
-const std::vector<const char*>& FVkDevice::GetRequiredExtensions()
+const std::vector<const char*>& FVulkanDevice::GetRequiredExtensions()
 {
 	static std::vector<const char*> RequiredExtensions = {
 		VK_KHR_SWAPCHAIN_EXTENSION_NAME,
@@ -212,9 +212,9 @@ const std::vector<const char*>& FVkDevice::GetRequiredExtensions()
 	return RequiredExtensions;
 }
 
-FVkDeviceSwapChainSupport FVkDevice::QuerySwapChainSupport(VkPhysicalDevice InDevice, VkSurfaceKHR InSurface)
+FVulkanDeviceSwapChainSupport FVulkanDevice::QuerySwapChainSupport(VkPhysicalDevice InDevice, VkSurfaceKHR InSurface)
 {
-	FVkDeviceSwapChainSupport Details;
+	FVulkanDeviceSwapChainSupport Details;
 
 	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(InDevice, InSurface, &Details.Capabilities);
 

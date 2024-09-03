@@ -6,16 +6,16 @@
 namespace Rev
 {
 
-class FVkBuffer
+class FVulkanBuffer
 {
 public:
-    FVkBuffer();
-	FVkBuffer(const FVkBuffer& Other) = delete;
-	FVkBuffer(FVkBuffer&& Other) noexcept;
-	virtual ~FVkBuffer();
+    FVulkanBuffer();
+	FVulkanBuffer(const FVulkanBuffer& Other) = delete;
+	FVulkanBuffer(FVulkanBuffer&& Other) noexcept;
+	virtual ~FVulkanBuffer();
 
-	FVkBuffer& operator=(const FVkBuffer& Other) = delete;
-	FVkBuffer& operator=(FVkBuffer&& Other) noexcept;
+	FVulkanBuffer& operator=(const FVulkanBuffer& Other) = delete;
+	FVulkanBuffer& operator=(FVulkanBuffer&& Other) noexcept;
 
 	VkBuffer GetBuffer() const { return mBuffer; }
 	void* GetMappedData() const { return mAllocationInfo.pMappedData; }
@@ -30,25 +30,25 @@ protected:
     VmaAllocationInfo mAllocationInfo = {};
 };
 
-class FVkStageBuffer : public FVkBuffer
+class FVulkanStageBuffer : public FVulkanBuffer
 {
 public:
-	FVkStageBuffer(uint64 Size, VkBufferUsageFlags BufferUsage, VmaMemoryUsage MemoryUsage);
-	virtual ~FVkStageBuffer();
+	FVulkanStageBuffer(uint64 Size, VkBufferUsageFlags BufferUsage, VmaMemoryUsage MemoryUsage);
+	virtual ~FVulkanStageBuffer();
 };
 
-class FVkVertexBuffer : public FRHIVertexBuffer, FVkBuffer
+class FVulkanVertexBuffer : public FRHIVertexBuffer, FVulkanBuffer
 {
 public:
-	FVkVertexBuffer(uint32 InSize, const float* InData = nullptr);
-	virtual ~FVkVertexBuffer();
+	FVulkanVertexBuffer(uint32 InSize, const float* InData = nullptr);
+	virtual ~FVulkanVertexBuffer();
 	virtual const void* GetNativeHandle() const override { return mBuffer; }
 	virtual void UpdateSubData(const void* Data, uint32 Size, uint32 Offset) override;
 private:
 	VkDeviceAddress mDeviceAddress = 0;
 };
 
-class FVkIndexBuffer : public FRHIIndexBuffer, FVkBuffer
+class FVkIndexBuffer : public FRHIIndexBuffer, FVulkanBuffer
 {
 public:
 	FVkIndexBuffer(uint32 InStride, uint32 InCount, const void* InData = nullptr);
@@ -76,11 +76,11 @@ public:
 //	Ref<FRHIIndexBuffer> mIndexBuffer;
 //};
 
-class FVkUniformBuffer : public FRHIUniformBuffer
+class FVulkanUniformBuffer : public FRHIUniformBuffer
 {
 public:
-	FVkUniformBuffer(uint32 InSize);
-	virtual ~FVkUniformBuffer();
+	FVulkanUniformBuffer(uint32 InSize);
+	virtual ~FVulkanUniformBuffer();
 	virtual const void* GetNativeHandle() const override { return &mHandle; }
 	virtual void UpdateSubData(const void* data, uint32 size, uint32 offset = 0) override;
 private:

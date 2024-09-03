@@ -5,7 +5,7 @@
 namespace Rev
 {
 
-FVkShader::FVkShader(ERHIShaderStage InStage, const FBuffer& InCompiledData)
+FVulkanShader::FVulkanShader(ERHIShaderStage InStage, const FBuffer& InCompiledData)
 	: FRHIShader(InStage)
 {
 	VkShaderModuleCreateInfo ShaderModuleCreateInfo{};
@@ -13,15 +13,15 @@ FVkShader::FVkShader(ERHIShaderStage InStage, const FBuffer& InCompiledData)
 	ShaderModuleCreateInfo.codeSize = InCompiledData.Size();
 	ShaderModuleCreateInfo.pCode = InCompiledData.DataAs<uint32_t>();
 
-	REV_VK_CHECK_THROW(vkCreateShaderModule(FVkCore::GetDevice(), &ShaderModuleCreateInfo, nullptr, &mModule), "[FVkShader] Failed to create shader module!");
+	REV_VK_CHECK_THROW(vkCreateShaderModule(FVulkanCore::GetDevice(), &ShaderModuleCreateInfo, nullptr, &mModule), "[FVkShader] Failed to create shader module!");
 }
 
-FVkShader::~FVkShader()
+FVulkanShader::~FVulkanShader()
 {
-	vkDestroyShaderModule(FVkCore::GetDevice(), mModule, nullptr);
+	vkDestroyShaderModule(FVulkanCore::GetDevice(), mModule, nullptr);
 }
 
-VkShaderStageFlagBits FVkShader::TranslateShaderStage(ERHIShaderStage InStage)
+VkShaderStageFlagBits FVulkanShader::TranslateShaderStage(ERHIShaderStage InStage)
 {
 	switch (InStage)
 	{

@@ -14,7 +14,7 @@
 
 namespace Rev
 {
-FVkContext::FVkContext()
+FVulkanContext::FVulkanContext()
 {
 	for (size_t i = 0; i < 4; i++)
 	{
@@ -26,11 +26,11 @@ FVkContext::FVkContext()
 	mClearDepthStencil.stencil = 0;
 }
 
-FVkContext::~FVkContext()
+FVulkanContext::~FVulkanContext()
 {
 }
 
-void FVkContext::Init()
+void FVulkanContext::Init()
 {
 	mInstance.CreateInstance();
 	mInstance.CreateSurface();
@@ -44,7 +44,7 @@ void FVkContext::Init()
 	CreateImmediateData();
 }
 
-void FVkContext::Cleanup()
+void FVulkanContext::Cleanup()
 {
 	vkDeviceWaitIdle(mDevice.GetLogicalDevice());
 	
@@ -58,12 +58,12 @@ void FVkContext::Cleanup()
 	mInstance.Cleanup();
 }
 
-void FVkContext::Flush()
+void FVulkanContext::Flush()
 {
 	vkDeviceWaitIdle(mDevice.GetLogicalDevice());
 }
 
-void FVkContext::BeginFrame(bool bClearBackBuffer)
+void FVulkanContext::BeginFrame(bool bClearBackBuffer)
 {
 	constexpr uint64 kWaitTime = 1000000000;
 	auto& FrameData = GetFrameData();
@@ -78,23 +78,23 @@ void FVkContext::BeginFrame(bool bClearBackBuffer)
 
 	VkCommandBuffer CmdBuffer = FrameData.MainCmdBuffer;
 	REV_VK_CHECK(vkResetCommandBuffer(CmdBuffer, 0));
-	VkCommandBufferBeginInfo CmdBufferBeginInfo = FVkInit::CmdBufferBeginInfo(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+	VkCommandBufferBeginInfo CmdBufferBeginInfo = FVulkanInit::CmdBufferBeginInfo(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 	REV_VK_CHECK(vkBeginCommandBuffer(CmdBuffer, &CmdBufferBeginInfo));
 
 	if (bClearBackBuffer)
 	{
-		FVkUtils::TransitionImage(CmdBuffer, GetSwapchainImage(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL);
+		FVulkanUtils::TransitionImage(CmdBuffer, GetSwapchainImage(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL);
 		ClearBackBuffer();
-		FVkUtils::TransitionImage(CmdBuffer, GetSwapchainImage(), VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+		FVulkanUtils::TransitionImage(CmdBuffer, GetSwapchainImage(), VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 	}
 	else
 	{
-		FVkUtils::TransitionImage(CmdBuffer, GetSwapchainImage(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+		FVulkanUtils::TransitionImage(CmdBuffer, GetSwapchainImage(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 	}
 	
 }
 
-void FVkContext::EndFrame()
+void FVulkanContext::EndFrame()
 {
 	//end cmd buffer
 	auto& FrameData = GetFrameData();
@@ -106,23 +106,23 @@ void FVkContext::EndFrame()
 	FVkUtils::BlitImage(CmdBuffer, mSwapchain.GetBackImage().Image, mSwapchain.GetImages()[mCurSwapchainImageIndex], mDrawExtent, mSwapchain.GetExtent());
 	FVkUtils::TransitionImage(CmdBuffer, mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);*/
 
-	FVkUtils::TransitionImage(CmdBuffer, mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+	FVulkanUtils::TransitionImage(CmdBuffer, mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 
 	REV_VK_CHECK(vkEndCommandBuffer(CmdBuffer));
 
 	//submit
-	VkCommandBufferSubmitInfo CmdBufferInfo = FVkInit::CmdBufferSubmitInfo(CmdBuffer);
-	VkSemaphoreSubmitInfo WaitSemaphoreInfo = FVkInit::SemaphoreSubmitInfo(VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT_KHR, FrameData.SwapchainSemaphore);
-	VkSemaphoreSubmitInfo SignalSemaphoreInfo = FVkInit::SemaphoreSubmitInfo(VK_PIPELINE_STAGE_2_ALL_GRAPHICS_BIT, FrameData.RenderSemaphore);
+	VkCommandBufferSubmitInfo CmdBufferInfo = FVulkanInit::CmdBufferSubmitInfo(CmdBuffer);
+	VkSemaphoreSubmitInfo WaitSemaphoreInfo = FVulkanInit::SemaphoreSubmitInfo(VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT_KHR, FrameData.SwapchainSemaphore);
+	VkSemaphoreSubmitInfo SignalSemaphoreInfo = FVulkanInit::SemaphoreSubmitInfo(VK_PIPELINE_STAGE_2_ALL_GRAPHICS_BIT, FrameData.RenderSemaphore);
 
-	VkSubmitInfo2 SubmitInfo = FVkInit::SubmitInfo(&CmdBufferInfo, &SignalSemaphoreInfo, &WaitSemaphoreInfo);
+	VkSubmitInfo2 SubmitInfo = FVulkanInit::SubmitInfo(&CmdBufferInfo, &SignalSemaphoreInfo, &WaitSemaphoreInfo);
 
 	//submit command buffer to the queue and execute it.
 	//Fence will now block until the graphic commands finish execution
 	REV_VK_CHECK(vkQueueSubmit2(mDevice.GetQueue(VQK_Graphics), 1, &SubmitInfo, FrameData.Fence));
 }
 
-void FVkContext::PresentFrame()
+void FVulkanContext::PresentFrame()
 {
 	auto& FrameData = GetFrameData();
 
@@ -153,19 +153,19 @@ void FVkContext::PresentFrame()
 
 }
 
-void FVkContext::ImmediateSubmit(std::function<void(VkCommandBuffer)>&& Func)
+void FVulkanContext::ImmediateSubmit(std::function<void(VkCommandBuffer)>&& Func)
 {
 	REV_VK_CHECK(vkResetFences(mDevice.GetLogicalDevice(), 1, &mImmFence));
 	REV_VK_CHECK(vkResetCommandBuffer(mImmCmdBuffer, 0));
 
-	VkCommandBufferBeginInfo BeginInfo = FVkInit::CmdBufferBeginInfo(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+	VkCommandBufferBeginInfo BeginInfo = FVulkanInit::CmdBufferBeginInfo(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 	REV_VK_CHECK(vkBeginCommandBuffer(mImmCmdBuffer, &BeginInfo));
 
 	Func(mImmCmdBuffer);
 
 	REV_VK_CHECK(vkEndCommandBuffer(mImmCmdBuffer));
-	VkCommandBufferSubmitInfo CmdBufferSubmitInfo = FVkInit::CmdBufferSubmitInfo(mImmCmdBuffer);
-	VkSubmitInfo2 SubmitInfo = FVkInit::SubmitInfo(&CmdBufferSubmitInfo, nullptr, nullptr);
+	VkCommandBufferSubmitInfo CmdBufferSubmitInfo = FVulkanInit::CmdBufferSubmitInfo(mImmCmdBuffer);
+	VkSubmitInfo2 SubmitInfo = FVulkanInit::SubmitInfo(&CmdBufferSubmitInfo, nullptr, nullptr);
 
 	// submit command buffer to the queue and execute it.
 	//  _renderFence will now block until the graphic commands finish execution
@@ -173,7 +173,7 @@ void FVkContext::ImmediateSubmit(std::function<void(VkCommandBuffer)>&& Func)
 	REV_VK_CHECK(vkWaitForFences(mDevice.GetLogicalDevice(), 1, &mImmFence, true, 9999999999));
 }
 
-void FVkContext::SetViewport(uint32 InX, uint32 InY, uint32 InWidth, uint32 InHeight)
+void FVulkanContext::SetViewport(uint32 InX, uint32 InY, uint32 InWidth, uint32 InHeight)
 {
 	VkViewport Viewport{};
 	Viewport.x = InX;
@@ -185,7 +185,7 @@ void FVkContext::SetViewport(uint32 InX, uint32 InY, uint32 InWidth, uint32 InHe
 	vkCmdSetViewport(GetMainCmdBuffer(), 0, 1, &Viewport);
 }
 
-void FVkContext::SetClearColor(const Math::FLinearColor& InColor)
+void FVulkanContext::SetClearColor(const Math::FLinearColor& InColor)
 {
 	for (size_t i = 0; i < 4; i++)
 	{
@@ -193,22 +193,22 @@ void FVkContext::SetClearColor(const Math::FLinearColor& InColor)
 	}
 }
 
-void FVkContext::SetClearDepthStencil(float InDepth, uint32 InStencil)
+void FVulkanContext::SetClearDepthStencil(float InDepth, uint32 InStencil)
 {
 	mClearDepthStencil.depth = InDepth;
 	mClearDepthStencil.stencil = InStencil;
 }
 
-void FVkContext::ClearBackBuffer()
+void FVulkanContext::ClearBackBuffer()
 {
-	VkImageSubresourceRange ColorImageRange = FVkInit::ImageSubresourceRange(VK_IMAGE_ASPECT_COLOR_BIT);
+	VkImageSubresourceRange ColorImageRange = FVulkanInit::ImageSubresourceRange(VK_IMAGE_ASPECT_COLOR_BIT);
 	vkCmdClearColorImage(GetMainCmdBuffer(), GetSwapchainImage(), VK_IMAGE_LAYOUT_GENERAL, &mClearColor, 1, &ColorImageRange);
 	/*VkImageSubresourceRange DepthImageRange = FVkInit::ImageSubresourceRange(VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT);
 	vkCmdClearDepthStencilImage(CmdBuffer, mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_GENERAL, &mClearDepthStencil, 1, &DepthImageRange);*/
 }
 
 
-void FVkContext::CreateAllocator()
+void FVulkanContext::CreateAllocator()
 {
 	VmaAllocatorCreateInfo AllocatorCreateInfo = {};
 	AllocatorCreateInfo.physicalDevice = mDevice.GetPhysicalDevice();
@@ -218,20 +218,20 @@ void FVkContext::CreateAllocator()
 	vmaCreateAllocator(&AllocatorCreateInfo, &mAllocator);
 }
 
-void FVkContext::CreateImmediateData()
+void FVulkanContext::CreateImmediateData()
 {
-	VkCommandPoolCreateInfo CmdPoolCreateInfo = FVkInit::CmdPoolCreateInfo(mDevice.GetQueueFamily(VQK_Graphics), VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
+	VkCommandPoolCreateInfo CmdPoolCreateInfo = FVulkanInit::CmdPoolCreateInfo(mDevice.GetQueueFamily(VQK_Graphics), VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
 	REV_VK_CHECK(vkCreateCommandPool(mDevice.GetLogicalDevice(), &CmdPoolCreateInfo, nullptr, &mImmCmdPool));
 
 	// allocate the command buffer for immediate submits
-	VkCommandBufferAllocateInfo cmdAllocInfo = FVkInit::CmdBufferAllocateInfo(mImmCmdPool, 1);
+	VkCommandBufferAllocateInfo cmdAllocInfo = FVulkanInit::CmdBufferAllocateInfo(mImmCmdPool, 1);
 	REV_VK_CHECK(vkAllocateCommandBuffers(mDevice.GetLogicalDevice(), &cmdAllocInfo, &mImmCmdBuffer));
 
 	mMainDeletorQueue.Add(FDeletor{ [=]() {
 		vkDestroyCommandPool(mDevice.GetLogicalDevice(), mImmCmdPool, nullptr);
 	} });
 
-	VkFenceCreateInfo FenceCreateInfo = FVkInit::FenceCreateInfo(VK_FENCE_CREATE_SIGNALED_BIT);
+	VkFenceCreateInfo FenceCreateInfo = FVulkanInit::FenceCreateInfo(VK_FENCE_CREATE_SIGNALED_BIT);
 	REV_VK_CHECK(vkCreateFence(mDevice.GetLogicalDevice(), &FenceCreateInfo, nullptr, &mImmFence));
 	mMainDeletorQueue.Add(FDeletor{ [=]() { 
 		vkDestroyFence(mDevice.GetLogicalDevice(), mImmFence, nullptr); 

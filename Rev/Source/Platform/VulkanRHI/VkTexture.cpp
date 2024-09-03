@@ -9,34 +9,34 @@
 namespace Rev
 {
 
-const FRHISampler* FVkTexture::GetSampler() const
+const FRHISampler* FVulkanTexture::GetSampler() const
 {
 	return mSampler.get();
 }
 
-void FVkTexture::ClearMipData(uint8 InMipLevel)
+void FVulkanTexture::ClearMipData(uint8 InMipLevel)
 {
 	REV_CORE_ASSERT(InMipLevel < mDesc.NumMips, "MipLevel out of range");
-	FVkUtils::ImmediateClearImage(mImage, mFormatInfo.AspectFlags, GetClearValue(), InMipLevel, 1, 0, 0);
+	FVulkanUtils::ImmediateClearImage(mImage, mFormatInfo.AspectFlags, GetClearValue(), InMipLevel, 1, 0, 0);
 }
 
-void FVkTexture::Transition(VkImageLayout DstLayout, VkCommandBuffer InCmdBuffer)
+void FVulkanTexture::Transition(VkImageLayout DstLayout, VkCommandBuffer InCmdBuffer)
 {
-	VkCommandBuffer CmdBuffer = InCmdBuffer ? InCmdBuffer : FVkCore::GetMainCmdBuffer();
+	VkCommandBuffer CmdBuffer = InCmdBuffer ? InCmdBuffer : FVulkanCore::GetMainCmdBuffer();
 	REV_CORE_ASSERT(CmdBuffer);
-	FVkUtils::TransitionImage(CmdBuffer, mImage, mImageLayout, DstLayout);
+	FVulkanUtils::TransitionImage(CmdBuffer, mImage, mImageLayout, DstLayout);
 	mImageLayout = DstLayout;
 }
 
-void FVkTexture::Transition(VkImageLayout SrcLayout, VkImageLayout DstLayout, VkCommandBuffer InCmdBuffer)
+void FVulkanTexture::Transition(VkImageLayout SrcLayout, VkImageLayout DstLayout, VkCommandBuffer InCmdBuffer)
 {
-	VkCommandBuffer CmdBuffer = InCmdBuffer ? InCmdBuffer : FVkCore::GetMainCmdBuffer();
+	VkCommandBuffer CmdBuffer = InCmdBuffer ? InCmdBuffer : FVulkanCore::GetMainCmdBuffer();
     REV_CORE_ASSERT(CmdBuffer);
-    FVkUtils::TransitionImage(CmdBuffer, mImage, SrcLayout, DstLayout);
+    FVulkanUtils::TransitionImage(CmdBuffer, mImage, SrcLayout, DstLayout);
     mImageLayout = DstLayout;
 }
 
-FVkTexture::FVkTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc)
+FVulkanTexture::FVulkanTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc)
     : FRHITexture(InDesc)
     , mFormatInfo(FVkPixelFormat::TranslatePixelFormat(InDesc.Format, InDesc.bSRGB))
 {
@@ -44,22 +44,22 @@ FVkTexture::FVkTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSampler
 	mSampler = CreateVkSampler(InSamplerDesc);
 }
 
-VkExtent3D FVkTexture::GetExtent()
+VkExtent3D FVulkanTexture::GetExtent()
 {
     return { mDesc.Width, mDesc.Height, mDesc.Depth };
 }
 
-VkExtent2D FVkTexture::CalculateMipSize2D(uint32 InMipLevel)
+VkExtent2D FVulkanTexture::CalculateMipSize2D(uint32 InMipLevel)
 {
     return { std::max<uint32>(1, GetWidth() >> InMipLevel), std::max<uint32>(1, GetHeight() >> InMipLevel) };
 }
 
-VkExtent3D FVkTexture::CalculateMipSize3D(uint32 InMipLevel)
+VkExtent3D FVulkanTexture::CalculateMipSize3D(uint32 InMipLevel)
 {
     return { std::max<uint32>(1, GetWidth() >> InMipLevel), std::max<uint32>(1, GetHeight() >> InMipLevel), std::max<uint32>(1, GetDepth() >> InMipLevel) };
 }
 
-VkClearValue FVkTexture::GetClearValue()
+VkClearValue FVulkanTexture::GetClearValue()
 {
 	bool bColorImage = mFormatInfo.AspectFlags & VK_IMAGE_ASPECT_COLOR_BIT;
 	VkClearValue ClearValue;
@@ -95,12 +95,12 @@ VkClearValue FVkTexture::GetClearValue()
 	return ClearValue;
 }
 
-Ref<FVkTexture> CreateVkTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc)
+Ref<FVulkanTexture> CreateVkTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc)
 {
 	switch (InDesc.Dimension)
 	{
 	case ETextureDimension::Texture2D:
-		return CreateRef<FVkTexture2D>(InDesc, InSamplerDesc);
+		return CreateRef<FVulkanTexture2D>(InDesc, InSamplerDesc);
 	case ETextureDimension::Texture2DArray:
 		//return CreateRef<FOpenGLTexture2DArray>(InDesc, InSamplerDesc);
 	case ETextureDimension::TextureCube:

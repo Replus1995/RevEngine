@@ -18,7 +18,7 @@ namespace Rev
 		case Rev::ERenderAPI::OpenGL:
 			return CreateScope<FOpenGLContext>();
 		case Rev::ERenderAPI::Vulkan:
-			return CreateScope<FVkContext>();
+			return CreateScope<FVulkanContext>();
 		}
 
 		REV_CORE_ASSERT(false, "Unknown RenderAPI!");

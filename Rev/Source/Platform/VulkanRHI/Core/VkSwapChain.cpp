@@ -13,13 +13,13 @@
 namespace Rev
 {
 
-void FVkSwapchain::CreateSwapchain(const FVkInstance* Instance, const FVkDevice* InDevice, VmaAllocator InAllocator)
+void FVulkanSwapchain::CreateSwapchain(const FVulkanInstance* Instance, const FVulkanDevice* InDevice, VmaAllocator InAllocator)
 {
     REV_CORE_ASSERT(Instance);
     REV_CORE_ASSERT(InDevice);
     REV_CORE_ASSERT(InAllocator);
 
-    const FVkDeviceSwapChainSupport& SwapChainSupport = InDevice->GetSwapChainSupport();
+    const FVulkanDeviceSwapChainSupport& SwapChainSupport = InDevice->GetSwapChainSupport();
 
     VkSurfaceFormatKHR SurfaceFormat = ChooseSurfaceFormat(SwapChainSupport.Formats);
     VkPresentModeKHR PresentMode = ChoosePresentMode(SwapChainSupport.PresentModes);
@@ -76,7 +76,7 @@ void FVkSwapchain::CreateSwapchain(const FVkInstance* Instance, const FVkDevice*
     CreateBackImage(InDevice, InAllocator);
 }
 
-void FVkSwapchain::Cleanup(const FVkDevice* InDevice, VmaAllocator InAllocator)
+void FVulkanSwapchain::Cleanup(const FVulkanDevice* InDevice, VmaAllocator InAllocator)
 {
     REV_CORE_ASSERT(InDevice);
     REV_CORE_ASSERT(InAllocator);
@@ -92,7 +92,7 @@ void FVkSwapchain::Cleanup(const FVkDevice* InDevice, VmaAllocator InAllocator)
     vkDestroySwapchainKHR(InDevice->GetLogicalDevice(), mSwapchain, nullptr);
 }
 
-VkSurfaceFormatKHR FVkSwapchain::ChooseSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& InAvailableFormats)
+VkSurfaceFormatKHR FVulkanSwapchain::ChooseSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& InAvailableFormats)
 {
     for (const auto& AvailableFormat : InAvailableFormats) {
         if (AvailableFormat.format == VK_FORMAT_R8G8B8A8_UNORM && AvailableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
@@ -102,7 +102,7 @@ VkSurfaceFormatKHR FVkSwapchain::ChooseSurfaceFormat(const std::vector<VkSurface
     return InAvailableFormats[0];
 }
 
-VkPresentModeKHR FVkSwapchain::ChoosePresentMode(const std::vector<VkPresentModeKHR>& InAvailablePresentModes)
+VkPresentModeKHR FVulkanSwapchain::ChoosePresentMode(const std::vector<VkPresentModeKHR>& InAvailablePresentModes)
 {
     for (const auto& AvailablePresentMode : InAvailablePresentModes) {
         if (AvailablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
@@ -112,7 +112,7 @@ VkPresentModeKHR FVkSwapchain::ChoosePresentMode(const std::vector<VkPresentMode
     return VK_PRESENT_MODE_FIFO_KHR;
 }
 
-VkExtent2D FVkSwapchain::ChooseExtent(const VkSurfaceCapabilitiesKHR& InCapabilities)
+VkExtent2D FVulkanSwapchain::ChooseExtent(const VkSurfaceCapabilitiesKHR& InCapabilities)
 {
     if (InCapabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
         return InCapabilities.currentExtent;
@@ -136,7 +136,7 @@ VkExtent2D FVkSwapchain::ChooseExtent(const VkSurfaceCapabilitiesKHR& InCapabili
     }
 }
 
-void FVkSwapchain::CreateImageViews(const FVkDevice* InDevice)
+void FVulkanSwapchain::CreateImageViews(const FVulkanDevice* InDevice)
 {
     REV_CORE_ASSERT(InDevice);
 
@@ -162,7 +162,7 @@ void FVkSwapchain::CreateImageViews(const FVkDevice* InDevice)
     }
 }
 
-void FVkSwapchain::CreateBackImage(const FVkDevice* InDevice, VmaAllocator InAllocator)
+void FVulkanSwapchain::CreateBackImage(const FVulkanDevice* InDevice, VmaAllocator InAllocator)
 {
     REV_CORE_ASSERT(InDevice);
     REV_CORE_ASSERT(InAllocator);
@@ -183,7 +183,7 @@ void FVkSwapchain::CreateBackImage(const FVkDevice* InDevice, VmaAllocator InAll
     BackImageUsages |= VK_IMAGE_USAGE_STORAGE_BIT;
     BackImageUsages |= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-    VkImageCreateInfo ImageCreateInfo = FVkInit::ImageCreateInfo2D(mBackImage.Format, BackImageUsages, BackImageExtent);
+    VkImageCreateInfo ImageCreateInfo = FVulkanInit::ImageCreateInfo2D(mBackImage.Format, BackImageUsages, BackImageExtent);
 
     //for the draw image, we want to allocate it from gpu local memory
     VmaAllocationCreateInfo ImageAllocinfo = {};
@@ -194,7 +194,7 @@ void FVkSwapchain::CreateBackImage(const FVkDevice* InDevice, VmaAllocator InAll
     vmaCreateImage(InAllocator, &ImageCreateInfo, &ImageAllocinfo, &mBackImage.Image, &mBackImage.Allocation, nullptr);
 
     //build a image-view for the draw image to use for rendering
-    VkImageViewCreateInfo ImageViewCreateInfo = FVkInit::ImageViewCreateInfo2D(mBackImage.Format, mBackImage.Image, VK_IMAGE_ASPECT_COLOR_BIT);
+    VkImageViewCreateInfo ImageViewCreateInfo = FVulkanInit::ImageViewCreateInfo2D(mBackImage.Format, mBackImage.Image, VK_IMAGE_ASPECT_COLOR_BIT);
 
     REV_VK_CHECK(vkCreateImageView(InDevice->GetLogicalDevice(), &ImageViewCreateInfo, nullptr, &mBackImage.ImageView));
 

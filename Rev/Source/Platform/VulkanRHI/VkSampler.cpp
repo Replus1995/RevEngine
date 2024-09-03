@@ -5,18 +5,18 @@
 namespace Rev
 {
 
-FVkSampler::FVkSampler(const FSamplerDesc& InDesc)
+FVulkanSampler::FVulkanSampler(const FSamplerDesc& InDesc)
 	: FRHISampler(InDesc)
 {
 	CreateResource();
 }
 
-FVkSampler::~FVkSampler()
+FVulkanSampler::~FVulkanSampler()
 {
-	vkDestroySampler(FVkCore::GetDevice(), mSampler, nullptr);
+	vkDestroySampler(FVulkanCore::GetDevice(), mSampler, nullptr);
 }
 
-VkFilter FVkSampler::TranslateFilterMode(ESamplerFilterMode InMode)
+VkFilter FVulkanSampler::TranslateFilterMode(ESamplerFilterMode InMode)
 {
 	switch (InMode)
 	{
@@ -32,7 +32,7 @@ VkFilter FVkSampler::TranslateFilterMode(ESamplerFilterMode InMode)
 	return VkFilter(0);
 }
 
-VkSamplerMipmapMode FVkSampler::TranslateMipmapMode(ESamplerFilterMode InMode)
+VkSamplerMipmapMode FVulkanSampler::TranslateMipmapMode(ESamplerFilterMode InMode)
 {
 	switch (InMode)
 	{
@@ -51,7 +51,7 @@ VkSamplerMipmapMode FVkSampler::TranslateMipmapMode(ESamplerFilterMode InMode)
 	return VkSamplerMipmapMode(0);
 }
 
-VkSamplerAddressMode FVkSampler::TranslateWarpMode(ESamplerWarpMode InMode)
+VkSamplerAddressMode FVulkanSampler::TranslateWarpMode(ESamplerWarpMode InMode)
 {
 	switch (InMode)
 	{
@@ -70,17 +70,17 @@ VkSamplerAddressMode FVkSampler::TranslateWarpMode(ESamplerWarpMode InMode)
 	return VK_SAMPLER_ADDRESS_MODE_REPEAT;
 }
 
-bool FVkSampler::UseAnisotropicFilter(const FSamplerDesc& InDesc)
+bool FVulkanSampler::UseAnisotropicFilter(const FSamplerDesc& InDesc)
 {
 	return InDesc.Filter >= SF_AnisotropicNearest;
 }
 
-bool FVkSampler::UseBorderWarp(const FSamplerDesc& InDesc)
+bool FVulkanSampler::UseBorderWarp(const FSamplerDesc& InDesc)
 {
 	return InDesc.WarpU == SW_Border || InDesc.WarpV == SW_Border || InDesc.WarpW == SW_Border;
 }
 
-void FVkSampler::CreateResource()
+void FVulkanSampler::CreateResource()
 {
 	VkSamplerCreateInfo CreateInfo{};
 	CreateInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -100,12 +100,12 @@ void FVkSampler::CreateResource()
 	//CreateInfo.borderColor
 	//CreateInfo.unnormalizedCoordinates
 
-	REV_VK_CHECK(vkCreateSampler(FVkCore::GetDevice(), &CreateInfo, nullptr, &mSampler));
+	REV_VK_CHECK(vkCreateSampler(FVulkanCore::GetDevice(), &CreateInfo, nullptr, &mSampler));
 }
 
-Ref<FVkSampler> CreateVkSampler(const FSamplerDesc& InSamplerDesc)
+Ref<FVulkanSampler> CreateVkSampler(const FSamplerDesc& InSamplerDesc)
 {
-	return CreateRef<FVkSampler>(InSamplerDesc);
+	return CreateRef<FVulkanSampler>(InSamplerDesc);
 }
 
 }

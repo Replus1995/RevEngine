@@ -6,23 +6,23 @@
 namespace Rev
 {
 
-FVkTexture2D::FVkTexture2D(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc)
-	: FVkTexture(InDesc, InSamplerDesc)
+FVulkanTexture2D::FVulkanTexture2D(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc)
+	: FVulkanTexture(InDesc, InSamplerDesc)
 {
 	REV_CORE_ASSERT(InDesc.Dimension == ETextureDimension::Texture2D);
 	CreateResource();
 }
 
-FVkTexture2D::~FVkTexture2D()
+FVulkanTexture2D::~FVulkanTexture2D()
 {
-    REV_CORE_ASSERT(FVkCore::GetDevice());
-    REV_CORE_ASSERT(FVkCore::GetAllocator());
+    REV_CORE_ASSERT(FVulkanCore::GetDevice());
+    REV_CORE_ASSERT(FVulkanCore::GetAllocator());
 
-    vkDestroyImageView(FVkCore::GetDevice(), mImageView, nullptr);
-    vmaDestroyImage(FVkCore::GetAllocator(), mImage, mAllocation);
+    vkDestroyImageView(FVulkanCore::GetDevice(), mImageView, nullptr);
+    vmaDestroyImage(FVulkanCore::GetAllocator(), mImage, mAllocation);
 }
 
-void FVkTexture2D::UpdateLayerData(const void* InData, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex, int32 InDepth)
+void FVulkanTexture2D::UpdateLayerData(const void* InData, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex, int32 InDepth)
 {
     if (mDesc.NumSamples != 1)
     {
@@ -36,22 +36,22 @@ void FVkTexture2D::UpdateLayerData(const void* InData, uint32 InSize, uint8 InMi
     VkExtent2D MipSize = CalculateMipSize2D(InMipLevel);
     REV_CORE_ASSERT(InSize == MipSize.width * MipSize.height * mFormatInfo.Channels * mFormatInfo.PixelDepth, "Data size mismatch");
 
-    FVkUtils::ImmediateUploadImage(mImage, mFormatInfo.AspectFlags, { MipSize.width, MipSize.height, 1 }, InData, InSize, InMipLevel, 0, 0);
+    FVulkanUtils::ImmediateUploadImage(mImage, mFormatInfo.AspectFlags, { MipSize.width, MipSize.height, 1 }, InData, InSize, InMipLevel, 0, 0);
 }
 
-void FVkTexture2D::ClearLayerData(uint8 InMipLevel, uint16 InArrayIndex, int32 InDepth)
+void FVulkanTexture2D::ClearLayerData(uint8 InMipLevel, uint16 InArrayIndex, int32 InDepth)
 {
     REV_CORE_ASSERT(InDepth <= 0, "Depth must be 0(-1) for 2d texture");
     REV_CORE_ASSERT(InArrayIndex == 0, "ArrayIndex must be 0 for 2d texture");
     REV_CORE_ASSERT(InMipLevel < mDesc.NumMips, "MipLevel out of range");
 
-    FVkUtils::ImmediateClearImage(mImage, mFormatInfo.AspectFlags, GetClearValue(), InMipLevel, 1, 0, 0);
+    FVulkanUtils::ImmediateClearImage(mImage, mFormatInfo.AspectFlags, GetClearValue(), InMipLevel, 1, 0, 0);
 }
 
-void FVkTexture2D::CreateResource()
+void FVulkanTexture2D::CreateResource()
 {
-    REV_CORE_ASSERT(FVkCore::GetDevice());
-    REV_CORE_ASSERT(FVkCore::GetAllocator());
+    REV_CORE_ASSERT(FVulkanCore::GetDevice());
+    REV_CORE_ASSERT(FVulkanCore::GetAllocator());
 
     VkImageCreateInfo ImageCreateInfo{};
     ImageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -73,7 +73,7 @@ void FVkTexture2D::CreateResource()
     ImageAllocinfo.requiredFlags = VkMemoryPropertyFlags(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
     //allocate and create the image
-    vmaCreateImage(FVkCore::GetAllocator(), &ImageCreateInfo, &ImageAllocinfo, &mImage, &mAllocation, nullptr);
+    vmaCreateImage(FVulkanCore::GetAllocator(), &ImageCreateInfo, &ImageAllocinfo, &mImage, &mAllocation, nullptr);
 
     //build a image-view for the draw image to use for rendering
     VkImageViewCreateInfo ImageViewCreateInfo{}; // = FVkInit::ImageViewCreateInfo2D(mFormatInfo.Format, mImage, VK_IMAGE_ASPECT_COLOR_BIT);
@@ -87,7 +87,7 @@ void FVkTexture2D::CreateResource()
     ImageViewCreateInfo.subresourceRange.layerCount = 1;
     ImageViewCreateInfo.subresourceRange.aspectMask = mFormatInfo.AspectFlags;
 
-    REV_VK_CHECK(vkCreateImageView(FVkCore::GetDevice(), &ImageViewCreateInfo, nullptr, &mImageView));
+    REV_VK_CHECK(vkCreateImageView(FVulkanCore::GetDevice(), &ImageViewCreateInfo, nullptr, &mImageView));
 }
 
 }

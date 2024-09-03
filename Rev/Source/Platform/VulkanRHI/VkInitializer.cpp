@@ -3,7 +3,7 @@
 namespace Rev
 {
 
-VkCommandPoolCreateInfo FVkInit::CmdPoolCreateInfo(uint32 InQueueFamily, VkCommandPoolCreateFlags InFlags)
+VkCommandPoolCreateInfo FVulkanInit::CmdPoolCreateInfo(uint32 InQueueFamily, VkCommandPoolCreateFlags InFlags)
 {
     VkCommandPoolCreateInfo CreateInfo = {};
     CreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
@@ -13,7 +13,7 @@ VkCommandPoolCreateInfo FVkInit::CmdPoolCreateInfo(uint32 InQueueFamily, VkComma
     return CreateInfo;
 }
 
-VkCommandBufferAllocateInfo FVkInit::CmdBufferAllocateInfo(VkCommandPool InPool, uint32 InCount)
+VkCommandBufferAllocateInfo FVulkanInit::CmdBufferAllocateInfo(VkCommandPool InPool, uint32 InCount)
 {
     VkCommandBufferAllocateInfo CreateInfo{};
     CreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -24,7 +24,7 @@ VkCommandBufferAllocateInfo FVkInit::CmdBufferAllocateInfo(VkCommandPool InPool,
     return CreateInfo;
 }
 
-VkCommandBufferBeginInfo FVkInit::CmdBufferBeginInfo(VkCommandBufferUsageFlags InFlags)
+VkCommandBufferBeginInfo FVulkanInit::CmdBufferBeginInfo(VkCommandBufferUsageFlags InFlags)
 {
     VkCommandBufferBeginInfo CreateInfo{};
     CreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -34,7 +34,7 @@ VkCommandBufferBeginInfo FVkInit::CmdBufferBeginInfo(VkCommandBufferUsageFlags I
     return CreateInfo;
 }
 
-VkCommandBufferSubmitInfo FVkInit::CmdBufferSubmitInfo(VkCommandBuffer InCmdBuffer)
+VkCommandBufferSubmitInfo FVulkanInit::CmdBufferSubmitInfo(VkCommandBuffer InCmdBuffer)
 {
     VkCommandBufferSubmitInfo SubmitInfo{};
     SubmitInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_SUBMIT_INFO;
@@ -44,7 +44,7 @@ VkCommandBufferSubmitInfo FVkInit::CmdBufferSubmitInfo(VkCommandBuffer InCmdBuff
     return SubmitInfo;
 }
 
-VkFenceCreateInfo FVkInit::FenceCreateInfo(VkFenceCreateFlags InFlags)
+VkFenceCreateInfo FVulkanInit::FenceCreateInfo(VkFenceCreateFlags InFlags)
 {
     VkFenceCreateInfo CreateInfo{};
     CreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
@@ -53,7 +53,7 @@ VkFenceCreateInfo FVkInit::FenceCreateInfo(VkFenceCreateFlags InFlags)
     return CreateInfo;
 }
 
-VkSemaphoreCreateInfo FVkInit::SemaphoreCreateInfo(VkSemaphoreCreateFlags InFlags)
+VkSemaphoreCreateInfo FVulkanInit::SemaphoreCreateInfo(VkSemaphoreCreateFlags InFlags)
 {
     VkSemaphoreCreateInfo CreateInfo{};
     CreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -62,7 +62,7 @@ VkSemaphoreCreateInfo FVkInit::SemaphoreCreateInfo(VkSemaphoreCreateFlags InFlag
     return CreateInfo;
 }
 
-VkSemaphoreSubmitInfo FVkInit::SemaphoreSubmitInfo(VkPipelineStageFlags2 InStageMask, VkSemaphore InSemaphore)
+VkSemaphoreSubmitInfo FVulkanInit::SemaphoreSubmitInfo(VkPipelineStageFlags2 InStageMask, VkSemaphore InSemaphore)
 {
     VkSemaphoreSubmitInfo SubmitInfo{};
     SubmitInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_SUBMIT_INFO;
@@ -74,7 +74,7 @@ VkSemaphoreSubmitInfo FVkInit::SemaphoreSubmitInfo(VkPipelineStageFlags2 InStage
     return SubmitInfo;
 }
 
-VkSubmitInfo2 FVkInit::SubmitInfo(VkCommandBufferSubmitInfo* CmdBufferInfo, VkSemaphoreSubmitInfo* SignalSemaphoreInfo, VkSemaphoreSubmitInfo* WaitSemaphoreInfo)
+VkSubmitInfo2 FVulkanInit::SubmitInfo(VkCommandBufferSubmitInfo* CmdBufferInfo, VkSemaphoreSubmitInfo* SignalSemaphoreInfo, VkSemaphoreSubmitInfo* WaitSemaphoreInfo)
 {
     VkSubmitInfo2 SubmitInfo{};
     SubmitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO_2;
@@ -92,7 +92,7 @@ VkSubmitInfo2 FVkInit::SubmitInfo(VkCommandBufferSubmitInfo* CmdBufferInfo, VkSe
     return SubmitInfo;
 }
 
-VkImageCreateInfo FVkInit::ImageCreateInfo2D(VkFormat Format, VkImageUsageFlags UsageFlags, VkExtent3D Extent)
+VkImageCreateInfo FVulkanInit::ImageCreateInfo2D(VkFormat Format, VkImageUsageFlags UsageFlags, VkExtent3D Extent)
 {
     VkImageCreateInfo CreateInfo{};
     CreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -116,7 +116,7 @@ VkImageCreateInfo FVkInit::ImageCreateInfo2D(VkFormat Format, VkImageUsageFlags 
     return CreateInfo;
 }
 
-VkImageViewCreateInfo FVkInit::ImageViewCreateInfo2D(VkFormat Format, VkImage Image, VkImageAspectFlags AspectFlags)
+VkImageViewCreateInfo FVulkanInit::ImageViewCreateInfo2D(VkFormat Format, VkImage Image, VkImageAspectFlags AspectFlags)
 {
     VkImageViewCreateInfo CreateInfo{};
     CreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -133,7 +133,7 @@ VkImageViewCreateInfo FVkInit::ImageViewCreateInfo2D(VkFormat Format, VkImage Im
     return CreateInfo;
 }
 
-VkImageSubresourceRange FVkInit::ImageSubresourceRange(VkImageAspectFlags InAspectMask)
+VkImageSubresourceRange FVulkanInit::ImageSubresourceRange(VkImageAspectFlags InAspectMask)
 {
     VkImageSubresourceRange Range{};
     Range.aspectMask = InAspectMask;
@@ -145,7 +145,7 @@ VkImageSubresourceRange FVkInit::ImageSubresourceRange(VkImageAspectFlags InAspe
     return Range;
 }
 
-VkRenderingAttachmentInfo FVkInit::AttachmentInfo(VkImageView ImageView, VkClearValue* ClearValue, VkImageLayout ImageLayout)
+VkRenderingAttachmentInfo FVulkanInit::AttachmentInfo(VkImageView ImageView, VkClearValue* ClearValue, VkImageLayout ImageLayout)
 {
     VkRenderingAttachmentInfo ColorAttachment{};
     ColorAttachment.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;

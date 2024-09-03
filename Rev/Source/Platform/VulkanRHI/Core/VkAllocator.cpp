@@ -3,6 +3,6 @@
 namespace Rev
 {
 
-VkAllocationCallbacks* FVkAllocator::Callbacks = nullptr;
+VkAllocationCallbacks* FVulkanAllocator::Callbacks = nullptr;
 
 }

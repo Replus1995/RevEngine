@@ -5,7 +5,7 @@
 namespace Rev
 {
 
-class FVkAllocator
+class FVulkanAllocator
 {
 public:
 	static VkAllocationCallbacks* Callbacks;

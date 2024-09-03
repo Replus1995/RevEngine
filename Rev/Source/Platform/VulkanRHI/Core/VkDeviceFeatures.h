@@ -5,10 +5,10 @@
 namespace Rev
 {
 
-struct FVkPhysicalDeviceFeatures
+struct FVulkanPhysicalDeviceFeatures
 {
 public:
-	FVkPhysicalDeviceFeatures();
+	FVulkanPhysicalDeviceFeatures();
 	VkPhysicalDeviceFeatures2* Get() { return &mFeatures; }
 
 private:
