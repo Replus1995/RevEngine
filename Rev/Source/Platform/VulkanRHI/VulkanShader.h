@@ -3,6 +3,7 @@
 #include "Rev/Core/Buffer.h"
 #include <map>
 #include <vulkan/vulkan.h>
+#include "../Shaderc/ShadercFactory.h"
 
 namespace Rev
 {
@@ -26,7 +27,7 @@ class FVulkanShaderProgram : public FRHIShaderProgram
 public:
 	FVulkanShaderProgram(const std::string& InName, const FRHIGraphicsShaders& InShaders);
 	virtual ~FVulkanShaderProgram();
-	virtual const void* GetNativeHandle() const override { return &mHandle; }
+	virtual const void* GetNativeHandle() const override { return mPipeline; }
 
 	virtual uint16 GetUniformLocation(std::string_view name) override;
 
@@ -41,7 +42,7 @@ public:
 	virtual void SetUniformArray(uint16 location, const int* values, uint32_t count) override;
 
 private:
-	uint32 mHandle;
+	VkPipeline mPipeline = VK_NULL_HANDL;
 };
 
 }

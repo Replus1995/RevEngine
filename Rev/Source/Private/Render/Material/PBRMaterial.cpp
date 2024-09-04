@@ -34,8 +34,7 @@ void PBRMaterial::Compile()
 		FragCompileOps.AddMacro(SCM_USE_EMISSIVE_TEX);
 
 
-	mProgram = FRHIShaderLibrary::GetInstance().CreateGraphicsProgram(
-		"PbrProgram",
+	mProgram = FRHIShaderLibrary::GetInstance().CreateGraphicsProgram("PbrProgram",
 		{ "/Engine/Shaders/CommonVS" },
 		{ "/Engine/Shaders/PBR/ForwardFS", FragCompileOps }
 	);

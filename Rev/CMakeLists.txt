@@ -60,6 +60,7 @@ if(WIN32)
         spirv-cross-glsl
         GPUOpen::VulkanMemoryAllocator
         imgui
+        cityhash
     )
 endif()
 

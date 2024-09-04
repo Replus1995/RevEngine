@@ -44,6 +44,15 @@ VkShaderStageFlagBits FVulkanShader::TranslateShaderStage(ERHIShaderStage InStag
 	return VkShaderStageFlagBits(0);
 }
 
+FVulkanShaderProgram::FVulkanShaderProgram(const std::string& InName, const FRHIGraphicsShaders& InShaders)
+	: FRHIShaderProgram(InName)
+{
+}
+
+FVulkanShaderProgram::~FVulkanShaderProgram()
+{
+}
+
 }
 
 

@@ -19,21 +19,21 @@ FForwardRenderer::~FForwardRenderer()
 void FForwardRenderer::BeginFrame()
 {
 	//prepare resource
-	if (!mLinearScreenTarget)
-	{
-		std::vector<FColorTargetDesc> vColorDesc;
-		vColorDesc.push_back({ PF_R8G8B8A8, Math::FLinearColor(0, 0, 0, 1) });
-		FRenderTargetDesc Desc = FRenderTargetDesc::Make2D(mContext->Width, mContext->Height, vColorDesc.data(), vColorDesc.size(), { PF_DepthStencil });
-		mLinearScreenTarget = FRHIResourceFactory::CreateRenderTarget(Desc);
+	//if (!mLinearScreenTarget)
+	//{
+	//	std::vector<FColorTargetDesc> vColorDesc;
+	//	vColorDesc.push_back({ PF_R8G8B8A8, Math::FLinearColor(0, 0, 0, 1) });
+	//	FRenderTargetDesc Desc = FRenderTargetDesc::Make2D(mContext->Width, mContext->Height, vColorDesc.data(), vColorDesc.size(), { PF_DepthStencil });
+	//	mLinearScreenTarget = FRHIResourceFactory::CreateRenderTarget(Desc);
 
 
-		mForwardSurfacePass.SetRenderTarget(mLinearScreenTarget);
-		RenderCmd::BindTexture(mLinearScreenTarget->GetTargetTexture(RTA_ColorAttachment0), UL::SLinearScreenTex); //to be optimized
-	}
-	else
-	{
-		mLinearScreenTarget->ResizeTargets(mContext->Width, mContext->Height);
-	}
+	//	mForwardSurfacePass.SetRenderTarget(mLinearScreenTarget);
+	//	RenderCmd::BindTexture(mLinearScreenTarget->GetTargetTexture(RTA_ColorAttachment0), UL::SLinearScreenTex); //to be optimized
+	//}
+	//else
+	//{
+	//	mLinearScreenTarget->ResizeTargets(mContext->Width, mContext->Height);
+	//}
 	
 }
 
@@ -47,7 +47,7 @@ void FForwardRenderer::DrawFrame()
 		// end render pass
 	// end cmd buffer
 
-	mForwardSurfacePass.BeginPass();
+	/*mForwardSurfacePass.BeginPass();
 	mForwardSurfacePass.ClearRenderTarget();
 	mContext->SceneProxy->SyncResource();
 	mContext->SceneProxy->DrawScene();
@@ -58,7 +58,7 @@ void FForwardRenderer::DrawFrame()
 
 	mGammaCorrectPass.BeginPass();
 	mGammaCorrectPass.RunPass();
-	mGammaCorrectPass.EndPass();
+	mGammaCorrectPass.EndPass();*/
 
 
 }

@@ -158,7 +158,7 @@ FShadercCompiledData FShadercFactory::LoadOrCompileShader(const FPath& InPath, c
 	std::string OptionHashStr = std::to_string(InOptions.Hash() );
 	fs::path ShaderCachePath(FShadercUtils::GetCacheDirectory() + Result.Name + "_" + OptionHashStr + FShadercUtils::GetCacheExtension());
 	bool bNeedCompile = true;
-	if (fs::exists(ShaderCachePath))
+	/*if (fs::exists(ShaderCachePath))
 	{
 		auto CacheWriteTime = fs::last_write_time(ShaderCachePath);
 		auto SourceWriteTime = fs::last_write_time(InPath.ToNative());
@@ -170,13 +170,13 @@ FShadercCompiledData FShadercFactory::LoadOrCompileShader(const FPath& InPath, c
 		{
 			bNeedCompile = !FShadercUtils::LoadShaderCompiledData(ShaderCachePath, Result);
 		}
-	}
+	}*/
 
 	if (bNeedCompile)
 	{
 		auto ShaderSource = FShadercUtils::LoadShaderSource(InPath);
 		CompileShaders(ShaderSource, InOptions, Result);
-		FShadercUtils::SaveShaderCompiledData(ShaderCachePath, Result);
+		//FShadercUtils::SaveShaderCompiledData(ShaderCachePath, Result);
 	}
 
 #ifdef REV_DEBUG

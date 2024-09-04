@@ -6,6 +6,7 @@
 //Private
 #include "Shaderc/ShadercFactory.h"
 #include "OpenGL/OpenGLShaderFactory.h"
+#include "VulkanRHI/VulkanShader.h"
 
 namespace Rev
 {
@@ -43,6 +44,8 @@ Ref<FRHIShaderProgram> FRHIShaderLibrary::CreateGraphicsProgram(const std::strin
 	{
 	case ERenderAPI::OpenGL:
 		return FOpenGLShaderFactory::CreateShaderProgram(InProgramName, Shaders);
+	case ERenderAPI::Vulkan:
+		return CreateRef<FVulkanShaderProgram>(InProgramName, Shaders);
 	default:
 		REV_CORE_ASSERT(false, "Unknown RenderAPI!");
 		break;
@@ -64,6 +67,12 @@ Ref<FRHIShader> FRHIShaderLibrary::LoadOrCompileShader(const FPath& InPath, cons
 	case ERenderAPI::OpenGL:
 	{
 		auto pShader = FOpenGLShaderFactory::CreateShader(Binary);
+		mShadersCache[Binary.Name].Add(InOptions.Hash(), pShader);
+		return pShader;
+	}
+	case ERenderAPI::Vulkan:
+	{
+		auto pShader = CreateRef<FVulkanShader>(Binary);
 		mShadersCache[Binary.Name].Add(InOptions.Hash(), pShader);
 		return pShader;
 	}

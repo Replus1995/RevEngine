@@ -19,7 +19,7 @@ if(MSVC)
         #$<$<CONFIG:Debug>:/MDd>
         #$<$<CONFIG:Release>:/MD>
         "/MD"
-        "/std:c++17"
+        "/std:c++20"
     )
 endif()
 
