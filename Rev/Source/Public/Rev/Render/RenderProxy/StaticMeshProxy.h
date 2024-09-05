@@ -4,6 +4,7 @@
 #include "Rev/Render/RenderCore.h"
 #include "Rev/Render/UniformDefine.h"
 #include "Rev/Render/Mesh/StaticMesh.h"
+#include "Rev/Render/Material/Material.h"
 
 namespace Rev
 {
@@ -27,10 +28,10 @@ public:
 	void Cleanup();
 	void FreeResource();
 
-	void DrawMeshes(EBlendMode InBlend, bool bUseMeshMaterial = true) const;
+	void DrawMeshes(EMaterialBlendMode InBlend, bool bUseMeshMaterial = true) const;
 
 private:
-	void DrawPrimitives(const FStaticMeshRenderData& InData, EBlendMode InBlend, bool bUseMeshMaterial = true) const;
+	void DrawPrimitives(const FStaticMeshRenderData& InData, EMaterialBlendMode InBlend, bool bUseMeshMaterial = true) const;
 
 private:
 	std::vector<FStaticMeshRenderData> mRenderDataArr;

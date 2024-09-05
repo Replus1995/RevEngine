@@ -10,8 +10,8 @@ struct FSurfaceMaterialStorage
 {
 public:
 	std::string Name;
-	EBlendMode BlendMode = Rev::BM_Opaque;
-	EShadingModel ShadingModel = Rev::SM_Default;
+	EMaterialBlendMode BlendMode = MBM_Opaque;
+	EMaterialShadingModel ShadingModel = MSM_Default;
 	float MaskClip = 0.5f;
 	bool TwoSided = false;
 

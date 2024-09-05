@@ -4,7 +4,7 @@
 #include "Rev/Render/RenderCmd.h"
 #include "Rev/Render/UniformLayout.h"
 
-#include "Rev/World/Scene.h"
+#include "Rev/World/Entity.h"
 
 
 namespace Rev
@@ -49,7 +49,7 @@ void FStaticMeshProxy::FreeResource()
 	uModel.FreeResource();
 }
 
-void FStaticMeshProxy::DrawMeshes(EBlendMode InBlend, bool bUseMeshMaterial) const
+void FStaticMeshProxy::DrawMeshes(EMaterialBlendMode InBlend, bool bUseMeshMaterial) const
 {
 	for (const auto& RenderData : mRenderDataArr)
 	{
@@ -58,7 +58,7 @@ void FStaticMeshProxy::DrawMeshes(EBlendMode InBlend, bool bUseMeshMaterial) con
 	}
 }
 
-void FStaticMeshProxy::DrawPrimitives(const FStaticMeshRenderData& InData, EBlendMode InBlend, bool bUseMeshMaterial) const
+void FStaticMeshProxy::DrawPrimitives(const FStaticMeshRenderData& InData, EMaterialBlendMode InBlend, bool bUseMeshMaterial) const
 {
 	for (uint32 i = 0; i < InData.MeshData->GetMaterialCount(); i++)
 	{

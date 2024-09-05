@@ -5,7 +5,7 @@
 #include "Rev/Render/Texture/Texture.h"
 #include "Rev/Render/Material/Material.h"
 #include "Rev/Render/RHI/RHIShaderLibrary.h"
-#include "Rev/World/Scene.h"
+#include "Rev/World/Entity.h"
 
 
 namespace Rev
@@ -32,16 +32,12 @@ public:
 
 	virtual void PreDraw() override
 	{
-		RenderCmd::EnableDepthWrite(false);
-		RenderCmd::SetDepthTestMode(DTM_LessEqual);
 		Material::PreDraw();
 	}
 
 	virtual void PostDraw() override
 	{
 		Material::PostDraw();
-		RenderCmd::SetDepthTestMode(DTM_Less);
-		RenderCmd::EnableDepthWrite(true);
 	}
 };
 

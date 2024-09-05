@@ -22,7 +22,7 @@ ExampleLayer::ExampleLayer()
 	//Load shader
 
 	//FFileSystem::MountDir("/SandBox", std::filesystem::current_path().generic_u8string());
-	FFileSystem::MountDir("/Game", (std::filesystem::current_path() / "Game").generic_u8string());
+	FFileSystem::MountDir("/Game", (std::filesystem::current_path() / "Game").generic_string());
 
 	//Create Sandbox Scene
 	mScene = CreateRef<Rev::FScene>();

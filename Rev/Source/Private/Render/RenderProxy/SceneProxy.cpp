@@ -42,7 +42,7 @@ void FSceneProxy::Cleanup()
 
 void FSceneProxy::DrawScene() const
 {
-	mStaticMeshProxy.DrawMeshes(BM_Opaque);
+	mStaticMeshProxy.DrawMeshes(MBM_Opaque);
 	mSkyProxy.DrawSkybox();
 }
 

@@ -16,8 +16,8 @@ public:
 	virtual void PostDraw() override;
 
 public:
-	EBlendMode BlendMode = BM_Opaque;
-	EShadingModel ShadingModel = SM_Default;
+	EMaterialBlendMode BlendMode = MBM_Opaque;
+	EMaterialShadingModel ShadingModel = MSM_Default;
 	bool TwoSided = false;
 	float MaskClip = 0.5f;
 };

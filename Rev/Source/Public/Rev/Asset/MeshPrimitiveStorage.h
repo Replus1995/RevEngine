@@ -11,7 +11,7 @@ struct FMeshPrimitiveStorage
 {
 public:
 	int MaterialIndex = 0;
-	EDrawMode DrawMode = EDrawMode::DM_Triangles;
+	EPrimitiveTopology PrimitiveTopology = PT_Triangles;
 
 	uint32 VertexCount = 0;
 	FBuffer PositonData;	//size = VertexCount * 3 * sizeof(float)

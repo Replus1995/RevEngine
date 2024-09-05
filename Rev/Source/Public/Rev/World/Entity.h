@@ -2,6 +2,7 @@
 #include "Rev/Core/UUID.h"
 #include "Rev/Core/Assert.h"
 #include "Rev/World/Component/AllComponents.h"
+#include "Rev/World/Scene.h"
 
 #include <entt/entt.hpp>
 
@@ -31,7 +32,7 @@ public:
 	}
 
 	template<typename... T>
-	auto& GetComponent()
+	auto GetComponent()
 	{
 		REV_CORE_ASSERT(HasComponent<T...>(), "Entity does not have component!");
 		return mScene->mRegistry.get<T...>(mHandle);

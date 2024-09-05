@@ -49,7 +49,7 @@ void RenderUtils::Shutdown()
 
 void RenderUtils::DrawScreenQuad()
 {
-    RenderCmd::Draw(sScreenQuad, DM_Triangles);
+    RenderCmd::Draw(sScreenQuad);
 }
 
 }

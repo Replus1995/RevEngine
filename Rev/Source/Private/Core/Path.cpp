@@ -18,9 +18,9 @@ struct FPathImpl
 		if (!tPath.empty())
 		{
 			tPath.lexically_normal();
-			Directory = tPath.parent_path().generic_u8string();
-			Name = tPath.stem().generic_u8string();
-			Extension = tPath.extension().generic_u8string();
+			Directory = tPath.parent_path().generic_string();
+			Name = tPath.stem().generic_string();
+			Extension = tPath.extension().generic_string();
 		}
 	}
 };

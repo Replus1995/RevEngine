@@ -10,6 +10,21 @@ enum EMaterialDomain : uint8
 	MD_PostProcess
 };
 
+enum EMaterialBlendMode : uint8
+{
+	MBM_Diabled = 0,
+	MBM_Opaque = 1,
+	MBM_Transparent,
+	MBM_Masked
+};
+
+enum EMaterialShadingModel : uint8
+{
+	MSM_Default = 0,
+	MSM_Unlit
+};
+
+
 class FRHIShaderProgram;
 class REV_API Material
 {

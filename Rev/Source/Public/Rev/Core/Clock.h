@@ -12,22 +12,22 @@ public:
 		Reset();
 	}
 
-	void Clock::Reset()
+	void Reset()
 	{
 		mStart = std::chrono::high_resolution_clock::now();
 	}
 
-	float Clock::Elapsed()
+	float Elapsed()
 	{
 		return ElapsedMillis() * 0.001f;
 	}
 
-	float Clock::ElapsedMillis()
+	float ElapsedMillis()
 	{
 		return ElapsedMicros() * 0.001f;
 	}
 
-	int64 Clock::ElapsedMicros()
+	int64 ElapsedMicros()
 	{
 		return std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - mStart).count();
 	}

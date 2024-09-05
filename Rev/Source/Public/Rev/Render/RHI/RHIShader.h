@@ -2,6 +2,7 @@
 #include "Rev/Core/Base.h"
 #include "Rev/Math/Maths.h"
 #include "Rev/Render/RHI/RHIResource.h"
+#include "Rev/Render/RHI/RHIPipeline.h"
 #include <unordered_map>
 
 namespace Rev
@@ -62,10 +63,15 @@ public:
     }
 
     const std::string& GetName() const { return mProgramName; };
+
+    FRHIGraphicsPipelineState PipelineState;
+    void MarkStateDirty() { mPipelineStateDirty = true; }
+
 protected:
     FRHIShaderProgram(const std::string& InName) : mProgramName(InName) {}
 protected:
     std::string mProgramName;
+    bool mPipelineStateDirty = false;
 };
 
 

@@ -1,5 +1,6 @@
 #pragma once
 #include "Rev/Render/RHI/RHIShader.h"
+#include "Rev/Render/RHI/RHIShaderCompile.h"
 #include "Rev/Core/Buffer.h"
 #include <map>
 #include <vulkan/vulkan.h>
@@ -29,20 +30,20 @@ public:
 	virtual ~FVulkanShaderProgram();
 	virtual const void* GetNativeHandle() const override { return mPipeline; }
 
-	virtual uint16 GetUniformLocation(std::string_view name) override;
+	virtual uint16 GetUniformLocation(std::string_view name) override { return 0; };
 
-	virtual void SetUniform(uint16 location, int value) override;
-	virtual void SetUniform(uint16 location, float value) override;
-	virtual void SetUniform(uint16 location, const Math::FVector2& value) override;
-	virtual void SetUniform(uint16 location, const Math::FVector3& value) override;
-	virtual void SetUniform(uint16 location, const Math::FVector4& value) override;
-	virtual void SetUniform(uint16 location, const Math::FMatrix3& value) override;
-	virtual void SetUniform(uint16 location, const Math::FMatrix4& value) override;
+	virtual void SetUniform(uint16 location, int value) override {};
+	virtual void SetUniform(uint16 location, float value) override {};
+	virtual void SetUniform(uint16 location, const Math::FVector2& value) override {};
+	virtual void SetUniform(uint16 location, const Math::FVector3& value) override {};
+	virtual void SetUniform(uint16 location, const Math::FVector4& value) override {};
+	virtual void SetUniform(uint16 location, const Math::FMatrix3& value) override {};
+	virtual void SetUniform(uint16 location, const Math::FMatrix4& value) override {};
 
-	virtual void SetUniformArray(uint16 location, const int* values, uint32_t count) override;
+	virtual void SetUniformArray(uint16 location, const int* values, uint32_t count) override {};
 
 private:
-	VkPipeline mPipeline = VK_NULL_HANDL;
+	VkPipeline mPipeline = VK_NULL_HANDLE;
 };
 
 }

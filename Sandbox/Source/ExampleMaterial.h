@@ -1,6 +1,5 @@
 #pragma once
 #include <Rev/Render/Material/Material.h>
-#include <Rev/Render/Material/MaterialUniform.h>
 #include <Rev/Math/Maths.h>
 #include <Rev/Render/RHI/RHIShaderLibrary.h>
 
@@ -12,7 +11,7 @@ public:
 
     void SetColor(const Rev::Math::FVector4& color)
     {
-        uColor = color;
+        //uColor = color;
     }
 
     virtual void Compile() override
@@ -23,10 +22,10 @@ public:
     virtual void PreDraw() override
     {
         Rev::Material::PreDraw();
-        uColor.Upload(mProgram);
+        //uColor.Upload(mProgram);
     }
 
 
 protected:
-    Rev::TMaterialUniform<Rev::Math::FLinearColor> uColor = { "Color", Rev::Math::FLinearColor(1) };
+    //Rev::TMaterialUniform<Rev::Math::FLinearColor> uColor = { "Color", Rev::Math::FLinearColor(1) };
 };

@@ -1,7 +1,7 @@
 #include "Rev/Render/RenderProxy/LightProxy.h"
 #include "Rev/Render/RenderCore.h"
 #include "Rev/Math/Maths.h"
-#include "Rev/World/Scene.h"
+#include "Rev/World/Entity.h"
 
 namespace Rev
 {

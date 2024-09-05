@@ -21,7 +21,7 @@ static Ref<Texture> sDefaultNormalTexture = nullptr;
 
 void FAssetLibrary::Init()
 {
-	FFileSystem::MountDir("/Engine", (std::filesystem::current_path() / "Engine").generic_u8string());
+	FFileSystem::MountDir("/Engine", (std::filesystem::current_path() / "Engine").generic_string());
 }
 
 void FAssetLibrary::Shutdown()

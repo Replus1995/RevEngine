@@ -1,7 +1,6 @@
 #pragma once
 #include "Rev/Core/Base.h"
 #include "Rev/Core/UUID.h"
-#include "Rev/World/Entity.h"
 #include "Rev/World/System/System.h"
 
 #include <entt/entt.hpp>

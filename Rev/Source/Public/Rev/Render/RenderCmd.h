@@ -28,18 +28,12 @@ public:
 	static void SetClearColor(const Math::FLinearColor& color);
 	static void ClearBackBuffer();
 
-	static void EnableDepthTest(bool bEnable);
-	static void EnableDepthWrite(bool bEnable);
-	static void SetDepthTestMode(EDepthTestMode InMode);
-	static void SetBlendMode(EBlendMode InMode);
-	static void SetCullFaceMode(ECullFaceMode InMode);
-
 	static void BindProgram(const Ref<FRHIShaderProgram>& InProgram);
 	static void BindUniformBuffer(const Ref<FRHIUniformBuffer>& InUniformBuffer, uint32 InUnit);
 	static void BindTexture(const Ref<FRHITexture>& InTexture, uint32 InUnit);
 	static void BindRenderTarget(const Ref<FRHIRenderTarget>& InRenderTarget);
 
-	static void Draw(const Ref<FRHIVertexArray>& InVertexArray, EDrawMode InDrawMode);
+	static void Draw(const Ref<FRHIVertexArray>& InVertexArray);
 	static void DrawPrimitive(const FMeshPrimitive* InPrimitive);
 	//static void DrawLines(const Ref<VertexArray>& vertexArray, uint32_t vertexCount, float lineWidth);
 

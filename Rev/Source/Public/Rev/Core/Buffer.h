@@ -92,8 +92,6 @@ public:
 	T* DataAs() { return (T*)mData; }
 	template<typename T>
 	const T* DataAs() const { return (const T*)mData; }
-
-	operator bool() const { return mBuffer; }
 private:
 	uint8 mData[N];
 };

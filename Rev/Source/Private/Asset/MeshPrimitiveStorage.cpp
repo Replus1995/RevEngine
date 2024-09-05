@@ -13,7 +13,7 @@ FMeshPrimitiveStorage::FMeshPrimitiveStorage()
 FMeshPrimitiveStorage::FMeshPrimitiveStorage(FMeshPrimitiveStorage&& InStorage) noexcept
 {
 	MaterialIndex = InStorage.MaterialIndex;
-	DrawMode = InStorage.DrawMode;
+	PrimitiveTopology = InStorage.PrimitiveTopology;
 
 	VertexCount = InStorage.VertexCount;
 	PositonData = std::move(InStorage.PositonData);
@@ -80,7 +80,6 @@ FMeshPrimitive FMeshPrimitiveStorage::CreateVertexData()
 	VertexArr->SetIndexBuffer(IndexBuffer);
 
 	FMeshPrimitive Result;
-	Result.DrawMode = EDrawMode::DM_Triangles;
 	Result.MaterialIndex = MaterialIndex;
 	Result.VertexData = VertexArr;
 	return Result;

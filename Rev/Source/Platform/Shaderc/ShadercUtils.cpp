@@ -166,7 +166,7 @@ bool FShadercUtils::LoadShaderCompiledData(const std::filesystem::path& ShaderCa
 	{
 		Clock timer;
 		{
-			FFileArchive Ar(ShaderCachePath.generic_u8string(), EFileArchiveKind::Read);
+			FFileArchive Ar(ShaderCachePath.generic_string(), EFileArchiveKind::Read);
 			Ar << OutCompiledData;
 		}
 		if (!OutCompiledData.Binary.Empty())
@@ -190,7 +190,7 @@ bool FShadercUtils::SaveShaderCompiledData(const std::filesystem::path& ShaderCa
 		fs::create_directories(CachedDir);
 
 	{
-		FFileArchive Ar(ShaderCachePath.generic_u8string(), EFileArchiveKind::Write);
+		FFileArchive Ar(ShaderCachePath.generic_string(), EFileArchiveKind::Write);
 		Ar << InCompiledData;
 	}
 

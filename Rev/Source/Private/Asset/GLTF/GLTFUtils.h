@@ -14,7 +14,7 @@ class FGLTFUtils
 {
 public:
 	static uint32 GetComponentSize(int InComponentType);
-	static EDrawMode TranslateDrawMode(int InDrawMode);
+	static EPrimitiveTopology TranslatePrimitiveTopology(int InPrimitiveTopology);
 	static EPixelFormat TranslateImageFormat(const tinygltf::Image& InImage);
 	static FSamplerDesc TranslateSampler(const tinygltf::Sampler& InSampler);
 	static Math::FLinearColor TranslateColor(const std::vector<double>& InColor);

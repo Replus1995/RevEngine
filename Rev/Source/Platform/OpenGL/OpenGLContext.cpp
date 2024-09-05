@@ -87,98 +87,98 @@ void FOpenGLContext::ClearBackBuffer()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void FOpenGLContext::EnableDepthTest(bool bEnable)
-{
-	if(bEnable)
-		glEnable(GL_DEPTH_TEST);
-	else
-		glDisable(GL_DEPTH_TEST);
-}
-
-void FOpenGLContext::EnableDepthWrite(bool bEnable)
-{
-	glDepthMask(bEnable ? GL_TRUE : GL_FALSE);
-}
-
-void FOpenGLContext::SetDepthTestMode(EDepthTestMode InMode)
-{
-	GLenum DepthFunc = GL_LESS;
-	switch (InMode)
-	{
-	case Rev::DTM_Never:
-		DepthFunc = GL_NEVER;
-		break;
-	/*case Rev::DTM_Less:
-		DepthFunc = GL_LESS;
-		break;*/
-	case Rev::DTM_Equal:
-		DepthFunc = GL_EQUAL;
-		break;
-	case Rev::DTM_Greater:
-		DepthFunc = GL_GREATER;
-		break;
-	case Rev::DTM_NotEqual:
-		DepthFunc = GL_NOTEQUAL;
-		break;
-	case Rev::DTM_LessEqual:
-		DepthFunc = GL_LEQUAL;
-		break;
-	case Rev::DTM_GreaterEqual:
-		DepthFunc = GL_GEQUAL;
-		break;
-	case Rev::DTM_Always:
-		DepthFunc = GL_ALWAYS;
-		break;
-	default:
-		break;
-	}
-
-	glDepthFunc(DepthFunc);
-}
-
-void FOpenGLContext::SetBlendMode(EBlendMode InMode)
-{
-	switch (InMode)
-	{
-	case BM_Opaque:
-		glDisable(GL_BLEND);
-		break;
-	case BM_Transparent:
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		break;
-	case BM_Masked:
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		break;
-	default:
-		break;
-	}
-}
-
-void FOpenGLContext::SetCullFaceMode(ECullFaceMode InMode)
-{
-	switch (InMode)
-	{
-	case Rev::CFM_Disabled:
-		glDisable(GL_CULL_FACE);
-		break;
-	case Rev::CFM_Back:
-		glEnable(GL_CULL_FACE);
-		glCullFace(GL_BACK);
-		break;
-	case Rev::CFM_Front:
-		glEnable(GL_CULL_FACE);
-		glCullFace(GL_FRONT);
-		break;
-	case Rev::CFM_BackAndFront:
-		glEnable(GL_CULL_FACE);
-		glCullFace(GL_FRONT_AND_BACK);
-		break;
-	default:
-		break;
-	}
-}
+//void FOpenGLContext::EnableDepthTest(bool bEnable)
+//{
+//	if(bEnable)
+//		glEnable(GL_DEPTH_TEST);
+//	else
+//		glDisable(GL_DEPTH_TEST);
+//}
+//
+//void FOpenGLContext::EnableDepthWrite(bool bEnable)
+//{
+//	glDepthMask(bEnable ? GL_TRUE : GL_FALSE);
+//}
+//
+//void FOpenGLContext::SetDepthTestMode(EDepthTestMode InMode)
+//{
+//	GLenum DepthFunc = GL_LESS;
+//	switch (InMode)
+//	{
+//	case Rev::DTM_Never:
+//		DepthFunc = GL_NEVER;
+//		break;
+//	/*case Rev::DTM_Less:
+//		DepthFunc = GL_LESS;
+//		break;*/
+//	case Rev::DTM_Equal:
+//		DepthFunc = GL_EQUAL;
+//		break;
+//	case Rev::DTM_Greater:
+//		DepthFunc = GL_GREATER;
+//		break;
+//	case Rev::DTM_NotEqual:
+//		DepthFunc = GL_NOTEQUAL;
+//		break;
+//	case Rev::DTM_LessEqual:
+//		DepthFunc = GL_LEQUAL;
+//		break;
+//	case Rev::DTM_GreaterEqual:
+//		DepthFunc = GL_GEQUAL;
+//		break;
+//	case Rev::DTM_Always:
+//		DepthFunc = GL_ALWAYS;
+//		break;
+//	default:
+//		break;
+//	}
+//
+//	glDepthFunc(DepthFunc);
+//}
+//
+//void FOpenGLContext::SetBlendMode(EBlendMode InMode)
+//{
+//	switch (InMode)
+//	{
+//	case BM_Opaque:
+//		glDisable(GL_BLEND);
+//		break;
+//	case BM_Transparent:
+//		glEnable(GL_BLEND);
+//		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//		break;
+//	case BM_Masked:
+//		glEnable(GL_BLEND);
+//		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//		break;
+//	default:
+//		break;
+//	}
+//}
+//
+//void FOpenGLContext::SetCullFaceMode(ECullFaceMode InMode)
+//{
+//	switch (InMode)
+//	{
+//	case Rev::CFM_Disabled:
+//		glDisable(GL_CULL_FACE);
+//		break;
+//	case Rev::CFM_Back:
+//		glEnable(GL_CULL_FACE);
+//		glCullFace(GL_BACK);
+//		break;
+//	case Rev::CFM_Front:
+//		glEnable(GL_CULL_FACE);
+//		glCullFace(GL_FRONT);
+//		break;
+//	case Rev::CFM_BackAndFront:
+//		glEnable(GL_CULL_FACE);
+//		glCullFace(GL_FRONT_AND_BACK);
+//		break;
+//	default:
+//		break;
+//	}
+//}
 
 void FOpenGLContext::Bind(const Ref<FRHIVertexBuffer>& InVertexBuffer)
 {
@@ -224,41 +224,42 @@ void FOpenGLContext::Bind(const Ref<FRHIRenderTarget>& InRenderTarget)
 	glBindFramebuffer(GL_FRAMEBUFFER, RenderTargetName);
 }
 
-void FOpenGLContext::Draw(const Ref<FRHIVertexArray>& InVertexArray, EDrawMode InDrawMode)
+void FOpenGLContext::Draw(const Ref<FRHIVertexArray>& InVertexArray)
 {
 	if(!InVertexArray)
 		return;
-	GLenum DrawMode = TranslateDrawMode(InDrawMode);
+	//GLenum DrawMode = TranslateDrawMode(InDrawMode);
+	GLenum DrawMode = GL_TRIANGLES;
 	uint32 IndexCount = InVertexArray->GetIndexBuffer()->GetCount();
 	GLenum IndexType = TranslateIndexType(InVertexArray->GetIndexBuffer()->GetStride());
 	Bind(InVertexArray);
 	glDrawElements(DrawMode, IndexCount, IndexType, nullptr);
 }
 
-GLenum FOpenGLContext::TranslateDrawMode(EDrawMode InDrawMode)
-{
-	switch (InDrawMode)
-	{
-	case Rev::DM_Points:
-		return GL_POINTS;
-	case Rev::DM_Line:
-		return GL_LINE;
-	case Rev::DM_LineLoop:
-		return GL_LINE_LOOP;
-	case Rev::DM_LineStrip:
-		return GL_LINE_STRIP;
-	case Rev::DM_Triangles:
-		return GL_TRIANGLES;
-	case Rev::DM_TriangleStrip:
-		return GL_TRIANGLE_STRIP;
-	case Rev::DM_TriangleFan:
-		return GL_TRIANGLE_FAN;
-	default:
-		break;
-	}
-	REV_CORE_ASSERT(false, "Unknown draw mode");
-	return 0;
-}
+//GLenum FOpenGLContext::TranslateDrawMode(EDrawMode InDrawMode)
+//{
+//	switch (InDrawMode)
+//	{
+//	case Rev::DM_Points:
+//		return GL_POINTS;
+//	case Rev::DM_Line:
+//		return GL_LINE;
+//	case Rev::DM_LineLoop:
+//		return GL_LINE_LOOP;
+//	case Rev::DM_LineStrip:
+//		return GL_LINE_STRIP;
+//	case Rev::DM_Triangles:
+//		return GL_TRIANGLES;
+//	case Rev::DM_TriangleStrip:
+//		return GL_TRIANGLE_STRIP;
+//	case Rev::DM_TriangleFan:
+//		return GL_TRIANGLE_FAN;
+//	default:
+//		break;
+//	}
+//	REV_CORE_ASSERT(false, "Unknown draw mode");
+//	return 0;
+//}
 
 GLenum FOpenGLContext::TranslateIndexType(uint32 InStride)
 {

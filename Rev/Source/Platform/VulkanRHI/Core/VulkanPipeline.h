@@ -24,7 +24,7 @@ public:
     FVulkanPipelineBuilder();
     VkPipeline Build(VkDevice InDevice);
     void Clear();
-}
+};
 
 
 }

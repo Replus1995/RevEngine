@@ -55,8 +55,8 @@ Ref<FRHIShaderProgram> FRHIShaderLibrary::CreateGraphicsProgram(const std::strin
 
 Ref<FRHIShader> FRHIShaderLibrary::LoadOrCompileShader(const FPath& InPath, const FRHIShaderCompileOptions& InOptions)
 {
-	auto Binary = FShadercFactory::LoadOrCompileShader(InPath, InOptions);
-	if (Binary.Empty())
+	auto CompiledData = FShadercFactory::LoadOrCompileShader(InPath, InOptions);
+	if (CompiledData.Empty())
 	{
 		REV_CORE_WARN("No shader complied for {0}", InPath.ToString().c_str());
 		return {};
@@ -66,14 +66,14 @@ Ref<FRHIShader> FRHIShaderLibrary::LoadOrCompileShader(const FPath& InPath, cons
 	{
 	case ERenderAPI::OpenGL:
 	{
-		auto pShader = FOpenGLShaderFactory::CreateShader(Binary);
-		mShadersCache[Binary.Name].Add(InOptions.Hash(), pShader);
+		auto pShader = FOpenGLShaderFactory::CreateShader(CompiledData);
+		mShadersCache[CompiledData.Name].Add(InOptions.Hash(), pShader);
 		return pShader;
 	}
 	case ERenderAPI::Vulkan:
 	{
-		auto pShader = CreateRef<FVulkanShader>(Binary);
-		mShadersCache[Binary.Name].Add(InOptions.Hash(), pShader);
+		auto pShader = CreateRef<FVulkanShader>(CompiledData.Stage, CompiledData.Binary);
+		mShadersCache[CompiledData.Name].Add(InOptions.Hash(), pShader);
 		return pShader;
 	}
 	default:

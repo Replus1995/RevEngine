@@ -23,8 +23,6 @@ void SurfaceMaterial::Compile()
 
 void SurfaceMaterial::PreDraw()
 {
-	RenderCmd::SetBlendMode(BlendMode);
-	RenderCmd::SetCullFaceMode(TwoSided ? CFM_Disabled : CFM_Back);
 	Material::PreDraw();
 }
 

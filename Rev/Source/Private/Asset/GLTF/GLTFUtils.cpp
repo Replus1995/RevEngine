@@ -88,26 +88,26 @@ uint32 FGLTFUtils::GetComponentSize(int InComponentType)
 	}
 }
 
-EDrawMode FGLTFUtils::TranslateDrawMode(int InDrawMode)
+EPrimitiveTopology FGLTFUtils::TranslatePrimitiveTopology(int InPrimitiveTopology)
 {
-	switch (InDrawMode)
+	switch (InPrimitiveTopology)
 	{
 	case TINYGLTF_MODE_POINTS:
-		return DM_Points;
+		return PT_Points;
 	case TINYGLTF_MODE_LINE:
-		return DM_Line;
+		return PT_Lines;
 	case TINYGLTF_MODE_LINE_LOOP:
-		return DM_LineLoop;
+		return PT_LineLoop;
 	case TINYGLTF_MODE_LINE_STRIP:
-		return DM_LineStrip;
+		return PT_LineStrip;
 	case TINYGLTF_MODE_TRIANGLES:
-		return DM_Triangles;
+		return PT_Triangles;
 	case TINYGLTF_MODE_TRIANGLE_STRIP:
-		return DM_TriangleStrip;
+		return PT_TriangleStrip;
 	case TINYGLTF_MODE_TRIANGLE_FAN:
-		return DM_TriangleFan;
+		return PT_TriangleFan;
 	default:
-		return DM_Triangles;
+		return PT_Triangles;
 	}
 }
 
@@ -245,7 +245,7 @@ Ref<FMeshPrimitiveStorage> FGLTFUtils::ImportMeshPrimitive(const tinygltf::Primi
 {
 	Ref<FMeshPrimitiveStorage> OutStorage = CreateRef<FMeshPrimitiveStorage>();
 	OutStorage->MaterialIndex = InPrimitive.material;
-	OutStorage->DrawMode = TranslateDrawMode(InPrimitive.mode);
+	OutStorage->PrimitiveTopology = TranslatePrimitiveTopology(InPrimitive.mode);
 
 	for (auto& [attrName, attrIndex] : InPrimitive.attributes)
 	{
@@ -336,7 +336,7 @@ Ref<FTextureStorage> FGLTFUtils::ImportTexture(const tinygltf::Texture& InTextur
 		if (InImage.name.empty())
 		{
 			std::filesystem::path uri(InImage.uri);
-			Result->Name = uri.filename().generic_u8string();
+			Result->Name = uri.filename().generic_string();
 		}
 		else
 		{
@@ -371,15 +371,15 @@ Ref<FSurfaceMaterialStorage> FGLTFUtils::ImportMaterial(const tinygltf::Material
 		//Alpha Mode
 		if (InMaterial.alphaMode == "OPAQUE")
 		{
-			Result->BlendMode = BM_Opaque;
+			Result->BlendMode = MBM_Opaque;
 		}
 		else if (InMaterial.alphaMode == "BLEND")
 		{
-			Result->BlendMode = BM_Transparent;
+			Result->BlendMode = MBM_Transparent;
 		}
 		else if (InMaterial.alphaMode == "MASK")
 		{
-			Result->BlendMode = BM_Masked;
+			Result->BlendMode = MBM_Masked;
 		}
 	}
 

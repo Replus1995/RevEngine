@@ -36,13 +36,6 @@ public:
 	virtual void SetClearColor(const Math::FLinearColor& InColor) override;
 	virtual void SetClearDepthStencil(float InDepth, uint32 InStencil);
 	virtual void ClearBackBuffer() override;
-
-	virtual void EnableDepthTest(bool bEnable) override {};
-	virtual void EnableDepthWrite(bool bEnable) override {};
-	virtual void SetDepthTestMode(EDepthTestMode InMode) override {};
-	virtual void SetBlendMode(EBlendMode InMode) override {};
-	virtual void SetCullFaceMode(ECullFaceMode InMode) override {};
-
 //Resource
 	virtual void Bind(const Ref<FRHIVertexBuffer>& InVertexBuffer) override {};
 	virtual void Bind(const Ref<FRHIIndexBuffer>& InIndexBuffer) override {};
@@ -53,7 +46,7 @@ public:
 	virtual void Bind(const Ref<FRHITexture>& InTexture, uint32 InUnit) override {};
 	virtual void Bind(const Ref<FRHIRenderTarget>& InRenderTarget) override {};
 
-	virtual void Draw(const Ref<FRHIVertexArray>& InVertexArray, EDrawMode InDrawMode) override {};
+	virtual void Draw(const Ref<FRHIVertexArray>& InVertexArray) override {};
 
 
 	const FVulkanInstance& GetInstance() const { return mInstance; }

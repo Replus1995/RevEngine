@@ -64,31 +64,6 @@ void RenderCmd::ClearBackBuffer()
 	sContext->ClearBackBuffer();
 }
 
-void RenderCmd::EnableDepthTest(bool bEnable)
-{
-	sContext->EnableDepthTest(bEnable);
-}
-
-void RenderCmd::EnableDepthWrite(bool bEnable)
-{
-	sContext->EnableDepthWrite(bEnable);
-}
-
-void RenderCmd::SetDepthTestMode(EDepthTestMode InMode)
-{
-	sContext->SetDepthTestMode(InMode);
-}
-
-void RenderCmd::SetBlendMode(EBlendMode InMode)
-{
-	sContext->SetBlendMode(InMode);
-}
-
-void RenderCmd::SetCullFaceMode(ECullFaceMode InMode)
-{
-	sContext->SetCullFaceMode(InMode);
-}
-
 void RenderCmd::BindProgram(const Ref<FRHIShaderProgram>& InProgram)
 {
 	sContext->Bind(InProgram);
@@ -113,12 +88,12 @@ void RenderCmd::DrawPrimitive(const FMeshPrimitive* InPrimitive)
 {
 	if(!InPrimitive)
 		return;
-	sContext->Draw(InPrimitive->VertexData, InPrimitive->DrawMode);
+	sContext->Draw(InPrimitive->VertexData);
 }
 
-void RenderCmd::Draw(const Ref<FRHIVertexArray>& InVertexArray, EDrawMode InDrawMode)
+void RenderCmd::Draw(const Ref<FRHIVertexArray>& InVertexArray)
 {
-	sContext->Draw(InVertexArray, InDrawMode);
+	sContext->Draw(InVertexArray);
 }
 
 FRHIContext* RenderCmd::GetContext()

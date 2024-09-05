@@ -21,12 +21,6 @@ public:
 	virtual void SetClearColor(const Math::FLinearColor& color) override;
 	virtual void ClearBackBuffer() override;
 
-	virtual void EnableDepthTest(bool bEnable) override;
-	virtual void EnableDepthWrite(bool bEnable) override;
-	virtual void SetDepthTestMode(EDepthTestMode InMode) override;
-	virtual void SetBlendMode(EBlendMode InMode) override;
-	virtual void SetCullFaceMode(ECullFaceMode InMode) override;
-
 	virtual void Bind(const Ref<FRHIVertexBuffer>& InVertexBuffer) override;
 	virtual void Bind(const Ref<FRHIIndexBuffer>& InIndexBuffer) override;
 	virtual void Bind(const Ref<FRHIVertexArray>& InVertexArray) override;
@@ -36,10 +30,10 @@ public:
 	virtual void Bind(const Ref<FRHITexture>& InTexture, uint32 InUnit) override;
 	virtual void Bind(const Ref<FRHIRenderTarget>& InRenderTarget) override;
 
-	virtual void Draw(const Ref<FRHIVertexArray>& InVertexArray, EDrawMode InDrawMode) override;
+	virtual void Draw(const Ref<FRHIVertexArray>& InVertexArray) override;
 
 private:
-	GLenum TranslateDrawMode(EDrawMode InDrawMode);
+	//GLenum TranslateDrawMode(EDrawMode InDrawMode);
 	GLenum TranslateIndexType(uint32 InStride);
 };
 
