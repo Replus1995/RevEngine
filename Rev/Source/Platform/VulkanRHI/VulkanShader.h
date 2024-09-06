@@ -16,7 +16,6 @@ public:
 	virtual ~FVulkanShader();
 	virtual const void* GetNativeHandle() const override { return mModule; }
 
-private:
 	static VkShaderStageFlagBits TranslateShaderStage(ERHIShaderStage InStage);
 private:
 	VkShaderModule mModule = VK_NULL_HANDLE;
@@ -42,8 +41,14 @@ public:
 
 	virtual void SetUniformArray(uint16 location, const int* values, uint32_t count) override {};
 
+	void FlushPipeline();
+
+private:
+	static std::vector<VkPipelineShaderStageCreateInfo> MakeShaderStageInfo(const FRHIGraphicsShaders& InShaders);
+
 private:
 	VkPipeline mPipeline = VK_NULL_HANDLE;
+	FRHIGraphicsShaders mShaders;
 };
 
 }

@@ -7,7 +7,7 @@
 namespace Rev
 {
 
-enum class EVertexElementType
+enum class EVertexElementType : uint8
 {
 	None = 0,
 	Float,
@@ -25,7 +25,7 @@ enum class EVertexElementType
 uint32 VertexElementSize(EVertexElementType type);
 uint32 VertexComponentCount(EVertexElementType type);
 
-struct FVertexBufferElement
+struct FRHIVertexElement
 {
 	std::string Name;
 	EVertexElementType Type;
@@ -34,9 +34,9 @@ struct FVertexBufferElement
 	uint32 Offset;
 	bool Normalized;
 
-	FVertexBufferElement() = default;
+	FRHIVertexElement() = default;
 
-	FVertexBufferElement(const std::string& InName, EVertexElementType InType, uint32 InLocation, bool InNormalized = false)
+	FRHIVertexElement(const std::string& InName, EVertexElementType InType, uint32 InLocation, bool InNormalized = false)
 		: Name(InName), Type(InType), Location(InLocation), Size(VertexElementSize(InType)), Offset(0), Normalized(InNormalized)
 	{
 	}
@@ -45,24 +45,24 @@ struct FVertexBufferElement
 	uint32 GetComponentCount() const;
 };
 
-class FVertexBufferLayout
+class FRHIVertexLayout
 {
 public:
-	FVertexBufferLayout() {}
+	FRHIVertexLayout() {}
 
-	FVertexBufferLayout(std::initializer_list<FVertexBufferElement> InElements)
+	FRHIVertexLayout(std::initializer_list<FRHIVertexElement> InElements)
 		: mElements(InElements)
 	{
 		CalculateOffsetsAndStride();
 	}
 
 	uint32 GetStride() const { return mStride; }
-	const std::vector<FVertexBufferElement>& GetElements() const { return mElements; }
+	const std::vector<FRHIVertexElement>& GetElements() const { return mElements; }
 
-	std::vector<FVertexBufferElement>::iterator begin() { return mElements.begin(); }
-	std::vector<FVertexBufferElement>::iterator end() { return mElements.end(); }
-	std::vector<FVertexBufferElement>::const_iterator begin() const { return mElements.begin(); }
-	std::vector<FVertexBufferElement>::const_iterator end() const { return mElements.end(); }
+	std::vector<FRHIVertexElement>::iterator begin() { return mElements.begin(); }
+	std::vector<FRHIVertexElement>::iterator end() { return mElements.end(); }
+	std::vector<FRHIVertexElement>::const_iterator begin() const { return mElements.begin(); }
+	std::vector<FRHIVertexElement>::const_iterator end() const { return mElements.end(); }
 private:
 	void CalculateOffsetsAndStride()
 	{
@@ -74,7 +74,7 @@ private:
 		}
 	}
 private:
-	std::vector<FVertexBufferElement> mElements;
+	std::vector<FRHIVertexElement> mElements;
 	uint32 mStride = 0;
 };
 
@@ -91,12 +91,12 @@ public:
 	*/
 	virtual void UpdateSubData(const void* Data, uint32 Size, uint32 Offset = 0) = 0;
 
-	const FVertexBufferLayout& GetLayout() const { return mLayout; }
-	void SetLayout(const FVertexBufferLayout& InLayout) { mLayout = InLayout; }
+	const FRHIVertexLayout& GetLayout() const { return mLayout; }
+	void SetLayout(const FRHIVertexLayout& InLayout) { mLayout = InLayout; }
 	uint32 GetCapacity() const { return mSize; }
 protected:
 	uint32 mSize;
-	FVertexBufferLayout mLayout;
+	FRHIVertexLayout mLayout;
 };
 
 class REV_API FRHIIndexBuffer : public FRHIResource

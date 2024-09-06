@@ -83,6 +83,7 @@ struct REV_API FRHIGraphicsShaders
     Ref<FRHIShader> PixelShader = nullptr;
     Ref<FRHIShader> GeometryShader = nullptr;
 
+    Ref<FRHIShader>& operator[](ERHIShaderStage Stage);
     const Ref<FRHIShader>& operator[](ERHIShaderStage Stage) const;
 };
 

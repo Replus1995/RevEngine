@@ -21,7 +21,7 @@ uint32 VertexElementSize(EVertexElementType type)
 	case EVertexElementType::Bool:     return 1;
 	}
 
-	REV_CORE_ASSERT(false, "Unknown BufferElementType!");
+	REV_CORE_ASSERT(false, "Unknown VertexElementType!");
 	return 0;
 }
 
@@ -42,16 +42,16 @@ uint32 VertexComponentCount(EVertexElementType type)
 	case EVertexElementType::Bool:    return 1;
 	}
 
-	REV_CORE_ASSERT(false, "Unknown ShaderDataType!");
+	REV_CORE_ASSERT(false, "Unknown VertexElementType!");
 	return 0;
 }
 
-uint32 FVertexBufferElement::GetElementSize() const
+uint32 FRHIVertexElement::GetElementSize() const
 {
 	return VertexElementSize(Type);
 }
 
-uint32 FVertexBufferElement::GetComponentCount() const
+uint32 FRHIVertexElement::GetComponentCount() const
 {
 	return VertexComponentCount(Type);
 }

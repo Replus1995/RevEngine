@@ -32,6 +32,8 @@ public:
 
 	virtual void PreDraw() override
 	{
+		//RenderCmd::EnableDepthWrite(false);
+		//RenderCmd::SetDepthTestMode(DTM_LessEqual);
 		Material::PreDraw();
 	}
 
