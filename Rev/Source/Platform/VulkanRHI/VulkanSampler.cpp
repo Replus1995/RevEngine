@@ -1,5 +1,6 @@
 #include "VulkanSampler.h"
 #include "VulkanCore.h"
+#include "Core/VulkanEnum.h"
 #include "Rev/Core/Assert.h"
 
 namespace Rev
@@ -16,60 +17,6 @@ FVulkanSampler::~FVulkanSampler()
 	vkDestroySampler(FVulkanCore::GetDevice(), mSampler, nullptr);
 }
 
-VkFilter FVulkanSampler::TranslateFilterMode(ESamplerFilterMode InMode)
-{
-	switch (InMode)
-	{
-	case SF_Nearest:
-		return VK_FILTER_NEAREST;
-	case SF_Bilinear:
-	case SF_Trilinear:
-	case SF_AnisotropicNearest:
-	case SF_AnisotropicLinear:
-		return VK_FILTER_LINEAR;
-	}
-	REV_CORE_ASSERT(false, "Invalid filter mode");
-	return VkFilter(0);
-}
-
-VkSamplerMipmapMode FVulkanSampler::TranslateMipmapMode(ESamplerFilterMode InMode)
-{
-	switch (InMode)
-	{
-	case SF_Nearest:
-		return VK_SAMPLER_MIPMAP_MODE_NEAREST;
-	case SF_Bilinear:
-		return VK_SAMPLER_MIPMAP_MODE_NEAREST;
-	case SF_Trilinear:
-		return VK_SAMPLER_MIPMAP_MODE_LINEAR;
-	case SF_AnisotropicNearest:
-		return VK_SAMPLER_MIPMAP_MODE_NEAREST;
-	case SF_AnisotropicLinear:
-		return VK_SAMPLER_MIPMAP_MODE_LINEAR;
-	}
-	REV_CORE_ASSERT(false, "Invalid mip mode");
-	return VkSamplerMipmapMode(0);
-}
-
-VkSamplerAddressMode FVulkanSampler::TranslateWarpMode(ESamplerWarpMode InMode)
-{
-	switch (InMode)
-	{
-	case Rev::SW_Repeat:
-		return VK_SAMPLER_ADDRESS_MODE_REPEAT;
-	case Rev::SW_Clamp:
-		return VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
-	case Rev::SW_Mirror:
-		return VK_SAMPLER_ADDRESS_MODE_MIRRORED_REPEAT;
-	case Rev::SW_Border:
-		return VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
-	default:
-		break;
-	}
-
-	return VK_SAMPLER_ADDRESS_MODE_REPEAT;
-}
-
 bool FVulkanSampler::UseAnisotropicFilter(const FSamplerDesc& InDesc)
 {
 	return InDesc.Filter >= SF_AnisotropicNearest;
@@ -82,14 +29,16 @@ bool FVulkanSampler::UseBorderWarp(const FSamplerDesc& InDesc)
 
 void FVulkanSampler::CreateResource()
 {
+	auto FilterMode = FVulkanEnum::Translate(mDesc.Filter);
+
 	VkSamplerCreateInfo CreateInfo{};
 	CreateInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-	CreateInfo.magFilter = TranslateFilterMode(mDesc.Filter);
-	CreateInfo.minFilter = TranslateFilterMode(mDesc.Filter);
-	CreateInfo.mipmapMode = TranslateMipmapMode(mDesc.Filter);
-	CreateInfo.addressModeU = TranslateWarpMode(mDesc.WarpU);
-	CreateInfo.addressModeV = TranslateWarpMode(mDesc.WarpV);
-	CreateInfo.addressModeW = TranslateWarpMode(mDesc.WarpW);
+	CreateInfo.magFilter = FilterMode.first;
+	CreateInfo.minFilter = FilterMode.first;
+	CreateInfo.mipmapMode = FilterMode.second;
+	CreateInfo.addressModeU = FVulkanEnum::Translate(mDesc.WarpU);
+	CreateInfo.addressModeV = FVulkanEnum::Translate(mDesc.WarpV);
+	CreateInfo.addressModeW = FVulkanEnum::Translate(mDesc.WarpW);
 	CreateInfo.mipLodBias = 0.0f;
 	CreateInfo.anisotropyEnable = UseAnisotropicFilter(mDesc);
 	CreateInfo.maxAnisotropy = float(mDesc.Anisotropic);

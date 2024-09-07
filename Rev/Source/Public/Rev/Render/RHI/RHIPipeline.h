@@ -12,9 +12,16 @@ namespace Rev
 //TODO: MultiSampling State
 //TODO: Stencil Compare State
 
+enum EPolygonMode : uint8
+{
+	PM_Fill = 0,
+	PM_Line = 1,
+	PM_Point = 2
+};
+
 enum ECullMode : uint8
 {
-	CM_Disabled = 0,
+	CM_None = 0,
 	CM_Back,
 	CM_Front,
 	CM_BackAndFront
@@ -88,7 +95,8 @@ public:
 	//InputAssembly
 	EPrimitiveTopology PrimitiveTopology = PT_Unknown;
 	//Rasterization
-	ECullMode CullMode = CM_Disabled;
+	ECullMode CullMode = CM_None;
+	EPolygonMode PolygonMode = PM_Fill;
 	bool DepthClampEnable = false;
 	bool DepthBiasEnable = false;
 	float DepthBiasConstantFactor;

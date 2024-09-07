@@ -65,13 +65,14 @@ void FVulkanShaderProgram::FlushPipeline()
 		vkDestroyPipeline(FVulkanCore::GetDevice(), mPipeline, nullptr);
 
     std::vector<VkPipelineShaderStageCreateInfo> ShaderStages = MakeShaderStageInfo(mShaders);
+    VkPipelineVertexInputStateCreateInfo VertexInputState{ .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO }; //TODO
+    VkPipelineInputAssemblyStateCreateInfo InputAssemblyState = FVulkanGraphicsPipeline::MakeInputAssemblyStateInfo(PipelineState);
+    //VkPipelineTessellationStateCreateInfo
     VkPipelineViewportStateCreateInfo ViewportState = FVulkanGraphicsPipeline::MakeViewportStateInfo(PipelineState);
-
-   
-
-    // completely clear VertexInputStateCreateInfo, as we have no need for it
-    VkPipelineVertexInputStateCreateInfo StateInfo{};
-    StateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+    VkPipelineRasterizationStateCreateInfo RasterizationState = FVulkanGraphicsPipeline::MakeRasterizationStateInfo(PipelineState);
+    //VkPipelineMultisampleStateCreateInfo
+    VkPipelineDepthStencilStateCreateInfo DepthStencilState = FVulkanGraphicsPipeline::MakeDepthStencilStateInfo(PipelineState);
+    VkPipelineColorBlendStateCreateInfo ColorBlendState = FVulkanGraphicsPipeline::MakeColorBlendStateInfo(PipelineState);
 
     // build the actual pipeline
     // we now use all of the info structs we have been writing into into this one

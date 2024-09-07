@@ -1,7 +1,6 @@
 #pragma once
 #include "Rev/Core/Base.h"
 #include "Rev/Render/RHI/RHIRenderTarget.h"
-#include "Rev/Render/RHI/RHIPipeline.h"
 
 namespace Rev
 {
@@ -16,7 +15,7 @@ struct FSubPassAttachmentRef
 struct FSubPassDesc
 {
 public:
-	EPipelineBindPoint PipelineBindPoint;
+	//EPipelineBindPoint PipelineBindPoint;
 	uint32 InputAttachmentCount;
 	FSubPassAttachmentRef InputAttachments[RTA_MaxColorAttachments + 1];
 	uint32 ColorAttachmentCount;

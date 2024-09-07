@@ -13,9 +13,6 @@ public:
 	virtual const void* GetNativeHandle() const override { return mSampler; }
 
 private:
-	static VkFilter TranslateFilterMode(ESamplerFilterMode InMode);
-	static VkSamplerMipmapMode TranslateMipmapMode(ESamplerFilterMode InMode);
-	static VkSamplerAddressMode TranslateWarpMode(ESamplerWarpMode InMode);
 	static bool UseAnisotropicFilter(const FSamplerDesc& InDesc);
 	static bool UseBorderWarp(const FSamplerDesc& InDesc);
 	void CreateResource();
