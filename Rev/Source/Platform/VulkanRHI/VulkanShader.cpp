@@ -65,46 +65,7 @@ void FVulkanShaderProgram::FlushPipeline()
 		vkDestroyPipeline(FVulkanCore::GetDevice(), mPipeline, nullptr);
 
     std::vector<VkPipelineShaderStageCreateInfo> ShaderStages = MakeShaderStageInfo(mShaders);
-    VkPipelineVertexInputStateCreateInfo VertexInputState{ .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO }; //TODO
-    VkPipelineInputAssemblyStateCreateInfo InputAssemblyState = FVulkanGraphicsPipeline::MakeInputAssemblyStateInfo(PipelineState);
-    //VkPipelineTessellationStateCreateInfo
-    VkPipelineViewportStateCreateInfo ViewportState = FVulkanGraphicsPipeline::MakeViewportStateInfo(PipelineState);
-    VkPipelineRasterizationStateCreateInfo RasterizationState = FVulkanGraphicsPipeline::MakeRasterizationStateInfo(PipelineState);
-    //VkPipelineMultisampleStateCreateInfo
-    VkPipelineDepthStencilStateCreateInfo DepthStencilState = FVulkanGraphicsPipeline::MakeDepthStencilStateInfo(PipelineState);
-    VkPipelineColorBlendStateCreateInfo ColorBlendState = FVulkanGraphicsPipeline::MakeColorBlendStateInfo(PipelineState);
-
-    // build the actual pipeline
-    // we now use all of the info structs we have been writing into into this one
-    // to create the pipeline
-    VkGraphicsPipelineCreateInfo PipelineInfo = { .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO };
-    // connect the renderInfo to the pNext extension mechanism
-    PipelineInfo.pNext = &RenderInfo;
-
-    PipelineInfo.stageCount = (uint32_t)ShaderStages.size();
-    PipelineInfo.pStages = ShaderStages.data();
-    PipelineInfo.pVertexInputState = &VertexInputInfo;
-    PipelineInfo.pInputAssemblyState = &InputAssembly;
-    PipelineInfo.pViewportState = &ViewportState;
-    PipelineInfo.pRasterizationState = &Rasterizer;
-    PipelineInfo.pMultisampleState = &Multisampling;
-    PipelineInfo.pColorBlendState = &ColorBlendState;
-    PipelineInfo.pDepthStencilState = &DepthStencil;
-    PipelineInfo.layout = PipelineLayout;
-
-    VkDynamicState DynamicStates[] = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
-
-    VkPipelineDynamicStateCreateInfo DynamicInfo = { .sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO };
-    DynamicInfo.pDynamicStates = &DynamicStates[0];
-    DynamicInfo.dynamicStateCount = 2;
-
-    PipelineInfo.pDynamicState = &DynamicInfo;
-
-    // its easy to error out on create graphics pipeline, so we handle it a bit
-   // better than the common VK_CHECK case
-    VkPipeline NewPipeline;
-    REV_VK_CHECK_THROW(vkCreateGraphicsPipelines(InDevice, VK_NULL_HANDLE, 1, &PipelineInfo, nullptr, &NewPipeline), "failed to create pipeline");
-    return NewPipeline;
+    
 
 }
 

@@ -10,19 +10,25 @@ namespace Rev
 struct FVulkanGraphicsPipelineBuilder
 {
 public:
+    FVulkanGraphicsPipelineBuilder(const FRHIGraphicsPipelineState& InState);
+    ~FVulkanGraphicsPipelineBuilder();
 
-
-private:
-    VkPipelineInputAssemblyStateCreateInfo MakeInputAssemblyStateInfo(const FRHIGraphicsPipelineState& InState);
-    //VkPipelineTessellationStateCreateInfo
-    VkPipelineViewportStateCreateInfo MakeViewportStateInfo(const FRHIGraphicsPipelineState& InState);
-    VkPipelineRasterizationStateCreateInfo MakeRasterizationStateInfo(const FRHIGraphicsPipelineState& InState);
-    VkPipelineMultisampleStateCreateInfo
-    VkPipelineDepthStencilStateCreateInfo MakeDepthStencilStateInfo(const FRHIGraphicsPipelineState& InState);
-    VkPipelineColorBlendStateCreateInfo MakeColorBlendStateInfo(const FRHIGraphicsPipelineState& InState);
-    VkPipelineDynamicStateCreateInfo MakeDynamicStateInfo();
+    VkPipeline Build(VkDevice InDevice, const std::vector<VkPipelineShaderStageCreateInfo>& InShaderStageInfo) const;
 
 private:
+    VkPipelineInputAssemblyStateCreateInfo MakeInputAssemblyStateInfo() const;
+    VkPipelineTessellationStateCreateInfo MakeTessellationStateInfo() const;
+    VkPipelineViewportStateCreateInfo MakeViewportStateInfo() const;
+    VkPipelineRasterizationStateCreateInfo MakeRasterizationStateInfo() const;
+    VkPipelineMultisampleStateCreateInfo MakeMultisampleStateInfo() const;
+    VkPipelineDepthStencilStateCreateInfo MakeDepthStencilStateInfo() const;
+    VkPipelineColorBlendStateCreateInfo MakeColorBlendStateInfo() const;
+    VkPipelineDynamicStateCreateInfo MakeDynamicStateInfo() const;
+    VkPipelineRenderingCreateInfo MakeRenderingInfo() const;
+
+private:
+    FRHIGraphicsPipelineState mState;
+    std::vector<VkPipelineColorBlendAttachmentState> mAttachemntStateVec;
     VkDynamicState mDynamicStates[2] = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
     //VkDynamicState mDynamicStates[3] = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR, VK_DYNAMIC_STATE_PRIMITIVE_TOPOLOGY };
     
