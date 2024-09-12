@@ -108,7 +108,7 @@ public:
 	bool DepthWriteEnable = false;
 	ECompareOp DepthCompareOp = CO_Never;
 	//ColorBlend
-	std::vector<FColorBlendAttachmentState> ColorBlendAttachmentStates;
+	FColorBlendAttachmentState ColorBlendAttachmentState;
 	Math::FLinearColor BlendConstants;
 };
 

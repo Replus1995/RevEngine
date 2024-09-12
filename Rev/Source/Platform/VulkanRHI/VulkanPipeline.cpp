@@ -8,28 +8,39 @@ namespace Rev
 FVulkanGraphicsPipelineBuilder::FVulkanGraphicsPipelineBuilder(const FRHIGraphicsPipelineState& InState)
     : mState(InState)
 {
-    mAttachemntStateVec.reserve(InState.ColorBlendAttachmentStates.size());
-    for (const auto& SrcAttachemntState : InState.ColorBlendAttachmentStates)
-    {
-        VkPipelineColorBlendAttachmentState AttachemntState{};
-        AttachemntState.blendEnable = SrcAttachemntState.BlendEnable;
-        AttachemntState.srcColorBlendFactor = FVulkanEnum::Translate(SrcAttachemntState.SrcColorBlendFactor);
-        AttachemntState.dstColorBlendFactor = FVulkanEnum::Translate(SrcAttachemntState.DstColorBlendFactor);
-        AttachemntState.colorBlendOp = FVulkanEnum::Translate(SrcAttachemntState.ColorBlendOp);
-        AttachemntState.srcAlphaBlendFactor = FVulkanEnum::Translate(SrcAttachemntState.SrcAlphaBlendFactor);
-        AttachemntState.dstAlphaBlendFactor = FVulkanEnum::Translate(SrcAttachemntState.DstAlphaBlendFactor);
-        AttachemntState.alphaBlendOp = FVulkanEnum::Translate(SrcAttachemntState.AlphaBlendOp);
-        AttachemntState.colorWriteMask = FVulkanEnum::Translate(SrcAttachemntState.ColorWriteMask);
-        mAttachemntStateVec.emplace_back(std::move(AttachemntState));
-    }
 }
 
 FVulkanGraphicsPipelineBuilder::~FVulkanGraphicsPipelineBuilder()
 {
 }
 
-VkPipeline FVulkanGraphicsPipelineBuilder::Build(VkDevice InDevice, const std::vector<VkPipelineShaderStageCreateInfo>& InShaderStageInfo) const
+VkPipelineLayout FVulkanGraphicsPipelineBuilder::BuildLayout()
 {
+    return VkPipelineLayout();
+}
+
+VkPipeline FVulkanGraphicsPipelineBuilder::Build(VkDevice InDevice, VkPipelineLayout InLayout, const std::vector<VkPipelineShaderStageCreateInfo>& InShaderStageInfo, uint32 InColorAttachmentCount)
+{
+    VkPipelineColorBlendAttachmentState AttachemntState{};
+    AttachemntState.blendEnable = mState.ColorBlendAttachmentState.BlendEnable;
+    AttachemntState.srcColorBlendFactor = FVulkanEnum::Translate(mState.ColorBlendAttachmentState.SrcColorBlendFactor);
+    AttachemntState.dstColorBlendFactor = FVulkanEnum::Translate(mState.ColorBlendAttachmentState.DstColorBlendFactor);
+    AttachemntState.colorBlendOp = FVulkanEnum::Translate(mState.ColorBlendAttachmentState.ColorBlendOp);
+    AttachemntState.srcAlphaBlendFactor = FVulkanEnum::Translate(mState.ColorBlendAttachmentState.SrcAlphaBlendFactor);
+    AttachemntState.dstAlphaBlendFactor = FVulkanEnum::Translate(mState.ColorBlendAttachmentState.DstAlphaBlendFactor);
+    AttachemntState.alphaBlendOp = FVulkanEnum::Translate(mState.ColorBlendAttachmentState.AlphaBlendOp);
+    AttachemntState.colorWriteMask = FVulkanEnum::Translate(mState.ColorBlendAttachmentState.ColorWriteMask);
+
+    std::vector<VkPipelineColorBlendAttachmentState> AttachemntStateVec;
+    AttachemntStateVec.reserve(InColorAttachmentCount);
+    for (uint32 i = 0; i < InColorAttachmentCount; i++)
+    {
+        AttachemntStateVec.push_back(AttachemntState);
+    }
+
+    std::vector<VkDynamicState> DynamicStates = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
+    //std::vector<VkDynamicState> DynamicStates = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR, VK_DYNAMIC_STATE_PRIMITIVE_TOPOLOGY };
+
     VkPipelineVertexInputStateCreateInfo VertexInputState{ .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO }; //TODO
     VkPipelineInputAssemblyStateCreateInfo InputAssemblyState = MakeInputAssemblyStateInfo();
     VkPipelineTessellationStateCreateInfo TessellationState = MakeTessellationStateInfo();
@@ -37,16 +48,17 @@ VkPipeline FVulkanGraphicsPipelineBuilder::Build(VkDevice InDevice, const std::v
     VkPipelineRasterizationStateCreateInfo RasterizationState = MakeRasterizationStateInfo();
     VkPipelineMultisampleStateCreateInfo MultisampleState = MakeMultisampleStateInfo();
     VkPipelineDepthStencilStateCreateInfo DepthStencilState = MakeDepthStencilStateInfo();
-    VkPipelineColorBlendStateCreateInfo ColorBlendState = MakeColorBlendStateInfo();
-    VkPipelineDynamicStateCreateInfo DynamicState = MakeDynamicStateInfo();
+    VkPipelineColorBlendStateCreateInfo ColorBlendState = MakeColorBlendStateInfo(AttachemntStateVec);
+    VkPipelineDynamicStateCreateInfo DynamicState = MakeDynamicStateInfo(DynamicStates);
     VkPipelineRenderingCreateInfo Rendering = MakeRenderingInfo();
 
     VkPipelineLayout Layout = VK_NULL_HANDLE;
     VkPipelineLayoutCreateInfo GraphicsLayout{};
     GraphicsLayout.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    GraphicsLayout.pNext = nullptr;
-    GraphicsLayout.pSetLayouts = &_drawImageDescriptorLayout;
-    GraphicsLayout.setLayoutCount = 1;
+    GraphicsLayout.setLayoutCount = 0; // Optional
+    GraphicsLayout.pSetLayouts = nullptr; // Optional
+    GraphicsLayout.pushConstantRangeCount = 0; // Optional
+    GraphicsLayout.pPushConstantRanges = nullptr; // Optional
 
     REV_VK_CHECK_THROW(vkCreatePipelineLayout(InDevice, &GraphicsLayout, nullptr, &Layout), "failed to create pipeline layout");
 
@@ -125,8 +137,8 @@ VkPipelineMultisampleStateCreateInfo FVulkanGraphicsPipelineBuilder::MakeMultisa
 {
     VkPipelineMultisampleStateCreateInfo StateInfo{};
     StateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-    StateInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
     StateInfo.sampleShadingEnable = VK_FALSE;
+    StateInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
     StateInfo.minSampleShading = 1.0f;
     StateInfo.pSampleMask = nullptr;
     StateInfo.alphaToCoverageEnable = VK_FALSE;
@@ -151,17 +163,14 @@ VkPipelineDepthStencilStateCreateInfo FVulkanGraphicsPipelineBuilder::MakeDepthS
     return StateInfo;
 }
 
-VkPipelineColorBlendStateCreateInfo FVulkanGraphicsPipelineBuilder::MakeColorBlendStateInfo() const
+VkPipelineColorBlendStateCreateInfo FVulkanGraphicsPipelineBuilder::MakeColorBlendStateInfo(const std::vector<VkPipelineColorBlendAttachmentState>& InAttachmentStates) const
 {
-    // setup dummy color blending. We arent using transparent objects yet
-    // the blending is just "no blend", but we do write to the color attachment
-    VkPipelineColorBlendStateCreateInfo StateInfo = {};
+    VkPipelineColorBlendStateCreateInfo StateInfo{};
     StateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
-    StateInfo.pNext = nullptr;
     StateInfo.logicOpEnable = VK_FALSE;
     StateInfo.logicOp = VK_LOGIC_OP_COPY;
-    StateInfo.attachmentCount = (uint32_t)mAttachemntStateVec.size();
-    StateInfo.pAttachments = mAttachemntStateVec.data();
+    StateInfo.pAttachments = InAttachmentStates.data();
+    StateInfo.attachmentCount = (uint32_t)InAttachmentStates.size();
 
     for (size_t i = 0; i < 4; i++)
     {
@@ -171,12 +180,12 @@ VkPipelineColorBlendStateCreateInfo FVulkanGraphicsPipelineBuilder::MakeColorBle
     return StateInfo;
 }
 
-VkPipelineDynamicStateCreateInfo FVulkanGraphicsPipelineBuilder::MakeDynamicStateInfo() const
+VkPipelineDynamicStateCreateInfo FVulkanGraphicsPipelineBuilder::MakeDynamicStateInfo(const std::vector<VkDynamicState>& InDynaimcStates) const
 {
     VkPipelineDynamicStateCreateInfo StateInfo{};
     StateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
-    StateInfo.pDynamicStates = &mDynamicStates[0];
-    StateInfo.dynamicStateCount = 2;
+    StateInfo.pDynamicStates = InDynaimcStates.data();
+    StateInfo.dynamicStateCount = (uint32_t)InDynaimcStates.size();
     return StateInfo;
 }
 

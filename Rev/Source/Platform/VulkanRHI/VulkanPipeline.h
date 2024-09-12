@@ -13,7 +13,8 @@ public:
     FVulkanGraphicsPipelineBuilder(const FRHIGraphicsPipelineState& InState);
     ~FVulkanGraphicsPipelineBuilder();
 
-    VkPipeline Build(VkDevice InDevice, const std::vector<VkPipelineShaderStageCreateInfo>& InShaderStageInfo) const;
+    VkPipelineLayout BuildLayout();
+    VkPipeline Build(VkDevice InDevice, VkPipelineLayout InLayout, const std::vector<VkPipelineShaderStageCreateInfo>& InShaderStageInfo, uint32 InColorAttachmentCount = 1);
 
 private:
     VkPipelineInputAssemblyStateCreateInfo MakeInputAssemblyStateInfo() const;
@@ -22,15 +23,12 @@ private:
     VkPipelineRasterizationStateCreateInfo MakeRasterizationStateInfo() const;
     VkPipelineMultisampleStateCreateInfo MakeMultisampleStateInfo() const;
     VkPipelineDepthStencilStateCreateInfo MakeDepthStencilStateInfo() const;
-    VkPipelineColorBlendStateCreateInfo MakeColorBlendStateInfo() const;
-    VkPipelineDynamicStateCreateInfo MakeDynamicStateInfo() const;
+    VkPipelineColorBlendStateCreateInfo MakeColorBlendStateInfo(const std::vector<VkPipelineColorBlendAttachmentState>& InAttachmentStates) const;
+    VkPipelineDynamicStateCreateInfo MakeDynamicStateInfo(const std::vector<VkDynamicState>& InDynaimcStates) const;
     VkPipelineRenderingCreateInfo MakeRenderingInfo() const;
 
 private:
     FRHIGraphicsPipelineState mState;
-    std::vector<VkPipelineColorBlendAttachmentState> mAttachemntStateVec;
-    VkDynamicState mDynamicStates[2] = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
-    //VkDynamicState mDynamicStates[3] = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR, VK_DYNAMIC_STATE_PRIMITIVE_TOPOLOGY };
     
 };
 
