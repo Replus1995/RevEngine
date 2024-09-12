@@ -5,24 +5,19 @@
 namespace Rev
 {
 
-FCityHash::FCityHash(uint64 InSeed)
-	: mSeed(InSeed)
+uint32 FCityHash::Gen(const void* InData, size_t InLength)
 {
+	return CityHash32((const char*)InData, InLength);
 }
 
-uint64 FCityHash::Build(const void* InData, size_t InLength)
+uint32 FCityHash::Gen(const char* InStr)
 {
-	return CityHash64WithSeed((const char*)InData, InLength, mSeed);
+	return Gen(std::string_view(InStr));
 }
 
-uint64 FCityHash::Build(const char* InStr)
+uint32 FCityHash::Gen(std::string_view InStr)
 {
-	return Build(std::string_view(InStr));
-}
-
-uint64 FCityHash::Build(std::string_view InStr)
-{
-	return Build(InStr.data(), InStr.length());
+	return Gen(InStr.data(), InStr.length());
 }
 
 }

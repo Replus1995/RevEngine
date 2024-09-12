@@ -7,20 +7,25 @@ namespace Rev
 class FCityHash
 {
 public:
-	FCityHash(uint64 InSeed = 0);
-
-	uint64 Build(const void* InData, size_t InLength);
-	uint64 Build(const char* InStr);
-	uint64 Build(std::string_view InStr);
+	static uint32 Gen(const void* InData, size_t InLength);
+	static uint32 Gen(const char* InStr);
+	static uint32 Gen(std::string_view InStr);
 
 	template<typename T>
-	uint64 Build(const T& InType)
+	static uint64 Gen(const T& InType)
 	{
 		return Build(&InType, sizeof(T));
 	}
+};
+
+class FHashEntry
+{
+public:
+	FHashEntry(uint32 InValue);
+	virtual ~FHashEntry();
 
 private:
-	uint64 mSeed;
+	uint32 mValue = 0;
 };
 
 }
