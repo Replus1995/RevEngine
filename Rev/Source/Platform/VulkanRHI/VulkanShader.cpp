@@ -1,6 +1,5 @@
 #include "VulkanShader.h"
 #include "VulkanCore.h"
-#include "Core/VulkanPipeline.h"
 #include "Rev/Core/Assert.h"
 
 namespace Rev
@@ -61,12 +60,9 @@ void FVulkanShaderProgram::FlushPipeline()
 		return;
 	mPipelineStateDirty = false;
 
-	if(mPipeline)
-		vkDestroyPipeline(FVulkanCore::GetDevice(), mPipeline, nullptr);
-
     std::vector<VkPipelineShaderStageCreateInfo> ShaderStages = MakeShaderStageInfo(mShaders);
     
-
+	mPipeline.Build(PipelineState, ShaderStages, 1);
 }
 
 std::vector<VkPipelineShaderStageCreateInfo> FVulkanShaderProgram::MakeShaderStageInfo(const FRHIGraphicsShaders& InShaders)

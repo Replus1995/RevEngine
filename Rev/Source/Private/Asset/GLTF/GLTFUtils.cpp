@@ -97,7 +97,7 @@ EPrimitiveTopology FGLTFUtils::TranslatePrimitiveTopology(int InPrimitiveTopolog
 	case TINYGLTF_MODE_LINE:
 		return PT_Lines;
 	case TINYGLTF_MODE_LINE_LOOP:
-		return PT_LineLoop;
+		return PT_Lines;
 	case TINYGLTF_MODE_LINE_STRIP:
 		return PT_LineStrip;
 	case TINYGLTF_MODE_TRIANGLES:

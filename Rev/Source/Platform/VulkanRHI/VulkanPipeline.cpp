@@ -1,9 +1,35 @@
 #include "VulkanPipeline.h"
+#include "VulkanCore.h"
 #include "Core/VulkanDefines.h"
 #include "Core/VulkanEnum.h"
 
 namespace Rev
 {
+
+FVulkanPipeline::FVulkanPipeline()
+{
+}
+
+FVulkanPipeline::~FVulkanPipeline()
+{
+    Release();
+}
+
+void FVulkanPipeline::Build(const FRHIGraphicsPipelineState& InState, const std::vector<VkPipelineShaderStageCreateInfo>& InShaderStageInfo, uint32 InColorAttachmentCount)
+{
+    Release();
+    FVulkanGraphicsPipelineBuilder Builder(InState);
+    mPipelineLayout = Builder.BuildLayout(FVulkanCore::GetDevice());
+    mPipeline = Builder.Build(FVulkanCore::GetDevice(), mPipelineLayout, InShaderStageInfo, InColorAttachmentCount);
+}
+
+void FVulkanPipeline::Release()
+{
+    if(mPipelineLayout)
+        vkDestroyPipelineLayout(FVulkanCore::GetDevice(), mPipelineLayout, nullptr);
+    if (mPipeline)
+        vkDestroyPipeline(FVulkanCore::GetDevice(), mPipeline, nullptr);
+}
 
 FVulkanGraphicsPipelineBuilder::FVulkanGraphicsPipelineBuilder(const FRHIGraphicsPipelineState& InState)
     : mState(InState)
@@ -14,9 +40,19 @@ FVulkanGraphicsPipelineBuilder::~FVulkanGraphicsPipelineBuilder()
 {
 }
 
-VkPipelineLayout FVulkanGraphicsPipelineBuilder::BuildLayout()
+VkPipelineLayout FVulkanGraphicsPipelineBuilder::BuildLayout(VkDevice InDevice)
 {
-    return VkPipelineLayout();
+    VkPipelineLayout NewLayout = VK_NULL_HANDLE;
+    VkPipelineLayoutCreateInfo GraphicsLayout{};
+    GraphicsLayout.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    GraphicsLayout.setLayoutCount = 0; // Optional
+    GraphicsLayout.pSetLayouts = nullptr; // Optional
+    GraphicsLayout.pushConstantRangeCount = 0; // Optional
+    GraphicsLayout.pPushConstantRanges = nullptr; // Optional
+
+    REV_VK_CHECK_THROW(vkCreatePipelineLayout(InDevice, &GraphicsLayout, nullptr, &NewLayout), "failed to create pipeline layout");
+
+    return NewLayout;
 }
 
 VkPipeline FVulkanGraphicsPipelineBuilder::Build(VkDevice InDevice, VkPipelineLayout InLayout, const std::vector<VkPipelineShaderStageCreateInfo>& InShaderStageInfo, uint32 InColorAttachmentCount)
@@ -52,16 +88,6 @@ VkPipeline FVulkanGraphicsPipelineBuilder::Build(VkDevice InDevice, VkPipelineLa
     VkPipelineDynamicStateCreateInfo DynamicState = MakeDynamicStateInfo(DynamicStates);
     VkPipelineRenderingCreateInfo Rendering = MakeRenderingInfo();
 
-    VkPipelineLayout Layout = VK_NULL_HANDLE;
-    VkPipelineLayoutCreateInfo GraphicsLayout{};
-    GraphicsLayout.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    GraphicsLayout.setLayoutCount = 0; // Optional
-    GraphicsLayout.pSetLayouts = nullptr; // Optional
-    GraphicsLayout.pushConstantRangeCount = 0; // Optional
-    GraphicsLayout.pPushConstantRanges = nullptr; // Optional
-
-    REV_VK_CHECK_THROW(vkCreatePipelineLayout(InDevice, &GraphicsLayout, nullptr, &Layout), "failed to create pipeline layout");
-
     // build the actual pipeline
     // we now use all of the info structs we have been writing into into this one
     // to create the pipeline
@@ -79,7 +105,7 @@ VkPipeline FVulkanGraphicsPipelineBuilder::Build(VkDevice InDevice, VkPipelineLa
     PipelineInfo.pDepthStencilState = &DepthStencilState;
     PipelineInfo.pColorBlendState = &ColorBlendState;
     PipelineInfo.pDynamicState = &DynamicState;
-    PipelineInfo.layout = Layout;
+    PipelineInfo.layout = InLayout;
 
     // its easy to error out on create graphics pipeline, so we handle it a bit
    // better than the common VK_CHECK case

@@ -4,6 +4,7 @@
 #include "Rev/Core/Buffer.h"
 #include <map>
 #include <vulkan/vulkan.h>
+#include "VulkanPipeline.h"
 #include "../Shaderc/ShadercFactory.h"
 
 namespace Rev
@@ -27,7 +28,7 @@ class FVulkanShaderProgram : public FRHIShaderProgram
 public:
 	FVulkanShaderProgram(const std::string& InName, const FRHIGraphicsShaders& InShaders);
 	virtual ~FVulkanShaderProgram();
-	virtual const void* GetNativeHandle() const override { return mPipeline; }
+	virtual const void* GetNativeHandle() const override { return mPipeline.GetPipeline(); }
 
 	virtual uint16 GetUniformLocation(std::string_view name) override { return 0; };
 
@@ -47,7 +48,7 @@ private:
 	static std::vector<VkPipelineShaderStageCreateInfo> MakeShaderStageInfo(const FRHIGraphicsShaders& InShaders);
 
 private:
-	VkPipeline mPipeline = VK_NULL_HANDLE;
+	FVulkanPipeline mPipeline;
 	FRHIGraphicsShaders mShaders;
 };
 
