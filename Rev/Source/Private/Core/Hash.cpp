@@ -20,6 +20,15 @@ uint32 FCityHash::Gen(std::string_view InStr)
 	return Gen(InStr.data(), InStr.length());
 }
 
+FHashEntry::FHashEntry(uint32 InValue)
+	: mValue(InValue)
+{
+}
+
+FHashEntry::~FHashEntry()
+{
+}
+
 }
 
 
