@@ -8,6 +8,8 @@
 #include <filesystem>
 #include <regex>
 #include <spirv_cross/spirv_cross.hpp>
+#include <spirv_cross/spirv_reflect.hpp>
+#include <spirv-tools/optimizer.hpp>
 
 #include <iostream>
 
@@ -201,12 +203,12 @@ void FShadercUtils::DumpShaderInfo(const FShadercCompiledData& InData)
 {
 	//for (auto&& [Stage, CompiledData] : InData.CompiledDataMap)
 	{
-		spirv_cross::Compiler compiler(InData.Binary.DataAs<uint32_t>(), InData.Binary.Size() / sizeof(uint32_t));
-		spirv_cross::ShaderResources resources = compiler.get_shader_resources();
+		spirv_cross::CompilerReflection Refl(InData.Binary.DataAs<uint32_t>(), InData.Binary.Size() / sizeof(uint32_t));
+		spirv_cross::ShaderResources ResourceRefl = Refl.get_shader_resources();
 
 		REV_CORE_TRACE("Shaderc::Reflect - {0} {1}", InData.Name.c_str(), ShaderStageToString(InData.Stage));
-		REV_CORE_TRACE("    {0} uniform buffers", resources.uniform_buffers.size());
-		REV_CORE_TRACE("    {0} sampled images", resources.sampled_images.size());
+		REV_CORE_TRACE("    {0} uniform buffers", ResourceRefl.uniform_buffers.size());
+		REV_CORE_TRACE("    {0} sampled images", ResourceRefl.sampled_images.size());
 		//REV_CORE_TRACE("    {0} separate images", resources.separate_images.size());
 		//REV_CORE_TRACE("    {0} separate samplers", resources.separate_samplers.size());
 

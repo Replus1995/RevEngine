@@ -4,8 +4,11 @@
 namespace Rev
 {
 
-class FNameEntry
+class FNameEntry : public FHashEntry
 {
+public:
+
+private:
 
 };
 
