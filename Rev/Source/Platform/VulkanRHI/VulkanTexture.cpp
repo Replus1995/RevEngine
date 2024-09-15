@@ -95,7 +95,7 @@ VkClearValue FVulkanTexture::GetClearValue()
 	return ClearValue;
 }
 
-Ref<FVulkanTexture> CreateVkTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc)
+Ref<FVulkanTexture> CreateVulkanTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc)
 {
 	switch (InDesc.Dimension)
 	{
