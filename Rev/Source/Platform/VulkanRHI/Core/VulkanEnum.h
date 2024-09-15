@@ -6,6 +6,7 @@
 #include "Rev/Render/RHI/RHIPrimitive.h"
 #include "Rev/Render/RHI/RHIShader.h"
 #include "Rev/Render/RHI/RHIPipeline.h"
+#include "Rev/Render/RHI/RHIRenderPass.h"
 #include <vulkan/vulkan.h>
 
 
@@ -27,6 +28,9 @@ public:
     static VkColorComponentFlags Translate(EColorComponentMask InMask);
     static VkPolygonMode Translate(EPolygonMode InMode);
     static VkCullModeFlags Translate(ECullMode InMode);
+    static VkAttachmentLoadOp Translate(EAttachmentLoadOp InOp);
+    static VkAttachmentStoreOp Translate(EAttachmentStoreOp InOp);
+    static VkPipelineBindPoint Translate(EPipelineBindPoint InBindPoint);
 };
 
 }

@@ -77,7 +77,15 @@ VkPipeline FVulkanGraphicsPipelineBuilder::Build(VkDevice InDevice, VkPipelineLa
     std::vector<VkDynamicState> DynamicStates = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
     //std::vector<VkDynamicState> DynamicStates = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR, VK_DYNAMIC_STATE_PRIMITIVE_TOPOLOGY };
 
-    VkPipelineVertexInputStateCreateInfo VertexInputState{ .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO }; //TODO
+    //TODO
+    VkPipelineVertexInputStateCreateInfo VertexInputState{};
+    VertexInputState.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+    VertexInputState.vertexBindingDescriptionCount = 0;
+    VertexInputState.pVertexBindingDescriptions = nullptr; // Optional
+    VertexInputState.vertexAttributeDescriptionCount = 0;
+    VertexInputState.pVertexAttributeDescriptions = nullptr; // Optional
+
+
     VkPipelineInputAssemblyStateCreateInfo InputAssemblyState = MakeInputAssemblyStateInfo();
     VkPipelineTessellationStateCreateInfo TessellationState = MakeTessellationStateInfo();
     VkPipelineViewportStateCreateInfo ViewportState = MakeViewportStateInfo();
@@ -137,7 +145,6 @@ VkPipelineViewportStateCreateInfo FVulkanGraphicsPipelineBuilder::MakeViewportSt
     // at the moment we wont support multiple viewports or scissors
     VkPipelineViewportStateCreateInfo StateInfo{};
     StateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-    StateInfo.pNext = nullptr;
     StateInfo.viewportCount = 1;
     StateInfo.scissorCount = 1;
     return StateInfo;

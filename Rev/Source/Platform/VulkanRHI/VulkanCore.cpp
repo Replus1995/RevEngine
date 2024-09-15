@@ -40,6 +40,11 @@ VkCommandBuffer FVulkanCore::GetMainCmdBuffer()
 	return GetContext()->GetMainCmdBuffer();
 }
 
+VkExtent2D FVulkanCore::GetSwapchainExtent()
+{
+	return GetContext()->GetSwapchain().GetExtent();
+}
+
 void FVulkanCore::ImmediateSubmit(std::function<void(VkCommandBuffer)>&& Func)
 {
 	GetContext()->ImmediateSubmit(std::move(Func));

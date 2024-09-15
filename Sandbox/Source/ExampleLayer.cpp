@@ -26,7 +26,10 @@ ExampleLayer::ExampleLayer()
 
 	//Create Sandbox Scene
 	mScene = CreateRef<Rev::FScene>();
-	FAssetLibrary::GetDefaultSurfaceMaterial();
+
+	auto pBoxMat = CreateRef<ExampleMaterial>();
+
+	//FAssetLibrary::GetDefaultSurfaceMaterial();
 
 	/*{
 		auto pBoxMat = CreateRef<ExampleMaterial>();

@@ -19,6 +19,9 @@ public:
 	void Transition(VkImageLayout DstLayout, VkCommandBuffer InCmdBuffer = VK_NULL_HANDLE);
 	void Transition(VkImageLayout SrcLayout, VkImageLayout DstLayout, VkCommandBuffer InCmdBuffer = VK_NULL_HANDLE);
 
+	VkImage GetImage() const { return mImage; } //For easy to understand
+	VkImageView GetImageView() const { return mImageView; }
+
 protected:
 	FVulkanTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc);
 	VkExtent3D GetExtent();
@@ -34,6 +37,6 @@ protected:
 	Ref<FVulkanSampler> mSampler = nullptr;
 };
 
-Ref<FVulkanTexture> CreateVkTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc);
+Ref<FVulkanTexture> CreateVulkanTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc);
 
 }

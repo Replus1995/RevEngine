@@ -112,4 +112,14 @@ public:
 	Math::FLinearColor BlendConstants;
 };
 
+
+
+enum EPipelineBindPoint
+{
+	PBP_Graphics,
+	PBP_Compute,
+	PBP_RayTracing
+};
+
+
 }

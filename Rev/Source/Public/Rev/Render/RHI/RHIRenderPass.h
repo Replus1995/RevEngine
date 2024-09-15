@@ -1,28 +1,19 @@
 #pragma once
 #include "Rev/Core/Base.h"
 #include "Rev/Render/RHI/RHIRenderTarget.h"
+#include "Rev/Render/RHI/RHIPipeline.h"
 
 namespace Rev
 {
 
-struct FSubPassAttachmentRef
-{
-	ERenderTargetAttachment Attachment = RTA_EmptyAttachment;
-	//Layout
-};
-
-
 struct FSubPassDesc
 {
 public:
-	//EPipelineBindPoint PipelineBindPoint;
-	uint32 InputAttachmentCount;
-	FSubPassAttachmentRef InputAttachments[RTA_MaxColorAttachments + 1];
-	uint32 ColorAttachmentCount;
-	FSubPassAttachmentRef ColorAttachments[RTA_MaxColorAttachments];
-	//FSubPassAttachmentRef ResolveAttachments[RTA_MaxColorAttachments]; //for msaa
-	FSubPassAttachmentRef DepthStencilAttachment;
-	//preserved ?
+	EPipelineBindPoint PipelineBindPoint;
+	std::vector<ERenderTargetAttachment> InputAttachments;
+	std::vector<ERenderTargetAttachment> ColorAttachments;
+	std::vector<ERenderTargetAttachment> ResolveAttachments;
+	ERenderTargetAttachment DepthAttachment;
 };
 
 struct FSubPassDependencyDesc
@@ -40,15 +31,13 @@ enum EAttachmentLoadOp : uint8
 {
 	ALO_Load = 0,
 	ALO_Clear,
-	ALO_DontCare,
-	ALO_NoneExt
+	ALO_DontCare
 };
 
 enum EAttachmentStoreOp : uint8
 {
 	ASO_Store = 0,
-	ASO_DontCare,
-	ASO_NoneExt
+	ASO_DontCare
 };
 
 struct FRenderPassAttachmentDesc
@@ -71,11 +60,15 @@ public:
 	std::vector<FSubPassDependencyDesc> Dependencies;
 };
 
-class FRHIRenderPass
+class FRHIRenderPass : public FRHIResource
 {
 public:
-	FRHIRenderPass();
-	virtual ~FRHIRenderPass();
+	FRHIRenderPass(const FRenderPassDesc& InDesc) : mDesc(InDesc) {}
+	virtual ~FRHIRenderPass() = default;
+
+protected:
+	FRenderPassDesc mDesc;
+	Ref<FRHIRenderTarget> mRenderTarget;
 
 };
 

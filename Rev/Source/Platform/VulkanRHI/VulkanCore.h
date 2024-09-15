@@ -15,6 +15,7 @@ public:
 	static uint32 GetQueueFamily(EVulkanQueueKind InKind);
 	static VmaAllocator GetAllocator();
 	static VkCommandBuffer GetMainCmdBuffer();
+	static VkExtent2D GetSwapchainExtent();
 
 	static void ImmediateSubmit(std::function<void(VkCommandBuffer)>&& Func);
 

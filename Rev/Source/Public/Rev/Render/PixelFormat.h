@@ -16,5 +16,12 @@ enum EPixelFormat : uint32
 	PF_ShadowDepth = 7
 };
 
+class FPixelFormatUtils
+{
+public:
+	static bool HasDepth(EPixelFormat InFormat);
+	static bool HasStencil(EPixelFormat InFormat);
+};
+
 
 }

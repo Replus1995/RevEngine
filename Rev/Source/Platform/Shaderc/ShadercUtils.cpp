@@ -203,7 +203,7 @@ void FShadercUtils::DumpShaderInfo(const FShadercCompiledData& InData)
 {
 	//for (auto&& [Stage, CompiledData] : InData.CompiledDataMap)
 	{
-		spirv_cross::CompilerReflection Refl(InData.Binary.DataAs<uint32_t>(), InData.Binary.Size() / sizeof(uint32_t));
+		spirv_cross::Compiler Refl(InData.Binary.DataAs<uint32_t>(), InData.Binary.Size() / sizeof(uint32_t));
 		spirv_cross::ShaderResources ResourceRefl = Refl.get_shader_resources();
 
 		REV_CORE_TRACE("Shaderc::Reflect - {0} {1}", InData.Name.c_str(), ShaderStageToString(InData.Stage));
