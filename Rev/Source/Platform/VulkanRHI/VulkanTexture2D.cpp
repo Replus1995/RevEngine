@@ -36,7 +36,7 @@ void FVulkanTexture2D::UpdateLayerData(const void* InData, uint32 InSize, uint8 
     VkExtent2D MipSize = CalculateMipSize2D(InMipLevel);
     REV_CORE_ASSERT(InSize == MipSize.width * MipSize.height * mFormatInfo.Channels * mFormatInfo.PixelDepth, "Data size mismatch");
 
-    FVulkanUtils::ImmediateUploadImage(mImage, mFormatInfo.AspectFlags, { MipSize.width, MipSize.height, 1 }, InData, InSize, InMipLevel, 0, 0);
+    FVulkanUtils::ImmediateUploadImage(mImage, mImageAspectFlags, { MipSize.width, MipSize.height, 1 }, InData, InSize, InMipLevel, 0, 0);
 }
 
 void FVulkanTexture2D::ClearLayerData(uint8 InMipLevel, uint16 InArrayIndex, int32 InDepth)
@@ -45,7 +45,7 @@ void FVulkanTexture2D::ClearLayerData(uint8 InMipLevel, uint16 InArrayIndex, int
     REV_CORE_ASSERT(InArrayIndex == 0, "ArrayIndex must be 0 for 2d texture");
     REV_CORE_ASSERT(InMipLevel < mDesc.NumMips, "MipLevel out of range");
 
-    FVulkanUtils::ImmediateClearImage(mImage, mFormatInfo.AspectFlags, GetClearValue(), InMipLevel, 1, 0, 0);
+    FVulkanUtils::ImmediateClearImage(mImage, mImageAspectFlags, GetClearValue(), InMipLevel, 1, 0, 0);
 }
 
 void FVulkanTexture2D::CreateResource()
@@ -85,7 +85,7 @@ void FVulkanTexture2D::CreateResource()
     ImageViewCreateInfo.subresourceRange.levelCount = 1;
     ImageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
     ImageViewCreateInfo.subresourceRange.layerCount = 1;
-    ImageViewCreateInfo.subresourceRange.aspectMask = mFormatInfo.AspectFlags;
+    ImageViewCreateInfo.subresourceRange.aspectMask = mImageAspectFlags;
 
     REV_VK_CHECK(vkCreateImageView(FVulkanCore::GetDevice(), &ImageViewCreateInfo, nullptr, &mImageView));
 }

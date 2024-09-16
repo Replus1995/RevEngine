@@ -9,6 +9,12 @@ FVulkanRenderTarget::FVulkanRenderTarget(const FRenderTargetDesc& InDesc)
 	: FRHIRenderTarget(InDesc)
 {
 
+    if (!IsEmptyTarget())
+    {
+        REV_CORE_ASSERT(InDesc.Width > 0 && InDesc.Width <= REV_VK_RENDERTARGET_SIZE_MAX, "Invalid render target width");
+        REV_CORE_ASSERT(InDesc.Height > 0 && InDesc.Height <= REV_VK_RENDERTARGET_SIZE_MAX, "Invalid render target height");
+    }
+    //CreateResource();
 }
 
 FVulkanRenderTarget::~FVulkanRenderTarget()
@@ -31,7 +37,7 @@ void FVulkanRenderTarget::ResizeTargets(uint16 InWidth, uint16 InHeight)
     mDesc.Width = InWidth;
     mDesc.Height = InHeight;
     ReleaseResource();
-    CreateResource();
+    //CreateResource();
 }
 
 const Ref<FRHITexture> FVulkanRenderTarget::GetTargetTexture(ERenderTargetAttachment Index) const
@@ -52,7 +58,7 @@ bool FVulkanRenderTarget::IsEmptyTarget() const
     return mDesc.Dimension == ERenderTargetDimension::RenderTargetEmpty;
 }
 
-void FVulkanRenderTarget::CreateResource()
+void FVulkanRenderTarget::CreateResource(VkRenderPass InRenderPass)
 {
     if (IsEmptyTarget())
         return;
@@ -74,7 +80,7 @@ void FVulkanRenderTarget::CreateResource()
 
     VkFramebufferCreateInfo FramebufferInfo{};
     FramebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-    FramebufferInfo.renderPass = renderPass;
+    FramebufferInfo.renderPass = InRenderPass;
     FramebufferInfo.attachmentCount = (uint32_t)Attachments.size();
     FramebufferInfo.pAttachments = Attachments.data();
     FramebufferInfo.width = (uint32_t)mDesc.Width;

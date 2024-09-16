@@ -8,7 +8,6 @@ namespace Rev
 struct FVulkanFormatInfo
 {
 	VkFormat Format;
-	VkImageAspectFlags AspectFlags;
 	uint16 Channels;
 	uint16 PixelDepth;
 };

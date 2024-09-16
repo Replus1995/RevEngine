@@ -114,7 +114,7 @@ public:
 
 
 
-enum EPipelineBindPoint
+enum EPipelineBindPoint : uint8
 {
 	PBP_Graphics,
 	PBP_Compute,

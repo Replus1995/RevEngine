@@ -17,7 +17,7 @@ const FRHISampler* FVulkanTexture::GetSampler() const
 void FVulkanTexture::ClearMipData(uint8 InMipLevel)
 {
 	REV_CORE_ASSERT(InMipLevel < mDesc.NumMips, "MipLevel out of range");
-	FVulkanUtils::ImmediateClearImage(mImage, mFormatInfo.AspectFlags, GetClearValue(), InMipLevel, 1, 0, 0);
+	FVulkanUtils::ImmediateClearImage(mImage, mImageAspectFlags, GetClearValue(), InMipLevel, 1, 0, 0);
 }
 
 void FVulkanTexture::Transition(VkImageLayout DstLayout, VkCommandBuffer InCmdBuffer)
@@ -40,7 +40,12 @@ FVulkanTexture::FVulkanTexture(const FTextureDesc& InDesc, const FSamplerDesc& I
     : FRHITexture(InDesc)
     , mFormatInfo(FVkPixelFormat::TranslatePixelFormat(InDesc.Format, InDesc.bSRGB))
 {
-	REV_CORE_ASSERT(mFormatInfo.AspectFlags != VK_IMAGE_ASPECT_NONE);
+	if (FPixelFormatUtils::HasDepth(InDesc.Format))
+		mImageAspectFlags |= VK_IMAGE_ASPECT_DEPTH_BIT;
+	if (FPixelFormatUtils::HasStencil(InDesc.Format))
+		mImageAspectFlags |= VK_IMAGE_ASPECT_STENCIL_BIT;
+	if (mImageAspectFlags == VK_IMAGE_ASPECT_NONE)
+		mImageAspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
 	mSampler = CreateVkSampler(InSamplerDesc);
 }
 
@@ -61,7 +66,7 @@ VkExtent3D FVulkanTexture::CalculateMipSize3D(uint32 InMipLevel)
 
 VkClearValue FVulkanTexture::GetClearValue()
 {
-	bool bColorImage = mFormatInfo.AspectFlags & VK_IMAGE_ASPECT_COLOR_BIT;
+	bool bColorImage = mImageAspectFlags & VK_IMAGE_ASPECT_COLOR_BIT;
 	VkClearValue ClearValue;
 	if (bColorImage)
 	{

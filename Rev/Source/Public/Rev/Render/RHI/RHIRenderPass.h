@@ -6,17 +6,19 @@
 namespace Rev
 {
 
-struct FSubPassDesc
+struct FSubpassDesc
 {
 public:
-	EPipelineBindPoint PipelineBindPoint;
-	std::vector<ERenderTargetAttachment> InputAttachments;
-	std::vector<ERenderTargetAttachment> ColorAttachments;
-	std::vector<ERenderTargetAttachment> ResolveAttachments;
-	ERenderTargetAttachment DepthAttachment;
+	EPipelineBindPoint PipelineBindPoint = PBP_Graphics;
+	ERenderTargetAttachment ColorAttachments[RTA_MaxColorAttachments];
+	ERenderTargetAttachment ResolveAttachments[RTA_MaxColorAttachments];
+	ERenderTargetAttachment DepthStencilAttachment;
+	ERenderTargetAttachment InputAttachments[RTA_MaxColorAttachments + 2];
+	uint32 ColorAttachmentCount = 0;
+	uint32 InputAttachmentCount = 0;
 };
 
-struct FSubPassDependencyDesc
+struct FSubpassDependDesc
 {
 public:
 	uint32 SrcIndex;
@@ -56,8 +58,8 @@ struct FRenderPassDesc
 public:
 	uint32 AttachmentCount = 0;
 	FRenderPassAttachmentDesc Attachments[RTA_MaxColorAttachments + 1];
-	std::vector<FSubPassDesc> SubPasses;
-	std::vector<FSubPassDependencyDesc> Dependencies;
+	std::vector<FSubpassDesc> SubpassDescs;
+	std::vector<FSubpassDependDesc> SubpassDependDescs;
 };
 
 class FRHIRenderPass : public FRHIResource

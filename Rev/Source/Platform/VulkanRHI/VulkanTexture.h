@@ -33,6 +33,7 @@ protected:
 	VkImage mImage = VK_NULL_HANDLE;
 	VkImageView mImageView = VK_NULL_HANDLE;
 	VkImageLayout mImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	VkImageAspectFlags mImageAspectFlags = VK_IMAGE_ASPECT_NONE;
 	VmaAllocation mAllocation = VK_NULL_HANDLE;
 	Ref<FVulkanSampler> mSampler = nullptr;
 };

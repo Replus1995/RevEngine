@@ -13,13 +13,13 @@ public:
 	virtual const void* GetNativeHandle() const override { return &mFramebuffer; }
 
 	virtual void ResizeTargets(uint16 InWidth, uint16 InHeight) override;
-	virtual void ClearTarget(ERenderTargetAttachment Index) override;
-	virtual void ClearTargets() override;
+	virtual void ClearTarget(ERenderTargetAttachment Index) override {};
+	virtual void ClearTargets() override {};
 	virtual const Ref<FRHITexture> GetTargetTexture(ERenderTargetAttachment Index) const override;
 
 protected:
 	bool IsEmptyTarget() const;
-	void CreateResource();
+	void CreateResource(VkRenderPass InRenderPass);
 	void ReleaseResource();
 	Ref<FVulkanTexture> CreateColorTexture(const FColorTargetDesc& InDesc);
 	Ref<FVulkanTexture> CreateDepthStencilTexture(const FDepthStencilTargetDesc& InDesc);

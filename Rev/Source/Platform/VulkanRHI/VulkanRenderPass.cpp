@@ -12,9 +12,17 @@ FVulkanRenderPass::FVulkanRenderPass(const FRenderPassDesc& InDesc)
 	: FRHIRenderPass(InDesc)
 {
 	REV_CORE_ASSERT(mDesc.AttachmentCount <= (uint32)RTA_MaxColorAttachments);
+}
 
+FVulkanRenderPass::~FVulkanRenderPass()
+{
+}
+
+void FVulkanRenderPass::CreateResource()
+{
+	uint32 nDepthStencilAttachmentIndex = 0;
 	std::vector<VkAttachmentDescription2> AttachmentDescs(mDesc.AttachmentCount);
-	for (size_t i = 0; i < mDesc.AttachmentCount; i++)
+	for (uint32 i = 0; i < mDesc.AttachmentCount; i++)
 	{
 		const FRenderPassAttachmentDesc& InAttachmentDesc = mDesc.Attachments[i];
 		EPixelFormat InFormat = InAttachmentDesc.Format;
@@ -30,19 +38,90 @@ FVulkanRenderPass::FVulkanRenderPass(const FRenderPassDesc& InDesc)
 		AttachmentDesc.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		AttachmentDesc.finalLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
 
+		if (FPixelFormatUtils::HasDepth(InFormat))
+			nDepthStencilAttachmentIndex = i;
+
 		AttachmentDescs.emplace_back(std::move(AttachmentDesc));
 	}
 
-	std::vector<VkSubpassDescription2> SubpassDescs(mDesc.SubPasses.size());
-	for (size_t i = 0; i < mDesc.SubPasses.size(); i++)
+	struct FSubpassAttachmentRef
 	{
-		const FSubPassDesc& InSubpassDesc = mDesc.SubPasses[i];
+		uint32 InputAttachmentCount;
+		VkAttachmentReference2 InputAttachments[RTA_MaxColorAttachments + 2];
+		uint32 ColorAttachmentCount;
+		VkAttachmentReference2 ColorAttachments[RTA_MaxColorAttachments];
+		VkAttachmentReference2 ResolveAttachments[RTA_MaxColorAttachments];
+		VkAttachmentReference2 DepthStencilAttachment;
+	};
 
-		VkSubpassDescription2 SubpassDesc;
+	std::vector<VkSubpassDescription2> SubpassDescs(mDesc.SubpassDescs.size());
+	std::vector<FSubpassAttachmentRef> SubpassAttachmentRefs(mDesc.SubpassDescs.size());
+	for (size_t i = 0; i < mDesc.SubpassDescs.size(); i++)
+	{
+		const FSubpassDesc& InSubpassDesc = mDesc.SubpassDescs[i];
+		FSubpassAttachmentRef& AttachmentRef = SubpassAttachmentRefs[i];
+		VkSubpassDescription2& SubpassDesc = SubpassDescs[i];
+
+		REV_CORE_ASSERT(AttachmentRef.ColorAttachmentCount > 0);
+
+		AttachmentRef.InputAttachmentCount = InSubpassDesc.InputAttachmentCount;
+		for (size_t ii = 0; ii < InSubpassDesc.InputAttachmentCount; ii++)
+		{
+			VkAttachmentReference2& Ref = AttachmentRef.InputAttachments[ii];
+			Ref.sType = VK_STRUCTURE_TYPE_ATTACHMENT_REFERENCE_2;
+			Ref.pNext = nullptr;
+			Ref.attachment = (uint32_t)InSubpassDesc.InputAttachments[ii];
+			Ref.layout = InSubpassDesc.InputAttachments[ii] < RTA_MaxColorAttachments ? VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL : VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+			Ref.aspectMask = InSubpassDesc.InputAttachments[ii] < RTA_MaxColorAttachments ? VK_IMAGE_ASPECT_COLOR_BIT : VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
+		}
+
+		bool bEnableResolve = false;
+		AttachmentRef.ColorAttachmentCount = InSubpassDesc.ColorAttachmentCount;
+		for (size_t ii = 0; ii < InSubpassDesc.ColorAttachmentCount; ii++)
+		{
+			VkAttachmentReference2& Ref = AttachmentRef.ColorAttachments[ii];
+			Ref.sType = VK_STRUCTURE_TYPE_ATTACHMENT_REFERENCE_2;
+			Ref.pNext = nullptr;
+			Ref.attachment = (uint32_t)InSubpassDesc.ColorAttachments[ii];
+			Ref.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+			Ref.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+
+			/*
+			if (InSubpassDesc.ResolveAttachments[ii] != RTA_EmptyAttachment)
+			{
+				VkAttachmentReference2& RefResolve = AttachmentRef.ResolveAttachments[ii];
+				RefResolve.sType = VK_STRUCTURE_TYPE_ATTACHMENT_REFERENCE_2;
+				RefResolve.pNext = nullptr;
+				RefResolve.attachment = (uint32_t)InSubpassDesc.ResolveAttachments[ii];
+				RefResolve.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+				RefResolve.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+
+				bEnableResolve = true;
+			}
+			*/
+		}
+
+		bool bEnableDepthStencil = false;
+		if (InSubpassDesc.DepthStencilAttachment != RTA_EmptyAttachment)
+		{
+			VkAttachmentReference2& Ref = AttachmentRef.DepthStencilAttachment;
+			Ref.sType = VK_STRUCTURE_TYPE_ATTACHMENT_REFERENCE_2;
+			Ref.pNext = nullptr;
+			Ref.attachment = nDepthStencilAttachmentIndex;
+			Ref.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+			Ref.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
+
+			bEnableDepthStencil = true;
+		}
+
 		SubpassDesc.sType = VK_STRUCTURE_TYPE_SUBPASS_DESCRIPTION_2;
 		SubpassDesc.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-		SubpassDesc.colorAttachmentCount = 1;
-		SubpassDesc.pColorAttachments = &colorAttachmentRef;
+		SubpassDesc.colorAttachmentCount = AttachmentRef.ColorAttachmentCount;
+		SubpassDesc.pColorAttachments = AttachmentRef.ColorAttachments;
+		SubpassDesc.pResolveAttachments = bEnableResolve ? AttachmentRef.ResolveAttachments : nullptr;
+		SubpassDesc.pDepthStencilAttachment = bEnableDepthStencil ? &AttachmentRef.DepthStencilAttachment : nullptr;
+		SubpassDesc.inputAttachmentCount = AttachmentRef.InputAttachmentCount;
+		SubpassDesc.pInputAttachments = AttachmentRef.InputAttachmentCount > 0 ? AttachmentRef.InputAttachments : nullptr;
 	}
 
 
@@ -54,7 +133,11 @@ FVulkanRenderPass::FVulkanRenderPass(const FRenderPassDesc& InDesc)
 	RenderPassInfo.pSubpasses = SubpassDescs.data();
 
 	REV_VK_CHECK_THROW(vkCreateRenderPass2(FVulkanCore::GetDevice(), &RenderPassInfo, nullptr, &mRenderPass), "failed to create render pass!");
+}
 
+void FVulkanRenderPass::ReleaseResource()
+{
+	vkDestroyRenderPass(FVulkanCore::GetDevice(), mRenderPass, nullptr);
 }
 
 
