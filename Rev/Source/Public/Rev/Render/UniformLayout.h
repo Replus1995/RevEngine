@@ -26,6 +26,8 @@ constexpr IndexType LBaseColorTexture	= LPbrStart + 6;
 
 
 //Sampler Binding
+constexpr IndexType SLinearScreenTex = 1;
+
 constexpr IndexType SPbrStart = 5;
 constexpr IndexType SBaseColorTex			= SPbrStart + 0;
 constexpr IndexType SMetallicRoughnessTex	= LPbrStart + 1;
@@ -33,12 +35,19 @@ constexpr IndexType SNormalTex				= LPbrStart + 2;
 constexpr IndexType SOcclusionTex			= LPbrStart + 3;
 constexpr IndexType SEmissiveTex			= LPbrStart + 4;
 
-//Uniform Buffer Binding
-constexpr IndexType BCamera = 0;
-constexpr IndexType BModel = 1;
-constexpr IndexType BShadow = 2;
-constexpr IndexType BForwardLight = 3;
+constexpr IndexType SEnviornmentTex = 11;
 
+//Uniform Buffer Binding
+constexpr IndexType BApp = 0;
+constexpr IndexType BScene = 1;
+constexpr IndexType BCamera = 2;
+constexpr IndexType BModel = 3;
+constexpr IndexType BShadow = 4;
+constexpr IndexType BForwardLight = 5;
+
+constexpr IndexType BDirectionalLight = 11;
+constexpr IndexType BSpotLight = 12;
+constexpr IndexType BPointLight = 13;
 
 }
 }

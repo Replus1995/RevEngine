@@ -3,26 +3,25 @@
 
 #include "OpenGLSampler.h"
 #include "OpenGLTexture2D.h"
+#include "OpenGLTexture2DArray.h"
+#include "OpenGLTextureCube.h"
+#include "OpenGLTextureCubeArray.h"
+#include "OpenGLTexture3D.h"
 
 namespace Rev
 {
+
 const FRHISampler* FOpenGLTexture::GetSampler() const
 {
 	return mSampler.get();
 }
 
-void FOpenGLTexture::Bind(uint32 InUnit) const
+void FOpenGLTexture::ClearMipData(uint8 InMipLevel)
 {
-	glBindTextureUnit(InUnit, mHandle);
-	glBindSampler(InUnit, *(GLuint*)mSampler->GetNativeHandle());
-}
-
-void FOpenGLTexture::ClearData()
-{
-	for (uint8 i = 0; i < mDesc.NumMips; i++)
-	{
-		ClearMipData(i);
-	}
+	RE_CORE_ASSERT(InMipLevel < mDesc.NumMips, "MipLevel out of range");
+	FClearColorBuffer ColorBuffer;
+	FillClearColor(ColorBuffer);
+	glClearTexImage(mHandle, InMipLevel, mFormatData.DataFormat, mFormatData.DataType, (const void*)ColorBuffer.Data());
 }
 
 FOpenGLTexture::FOpenGLTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc)
@@ -32,70 +31,62 @@ FOpenGLTexture::FOpenGLTexture(const FTextureDesc& InDesc, const FSamplerDesc& I
 	mSampler = CreateRef<FOpenGLSampler>(InSamplerDesc, mFormatData.DataType, InDesc.NumMips > 1);
 }
 
-void FOpenGLTexture::ClearMipData(uint32 InMipLevel)
+std::pair<uint32, uint32> FOpenGLTexture::CalculateMipSize2D(uint32 InMipLevel)
+{
+	return { std::max<uint32>(1, GetWidth() >> InMipLevel), std::max<uint32>(1, GetHeight() >> InMipLevel) };
+}
+
+std::tuple<uint32, uint32, uint32> FOpenGLTexture::CalculateMipSize3D(uint32 InMipLevel)
+{
+	return { std::max<uint32>(1, GetWidth() >> InMipLevel), std::max<uint32>(1, GetHeight() >> InMipLevel), std::max<uint32>(1, GetDepth() >> InMipLevel)};
+}
+
+void FOpenGLTexture::FillClearColor(FClearColorBuffer& OutBuffer)
 {
 	switch (mDesc.Format)
 	{
 	case PF_R32G32B32A32F:
 	{
-		const float* ClearColor = mDesc.ClearColor.RGBA.Data();
-		glClearTexImage(mHandle, InMipLevel, mFormatData.DataFormat, mFormatData.DataType, (const void*)&ClearColor);
+		Math::FLinearColor& ClearColor = *OutBuffer.DataAs<Math::FLinearColor>();
+		ClearColor = mDesc.ClearColor.RGBA;
 		break;
 	}
 	case PF_R8G8B8A8:
 	case PF_RGB8:
 	{
-		Math::FColor ClearColor(0, 0, 0, 0);
-		if (mDesc.bSRGB)
-		{
-			ClearColor = Math::FLinearColor::ToSRGB(mDesc.ClearColor.RGBA);
-		}
-		else
-		{
-			for (size_t i = 0; i < 4; i++)
-			{
-				ClearColor[i] = uint8(mDesc.ClearColor.RGBA[i] * 255.0f);
-			}
-		}
-		glClearTexImage(mHandle, InMipLevel, mFormatData.DataFormat, mFormatData.DataType, (const void*)&ClearColor);
+		Math::FColor& ClearColor = *OutBuffer.DataAs<Math::FColor>();
+		ClearColor = Math::FLinearColor::ToColor(mDesc.ClearColor.RGBA, mDesc.bSRGB);
 		break;
 	}
 	case PF_R8:
 	{
-		uint8 ClearColor = mDesc.ClearColor.RGBA.R * 255.0f;
-		glClearTexImage(mHandle, InMipLevel, mFormatData.DataFormat, mFormatData.DataType, (const void*)&ClearColor);
+		uint8& ClearColor = *OutBuffer.DataAs<uint8>();
+		ClearColor = mDesc.ClearColor.RGBA.R * 255.0f;
 		break;
 	}
 	case PF_R16:
 	{
-		uint16 ClearColor = mDesc.ClearColor.RGBA.R * 65535.0f;
-		glClearTexImage(mHandle, InMipLevel, mFormatData.DataFormat, mFormatData.DataType, (const void*)&ClearColor);
+		uint16& ClearColor = *OutBuffer.DataAs<uint16>();
+		ClearColor = mDesc.ClearColor.RGBA.R * 65535.0f;
 		break;
 	}
 	case PF_DepthStencil:
 	{
+		uint32& ClearColor = *OutBuffer.DataAs<uint32>();
 		uint32 Depth = uint32(mDesc.ClearColor.Depth * 16777215.0f) << 8;
 		uint8 Stencil = mDesc.ClearColor.Stencil;
-		uint32 ClearColor = Depth & (uint32)Stencil;
-		glClearTexImage(mHandle, InMipLevel, mFormatData.DataFormat, mFormatData.DataType, (const void*)&ClearColor);
+		ClearColor = Depth & (uint32)Stencil;
 		break;
 	}
 	case PF_ShadowDepth:
 	{
-		float Depth = mDesc.ClearColor.Depth;
-		glClearTexImage(mHandle, InMipLevel, mFormatData.DataFormat, mFormatData.DataType, (const void*)&Depth);
+		float& ClearColor = *OutBuffer.DataAs<float>();
+		ClearColor = mDesc.ClearColor.Depth;
 		break;
 	}
 	default:
 		break;
 	}
-}
-
-void FOpenGLTexture::CalculateMipSize(uint32 InMipLevel, uint32& OutMipWidth, uint32& OutMipHeight)
-{
-	uint32 MipFactor = Math::PowI<uint32>(2, InMipLevel);
-	OutMipWidth = std::max<uint32>(1, GetWidth() / MipFactor);
-	OutMipHeight = std::max<uint32>(1, GetHeight() / MipFactor);
 }
 
 Ref<FOpenGLTexture> CreateOpenGLTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc)
@@ -105,9 +96,13 @@ Ref<FOpenGLTexture> CreateOpenGLTexture(const FTextureDesc& InDesc, const FSampl
 	case ETextureDimension::Texture2D:
 		return CreateRef<FOpenGLTexture2D>(InDesc, InSamplerDesc);
 	case ETextureDimension::Texture2DArray:
-	case ETextureDimension::Texture3D:
+		return CreateRef<FOpenGLTexture2DArray>(InDesc, InSamplerDesc);
 	case ETextureDimension::TextureCube:
+		return CreateRef<FOpenGLTextureCube>(InDesc, InSamplerDesc);
 	case ETextureDimension::TextureCubeArray:
+		return CreateRef<FOpenGLTextureCubeArray>(InDesc, InSamplerDesc);
+	case ETextureDimension::Texture3D:
+		return CreateRef<FOpenGLTexture3D>(InDesc, InSamplerDesc);
 	default:
 		break;
 	}

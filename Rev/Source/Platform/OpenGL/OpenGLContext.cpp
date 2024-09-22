@@ -4,11 +4,12 @@
 #include "Rev/Core/Application.h"
 #include "Rev/Core/Window.h"
 #include "Rev/Render/Material/Material.h"
+#include "Rev/Render/Material/SurfaceMaterial.h"
 
 #include "OpenGLShader.h"
-#include "OpenGLVertexBuffer.h"
-#include "OpenGLUniformBuffer.h"
+#include "OpenGLBuffer.h"
 #include "OpenGLTexture.h"
+#include "OpenGLRenderTarget.h"
 
 #include <GLFW/glfw3.h>
 
@@ -45,7 +46,7 @@ void FOpenGLContext::Init()
 	case EWindowType::GLFW:
 	{
 		int version = gladLoadGL(glfwGetProcAddress);
-		RE_CORE_TRACE("[OpenGLRHI] Version {0}.{1}", GLAD_VERSION_MAJOR(version), GLAD_VERSION_MINOR(version));
+		RE_CORE_TRACE("[OpenGLRHI] OpenGL Version {0}.{1}", GLAD_VERSION_MAJOR(version), GLAD_VERSION_MINOR(version));
 		break;
 	}
 	default:
@@ -77,16 +78,63 @@ void FOpenGLContext::SetClearColor(const Math::FLinearColor& color)
 	glClearColor(color.R, color.G, color.B, color.A);
 }
 
-void FOpenGLContext::Clear()
+void FOpenGLContext::ClearBackBuffer()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void FOpenGLContext::PrepareMaterial(const Material* InMaterial)
+void FOpenGLContext::EnableDepthTest(bool bEnable)
 {
-	if(!InMaterial)
-		return;
-	switch (InMaterial->BlendMode)
+	if(bEnable)
+		glEnable(GL_DEPTH_TEST);
+	else
+		glDisable(GL_DEPTH_TEST);
+}
+
+void FOpenGLContext::EnableDepthWrite(bool bEnable)
+{
+	glDepthMask(bEnable ? GL_TRUE : GL_FALSE);
+}
+
+void FOpenGLContext::SetDepthTestMode(EDepthTestMode InMode)
+{
+	GLenum DepthFunc = GL_LESS;
+	switch (InMode)
+	{
+	case Rev::DTM_Never:
+		DepthFunc = GL_NEVER;
+		break;
+	/*case Rev::DTM_Less:
+		DepthFunc = GL_LESS;
+		break;*/
+	case Rev::DTM_Equal:
+		DepthFunc = GL_EQUAL;
+		break;
+	case Rev::DTM_Greater:
+		DepthFunc = GL_GREATER;
+		break;
+	case Rev::DTM_NotEqual:
+		DepthFunc = GL_NOTEQUAL;
+		break;
+	case Rev::DTM_LessEqual:
+		DepthFunc = GL_LEQUAL;
+		break;
+	case Rev::DTM_GreaterEqual:
+		DepthFunc = GL_GEQUAL;
+		break;
+	case Rev::DTM_Always:
+		DepthFunc = GL_ALWAYS;
+		break;
+	default:
+		break;
+	}
+
+	glDepthFunc(DepthFunc);
+}
+
+void FOpenGLContext::SetBlendMode(EBlendMode InMode)
+{
+	switch (InMode)
 	{
 	case BM_Opaque:
 		glDisable(GL_BLEND);
@@ -102,26 +150,84 @@ void FOpenGLContext::PrepareMaterial(const Material* InMaterial)
 	default:
 		break;
 	}
+}
 
-	if (InMaterial->TwoSided)
+void FOpenGLContext::SetCullFaceMode(ECullFaceMode InMode)
+{
+	switch (InMode)
 	{
-		 glDisable(GL_CULL_FACE);
-	}
-	else
-	{
+	case Rev::CFM_Disabled:
+		glDisable(GL_CULL_FACE);
+		break;
+	case Rev::CFM_Back:
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
+		break;
+	case Rev::CFM_Front:
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_FRONT);
+		break;
+	case Rev::CFM_BackAndFront:
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_FRONT_AND_BACK);
+		break;
+	default:
+		break;
 	}
 }
 
-void FOpenGLContext::DrawVertices(const Ref<FRHIVertexArray>& InVertexArray, EDrawMode InDrawMode)
+void FOpenGLContext::Bind(const Ref<FRHIVertexBuffer>& InVertexBuffer)
+{
+	GLuint VertexBufferName = InVertexBuffer ? *(const GLuint*)InVertexBuffer->GetNativeHandle() : 0;
+	glBindBuffer(GL_ARRAY_BUFFER, VertexBufferName);
+}
+
+void FOpenGLContext::Bind(const Ref<FRHIIndexBuffer>& InIndexBuffer)
+{
+	GLuint IndexBufferName = InIndexBuffer ? *(const GLuint*)InIndexBuffer->GetNativeHandle() : 0;
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IndexBufferName);
+}
+
+void FOpenGLContext::Bind(const Ref<FRHIVertexArray>& InVertexArray)
+{
+	GLuint VertexArrayName = InVertexArray ? *(const GLuint*)InVertexArray->GetNativeHandle() : 0;
+	glBindVertexArray(VertexArrayName);
+}
+
+void FOpenGLContext::Bind(const Ref<FRHIShaderProgram>& InProgram)
+{
+	GLuint ProgramName = InProgram ? *(const GLuint*)InProgram->GetNativeHandle() : 0;
+	glUseProgram(ProgramName);
+}
+
+void FOpenGLContext::Bind(const Ref<FRHIUniformBuffer>& InUniformBuffer, uint32 InUnit)
+{
+	GLuint UniformBufferName = InUniformBuffer ? *(const GLuint*)InUniformBuffer->GetNativeHandle() : 0;
+	glBindBufferBase(GL_UNIFORM_BUFFER, InUnit, UniformBufferName);
+}
+
+void FOpenGLContext::Bind(const Ref<FRHITexture>& InTexture, uint32 InUnit)
+{
+	GLuint TextureName = InTexture ? *(const GLuint*)InTexture->GetNativeHandle() : 0;
+	GLuint SamplerName = InTexture ? *(const GLuint*)InTexture->GetSampler()->GetNativeHandle() : 0;
+	glBindTextureUnit(InUnit, TextureName);
+	glBindSampler(InUnit, SamplerName);
+}
+
+void FOpenGLContext::Bind(const Ref<FRHIRenderTarget>& InRenderTarget)
+{
+	GLuint RenderTargetName = InRenderTarget ? *(const GLuint*)InRenderTarget->GetNativeHandle() : 0;
+	glBindFramebuffer(GL_FRAMEBUFFER, RenderTargetName);
+}
+
+void FOpenGLContext::Draw(const Ref<FRHIVertexArray>& InVertexArray, EDrawMode InDrawMode)
 {
 	if(!InVertexArray)
 		return;
 	GLenum DrawMode = TranslateDrawMode(InDrawMode);
 	uint32 IndexCount = InVertexArray->GetIndexBuffer()->GetCount();
 	GLenum IndexType = TranslateIndexType(InVertexArray->GetIndexBuffer()->GetStride());
-	InVertexArray->Bind();
+	Bind(InVertexArray);
 	glDrawElements(DrawMode, IndexCount, IndexType, nullptr);
 }
 

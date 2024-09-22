@@ -17,7 +17,8 @@ void RenderCmd::Init()
 	sContext = FRHIContext::Create();
 	sContext->Init();
 	FRHIShaderLibrary::CreateInstance();
-	
+
+	SetClearColor(Math::FLinearColor(0, 0, 0, 1));
 }
 
 void RenderCmd::Shutdown()
@@ -37,26 +38,66 @@ void RenderCmd::SetClearColor(const Math::FLinearColor& color)
 	sContext->SetClearColor(color);
 }
 
-void RenderCmd::Clear()
+void RenderCmd::ClearBackBuffer()
 {
-	sContext->Clear();
+	sContext->ClearBackBuffer();
 }
 
-void RenderCmd::PrepareMaterial(const Material* InMaterial)
+void RenderCmd::EnableDepthTest(bool bEnable)
 {
-	sContext->PrepareMaterial(InMaterial);
+	sContext->EnableDepthTest(bEnable);
+}
+
+void RenderCmd::EnableDepthWrite(bool bEnable)
+{
+	sContext->EnableDepthWrite(bEnable);
+}
+
+void RenderCmd::SetDepthTestMode(EDepthTestMode InMode)
+{
+	sContext->SetDepthTestMode(InMode);
+}
+
+void RenderCmd::SetBlendMode(EBlendMode InMode)
+{
+	sContext->SetBlendMode(InMode);
+}
+
+void RenderCmd::SetCullFaceMode(ECullFaceMode InMode)
+{
+	sContext->SetCullFaceMode(InMode);
+}
+
+void RenderCmd::BindProgram(const Ref<FRHIShaderProgram>& InProgram)
+{
+	sContext->Bind(InProgram);
+}
+
+void RenderCmd::BindUniformBuffer(const Ref<FRHIUniformBuffer>& InUniformBuffer, uint32 InUnit)
+{
+	sContext->Bind(InUniformBuffer, InUnit);
+}
+
+void RenderCmd::BindTexture(const Ref<FRHITexture>& InTexture, uint32 InUnit)
+{
+	sContext->Bind(InTexture, InUnit);
+}
+
+void RenderCmd::BindRenderTarget(const Ref<FRHIRenderTarget>& InRenderTarget)
+{
+	sContext->Bind(InRenderTarget);
 }
 
 void RenderCmd::DrawPrimitive(const FMeshPrimitive* InPrimitive)
 {
 	if(!InPrimitive)
 		return;
-	sContext->DrawVertices(InPrimitive->VertexData, InPrimitive->DrawMode);
+	sContext->Draw(InPrimitive->VertexData, InPrimitive->DrawMode);
 }
 
-void RenderCmd::DrawVertices(const Ref<FRHIVertexArray>& InVertexArray, EDrawMode InDrawMode)
+void RenderCmd::Draw(const Ref<FRHIVertexArray>& InVertexArray, EDrawMode InDrawMode)
 {
-	sContext->DrawVertices(InVertexArray, InDrawMode);
+	sContext->Draw(InVertexArray, InDrawMode);
 }
 
 }

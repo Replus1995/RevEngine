@@ -4,16 +4,16 @@
 namespace Rev
 {
 
-Scene::Scene()
+FScene::FScene()
 {
 	AddSystem<PlayerCameraSystem>();
 }
 
-Scene::~Scene()
+FScene::~FScene()
 {
 }
 
-void Scene::OnRuntimeStart()
+void FScene::OnRuntimeStart()
 {
 	mIsRunning = true;
 	//OnPhysics2DStart();
@@ -25,7 +25,7 @@ void Scene::OnRuntimeStart()
 
 }
 
-void Scene::OnRuntimeStop()
+void FScene::OnRuntimeStop()
 {
 	mIsRunning = false;
 	//OnPhysics2DStop();
@@ -36,7 +36,7 @@ void Scene::OnRuntimeStop()
 	}
 }
 
-void Scene::OnUpdateRuntime(float dt)
+void FScene::OnUpdateRuntime(float dt)
 {
 	if (!mIsPaused)
 	{
@@ -47,14 +47,14 @@ void Scene::OnUpdateRuntime(float dt)
 	}
 }
 
-Entity Scene::CreateEntity(const std::string& name)
+FEntity FScene::CreateEntity(const std::string& name)
 {
 	return CreateEntityWithUUID(UUID(), name);
 }
 
-Entity Scene::CreateEntityWithUUID(UUID uuid, const std::string& name)
+FEntity FScene::CreateEntityWithUUID(UUID uuid, const std::string& name)
 {
-	Entity entity(mRegistry.create(), this);
+	FEntity entity(mRegistry.create(), this);
 	entity.AddComponent<IDComponent>(uuid);
 	entity.AddComponent<TransformComponent>();
 	auto& tag = entity.AddComponent<TagComponent>();
@@ -65,40 +65,40 @@ Entity Scene::CreateEntityWithUUID(UUID uuid, const std::string& name)
 	return entity;
 }
 
-void Scene::DestroyEntity(Entity entity)
+void FScene::DestroyEntity(FEntity entity)
 {
 	mEntityMap.erase(entity.GetUUID());
 	mRegistry.destroy(entity);
 }
 
-Entity Scene::DuplicateEntity(Entity entity)
+FEntity FScene::DuplicateEntity(FEntity entity)
 {
 	std::string name = entity.GetName();
-	Entity newEntity = CreateEntity(name);
-	Entity::CopyComponentIfExists(AllComponents{}, newEntity, entity);
+	FEntity newEntity = CreateEntity(name);
+	FEntity::CopyComponentIfExists(AllComponents{}, newEntity, entity);
 	return newEntity;
 }
 
-Entity Scene::FindEntityByName(std::string_view name)
+FEntity FScene::FindEntityByName(std::string_view name)
 {
 	auto view = mRegistry.view<TagComponent>();
 	for (auto entity : view)
 	{
 		const TagComponent& tc = view.get<TagComponent>(entity);
 		if (tc.Tag == name)
-			return Entity{ entity, this };
+			return FEntity{ entity, this };
 	}
 	return {};
 }
 
-Entity Scene::FindEntityByUUID(UUID uuid)
+FEntity FScene::FindEntityByUUID(UUID uuid)
 {
 	if (mEntityMap.find(uuid) != mEntityMap.end())
 		return { mEntityMap.at(uuid), this };
 	return {};
 }
 
-bool Scene::AddSystem(size_t hash, Scope<ISystem>&& pSystem)
+bool FScene::AddSystem(size_t hash, Scope<ISystem>&& pSystem)
 {
 	if (auto iter = mSystemMap.find(hash); iter == mSystemMap.end())
 	{
@@ -110,7 +110,7 @@ bool Scene::AddSystem(size_t hash, Scope<ISystem>&& pSystem)
 	return false;
 }
 
-bool Scene::RemoveSystem(size_t hash)
+bool FScene::RemoveSystem(size_t hash)
 {
 	if (auto iter = mSystemMap.find(hash); iter != mSystemMap.end())
 	{
@@ -122,7 +122,7 @@ bool Scene::RemoveSystem(size_t hash)
 	return false;
 }
 
-ISystem* Scene::GetSystem(size_t hash)
+ISystem* FScene::GetSystem(size_t hash)
 {
 	if (auto iter = mSystemMap.find(hash); iter != mSystemMap.end())
 	{

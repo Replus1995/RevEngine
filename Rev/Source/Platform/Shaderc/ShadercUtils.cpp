@@ -207,8 +207,8 @@ void FShadercUtils::DumpShaderInfo(const FShadercCompiledData& InData)
 		RE_CORE_TRACE("Shaderc::Reflect - {0} {1}", InData.Name.c_str(), ShaderStageToString(InData.Stage));
 		RE_CORE_TRACE("    {0} uniform buffers", resources.uniform_buffers.size());
 		RE_CORE_TRACE("    {0} sampled images", resources.sampled_images.size());
-		RE_CORE_TRACE("    {0} separate images", resources.separate_images.size());
-		RE_CORE_TRACE("    {0} separate samplers", resources.separate_samplers.size());
+		//RE_CORE_TRACE("    {0} separate images", resources.separate_images.size());
+		//RE_CORE_TRACE("    {0} separate samplers", resources.separate_samplers.size());
 
 		//RE_CORE_TRACE("Uniform buffers:");
 		//for (const auto& resource : resources.uniform_buffers)

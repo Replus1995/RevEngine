@@ -62,7 +62,7 @@ FOpenGLShaderProgram::FOpenGLShaderProgram(const std::string& InName, const FRHI
 		auto& ShaderRef = InShaders[(ERHIShaderStage)i];
 		if (ShaderRef)
 		{
-			GLuint ShaderHandle = *(GLuint*)ShaderRef->GetNativeHandle();
+			GLuint ShaderHandle = *(const GLuint*)ShaderRef->GetNativeHandle();
 			glAttachShader(ProgramHandle, ShaderHandle);
 			ShaderHandles.push_back(ShaderHandle);
 		}
@@ -95,16 +95,6 @@ FOpenGLShaderProgram::FOpenGLShaderProgram(const std::string& InName, const FRHI
 FOpenGLShaderProgram::~FOpenGLShaderProgram()
 {
 	glDeleteProgram(mHandle);
-}
-
-void FOpenGLShaderProgram::Bind() const
-{
-	glUseProgram(mHandle);
-}
-
-void FOpenGLShaderProgram::Unbind() const
-{
-	glUseProgram(0);
 }
 
 uint16 FOpenGLShaderProgram::GetUniformLocation(std::string_view name)

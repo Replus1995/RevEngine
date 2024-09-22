@@ -18,16 +18,26 @@ enum class EBasicGeometry : uint8
 
 class Texture;
 class Material;
+class SurfaceMaterial;
 class StaticMesh;
 class REV_API FAssetLibrary
 {
 public:
-	static const Ref<Texture>& GetDefaultWhiteTexture();
-	static const Ref<Texture>& GetDefaultNormalTexture();
-	static const Ref<Material>& GetDefaultMaterial();
-	static Ref<StaticMesh> CreateBasicGeometry(EBasicGeometry InKind, const Ref<Material>& InMaterial = nullptr);
+	static const Ref<Texture>& GetDefaultWhiteTexture2D();
+	static const Ref<Texture>& GetDefaultBlackTexture2D();
+	static const Ref<Texture>& GetDefaultNormalTexture2D();
+	static const Ref<SurfaceMaterial>& GetDefaultSurfaceMaterial();
+	static Ref<StaticMesh> CreateBasicGeometry(EBasicGeometry InKind, const Ref<SurfaceMaterial>& InMaterial = nullptr);
 
-	static FMeshImportResult ImportMesh(const FPath& InPath);
+
+	static FTextureStorage ImportTexture(const FPath& InPath);
+	static FTextureStorage ImportTextureCube(
+		const FPath& InPathPX, const FPath& InPathNX,
+		const FPath& InPathPY, const FPath& InPathNY,
+		const FPath& InPathPZ, const FPath& InPathNZ
+		);
+
+	static FModelImportResult ImportModel(const FPath& InPath);
 
 private:
 	friend class Application;

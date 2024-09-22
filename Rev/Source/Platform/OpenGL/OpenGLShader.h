@@ -12,7 +12,7 @@ class FOpenGLShader : public FRHIShader
 public:
 	FOpenGLShader(ERHIShaderStage InStage, const FBuffer& InCompiledData);
 	virtual ~FOpenGLShader();
-	virtual void* GetNativeHandle() override { return &mHandle; }
+	virtual const void* GetNativeHandle() const override { return &mHandle; }
 
 private:
 	static GLenum TranslateShaderStage(ERHIShaderStage InStage);
@@ -25,10 +25,7 @@ class FOpenGLShaderProgram : public FRHIShaderProgram
 public:
 	FOpenGLShaderProgram(const std::string& InName, const FRHIGraphicsShaders& InShaders);
 	virtual ~FOpenGLShaderProgram();
-	virtual void* GetNativeHandle() override { return &mHandle; }
-
-	virtual void Bind() const override;
-	virtual void Unbind() const override;
+	virtual const void* GetNativeHandle() const override { return &mHandle; }
 
 	virtual uint16 GetUniformLocation(std::string_view name) override;
 

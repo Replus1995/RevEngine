@@ -13,7 +13,7 @@ StaticMesh::~StaticMesh()
 {
 }
 
-void StaticMesh::SetMaterials(std::vector<Ref<Material>>&& pMaterials)
+void StaticMesh::SetMaterials(std::vector<Ref<SurfaceMaterial>>&& pMaterials)
 {
 	mMaterials = std::move(pMaterials);
 }
@@ -23,7 +23,7 @@ void StaticMesh::SetPrimitives(std::vector<FMeshPrimitive>&& pPrimitives)
 	mPrimitives = std::move(pPrimitives);
 }
 
-const Ref<Material>& StaticMesh::GetMaterial(uint32 index) const
+const Ref<SurfaceMaterial>& StaticMesh::GetMaterial(uint32 index) const
 {
 	if (index < mMaterials.size())
 	{
@@ -35,7 +35,7 @@ const Ref<Material>& StaticMesh::GetMaterial(uint32 index) const
 	}
 	else
 	{
-		static Ref<Material> sMeshEmptyMaterial = nullptr;
+		static Ref<SurfaceMaterial> sMeshEmptyMaterial = nullptr;
 		return sMeshEmptyMaterial;
 	}
 }

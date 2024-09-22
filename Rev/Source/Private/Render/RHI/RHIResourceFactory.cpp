@@ -3,11 +3,10 @@
 #include "Rev/Core/Assert.h"
 
 //OpenGL impl headers
-#include "OpenGL/OpenGLVertexBuffer.h"
-#include "OpenGL/OpenGLUniformBuffer.h"
+#include "OpenGL/OpenGLBuffer.h"
 #include "OpenGL/OpenGLSampler.h"
 #include "OpenGL/OpenGLTexture.h"
-#include "OpenGL/OpenGLRenderTarget2D.h"
+#include "OpenGL/OpenGLRenderTarget.h"
 
 namespace Rev
 {
@@ -79,7 +78,7 @@ Ref<FRHIIndexBuffer> FRHIResourceFactory::CreateIndexBuffer(const void* InIndice
 	return nullptr;
 }
 
-Ref<FRHIVertexArray> FRHIResourceFactory::CreateVertexData()
+Ref<FRHIVertexArray> FRHIResourceFactory::CreateVertexArray()
 {
 	switch (GetRenderAPI())
 	{
@@ -91,12 +90,12 @@ Ref<FRHIVertexArray> FRHIResourceFactory::CreateVertexData()
 	return nullptr;
 }
 
-Ref<FRHIUniformBuffer> FRHIResourceFactory::CreateUniformBuffer(uint32 InSize, uint32 InBinding)
+Ref<FRHIUniformBuffer> FRHIResourceFactory::CreateUniformBuffer(uint32 InSize)
 {
 	switch (GetRenderAPI())
 	{
 	case ERenderAPI::None:    RE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
-	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLUniformBuffer>(InSize, InBinding);
+	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLUniformBuffer>(InSize);
 	}
 
 	RE_CORE_ASSERT(false, "Unknown RenderAPI!");
@@ -133,7 +132,7 @@ Ref<FRHIRenderTarget> FRHIResourceFactory::CreateRenderTarget(const FRenderTarge
 	switch (GetRenderAPI())
 	{
 	case ERenderAPI::None:    RE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
-	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLRenderTarget2D>(InDesc);
+	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLRenderTarget>(InDesc);
 	}
 
 	RE_CORE_ASSERT(false, "Unknown RenderAPI!");

@@ -7,7 +7,7 @@ namespace Rev
 {
 class StaticMesh;
 struct FTextureStorage;
-struct FMaterialStorage;
+struct FSurfaceMaterialStorage;
 struct REV_API FMeshStorage
 {
 public:
@@ -17,7 +17,7 @@ public:
 struct REV_API FStaticMeshStorage : public FMeshStorage
 {
 public:
-	std::vector<Ref<FMaterialStorage>> Materials;
+	std::vector<Ref<FSurfaceMaterialStorage>> Materials;
 	std::vector<Ref<FMeshPrimitiveStorage>> Primitives;
 
 	Ref<StaticMesh> CreateStaticMesh();
@@ -25,10 +25,10 @@ private:
 	Ref<StaticMesh> mCache = nullptr;
 };
 
-struct FMeshImportResult
+struct FModelImportResult
 {
 	std::vector<Ref<FTextureStorage>> Textures;
-	std::vector<Ref<FMaterialStorage>> Materials;
+	std::vector<Ref<FSurfaceMaterialStorage>> Materials;
 	std::vector<Ref<FStaticMeshStorage>> StaticMeshes;
 	//SkeletalMeshes
 };

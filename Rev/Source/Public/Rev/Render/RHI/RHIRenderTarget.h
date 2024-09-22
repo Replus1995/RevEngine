@@ -9,6 +9,15 @@
 namespace Rev
 {
 
+enum class ERenderTargetDimension : uint8
+{
+	RenderTargetEmpty		= 0,
+	RenderTarget2D			= 1,
+	RenderTarget2DArray		= 2,
+	RenderTargetCube		= 3,
+	RenderTargetCubeArray	= 4
+};
+
 enum ERenderTargetAttachment : uint8
 {
 	RTA_ColorAttachment0 = 0,
@@ -20,7 +29,9 @@ enum ERenderTargetAttachment : uint8
 	RTA_ColorAttachment6 = 6,
 	RTA_ColorAttachment7 = 7,
 	RTA_MaxColorAttachments = 8,
-	RTA_DepthStencilAttachment = 9,
+	RTA_DepthAttachment = 9,
+	RTA_DepthStencilAttachment = 10,
+	RTA_EmptyAttachment = 16
 };
 
 struct FColorTargetDesc
@@ -40,8 +51,10 @@ struct FDepthStencilTargetDesc
 
 struct FRenderTargetDesc
 {
-	uint32 Width = 0;
-	uint32 Height = 0;
+	uint16 Width = 0;
+	uint16 Height = 0;
+	ERenderTargetDimension Dimension = ERenderTargetDimension::RenderTargetEmpty;
+	uint16 ArraySize = 1;
 	FColorTargetDesc ColorTargets[RTA_MaxColorAttachments] = {};
 	uint8 NumColorTargets = 0;
 	FDepthStencilTargetDesc DepthStencilTarget;
@@ -49,14 +62,17 @@ struct FRenderTargetDesc
 
 	FRenderTargetDesc() = default;
 	FRenderTargetDesc(
-		uint32 InWidth, uint32 InHeight,
+		ERenderTargetDimension InDimension,
+		uint16 InWidth, uint16 InHeight,
 		const FColorTargetDesc* InColorTargets,
 		uint32 InNumColorTargets,
 		const FDepthStencilTargetDesc& InDepthStencilTarget,
-		uint8 InNumSamples = 1
+		uint16 InArraySize = 1, uint8 InNumSamples = 1
 	)
 		: Width(InWidth)
 		, Height(InHeight)
+		, Dimension(InDimension)
+		, ArraySize(InArraySize)
 		, DepthStencilTarget(InDepthStencilTarget)
 		, NumSamples(InNumSamples)
 	{
@@ -67,32 +83,52 @@ struct FRenderTargetDesc
 			ColorTargets[i] = InColorTargets[i];
 		}
 	}
-};
 
-struct FRenderTargetSource
-{
-	Ref<FRHITexture> Texture = nullptr;
-	uint16 ArrayIndex = 0;
-	uint8 MipLevel = 0;
+	static FRenderTargetDesc MakeEmpty()
+	{
+		return FRenderTargetDesc();
+	}
+
+	static FRenderTargetDesc Make2D(uint16 InWidth, uint16 InHeight, const FColorTargetDesc* InColorTargets, uint32 InNumColorTargets, const FDepthStencilTargetDesc& InDepthStencilTarget, uint8 InNumSamples = 1)
+	{
+		return FRenderTargetDesc(ERenderTargetDimension::RenderTarget2D, InWidth, InHeight, InColorTargets, InNumColorTargets, InDepthStencilTarget, 1, InNumSamples);
+	}
+
+	static FRenderTargetDesc Make2DArray(uint16 InWidth, uint16 InHeight, const FColorTargetDesc* InColorTargets, uint32 InNumColorTargets, const FDepthStencilTargetDesc& InDepthStencilTarget, uint16 InArraySize, uint8 InNumSamples = 1)
+	{
+		return FRenderTargetDesc(ERenderTargetDimension::RenderTarget2DArray, InWidth, InHeight, InColorTargets, InNumColorTargets, InDepthStencilTarget, InArraySize, InNumSamples);
+	}
+
+	static FRenderTargetDesc MakeCube(uint16 InWidth, uint16 InHeight, const FColorTargetDesc* InColorTargets, uint32 InNumColorTargets, const FDepthStencilTargetDesc& InDepthStencilTarget, uint8 InNumSamples = 1)
+	{
+		return FRenderTargetDesc(ERenderTargetDimension::RenderTargetCube, InWidth, InHeight, InColorTargets, InNumColorTargets, InDepthStencilTarget, 1, InNumSamples);
+	}
+
+	static FRenderTargetDesc MakeCubeArray(uint16 InWidth, uint16 InHeight, const FColorTargetDesc* InColorTargets, uint32 InNumColorTargets, const FDepthStencilTargetDesc& InDepthStencilTarget, uint16 InArraySize, uint8 InNumSamples = 1)
+	{
+		return FRenderTargetDesc(ERenderTargetDimension::RenderTargetCube, InWidth, InHeight, InColorTargets, InNumColorTargets, InDepthStencilTarget, InArraySize, InNumSamples);
+	}
 };
 
 class FRHIRenderTarget : public FRHIResource
 {
 public:
 	virtual ~FRHIRenderTarget() = default;
+	const FRenderTargetDesc& GetDesc() const { return mDesc; };
 
-	virtual void Bind() = 0;
-	virtual void Unbind() = 0;
-
-	virtual const FRenderTargetDesc& GetDesc() const { return mDesc; };
-
+	virtual void ResizeTargets(uint16 InWidth, uint16 InHeight) = 0;
 	virtual void ClearTarget(ERenderTargetAttachment Index) = 0;
+	virtual void ClearTargets() = 0;
 	virtual const Ref<FRHITexture> GetTargetTexture(ERenderTargetAttachment Index) const = 0;
-	virtual void Recreate(uint32 InWidth, uint32 InHeight) = 0;
+
+	//Use textures created by user
+	virtual void Attach(ERenderTargetAttachment Index, const Ref<FRHITexture>& InTexture, uint8 InMipLevel = 0, int32 InArrayIndex = -1) = 0;
+	virtual void Detach(ERenderTargetAttachment Index) = 0;
+	virtual void DetachAll() = 0;
+	virtual void FlushAttach() = 0;
 
 protected:
 	FRHIRenderTarget(const FRenderTargetDesc& InDesc) : mDesc(InDesc) {}
-	FRHIRenderTarget(const FRenderTargetSource* InColorSources, uint32 InNumColorSources, const FRenderTargetSource& InDepthSource = {});
 protected:
 	FRenderTargetDesc mDesc;
 };

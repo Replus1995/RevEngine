@@ -21,7 +21,7 @@ void PlayerCameraSystem::OnUpdate(float dt)
 {
 	if (mCamEntity)
 	{
-		auto [transformComp, cameraComp] = mRegistry.get<TransformComponent, CameraComponent>(mCamEntity);
+		const auto& [transformComp, cameraComp] = mCamEntity.GetComponent<TransformComponent, CameraComponent>();
 		mCamController->OnUpdate(dt, cameraComp.Camera, transformComp.Transform);
 	}
 }
@@ -34,7 +34,7 @@ void PlayerCameraSystem::FillCameraUniform(FCameraUniform& OutUniform) const
 {
 	if (mCamEntity)
 	{
-		auto [transformComp, cameraComp] = mRegistry.get<TransformComponent, CameraComponent>(mCamEntity);
+		const auto& [transformComp, cameraComp] = mCamEntity.GetComponent<TransformComponent, CameraComponent>();
 		if (cameraComp.AutoAspectRatio)
 		{
 			auto window = Application::GetApp().GetWindow();
@@ -53,9 +53,10 @@ void PlayerCameraSystem::FillCameraUniform(FCameraUniform& OutUniform) const
 		OutUniform.ViewMatrix = Math::FMatrix4(1.0f);
 		OutUniform.Position = Math::FVector4(0, 0, 0, 1);
 	}
+	OutUniform.InvProjViewMatrix = (OutUniform.ProjMatrix * OutUniform.ViewMatrix).Inverse();
 }
 
-bool PlayerCameraSystem::SetPlayerCamera(Entity e)
+bool PlayerCameraSystem::SetPlayerCamera(FEntity e)
 {
 	if (e.HasComponent<CameraComponent>())
 	{

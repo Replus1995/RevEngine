@@ -1,7 +1,7 @@
 #pragma once
 #include "Rev/World/System/System.h"
 #include "Rev/World/Entity.h"
-#include "Rev/Render/Camera.h"
+#include "Rev/Render/Component/Camera.h"
 #include "Rev/Render/UniformDefine.h"
 
 namespace Rev
@@ -16,11 +16,11 @@ public:
 	virtual void OnDestroy() override;
 
 	void FillCameraUniform(FCameraUniform& OutUniform) const;
-	bool SetPlayerCamera(Entity e);
+	bool SetPlayerCamera(FEntity e);
 	void SetPlayerCameraController(const Ref<CameraController>& c);
 	
 private:
-	Entity mCamEntity;
+	FEntity mCamEntity;
 	Ref<CameraController> mCamController;
 };
 

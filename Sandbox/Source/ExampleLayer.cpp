@@ -3,12 +3,12 @@
 #include <Rev/World/Scene.h>
 #include <Rev/World/Component/AllComponents.h>
 #include <Rev/World/System/PlayerCameraSystem.h>
-#include <Rev/Render/Renderer.h>
 #include <Rev/Render/Mesh/StaticMesh.h>
 #include <Rev/Render/Material/PBRMaterial.h>
 #include <Rev/Render/RHI/RHIShaderLibrary.h>
 #include <Rev/Core/FileSystem.h>
 #include <Rev/Asset/AssetLibrary.h>
+#include <Rev/Asset/TextureStorage.h>
 
 #include <filesystem>
 
@@ -27,7 +27,7 @@ ExampleLayer::ExampleLayer()
 	FPath TestPath("/Game/Assets/Shaders/Common.vs.glsl");
 
 	//Create Sandbox Scene
-	mScene = CreateRef<Rev::Scene>();
+	mScene = CreateRef<Rev::FScene>();
 
 	/*{
 		auto pBoxMat = CreateRef<ExampleMaterial>();
@@ -43,7 +43,7 @@ ExampleLayer::ExampleLayer()
 
 	{
 		//auto importRes = FAssetLibrary::ImportMesh(FPath("/Game/Assets/Models/Cube/Cube.gltf"));
-		auto importRes = FAssetLibrary::ImportMesh(FPath("/Game/Assets/Models/DamagedHelmet.glb"));
+		auto importRes = FAssetLibrary::ImportModel(FPath("/Game/Assets/Models/DamagedHelmet.glb"));
 		if (!importRes.StaticMeshes.empty())
 		{
 			auto meshStorage = importRes.StaticMeshes[0];
@@ -69,7 +69,7 @@ ExampleLayer::ExampleLayer()
 		meshComp.StaticMesh = FAssetLibrary::CreateBasicGeometry(EBasicGeometry::Plane, pPlaneMat);
 		auto& transformComp = meshEntity.GetComponent<TransformComponent>();
 		transformComp.SetLocation(Math::FVector3(0, 0, -5));
-		transformComp.SetRotation(Math::FRotator(90.0F, 0, 0));
+		transformComp.SetRotation(Math::FRotator(-90.0F, 0, 0));
 		transformComp.SetScale(Math::FVector3(5, 5, 0));
 	}
 
@@ -96,6 +96,25 @@ ExampleLayer::ExampleLayer()
 		if (camSys)
 		{
 			camSys->SetPlayerCamera(camEntity);
+		}
+	}
+
+	{
+		//CubeMap
+		auto CubeTexStorage = FAssetLibrary::ImportTextureCube(
+			"/Game/Assets/Textures/Skybox/right.jpg", 
+			"/Game/Assets/Textures/Skybox/left.jpg",
+			"/Game/Assets/Textures/Skybox/top.jpg",
+			"/Game/Assets/Textures/Skybox/bottom.jpg",
+			"/Game/Assets/Textures/Skybox/front.jpg",
+			"/Game/Assets/Textures/Skybox/back.jpg");
+		auto CubeTex = CubeTexStorage.CreateTexture();
+		if (CubeTex)
+		{ 
+			//Enviornment
+			auto  skyEntity = mScene->CreateEntity();
+			auto& skyComp = skyEntity.AddComponent<SkyComponent>();
+			skyComp.Skybox.SetEnvironmentTexture(CubeTex);
 		}
 	}
 }

@@ -136,14 +136,13 @@ inline FLinearColor::FLinearColor(float InR, float InG, float InB, float InA)
 {
 }
 
-inline FLinearColor::FLinearColor(const FColor& InColor)
-	: R(std::powf((float)InColor.R / 255.0f, sGamma))
-	, G(std::powf((float)InColor.G / 255.0f, sGamma))
-	, B(std::powf((float)InColor.B / 255.0f, sGamma))
-	, A((float)InColor.A / 255.0f)
-{
-	
-}
+//inline FLinearColor::FLinearColor(const FColor& InColor)
+//	: R(std::powf((float)InColor.R / 255.0f, sGamma))
+//	, G(std::powf((float)InColor.G / 255.0f, sGamma))
+//	, B(std::powf((float)InColor.B / 255.0f, sGamma))
+//	, A((float)InColor.A / 255.0f)
+//{
+//}
 
 inline FLinearColor::FLinearColor(const FVector4& InVec)
 	: R(InVec.X)
@@ -316,7 +315,12 @@ inline FLinearColor FLinearColor::BGRA(float InB, float InG, float InR, float In
 
 inline FLinearColor FLinearColor::FromSRGB(const FColor& InColor)
 {
-	return FLinearColor(InColor);
+	FLinearColor Result;
+	Result.R = std::powf((float)InColor.R / 255.0f, sGamma);
+	Result.G = std::powf((float)InColor.G / 255.0f, sGamma);
+	Result.B = std::powf((float)InColor.B / 255.0f, sGamma);
+	Result.A = (float)InColor.A / 255.0f;
+	return Result;
 }
 
 inline FColor FLinearColor::ToSRGB(const FLinearColor& InColor)
@@ -327,6 +331,40 @@ inline FColor FLinearColor::ToSRGB(const FLinearColor& InColor)
 	Result.B = (uint8_t)Clamp<float>(std::powf(InColor.B, sInvGamma) * 255.0F, 0, 255);
 	Result.A = (uint8_t)Clamp<float>(InColor.A * 255.0F, 0, 255);
 	return Result;
+}
+
+inline FLinearColor FLinearColor::FromColor(const FColor& InColor, bool bSRGB)
+{
+	if (bSRGB)
+	{
+		return FromSRGB(InColor);
+	}
+	else
+	{
+		FLinearColor Result;
+		Result.R = (float)InColor.R / 255.0f;
+		Result.G = (float)InColor.G / 255.0f;
+		Result.B = (float)InColor.B / 255.0f;
+		Result.A = (float)InColor.A / 255.0f;
+		return Result;
+	}
+}
+
+inline FColor FLinearColor::ToColor(const FLinearColor& InColor, bool bSRGB)
+{
+	if (bSRGB)
+	{
+		return ToSRGB(InColor);
+	}
+	else
+	{
+		FColor Result;
+		Result.R = (uint8_t)Clamp<float>(InColor.R * 255.0F, 0, 255);
+		Result.G = (uint8_t)Clamp<float>(InColor.G * 255.0F, 0, 255);
+		Result.B = (uint8_t)Clamp<float>(InColor.B * 255.0F, 0, 255);
+		Result.A = (uint8_t)Clamp<float>(InColor.A * 255.0F, 0, 255);
+		return Result;
+	}
 }
 
 inline FLinearColor FLinearColor::FromTemperature(float InTemperature)

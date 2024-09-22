@@ -1,6 +1,7 @@
 #pragma once
 #include "Rev/World/Component/BaseComponent.h"
 #include "Rev/World/Component/LightComponent.h"
+#include "Rev/World/Component/SkyComponent.h"
 #include "Rev/World/Component/MeshComponent.h"
 #include <entt/entt.hpp>
 
@@ -15,6 +16,7 @@ struct ComponentGroup
 using AllComponents = ComponentGroup<
 	TransformComponent, CameraComponent,
 	DirectionalLightComponent, SpotLightComponent, PointLightComponent, 
+	SkyComponent,
 	StaticMeshComponent
 >;
 

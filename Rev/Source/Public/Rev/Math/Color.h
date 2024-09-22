@@ -36,7 +36,7 @@ public:
 
 	FLinearColor();
 	FLinearColor(float InR, float InG, float InB, float InA = 1.0F);
-	FLinearColor(const FColor& InColor);
+	//FLinearColor(const FColor& InColor);
 	FLinearColor(const FVector4& InVec);
 
 	operator FVector4() const { return FVector4(R, G, B, A); }
@@ -69,6 +69,9 @@ public:
 
 	static FLinearColor FromSRGB(const FColor& InColor);
 	static FColor ToSRGB(const FLinearColor& InColor);
+
+	static FLinearColor FromColor(const FColor& InColor, bool bSRGB = false);
+	static FColor ToColor(const FLinearColor& InColor, bool bSRGB = false);
 
 	static FLinearColor FromTemperature(float InTemperature);
 };

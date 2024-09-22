@@ -38,9 +38,9 @@ static constexpr uint32 sBoxIndices[] = {
 class FBoxGeometry
 {
 public:
-    static Ref<StaticMesh> Create(const Ref<Material>& InMat)
+    static Ref<StaticMesh> Create(const Ref<SurfaceMaterial>& InMat)
     {
-        std::vector<Ref<Material>> boxMatArr = { InMat };
+        std::vector<Ref<SurfaceMaterial>> boxMatArr = { InMat };
         std::vector<FMeshPrimitive> boxPrimArr;
         {
             constexpr uint32 boxVerticesSize = sizeof(sBoxVertices);
@@ -55,7 +55,7 @@ public:
             Ref<FRHIIndexBuffer> boxIndices = FRHIResourceFactory::CreateIndexBuffer(sBoxIndices, sizeof(uint32), boxIndicesCount);
 
             FMeshPrimitive boxMeshPrim;
-            boxMeshPrim.VertexData = FRHIResourceFactory::CreateVertexData();
+            boxMeshPrim.VertexData = FRHIResourceFactory::CreateVertexArray();
             boxMeshPrim.VertexData->AddVertexBuffer(boxVertices);
             boxMeshPrim.VertexData->SetIndexBuffer(boxIndices);
 

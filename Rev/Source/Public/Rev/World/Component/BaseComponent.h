@@ -2,7 +2,7 @@
 #include "Rev/Core/Base.h"
 #include "Rev/Core/UUID.h"
 #include "Rev/Math/Maths.h"
-#include "Rev/Render/Camera.h"
+#include "Rev/Render/Component/Camera.h"
 
 
 namespace Rev
@@ -53,8 +53,5 @@ struct CameraComponent
 	CameraComponent() = default;
 	CameraComponent(const CameraComponent&) = default;
 };
-
-
-
 
 }

@@ -7,13 +7,13 @@
 
 namespace Rev {
 
-class Scene;
-class REV_API Entity
+class FScene;
+class REV_API FEntity
 {
 public:
-	Entity() = default;
-	Entity(entt::entity handle, Scene* scene);
-	Entity(const Entity& other) = default;
+	FEntity() = default;
+	FEntity(entt::entity handle, FScene* scene);
+	FEntity(const FEntity& other) = default;
 
 	template<typename T, typename... Args>
 	T& AddComponent(Args&&... args)
@@ -30,17 +30,24 @@ public:
 		return component;
 	}
 
-	template<typename T>
-	T& GetComponent()
+	template<typename... T>
+	auto& GetComponent()
 	{
-		RE_CORE_ASSERT(HasComponent<T>(), "Entity does not have component!");
-		return mScene->mRegistry.get<T>(mHandle);
+		RE_CORE_ASSERT(HasComponent<T...>(), "Entity does not have component!");
+		return mScene->mRegistry.get<T...>(mHandle);
 	}
 
-	template<typename T>
-	bool HasComponent()
+	template<typename... T>
+	const auto& GetComponent() const
 	{
-		return mScene->mRegistry.any_of<T>(mHandle);
+		RE_CORE_ASSERT(HasComponent<T...>(), "Entity does not have component!");
+		return mScene->mRegistry.get<T...>(mHandle);
+	}
+
+	template<typename... T>
+	bool HasComponent() const
+	{
+		return mScene->mRegistry.any_of<T...>(mHandle);
 	}
 
 	template<typename T>
@@ -57,22 +64,22 @@ public:
 	UUID GetUUID();
 	const std::string& GetName();
 
-	bool operator==(const Entity& other) const
+	bool operator==(const FEntity& other) const
 	{
 		return mHandle == other.mHandle && mScene == other.mScene;
 	}
 
-	bool operator!=(const Entity& other) const
+	bool operator!=(const FEntity& other) const
 	{
 		return !(*this == other);
 	}
 private:
 	entt::entity mHandle{ entt::null };
-	Scene* mScene = nullptr;
+	FScene* mScene = nullptr;
 
 public:
 	template<typename... Component>
-	static void CopyComponentIfExists(Entity dst, Entity src)
+	static void CopyComponentIfExists(FEntity dst, FEntity src)
 	{
 		([&]()
 			{
@@ -82,7 +89,7 @@ public:
 	}
 
 	template<typename... Component>
-	static void CopyComponentIfExists(ComponentGroup<Component...>, Entity dst, Entity src)
+	static void CopyComponentIfExists(ComponentGroup<Component...>, FEntity dst, FEntity src)
 	{
 		CopyComponentIfExists<Component...>(dst, src);
 	}

@@ -4,18 +4,18 @@
 namespace Rev
 {
 
-Entity::Entity(entt::entity handle, Scene* scene)
+FEntity::FEntity(entt::entity handle, FScene* scene)
 	: mHandle(handle)
 	, mScene(scene)
 {
 }
 
-UUID Entity::GetUUID()
+UUID FEntity::GetUUID()
 {
 	return GetComponent<IDComponent>().ID;
 }
 
-const std::string& Entity::GetName()
+const std::string& FEntity::GetName()
 {
 	return GetComponent<TagComponent>().Tag;
 }

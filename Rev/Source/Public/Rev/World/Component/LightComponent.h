@@ -1,5 +1,5 @@
 #pragma once
-#include "Rev/Render/Light.h"
+#include "Rev/Render/Component/Light.h"
 
 
 namespace Rev
@@ -12,7 +12,7 @@ struct DirectionalLightComponent
 	Ref<FRHIRenderTarget> mShadowDepth = nullptr;
 
 	DirectionalLightComponent() = default;
-	DirectionalLightComponent(const DirectionalLightComponent& other) { this->Light = other.Light; }
+	DirectionalLightComponent(const DirectionalLightComponent& Other) { this->Light = Other.Light; }
 };
 
 struct SpotLightComponent
@@ -21,7 +21,7 @@ struct SpotLightComponent
 	Ref<FRHIRenderTarget> mShadowDepth = nullptr;
 
 	SpotLightComponent() = default;
-	SpotLightComponent(const SpotLightComponent& other) { this->Light = other.Light; }
+	SpotLightComponent(const SpotLightComponent& Other) { this->Light = Other.Light; }
 };
 
 struct PointLightComponent
@@ -30,7 +30,7 @@ struct PointLightComponent
 	Ref<FRHIRenderTarget> mShadowDepth = nullptr;
 
 	PointLightComponent() = default;
-	PointLightComponent(const PointLightComponent& other) { this->Light = other.Light; }
+	PointLightComponent(const PointLightComponent& Other) { this->Light = Other.Light; }
 };
 
 

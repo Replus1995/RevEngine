@@ -1,7 +1,6 @@
 #pragma once
 #include <Rev/Render/Material/Material.h>
 #include <Rev/Render/Material/MaterialUniform.h>
-#include <Rev/Render/Renderer.h>
 #include <Rev/Math/Maths.h>
 #include <Rev/Render/RHI/RHIShaderLibrary.h>
 

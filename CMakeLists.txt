@@ -23,9 +23,9 @@ if(MSVC)
     )
 endif()
 
-set(VENDOR_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/vendor)
 #vender
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/vendor ${CMAKE_CURRENT_BINARY_DIR}/vendor)
+set(VENDOR_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/vendor)
+include(${CMAKE_CURRENT_SOURCE_DIR}/vendor/vendor.cmake)
 
 #Rev
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Rev ${CMAKE_CURRENT_BINARY_DIR}/Rev)

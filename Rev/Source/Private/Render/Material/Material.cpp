@@ -1,8 +1,6 @@
 #include "Rev/Render/Material/Material.h"
 #include "Rev/Render/Material/MaterialUniform.h"
-#include "Rev/Render/Texture/Texture.h"
-#include "Rev/Render/RHI/RHITexture.h"
-#include <Rev/Render/RHI/RHIShaderLibrary.h>
+#include "Rev/Render/RenderCmd.h"
 
 namespace Rev
 {
@@ -21,21 +19,15 @@ Material::~Material()
 {
 }
 
-void Material::Compile()
-{
-	mProgram = FRHIShaderLibrary::GetInstance().CreateGraphicsProgram("BasicProgram",
-		{ "/Engine/Shaders/BasicVS" },
-		{ "/Engine/Shaders/BasicFS" });
-}
-
 void Material::PreDraw()
 {
+	RenderCmd::BindProgram(mProgram);
 }
 
 void Material::PostDraw()
 {
+	//RenderCmd::BindProgram(nullptr);
 }
-
 
 }
 

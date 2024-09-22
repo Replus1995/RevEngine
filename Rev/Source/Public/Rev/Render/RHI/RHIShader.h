@@ -37,9 +37,6 @@ class REV_API FRHIShaderProgram : public FRHIResource
 public:
     virtual ~FRHIShaderProgram() = default;
 
-    virtual void Bind() const = 0;
-    virtual void Unbind() const = 0;
-
     virtual uint16 GetUniformLocation(std::string_view name) = 0;
 
     virtual void SetUniform(uint16 location, int value) = 0;
