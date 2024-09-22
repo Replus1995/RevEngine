@@ -5,6 +5,7 @@ A tiny 3d engine for learning graphics apis & algorithms
 # Modules
 - **Core** : Engine base classes
 - **Render** : Render Components & RHI classes
+- **World** : ECS scene management based on entt
 - **Archive** : A simple archive class to do serialize & deserialize
 - **Asset** : Asset related classes & functions
 - **GLFW** : GLFW window class
@@ -18,6 +19,7 @@ A tiny 3d engine for learning graphics apis & algorithms
   - Hash string (FName)
 - **Todo List**
   - Use hlsl instead of glsl
+  - Render graph
 
 
 # Reference
