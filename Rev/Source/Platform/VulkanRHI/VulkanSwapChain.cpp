@@ -1,8 +1,7 @@
 #include "VulkanSwapChain.h"
-#include "VulkanDefines.h"
-#include "VulkanInstance.h"
-#include "VulkanDevice.h"
-#include "VulkanInit.h"
+#include "Core/VulkanDefines.h"
+#include "Core/VulkanInit.h"
+#include "VulkanCore.h"
 #include "Rev/Core/Assert.h"
 #include "Rev/Core/Application.h"
 #include "Rev/Core/Window.h"
@@ -13,13 +12,9 @@
 namespace Rev
 {
 
-void FVulkanSwapchain::CreateSwapchain(const FVulkanInstance* Instance, const FVulkanDevice* InDevice, VmaAllocator InAllocator)
+void FVulkanSwapchain::CreateSwapchain()
 {
-    REV_CORE_ASSERT(Instance);
-    REV_CORE_ASSERT(InDevice);
-    REV_CORE_ASSERT(InAllocator);
-
-    const FVulkanSwapChainSupport& SwapChainSupport = InDevice->GetSwapChainSupport();
+    const FVulkanSwapChainSupport& SwapChainSupport = FVulkanCore::GetSwapChainSupport();
 
     VkSurfaceFormatKHR SurfaceFormat = ChooseSurfaceFormat(SwapChainSupport.Formats);
     VkPresentModeKHR PresentMode = ChoosePresentMode(SwapChainSupport.PresentModes);
@@ -32,7 +27,7 @@ void FVulkanSwapchain::CreateSwapchain(const FVulkanInstance* Instance, const FV
 
     VkSwapchainCreateInfoKHR SwapChainCreateInfo{};
     SwapChainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-    SwapChainCreateInfo.surface = Instance->GetSurface();
+    SwapChainCreateInfo.surface = FVulkanCore::GetSurface();
     SwapChainCreateInfo.minImageCount = ImageCount;
     SwapChainCreateInfo.imageFormat = SurfaceFormat.format;
     SwapChainCreateInfo.imageColorSpace = SurfaceFormat.colorSpace;
@@ -43,8 +38,8 @@ void FVulkanSwapchain::CreateSwapchain(const FVulkanInstance* Instance, const FV
     {
         //queue families
         std::set<uint32> UniqueIndexSet;
-        UniqueIndexSet.insert(InDevice->GetQueueFamily(VQK_Present));
-        UniqueIndexSet.insert(InDevice->GetQueueFamily(VQK_Graphics));
+        UniqueIndexSet.insert(FVulkanCore::GetQueueFamily(VQK_Present));
+        UniqueIndexSet.insert(FVulkanCore::GetQueueFamily(VQK_Graphics));
 
         std::vector<uint32> UniqueIndices;
         for (uint32 Index : UniqueIndexSet)
@@ -64,32 +59,24 @@ void FVulkanSwapchain::CreateSwapchain(const FVulkanInstance* Instance, const FV
     SwapChainCreateInfo.clipped = VK_TRUE;
     SwapChainCreateInfo.oldSwapchain = VK_NULL_HANDLE;
 
-    REV_VK_CHECK_THROW(vkCreateSwapchainKHR(InDevice->GetDevice(), &SwapChainCreateInfo, nullptr, &mSwapchain), "[FVkSwapChain] Failed to create swap chain!");
+    REV_VK_CHECK_THROW(vkCreateSwapchainKHR(FVulkanCore::GetDevice(), &SwapChainCreateInfo, nullptr, &mSwapchain), "[FVkSwapChain] Failed to create swap chain!");
 
     mExtent = Extent;
     mFormat = SurfaceFormat.format;
-    vkGetSwapchainImagesKHR(InDevice->GetDevice(), mSwapchain, &ImageCount, nullptr);
+    vkGetSwapchainImagesKHR(FVulkanCore::GetDevice(), mSwapchain, &ImageCount, nullptr);
     mImages.resize(ImageCount);
-    vkGetSwapchainImagesKHR(InDevice->GetDevice(), mSwapchain, &ImageCount, mImages.data());
-    CreateImageViews(InDevice);
-
-    CreateBackImage(InDevice, InAllocator);
+    vkGetSwapchainImagesKHR(FVulkanCore::GetDevice(), mSwapchain, &ImageCount, mImages.data());
+    CreateImageViews();
 }
 
-void FVulkanSwapchain::Cleanup(const FVulkanDevice* InDevice, VmaAllocator InAllocator)
+void FVulkanSwapchain::Cleanup()
 {
-    REV_CORE_ASSERT(InDevice);
-    REV_CORE_ASSERT(InAllocator);
-
-    vkDestroyImageView(InDevice->GetDevice(), mBackImage.ImageView, nullptr);
-    vmaDestroyImage(InAllocator, mBackImage.Image, mBackImage.Allocation);
-
     for (auto ImageView : mImageViews) {
-        vkDestroyImageView(InDevice->GetDevice(), ImageView, nullptr);
+        vkDestroyImageView(FVulkanCore::GetDevice(), ImageView, nullptr);
     }
     mImageViews.clear();
     mImages.clear();
-    vkDestroySwapchainKHR(InDevice->GetDevice(), mSwapchain, nullptr);
+    vkDestroySwapchainKHR(FVulkanCore::GetDevice(), mSwapchain, nullptr);
 }
 
 VkSurfaceFormatKHR FVulkanSwapchain::ChooseSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& InAvailableFormats)
@@ -136,10 +123,8 @@ VkExtent2D FVulkanSwapchain::ChooseExtent(const VkSurfaceCapabilitiesKHR& InCapa
     }
 }
 
-void FVulkanSwapchain::CreateImageViews(const FVulkanDevice* InDevice)
+void FVulkanSwapchain::CreateImageViews()
 {
-    REV_CORE_ASSERT(InDevice);
-
     mImageViews.resize(mImages.size());
     for (size_t i = 0; i < mImages.size(); i++)
     {
@@ -158,46 +143,8 @@ void FVulkanSwapchain::CreateImageViews(const FVulkanDevice* InDevice)
         ImageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
         ImageViewCreateInfo.subresourceRange.layerCount = 1;
 
-        REV_VK_CHECK_THROW(vkCreateImageView(InDevice->GetDevice(), &ImageViewCreateInfo, nullptr, &mImageViews[i]), "[FVkSwapChain] Failed to create image views!");
+        REV_VK_CHECK_THROW(vkCreateImageView(FVulkanCore::GetDevice(), &ImageViewCreateInfo, nullptr, &mImageViews[i]), "[FVkSwapChain] Failed to create image views!");
     }
-}
-
-void FVulkanSwapchain::CreateBackImage(const FVulkanDevice* InDevice, VmaAllocator InAllocator)
-{
-    REV_CORE_ASSERT(InDevice);
-    REV_CORE_ASSERT(InAllocator);
-
-    VkExtent3D BackImageExtent = {
-        mExtent.width,
-        mExtent.height,
-        1
-    };
-
-    //hardcoding the draw format to 32 bit float
-    mBackImage.Format = VK_FORMAT_R16G16B16A16_SFLOAT;
-    mBackImage.Extent = BackImageExtent;
-
-    VkImageUsageFlags BackImageUsages{};
-    BackImageUsages |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
-    BackImageUsages |= VK_IMAGE_USAGE_TRANSFER_DST_BIT;
-    BackImageUsages |= VK_IMAGE_USAGE_STORAGE_BIT;
-    BackImageUsages |= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-
-    VkImageCreateInfo ImageCreateInfo = FVulkanInit::ImageCreateInfo2D(mBackImage.Format, BackImageUsages, BackImageExtent);
-
-    //for the draw image, we want to allocate it from gpu local memory
-    VmaAllocationCreateInfo ImageAllocinfo = {};
-    ImageAllocinfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
-    ImageAllocinfo.requiredFlags = VkMemoryPropertyFlags(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-
-    //allocate and create the image
-    vmaCreateImage(InAllocator, &ImageCreateInfo, &ImageAllocinfo, &mBackImage.Image, &mBackImage.Allocation, nullptr);
-
-    //build a image-view for the draw image to use for rendering
-    VkImageViewCreateInfo ImageViewCreateInfo = FVulkanInit::ImageViewCreateInfo2D(mBackImage.Format, mBackImage.Image, VK_IMAGE_ASPECT_COLOR_BIT);
-
-    REV_VK_CHECK(vkCreateImageView(InDevice->GetDevice(), &ImageViewCreateInfo, nullptr, &mBackImage.ImageView));
-
 }
 
 }

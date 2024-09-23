@@ -46,8 +46,5 @@ public:
 
 
 	virtual void Draw(const Ref<FRHIVertexArray>& InVertexArray) = 0;
-
-
-	static std::unique_ptr<FRHIContext> Create();
 };
 }

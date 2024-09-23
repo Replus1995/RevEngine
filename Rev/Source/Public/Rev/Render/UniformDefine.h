@@ -5,7 +5,7 @@
 #include "Rev/Render/RenderCmd.h"
 #include "Rev/Render/UniformLayout.h"
 #include "Rev/Render/RHI/RHIBuffer.h"
-#include "Rev/Render/RHI/RHIResourceFactory.h"
+#include "Rev/Render/RHI/RHICore.h"
 
 namespace Rev
 {
@@ -35,7 +35,7 @@ public:
 		if (!Resource)
 		{
 			TUniform<T, Binding>* pThis = const_cast<TUniform<T, Binding>*>(this);
-			pThis->Resource = FRHIResourceFactory::CreateUniformBuffer(sizeof(T));
+			pThis->Resource = FRHICore::CreateUniformBuffer(sizeof(T));
 			RenderCmd::BindUniformBuffer(Resource, Binding);
 		}
 		uint32 UploadSize = InSize > 0 ? InSize : sizeof(T);

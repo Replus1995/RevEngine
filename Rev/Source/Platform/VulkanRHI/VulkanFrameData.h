@@ -18,7 +18,7 @@ public:
 	FDeletorQueue DeletorQueue;
 };
 
-void InitFrameData(FVulkanFrameData* Frames, uint32 Count, const FVulkanDevice* InDevice);
-void CleanupFrameData(FVulkanFrameData* Frames, uint32 Count, const FVulkanDevice* InDevice);
+void InitFrameData(FVulkanFrameData* Frames, uint32 Count);
+void CleanupFrameData(FVulkanFrameData* Frames, uint32 Count);
 
 }

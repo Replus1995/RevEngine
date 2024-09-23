@@ -1,7 +1,7 @@
 #include "Rev/Asset/MeshPrimitiveStorage.h"
 #include "Rev/Core/Assert.h"
 #include "Rev/Render/RHI/RHIBuffer.h"
-#include "Rev/Render/RHI/RHIResourceFactory.h"
+#include "Rev/Render/RHI/RHICore.h"
 
 namespace Rev
 {
@@ -42,10 +42,10 @@ FMeshPrimitive FMeshPrimitiveStorage::CreateVertexData()
 	if (TangentData.Empty())
 		CalculateTangents();
 
-	Ref<FRHIVertexArray> VertexArr = FRHIResourceFactory::CreateVertexArray();
+	Ref<FRHIVertexArray> VertexArr = FRHICore::CreateVertexArray();
 	//Position
 	{
-		Ref<FRHIVertexBuffer> PositionBuffer = FRHIResourceFactory::CreateVertexBuffer(PositonData.DataAs<float>(), PositonData.Size());
+		Ref<FRHIVertexBuffer> PositionBuffer = FRHICore::CreateVertexBuffer(PositonData.DataAs<float>(), PositonData.Size());
 		PositionBuffer->SetLayout({
 			{"Position", EVertexElementType::Float3,  0}
 			});
@@ -53,7 +53,7 @@ FMeshPrimitive FMeshPrimitiveStorage::CreateVertexData()
 	}
 	//Normal
 	{
-		Ref<FRHIVertexBuffer> NormalBuffer = FRHIResourceFactory::CreateVertexBuffer(NormalData.DataAs<float>(), NormalData.Size());
+		Ref<FRHIVertexBuffer> NormalBuffer = FRHICore::CreateVertexBuffer(NormalData.DataAs<float>(), NormalData.Size());
 		NormalBuffer->SetLayout({
 			{"Normal", EVertexElementType::Float3,  1}
 			});
@@ -61,7 +61,7 @@ FMeshPrimitive FMeshPrimitiveStorage::CreateVertexData()
 	}
 	//Tangent
 	{
-		Ref<FRHIVertexBuffer> TangentBuffer = FRHIResourceFactory::CreateVertexBuffer(TangentData.DataAs<float>(), TangentData.Size());
+		Ref<FRHIVertexBuffer> TangentBuffer = FRHICore::CreateVertexBuffer(TangentData.DataAs<float>(), TangentData.Size());
 		TangentBuffer->SetLayout({
 			{"Tangent", EVertexElementType::Float4,  2}
 			});
@@ -69,14 +69,14 @@ FMeshPrimitive FMeshPrimitiveStorage::CreateVertexData()
 	}
 	//TexCoord
 	{
-		Ref<FRHIVertexBuffer> TexCoordBuffer = FRHIResourceFactory::CreateVertexBuffer(TexCoordData.DataAs<float>(), TexCoordData.Size());
+		Ref<FRHIVertexBuffer> TexCoordBuffer = FRHICore::CreateVertexBuffer(TexCoordData.DataAs<float>(), TexCoordData.Size());
 		TexCoordBuffer->SetLayout({
 			{"TexCoord0", EVertexElementType::Float2,  3}
 			});
 		VertexArr->AddVertexBuffer(TexCoordBuffer);
 	}
 
-	Ref<FRHIIndexBuffer> IndexBuffer = FRHIResourceFactory::CreateIndexBuffer(IndexData.Data(), IndexStride, IndexCount);
+	Ref<FRHIIndexBuffer> IndexBuffer = FRHICore::CreateIndexBuffer(IndexData.Data(), IndexStride, IndexCount);
 	VertexArr->SetIndexBuffer(IndexBuffer);
 
 	FMeshPrimitive Result;

@@ -1,4 +1,5 @@
 #pragma once
+#include "Rev/Render/RHI/RHIContext.h"
 #include "Rev/Render/RHI/RHIBuffer.h"
 #include "Rev/Render/RHI/RHISampler.h"
 #include "Rev/Render/RHI/RHITexture.h"
@@ -7,9 +8,13 @@
 namespace Rev
 {
 
-class REV_API FRHIResourceFactory
+class REV_API FRHICore
 {
 public:
+	static void Init();
+	static void Cleanup();
+
+	static Scope<FRHIContext> CreateContext();
 	//Resource
 	static Ref<FRHIVertexBuffer> CreateVertexBuffer(uint32 InSize); //Dynamic Data
 	static Ref<FRHIVertexBuffer> CreateVertexBuffer(const float* InVertices, uint32 InSize); //Static Data

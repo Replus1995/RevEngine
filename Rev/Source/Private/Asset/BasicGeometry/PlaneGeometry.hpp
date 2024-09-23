@@ -3,7 +3,7 @@
 #include "Rev/Render/Material/SurfaceMaterial.h"
 #include "Rev/Render/Mesh/StaticMesh.h"
 #include "Rev/Render/RHI/RHIBuffer.h"
-#include "Rev/Render/RHI/RHIResourceFactory.h"
+#include "Rev/Render/RHI/RHICore.h"
 
 namespace Rev
 {
@@ -42,16 +42,16 @@ public:
     static Ref<FRHIVertexArray> MakeVertexData()
     {
         constexpr uint32 planeVerticesSize = sizeof(sPlaneVertices);
-        Ref<FRHIVertexBuffer> planeVertices = FRHIResourceFactory::CreateVertexBuffer(sPlaneVertices, planeVerticesSize);
+        Ref<FRHIVertexBuffer> planeVertices = FRHICore::CreateVertexBuffer(sPlaneVertices, planeVerticesSize);
         planeVertices->SetLayout({
             {"Position", EVertexElementType::Float3, 0},
             {"TexCoord", EVertexElementType::Float2, 1}
             });
 
         constexpr uint32 planeIndicesCount = sizeof(sPlaneIndices) / sizeof(uint32);
-        Ref<FRHIIndexBuffer> planeIndices = FRHIResourceFactory::CreateIndexBuffer(sPlaneIndices, sizeof(uint32), planeIndicesCount);
+        Ref<FRHIIndexBuffer> planeIndices = FRHICore::CreateIndexBuffer(sPlaneIndices, sizeof(uint32), planeIndicesCount);
 
-        Ref<FRHIVertexArray> Result = FRHIResourceFactory::CreateVertexArray();
+        Ref<FRHIVertexArray> Result = FRHICore::CreateVertexArray();
         Result->AddVertexBuffer(planeVertices);
         Result->SetIndexBuffer(planeIndices);
         return Result;

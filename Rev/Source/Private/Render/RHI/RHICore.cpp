@@ -1,12 +1,17 @@
-#include "Rev/Render/RHI/RHIResourceFactory.h"
+#include "Rev/Render/RHI/RHICore.h"
 #include "Rev/Render/RenderCore.h"
 #include "Rev/Core/Assert.h"
 
 //OpenGL impl headers
+#include "OpenGL/OpenGLContext.h"
 #include "OpenGL/OpenGLBuffer.h"
 #include "OpenGL/OpenGLSampler.h"
 #include "OpenGL/OpenGLTexture.h"
 #include "OpenGL/OpenGLRenderTarget.h"
+
+//Vulkan impl headers
+#include "VulkanRHI/VulkanCore.h"
+#include "VulkanRHI/VulkanContext.h"
 
 namespace Rev
 {
@@ -29,8 +34,34 @@ Ref<TRHIResource> CreateRHIResource(Args&&... args)
 
 }
 
+void FRHICore::Init()
+{
+	FVulkanCore::Init();
+}
 
-Ref<FRHIVertexBuffer> FRHIResourceFactory::CreateVertexBuffer(uint32 InSize)
+void FRHICore::Cleanup()
+{
+	FVulkanCore::Cleanup();
+}
+
+Scope<FRHIContext> FRHICore::CreateContext()
+{
+	switch (GetRenderAPI())
+	{
+	case Rev::ERenderAPI::None:
+		REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!");
+		return nullptr;
+	case Rev::ERenderAPI::OpenGL:
+		return CreateScope<FOpenGLContext>();
+	case Rev::ERenderAPI::Vulkan:
+		return CreateScope<FVulkanContext>();
+	}
+
+	REV_CORE_ASSERT(false, "Unknown RenderAPI!");
+	return nullptr;
+}
+
+Ref<FRHIVertexBuffer> FRHICore::CreateVertexBuffer(uint32 InSize)
 {
 	switch (GetRenderAPI())
 	{
@@ -42,7 +73,7 @@ Ref<FRHIVertexBuffer> FRHIResourceFactory::CreateVertexBuffer(uint32 InSize)
 	return nullptr;
 }
 
-Ref<FRHIVertexBuffer> FRHIResourceFactory::CreateVertexBuffer(const float* InVertices, uint32 InSize)
+Ref<FRHIVertexBuffer> FRHICore::CreateVertexBuffer(const float* InVertices, uint32 InSize)
 {
 	switch (GetRenderAPI())
 	{
@@ -54,7 +85,7 @@ Ref<FRHIVertexBuffer> FRHIResourceFactory::CreateVertexBuffer(const float* InVer
 	return nullptr;
 }
 
-Ref<FRHIIndexBuffer> FRHIResourceFactory::CreateIndexBuffer(uint32 InStride, uint32 InCount)
+Ref<FRHIIndexBuffer> FRHICore::CreateIndexBuffer(uint32 InStride, uint32 InCount)
 {
 	switch (GetRenderAPI())
 	{
@@ -66,7 +97,7 @@ Ref<FRHIIndexBuffer> FRHIResourceFactory::CreateIndexBuffer(uint32 InStride, uin
 	return nullptr;
 }
 
-Ref<FRHIIndexBuffer> FRHIResourceFactory::CreateIndexBuffer(const void* InIndices, uint32 InStride, uint32 InCount)
+Ref<FRHIIndexBuffer> FRHICore::CreateIndexBuffer(const void* InIndices, uint32 InStride, uint32 InCount)
 {
 	switch (GetRenderAPI())
 	{
@@ -78,7 +109,7 @@ Ref<FRHIIndexBuffer> FRHIResourceFactory::CreateIndexBuffer(const void* InIndice
 	return nullptr;
 }
 
-Ref<FRHIVertexArray> FRHIResourceFactory::CreateVertexArray()
+Ref<FRHIVertexArray> FRHICore::CreateVertexArray()
 {
 	switch (GetRenderAPI())
 	{
@@ -90,7 +121,7 @@ Ref<FRHIVertexArray> FRHIResourceFactory::CreateVertexArray()
 	return nullptr;
 }
 
-Ref<FRHIUniformBuffer> FRHIResourceFactory::CreateUniformBuffer(uint32 InSize)
+Ref<FRHIUniformBuffer> FRHICore::CreateUniformBuffer(uint32 InSize)
 {
 	switch (GetRenderAPI())
 	{
@@ -115,7 +146,7 @@ Ref<FRHIUniformBuffer> FRHIResourceFactory::CreateUniformBuffer(uint32 InSize)
 //}
 
 
-Ref<FRHITexture> FRHIResourceFactory::CreateTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc)
+Ref<FRHITexture> FRHICore::CreateTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc)
 {
 	switch (GetRenderAPI())
 	{
@@ -127,7 +158,7 @@ Ref<FRHITexture> FRHIResourceFactory::CreateTexture(const FTextureDesc& InDesc, 
 	return nullptr;
 }
 
-Ref<FRHIRenderTarget> FRHIResourceFactory::CreateRenderTarget(const FRenderTargetDesc& InDesc)
+Ref<FRHIRenderTarget> FRHICore::CreateRenderTarget(const FRenderTargetDesc& InDesc)
 {
 	switch (GetRenderAPI())
 	{

@@ -1,5 +1,5 @@
 #include "Rev/Render/RenderCmd.h"
-#include "Rev/Render/RHI/RHIContext.h"
+#include "Rev/Render/RHI/RHICore.h"
 #include "Rev/Render/RHI/RHIShader.h"
 #include "Rev/Render/RHI/RHIShaderLibrary.h"
 #include "Rev/Render/Mesh/MeshPrimitive.h"
@@ -14,7 +14,8 @@ static Scope<FRHIContext> sContext;
 void RenderCmd::Init()
 {
 	REV_CORE_ASSERT(!sContext, "RenderCmd already initialized!");
-	sContext = FRHIContext::Create();
+	FRHICore::Init();
+	sContext = FRHICore::CreateContext();
 	sContext->Init();
 	FRHIShaderLibrary::CreateInstance();
 
@@ -27,6 +28,7 @@ void RenderCmd::Shutdown()
 	FRHIShaderLibrary::ReleaseInstance();
 	sContext->Cleanup();
 	sContext.reset();
+	FRHICore::Cleanup();
 }
 
 void RenderCmd::Flush()

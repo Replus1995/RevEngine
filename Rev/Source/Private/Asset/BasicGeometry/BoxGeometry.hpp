@@ -3,7 +3,7 @@
 #include "Rev/Render/Material/Material.h"
 #include "Rev/Render/Mesh/StaticMesh.h"
 #include "Rev/Render/RHI/RHIBuffer.h"
-#include "Rev/Render/RHI/RHIResourceFactory.h"
+#include "Rev/Render/RHI/RHICore.h"
 
 namespace Rev
 {
@@ -44,7 +44,7 @@ public:
         std::vector<FMeshPrimitive> boxPrimArr;
         {
             constexpr uint32 boxVerticesSize = sizeof(sBoxVertices);
-            Ref<FRHIVertexBuffer> boxVertices = FRHIResourceFactory::CreateVertexBuffer(sBoxVertices, boxVerticesSize);
+            Ref<FRHIVertexBuffer> boxVertices = FRHICore::CreateVertexBuffer(sBoxVertices, boxVerticesSize);
             boxVertices->SetLayout({
                 {"Position", EVertexElementType::Float3,  0}
                 //{EShaderDataType::Float3, "a_Normal"},
@@ -52,10 +52,10 @@ public:
                 });
 
             constexpr uint32 boxIndicesCount = sizeof(sBoxIndices) / sizeof(uint32);
-            Ref<FRHIIndexBuffer> boxIndices = FRHIResourceFactory::CreateIndexBuffer(sBoxIndices, sizeof(uint32), boxIndicesCount);
+            Ref<FRHIIndexBuffer> boxIndices = FRHICore::CreateIndexBuffer(sBoxIndices, sizeof(uint32), boxIndicesCount);
 
             FMeshPrimitive boxMeshPrim;
-            boxMeshPrim.VertexData = FRHIResourceFactory::CreateVertexArray();
+            boxMeshPrim.VertexData = FRHICore::CreateVertexArray();
             boxMeshPrim.VertexData->AddVertexBuffer(boxVertices);
             boxMeshPrim.VertexData->SetIndexBuffer(boxIndices);
 

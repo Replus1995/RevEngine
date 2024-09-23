@@ -1,7 +1,5 @@
 #pragma once
 #include "Rev/Core/Base.h"
-#include <vector>
-#include <optional>
 #include <vulkan/vulkan.h>
 
 namespace Rev

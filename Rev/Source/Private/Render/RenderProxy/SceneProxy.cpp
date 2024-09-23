@@ -1,6 +1,6 @@
 #include "Rev/Render/RenderProxy/SceneProxy.h" 
 #include "Rev/Render/RenderCmd.h"
-#include "Rev/Render/RHI/RHIResourceFactory.h"
+#include "Rev/Render/RHI/RHICore.h"
 #include "Rev/Render/UniformLayout.h"
 #include "Rev/Render/Texture/Texture.h"
 

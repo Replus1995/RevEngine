@@ -2,17 +2,17 @@
 #include "Core/VulkanInit.h"
 #include "Core/VulkanDevice.h"
 #include "Core/VulkanDefines.h"
+#include "VulkanCore.h"
 
 #include "Rev/Core/Assert.h"
 
 namespace Rev
 {
 
-void InitFrameData(FVulkanFrameData* Frames, uint32 Count, const FVulkanDevice* InDevice)
+void InitFrameData(FVulkanFrameData* Frames, uint32 Count)
 {
-	REV_CORE_ASSERT(InDevice);
-	VkDevice Device = InDevice->GetDevice();
-	uint32 GraphicsFamily = InDevice->GetQueueFamily(VQK_Graphics);
+	VkDevice Device = FVulkanCore::GetDevice();
+	uint32 GraphicsFamily = FVulkanCore::GetQueueFamily(VQK_Graphics);
 
 	VkCommandPoolCreateInfo CmdPoolCreateInfo = FVulkanInit::CmdPoolCreateInfo(GraphicsFamily, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
 	for (uint32 i = 0; i < Count; i++) {
@@ -36,11 +36,9 @@ void InitFrameData(FVulkanFrameData* Frames, uint32 Count, const FVulkanDevice* 
 
 }
 
-void CleanupFrameData(FVulkanFrameData* Frames, uint32 Count, const FVulkanDevice* InDevice)
+void CleanupFrameData(FVulkanFrameData* Frames, uint32 Count)
 {
-	REV_CORE_ASSERT(InDevice);
-	VkDevice Device = InDevice->GetDevice();
-
+	VkDevice Device = FVulkanCore::GetDevice();
 	for (uint32 i = 0; i < Count; i++) {
 		//destroy cmd pool
 		vkDestroyCommandPool(Device, Frames[i].CmdPool, nullptr);

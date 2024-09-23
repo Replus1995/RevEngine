@@ -3,13 +3,10 @@
 #include "Rev/Core/Deleter.h"
 #include <vector>
 #include <vulkan/vulkan.h>
-#include <vk_mem_alloc.h>
 
 #include "Core/VulkanDefines.h"
-#include "Core/VulkanInstance.h"
-#include "Core/VulkanDevice.h"
-#include "Core/VulkanSwapchain.h"
 #include "Core/VulkanInit.h"
+#include "VulkanSwapchain.h"
 #include "VulkanFrameData.h"
 
 namespace Rev
@@ -49,28 +46,17 @@ public:
 	virtual void Draw(const Ref<FRHIVertexArray>& InVertexArray) override {};
 
 
-	const FVulkanInstance& GetInstance() const { return mInstance; }
-	const FVulkanDevice& GetDevice() const { return mDevice; }
 	const FVulkanSwapchain& GetSwapchain() const { return mSwapchain; }
-	const VmaAllocator& GetAllocator() const { return mAllocator; }
-
+	VkImage GetSwapchainImage() { return mSwapchain.GetImages()[mCurSwapchainImageIndex]; }
+	VkImageView GetSwapchainImageView() { return mSwapchain.GetImageViews()[mCurSwapchainImageIndex]; }
 
 	FVulkanFrameData& GetFrameData() { return mFrameData[mFrameDataIndex]; }
 	VkCommandBuffer GetMainCmdBuffer() { return mFrameData[mFrameDataIndex].MainCmdBuffer; }
-	VkImage GetSwapchainImage() { return mSwapchain.GetImages()[mCurSwapchainImageIndex]; }
-	VkImageView GetSwapchainImageView() { return mSwapchain.GetImageViews()[mCurSwapchainImageIndex]; }
-	
 private:
-	void CreateAllocator();
 	void CreateImmediateData();
 
 private:
-	FVulkanInstance mInstance;
-	FVulkanDevice mDevice;
 	FVulkanSwapchain mSwapchain;
-	VmaAllocator mAllocator = nullptr;
-
-	FDeletorQueue mMainDeletorQueue;
 
 	//frame data
 	uint32 mCurSwapchainImageIndex = 0;

@@ -1,4 +1,5 @@
 #include "VulkanContext.h"
+#include "VulkanCore.h"
 #include "VulkanUtils.h"
 
 #include "Rev/Core/Base.h"
@@ -31,49 +32,38 @@ FVulkanContext::~FVulkanContext()
 
 void FVulkanContext::Init()
 {
-	mInstance.CreateInstance();
-	mInstance.CreateSurface();
-	mDevice.PickPhysicalDevice(&mInstance);
-	mDevice.CreateLogicalDevice(&mInstance);
-	CreateAllocator();
-
-	mSwapchain.CreateSwapchain(&mInstance, &mDevice, mAllocator);
-	InitFrameData(mFrameData, REV_VK_FRAME_OVERLAP, &mDevice);
-
+	mSwapchain.CreateSwapchain();
+	InitFrameData(mFrameData, REV_VK_FRAME_OVERLAP);
 	CreateImmediateData();
 }
 
 void FVulkanContext::Cleanup()
 {
-	vkDeviceWaitIdle(mDevice.GetDevice());
-	
-	mMainDeletorQueue.Flush();
+	vkDestroyCommandPool(FVulkanCore::GetDevice(), mImmCmdPool, nullptr);
+	vkDestroyFence(FVulkanCore::GetDevice(), mImmFence, nullptr);
 
-	CleanupFrameData(mFrameData, REV_VK_FRAME_OVERLAP, &mDevice);
-	mSwapchain.Cleanup(&mDevice, mAllocator);
-
-	vmaDestroyAllocator(mAllocator);
-	mDevice.Cleanup();
-	mInstance.Cleanup();
+	vkDeviceWaitIdle(FVulkanCore::GetDevice());
+	CleanupFrameData(mFrameData, REV_VK_FRAME_OVERLAP);
+	mSwapchain.Cleanup();
 }
 
 void FVulkanContext::Flush()
 {
-	vkDeviceWaitIdle(mDevice.GetDevice());
+	vkDeviceWaitIdle(FVulkanCore::GetDevice());
 }
 
 void FVulkanContext::BeginFrame(bool bClearBackBuffer)
 {
 	constexpr uint64 kWaitTime = 1000000000;
 	auto& FrameData = GetFrameData();
-	REV_VK_CHECK(vkWaitForFences(mDevice.GetDevice(), 1, &FrameData.Fence, true, kWaitTime));
+	REV_VK_CHECK(vkWaitForFences(FVulkanCore::GetDevice(), 1, &FrameData.Fence, true, kWaitTime));
 	FrameData.DeletorQueue.Flush();
-	REV_VK_CHECK(vkResetFences(mDevice.GetDevice(), 1, &FrameData.Fence));
+	REV_VK_CHECK(vkResetFences(FVulkanCore::GetDevice(), 1, &FrameData.Fence));
 
-	REV_VK_CHECK(vkAcquireNextImageKHR(mDevice.GetDevice(), mSwapchain.GetSwapchain(), kWaitTime, FrameData.SwapchainSemaphore, nullptr, &mCurSwapchainImageIndex));
+	REV_VK_CHECK(vkAcquireNextImageKHR(FVulkanCore::GetDevice(), mSwapchain.GetSwapchain(), kWaitTime, FrameData.SwapchainSemaphore, nullptr, &mCurSwapchainImageIndex));
 
-	mDrawExtent.width = mSwapchain.GetBackImage().Extent.width;
-	mDrawExtent.height = mSwapchain.GetBackImage().Extent.height;
+	mDrawExtent.width = mSwapchain.GetExtent().width;
+	mDrawExtent.height = mSwapchain.GetExtent().height;
 
 	VkCommandBuffer CmdBuffer = FrameData.MainCmdBuffer;
 	REV_VK_CHECK(vkResetCommandBuffer(CmdBuffer, 0));
@@ -118,7 +108,7 @@ void FVulkanContext::EndFrame()
 
 	//submit command buffer to the queue and execute it.
 	//Fence will now block until the graphic commands finish execution
-	REV_VK_CHECK(vkQueueSubmit2(mDevice.GetQueue(VQK_Graphics), 1, &SubmitInfo, FrameData.Fence));
+	REV_VK_CHECK(vkQueueSubmit2(FVulkanCore::GetQueue(VQK_Graphics), 1, &SubmitInfo, FrameData.Fence));
 }
 
 void FVulkanContext::PresentFrame()
@@ -134,13 +124,13 @@ void FVulkanContext::PresentFrame()
 	PresentInfo.pWaitSemaphores = &FrameData.RenderSemaphore;
 	PresentInfo.waitSemaphoreCount = 1;
 	PresentInfo.pImageIndices = &mCurSwapchainImageIndex;
-	auto PresentRes = vkQueuePresentKHR(mDevice.GetQueue(VQK_Graphics), &PresentInfo);
+	auto PresentRes = vkQueuePresentKHR(FVulkanCore::GetQueue(VQK_Graphics), &PresentInfo);
 
 	if (PresentRes == VK_ERROR_OUT_OF_DATE_KHR || PresentRes == VK_SUBOPTIMAL_KHR)
 	{
-		vkDeviceWaitIdle(mDevice.GetDevice());
-		mSwapchain.Cleanup(&mDevice, mAllocator);
-		mSwapchain.CreateSwapchain(&mInstance, &mDevice, mAllocator);
+		vkDeviceWaitIdle(FVulkanCore::GetDevice());
+		mSwapchain.Cleanup();
+		mSwapchain.CreateSwapchain();
 	}
 	else if (PresentRes != VK_SUCCESS)
 	{
@@ -154,7 +144,7 @@ void FVulkanContext::PresentFrame()
 
 void FVulkanContext::ImmediateSubmit(std::function<void(VkCommandBuffer)>&& Func)
 {
-	REV_VK_CHECK(vkResetFences(mDevice.GetDevice(), 1, &mImmFence));
+	REV_VK_CHECK(vkResetFences(FVulkanCore::GetDevice(), 1, &mImmFence));
 	REV_VK_CHECK(vkResetCommandBuffer(mImmCmdBuffer, 0));
 
 	VkCommandBufferBeginInfo BeginInfo = FVulkanInit::CmdBufferBeginInfo(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
@@ -168,8 +158,8 @@ void FVulkanContext::ImmediateSubmit(std::function<void(VkCommandBuffer)>&& Func
 
 	// submit command buffer to the queue and execute it.
 	//  _renderFence will now block until the graphic commands finish execution
-	REV_VK_CHECK(vkQueueSubmit2(mDevice.GetQueue(VQK_Graphics), 1, &SubmitInfo, mImmFence));
-	REV_VK_CHECK(vkWaitForFences(mDevice.GetDevice(), 1, &mImmFence, true, 9999999999));
+	REV_VK_CHECK(vkQueueSubmit2(FVulkanCore::GetQueue(VQK_Graphics), 1, &SubmitInfo, mImmFence));
+	REV_VK_CHECK(vkWaitForFences(FVulkanCore::GetDevice(), 1, &mImmFence, true, 9999999999));
 }
 
 void FVulkanContext::SetViewport(uint32 InX, uint32 InY, uint32 InWidth, uint32 InHeight)
@@ -206,35 +196,17 @@ void FVulkanContext::ClearBackBuffer()
 	vkCmdClearDepthStencilImage(CmdBuffer, mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_GENERAL, &mClearDepthStencil, 1, &DepthImageRange);*/
 }
 
-
-void FVulkanContext::CreateAllocator()
-{
-	VmaAllocatorCreateInfo AllocatorCreateInfo = {};
-	AllocatorCreateInfo.physicalDevice = mDevice.GetPhysicalDevice();
-	AllocatorCreateInfo.device = mDevice.GetDevice();
-	AllocatorCreateInfo.instance = mInstance.GetInstance();
-	AllocatorCreateInfo.flags = VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT;
-	vmaCreateAllocator(&AllocatorCreateInfo, &mAllocator);
-}
-
 void FVulkanContext::CreateImmediateData()
 {
-	VkCommandPoolCreateInfo CmdPoolCreateInfo = FVulkanInit::CmdPoolCreateInfo(mDevice.GetQueueFamily(VQK_Graphics), VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
-	REV_VK_CHECK(vkCreateCommandPool(mDevice.GetDevice(), &CmdPoolCreateInfo, nullptr, &mImmCmdPool));
+	VkCommandPoolCreateInfo CmdPoolCreateInfo = FVulkanInit::CmdPoolCreateInfo(FVulkanCore::GetQueueFamily(VQK_Graphics), VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
+	REV_VK_CHECK(vkCreateCommandPool(FVulkanCore::GetDevice(), &CmdPoolCreateInfo, nullptr, &mImmCmdPool));
 
 	// allocate the command buffer for immediate submits
 	VkCommandBufferAllocateInfo cmdAllocInfo = FVulkanInit::CmdBufferAllocateInfo(mImmCmdPool, 1);
-	REV_VK_CHECK(vkAllocateCommandBuffers(mDevice.GetDevice(), &cmdAllocInfo, &mImmCmdBuffer));
-
-	mMainDeletorQueue.Add(FDeletor{ [=]() {
-		vkDestroyCommandPool(mDevice.GetDevice(), mImmCmdPool, nullptr);
-	} });
+	REV_VK_CHECK(vkAllocateCommandBuffers(FVulkanCore::GetDevice(), &cmdAllocInfo, &mImmCmdBuffer));
 
 	VkFenceCreateInfo FenceCreateInfo = FVulkanInit::FenceCreateInfo(VK_FENCE_CREATE_SIGNALED_BIT);
-	REV_VK_CHECK(vkCreateFence(mDevice.GetDevice(), &FenceCreateInfo, nullptr, &mImmFence));
-	mMainDeletorQueue.Add(FDeletor{ [=]() { 
-		vkDestroyFence(mDevice.GetDevice(), mImmFence, nullptr); 
-	} });
+	REV_VK_CHECK(vkCreateFence(FVulkanCore::GetDevice(), &FenceCreateInfo, nullptr, &mImmFence));
 }
 
 }

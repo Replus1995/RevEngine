@@ -1,5 +1,5 @@
 #include "Rev/Render/RenderPass/GammaPass.h"
-#include "Rev/Render/RHI/RHIResourceFactory.h"
+#include "Rev/Render/RHI/RHICore.h"
 #include "Rev/Render/RHI/RHIShaderLibrary.h"
 #include "Rev/Render/RenderCmd.h"
 #include "Rev/Render/RenderUtils.h"
