@@ -42,7 +42,7 @@ public:
 
 	virtual void SetUniformArray(uint16 location, const int* values, uint32_t count) override {};
 
-	void FlushPipeline();
+	void FlushResource();
 
 private:
 	static std::vector<VkPipelineShaderStageCreateInfo> MakeShaderStageInfo(const FRHIGraphicsShaders& InShaders);

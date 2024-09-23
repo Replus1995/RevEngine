@@ -33,11 +33,11 @@ GLenum FOpenGLShader::TranslateShaderStage(ERHIShaderStage InStage)
 	{
 	case ERHIShaderStage::Vertex:
 		return GL_VERTEX_SHADER;
-	case ERHIShaderStage::Fragment:
+	case ERHIShaderStage::Pixel:
 		return GL_FRAGMENT_SHADER;
-	case ERHIShaderStage::TessControl:
+	case ERHIShaderStage::Hull:
 		return GL_TESS_CONTROL_SHADER;
-	case ERHIShaderStage::TessEval:
+	case ERHIShaderStage::Domain:
 		return GL_TESS_EVALUATION_SHADER;
 	case ERHIShaderStage::Geometry:
 		return GL_GEOMETRY_SHADER;

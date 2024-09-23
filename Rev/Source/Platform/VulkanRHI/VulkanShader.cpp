@@ -27,11 +27,11 @@ VkShaderStageFlagBits FVulkanShader::TranslateShaderStage(ERHIShaderStage InStag
 	{
 	case ERHIShaderStage::Vertex:
 		return VK_SHADER_STAGE_VERTEX_BIT;
-	case ERHIShaderStage::Fragment:
+	case ERHIShaderStage::Pixel:
 		return VK_SHADER_STAGE_FRAGMENT_BIT;
-	case ERHIShaderStage::TessControl:
+	case ERHIShaderStage::Hull:
 		return VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT;
-	case ERHIShaderStage::TessEval:
+	case ERHIShaderStage::Domain:
 		return VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT;
 	case ERHIShaderStage::Geometry:
 		return VK_SHADER_STAGE_GEOMETRY_BIT;
@@ -54,14 +54,13 @@ FVulkanShaderProgram::~FVulkanShaderProgram()
 {
 }
 
-void FVulkanShaderProgram::FlushPipeline()
+void FVulkanShaderProgram::FlushResource()
 {
 	if(!mPipelineStateDirty)
 		return;
 	mPipelineStateDirty = false;
 
     std::vector<VkPipelineShaderStageCreateInfo> ShaderStages = MakeShaderStageInfo(mShaders);
-    
 	mPipeline.Build(PipelineState, ShaderStages, 1);
 }
 

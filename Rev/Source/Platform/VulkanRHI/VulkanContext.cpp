@@ -57,7 +57,6 @@ void FVulkanContext::BeginFrame(bool bClearBackBuffer)
 	constexpr uint64 kWaitTime = 1000000000;
 	auto& FrameData = GetFrameData();
 	REV_VK_CHECK(vkWaitForFences(FVulkanCore::GetDevice(), 1, &FrameData.Fence, true, kWaitTime));
-	FrameData.DeletorQueue.Flush();
 	REV_VK_CHECK(vkResetFences(FVulkanCore::GetDevice(), 1, &FrameData.Fence));
 
 	REV_VK_CHECK(vkAcquireNextImageKHR(FVulkanCore::GetDevice(), mSwapchain.GetSwapchain(), kWaitTime, FrameData.SwapchainSemaphore, nullptr, &mCurSwapchainImageIndex));

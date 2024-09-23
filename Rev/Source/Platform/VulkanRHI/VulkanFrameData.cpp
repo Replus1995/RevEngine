@@ -47,8 +47,6 @@ void CleanupFrameData(FVulkanFrameData* Frames, uint32 Count)
 		vkDestroyFence(Device, Frames[i].Fence, nullptr);
 		vkDestroySemaphore(Device, Frames[i].RenderSemaphore, nullptr);
 		vkDestroySemaphore(Device, Frames[i].SwapchainSemaphore, nullptr);
-
-		Frames[i].DeletorQueue.Flush();
 	}
 }
 

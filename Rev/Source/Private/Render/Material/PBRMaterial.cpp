@@ -22,17 +22,6 @@ PBRMaterial::~PBRMaterial()
 void PBRMaterial::Compile()
 {
 	FRHIShaderCompileOptions FragCompileOps;
-	if(BaseColorTexture)
-		FragCompileOps.AddMacro(SCM_USE_BASECOLOR_TEX);
-	if (MetallicRoughnessTexture)
-		FragCompileOps.AddMacro(SCM_USE_METALLICROUGHNESS_TEX);
-	if (NormalTexture)
-		FragCompileOps.AddMacro(SCM_USE_NORMAL_TEX);
-	if (OcclusionTexture)
-		FragCompileOps.AddMacro(SCM_USE_OCCLUSION_TEX);
-	if (EmissiveTexture)
-		FragCompileOps.AddMacro(SCM_USE_EMISSIVE_TEX);
-
 
 	mProgram = FRHIShaderLibrary::GetInstance().CreateGraphicsProgram("PbrProgram",
 		{ "/Engine/Shaders/CommonVS" },

@@ -12,9 +12,9 @@ public:
 	static uint32 Gen(std::string_view InStr);
 
 	template<typename T>
-	static uint64 Gen(const T& InType)
+	static uint32 Gen(const T& InType)
 	{
-		return Build(&InType, sizeof(T));
+		return Gen(&InType, sizeof(T));
 	}
 };
 

@@ -15,7 +15,6 @@ public:
 	VkSemaphore SwapchainSemaphore;
 	VkSemaphore RenderSemaphore;
 	VkFence Fence;
-	FDeletorQueue DeletorQueue;
 };
 
 void InitFrameData(FVulkanFrameData* Frames, uint32 Count);

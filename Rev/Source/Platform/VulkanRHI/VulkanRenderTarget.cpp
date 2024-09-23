@@ -14,7 +14,6 @@ FVulkanRenderTarget::FVulkanRenderTarget(const FRenderTargetDesc& InDesc)
         REV_CORE_ASSERT(InDesc.Width > 0 && InDesc.Width <= REV_VK_RENDERTARGET_SIZE_MAX, "Invalid render target width");
         REV_CORE_ASSERT(InDesc.Height > 0 && InDesc.Height <= REV_VK_RENDERTARGET_SIZE_MAX, "Invalid render target height");
     }
-    //CreateResource();
 }
 
 FVulkanRenderTarget::~FVulkanRenderTarget()
@@ -36,8 +35,7 @@ void FVulkanRenderTarget::ResizeTargets(uint16 InWidth, uint16 InHeight)
 
     mDesc.Width = InWidth;
     mDesc.Height = InHeight;
-    ReleaseResource();
-    //CreateResource();
+    mNeedResize = true;
 }
 
 const Ref<FRHITexture> FVulkanRenderTarget::GetTargetTexture(ERenderTargetAttachment Index) const
@@ -53,35 +51,74 @@ const Ref<FRHITexture> FVulkanRenderTarget::GetTargetTexture(ERenderTargetAttach
     return nullptr;
 }
 
+void FVulkanRenderTarget::FlushResource(VkRenderPass InRenderPass)
+{
+    bool bNeedCreateFramebuffer = false;
+
+    if (mNeedResize)
+    {
+        mNeedResize = false;
+        ReleaseResource();
+        CreateTextures();
+        bNeedCreateFramebuffer = true;
+    }
+
+    if (InRenderPass != mRenderPassCache)
+    {
+        mRenderPassCache = InRenderPass;
+        if (mFramebuffer)
+            vkDestroyFramebuffer(FVulkanCore::GetDevice(), mFramebuffer, nullptr);
+        bNeedCreateFramebuffer = true;
+    }
+
+    if (bNeedCreateFramebuffer)
+    {
+        CreateFramebuffer(InRenderPass);
+    }
+}
+
 bool FVulkanRenderTarget::IsEmptyTarget() const
 {
     return mDesc.Dimension == ERenderTargetDimension::RenderTargetEmpty;
 }
 
-void FVulkanRenderTarget::CreateResource(VkRenderPass InRenderPass)
+void FVulkanRenderTarget::CreateTextures()
 {
     if (IsEmptyTarget())
         return;
 
-    std::vector<VkImageView> Attachments;
     for (uint32 i = 0; i < mDesc.NumColorTargets; i++)
     {
         if (auto ColorTexture = CreateColorTexture(mDesc.ColorTargets[i]); ColorTexture)
         {
-            Attachments.push_back(ColorTexture->GetImageView());
             mColorAttachments[i].Texture = std::move(ColorTexture);
         }
     }
     if (auto DepthTexture = CreateDepthStencilTexture(mDesc.DepthStencilTarget); DepthTexture)
     {
-        Attachments.push_back(DepthTexture->GetImageView());
         mDepthStencilAttachment.Texture = std::move(DepthTexture);
+    }
+}
+
+void FVulkanRenderTarget::CreateFramebuffer(VkRenderPass InRenderPass)
+{
+    std::array<VkImageView, RTA_MaxColorAttachments + 1> Attachments;
+    uint32 AttachmentCount = 0;
+    for (uint32 i = 0; i < mDesc.NumColorTargets; i++)
+    {
+        Attachments[AttachmentCount] = mColorAttachments[i].Texture->GetImageView();
+        AttachmentCount++;
+    }
+    if (mDepthStencilAttachment.Texture)
+    {
+        Attachments[AttachmentCount] = mDepthStencilAttachment.Texture->GetImageView();
+        AttachmentCount++;
     }
 
     VkFramebufferCreateInfo FramebufferInfo{};
     FramebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
     FramebufferInfo.renderPass = InRenderPass;
-    FramebufferInfo.attachmentCount = (uint32_t)Attachments.size();
+    FramebufferInfo.attachmentCount = (uint32_t)AttachmentCount;
     FramebufferInfo.pAttachments = Attachments.data();
     FramebufferInfo.width = (uint32_t)mDesc.Width;
     FramebufferInfo.height = (uint32_t)mDesc.Height;
@@ -94,19 +131,21 @@ void FVulkanRenderTarget::CreateResource(VkRenderPass InRenderPass)
 
 void FVulkanRenderTarget::ReleaseResource()
 {
-    vkDestroyFramebuffer(FVulkanCore::GetDevice(), mFramebuffer, nullptr);
-    if (!IsEmptyTarget())
+    if (IsEmptyTarget())
+        return;
+
+    if(mFramebuffer)
+        vkDestroyFramebuffer(FVulkanCore::GetDevice(), mFramebuffer, nullptr);
+
+    for (uint8 i = 0; i < RTA_MaxColorAttachments; i++)
     {
-        for (uint8 i = 0; i < RTA_MaxColorAttachments; i++)
-        {
-            //mColorAttachments[i].MipLevel = 0;
-            //mColorAttachments[i].ArrayIndex = -1;
-            mColorAttachments[i].Texture.reset();
-        }
-        //mDepthStencilAttachment.MipLevel = 0;
-        //mDepthStencilAttachment.ArrayIndex = -1;
-        mDepthStencilAttachment.Texture.reset();
+        //mColorAttachments[i].MipLevel = 0;
+        //mColorAttachments[i].ArrayIndex = -1;
+        mColorAttachments[i].Texture.reset();
     }
+    //mDepthStencilAttachment.MipLevel = 0;
+    //mDepthStencilAttachment.ArrayIndex = -1;
+    mDepthStencilAttachment.Texture.reset();
 }
 
 Ref<FVulkanTexture> FVulkanRenderTarget::CreateColorTexture(const FColorTargetDesc& InDesc)

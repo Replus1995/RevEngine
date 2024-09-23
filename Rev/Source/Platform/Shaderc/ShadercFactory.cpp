@@ -79,12 +79,12 @@ static shaderc_shader_kind ShaderStageToShadercKind(ERHIShaderStage InStage)
 {
 	switch (InStage)
 	{
-	case ERHIShaderStage::Vertex:		return shaderc_glsl_vertex_shader;
-	case ERHIShaderStage::TessControl:	return shaderc_glsl_tess_control_shader;
-	case ERHIShaderStage::TessEval:		return shaderc_glsl_tess_evaluation_shader;
-	case ERHIShaderStage::Fragment:		return shaderc_glsl_fragment_shader;
-	case ERHIShaderStage::Geometry:		return shaderc_glsl_geometry_shader;
-	case ERHIShaderStage::Compute:		return shaderc_glsl_compute_shader;
+	case ERHIShaderStage::Vertex:		return shaderc_vertex_shader;
+	case ERHIShaderStage::Hull:			return shaderc_tess_control_shader;
+	case ERHIShaderStage::Domain:		return shaderc_tess_evaluation_shader;
+	case ERHIShaderStage::Pixel:		return shaderc_fragment_shader;
+	case ERHIShaderStage::Geometry:		return shaderc_geometry_shader;
+	case ERHIShaderStage::Compute:		return shaderc_compute_shader;
 	}
 	REV_CORE_ASSERT(false, "Unknown Shader Stage");
 	return (shaderc_shader_kind)0;
@@ -98,32 +98,25 @@ static void InitCompileOptions(shaderc::CompileOptions& Options)
 		Options.SetTargetEnvironment(shaderc_target_env_opengl, shaderc_env_version_opengl_4_5);
 		break;
 	case Rev::ERenderAPI::Vulkan:
-		Options.SetTargetEnvironment(shaderc_target_env_vulkan, shaderc_env_version_vulkan_1_2);
+		Options.SetTargetEnvironment(shaderc_target_env_vulkan, shaderc_env_version_vulkan_1_3);
 		break;
 	default:
 		REV_CORE_ASSERT(false, "Unknow Render API")
 			break;
 	}
+	Options.SetSourceLanguage(shaderc_source_language_hlsl);
 	Options.SetIncluder(CreateScope<ShaderIncluder>());
+
+	//Todo: shader limits
 
 	constexpr bool bOptimize = false;
 	if (bOptimize)
 		Options.SetOptimizationLevel(shaderc_optimization_level_performance);
 }
 
-static void AddCompileMacros(shaderc::CompileOptions& Options, uint64 InMacros)
+static void AddCompileMacros(shaderc::CompileOptions& Options, const std::string& InMacros)
 {
-	//TODO: Use cpp reflect to optimize this step
-	if (InMacros & SCM_USE_BASECOLOR_TEX)
-		Options.AddMacroDefinition("USE_BASECOLOR_TEX");
-	if (InMacros & SCM_USE_METALLICROUGHNESS_TEX)
-		Options.AddMacroDefinition("USE_METALLICROUGHNESS_TEX");
-	if (InMacros & SCM_USE_NORMAL_TEX)
-		Options.AddMacroDefinition("USE_NORMAL_TEX");
-	if (InMacros & SCM_USE_OCCLUSION_TEX)
-		Options.AddMacroDefinition("USE_OCCLUSION_TEX");
-	if (InMacros & SCM_USE_EMISSIVE_TEX)
-		Options.AddMacroDefinition("USE_EMISSIVE_TEX");
+	//todo
 }
 
 void FShadercFactory::CompileShaders(const FShadercSource& InSource, const FRHIShaderCompileOptions& InOptions, FShadercCompiledData& OutData)
@@ -133,7 +126,7 @@ void FShadercFactory::CompileShaders(const FShadercSource& InSource, const FRHIS
 	shaderc::Compiler compiler;
 	shaderc::CompileOptions options;
 	InitCompileOptions(options);
-	AddCompileMacros(options, InOptions.mMacros);
+	AddCompileMacros(options, InOptions.Macros);
 
 	{
 		shaderc::SpvCompilationResult CompileResult = compiler.CompileGlslToSpv(InSource.FileContent.DataAs<char>(), InSource.FileContent.Size(), ShaderStageToShadercKind(InSource.Stage), NativeFilePath.c_str(), options);
@@ -155,7 +148,7 @@ FShadercCompiledData FShadercFactory::LoadOrCompileShader(const FPath& InPath, c
 	FShadercCompiledData Result;
 	Result.Name = InPath.ToString(false);
 
-	std::string OptionHashStr = std::to_string(InOptions.Hash() );
+	std::string OptionHashStr = std::to_string(InOptions.GetHash());
 	fs::path ShaderCachePath(FShadercUtils::GetCacheDirectory() + Result.Name + "_" + OptionHashStr + FShadercUtils::GetCacheExtension());
 	bool bNeedCompile = true;
 	/*if (fs::exists(ShaderCachePath))

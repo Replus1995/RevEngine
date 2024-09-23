@@ -12,9 +12,9 @@ enum class ERHIShaderStage : uint8
 {
     Unknown = 0,
     Vertex = 1,
-    Fragment = 2,
-    TessControl = 3, //unsupported
-    TessEval = 4, //unsupported
+    Pixel = 2,
+    Hull = 3, //unsupported
+    Domain = 4, //unsupported
     Geometry = 5, //unsupported
     Compute = 6, //unsupported
     Count = 7

@@ -6,33 +6,16 @@
 namespace Rev
 {
 
-enum EShaderCompileMacro : uint64
-{
-    SCM_NONE = 0,
-    SCM_USE_BASECOLOR_TEX = 1,
-    SCM_USE_METALLICROUGHNESS_TEX = 1 << 1,
-    SCM_USE_NORMAL_TEX = 1 << 2,
-    SCM_USE_OCCLUSION_TEX = 1 << 3,
-    SCM_USE_EMISSIVE_TEX = 1 << 4
-};
-
 struct REV_API FRHIShaderCompileOptions
 {
 public:
-    uint64 mMacros = 0;
+    std::string Macros = 0;
 
     FRHIShaderCompileOptions() = default;
     ~FRHIShaderCompileOptions() = default;
 
-    uint64 Hash() const { return mMacros; };
-    void AddMacro(EShaderCompileMacro InMacro)
-    {
-        mMacros |= (uint64)InMacro;
-    }
-    void RemoveMacro(EShaderCompileMacro InMacro)
-    {
-        mMacros &= ~((uint64)InMacro);
-    }
+    void AddMacro(const std::string& InMacro);
+    uint32 GetHash() const;
 };
 
 
@@ -41,15 +24,15 @@ struct REV_API FCompiledShaders
 public:
     FCompiledShaders() = default;
     ~FCompiledShaders() = default;
-    inline void Add(uint64 OptionHash, const Ref<FRHIShader>& InShader)
+    inline void Add(uint32 OptionHash, const Ref<FRHIShader>& InShader)
     {
         mOptionShaderMap.emplace(OptionHash, InShader);
     }
-    inline void Remove(uint64 OptionHash)
+    inline void Remove(uint32 OptionHash)
     {
         mOptionShaderMap.erase(OptionHash);
     }
-    Ref<FRHIShader> operator[](uint64 OptionHash) const
+    Ref<FRHIShader> operator[](uint32 OptionHash) const
     {
         if (auto iter = mOptionShaderMap.find(OptionHash); iter != mOptionShaderMap.end())
         {
@@ -58,7 +41,7 @@ public:
         return nullptr;
     }
 private:
-    std::map<uint64, Ref<FRHIShader>> mOptionShaderMap;
+    std::map<uint32, Ref<FRHIShader>> mOptionShaderMap;
 };
 
 struct FRHIShaderCreateDesc

@@ -1,0 +1,11 @@
+#include "/Engine/Shaders/Include/Global.rsh"
+
+struct VS_INPUT
+{
+    float3 aPosition : POSITION;
+};
+
+struct VS_OUTPUT
+{
+    float4 vPosition : POSITION;
+};

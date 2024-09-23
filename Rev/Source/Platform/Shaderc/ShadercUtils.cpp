@@ -104,11 +104,11 @@ ERHIShaderStage FShadercUtils::StringToShaderStage(std::string_view InStr)
 	if (InStr == "vertex")
 		return ERHIShaderStage::Vertex;
 	else if (InStr == "fragment" || InStr == "pixel")
-		return ERHIShaderStage::Fragment;
+		return ERHIShaderStage::Pixel;
 	else if (InStr == "tesscontrol" || InStr == "hull")
-		return ERHIShaderStage::TessControl;
+		return ERHIShaderStage::Hull;
 	else if (InStr == "tesseval" || InStr == "domain")
-		return ERHIShaderStage::TessEval;
+		return ERHIShaderStage::Domain;
 	else if (InStr == "geometry")
 		return ERHIShaderStage::Geometry;
 	else if (InStr == "compute")
@@ -122,9 +122,9 @@ const char* FShadercUtils::ShaderStageToString(ERHIShaderStage InStage)
 	switch (InStage)
 	{
 	case ERHIShaderStage::Vertex:		return "Vertex";
-	case ERHIShaderStage::Fragment:		return "Fragment";
-	case ERHIShaderStage::TessControl:	return "Tesselation Control";
-	case ERHIShaderStage::TessEval:		return "Tesselation Evaluation";
+	case ERHIShaderStage::Pixel:		return "Pixel";
+	case ERHIShaderStage::Hull:			return "Hull";
+	case ERHIShaderStage::Domain:		return "Domain";
 	case ERHIShaderStage::Geometry:		return "Geometry";
 	case ERHIShaderStage::Compute:		return "Compute";
 	}

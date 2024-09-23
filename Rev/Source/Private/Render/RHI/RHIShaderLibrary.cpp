@@ -67,13 +67,13 @@ Ref<FRHIShader> FRHIShaderLibrary::LoadOrCompileShader(const FPath& InPath, cons
 	case ERenderAPI::OpenGL:
 	{
 		auto pShader = FOpenGLShaderFactory::CreateShader(CompiledData);
-		mShadersCache[CompiledData.Name].Add(InOptions.Hash(), pShader);
+		mShadersCache[CompiledData.Name].Add(InOptions.GetHash(), pShader);
 		return pShader;
 	}
 	case ERenderAPI::Vulkan:
 	{
 		auto pShader = CreateRef<FVulkanShader>(CompiledData.Stage, CompiledData.Binary);
-		mShadersCache[CompiledData.Name].Add(InOptions.Hash(), pShader);
+		mShadersCache[CompiledData.Name].Add(InOptions.GetHash(), pShader);
 		return pShader;
 	}
 	default:
@@ -89,7 +89,7 @@ Ref<FRHIShader> FRHIShaderLibrary::CreateShader(const FRHIShaderCreateDesc& InDe
 	Ref<FRHIShader> Result = nullptr;
 	if (auto iter = mShadersCache.find(InDesc.Name); iter != mShadersCache.end())
 	{
-		Result = iter->second[InDesc.Options.Hash()];
+		Result = iter->second[InDesc.Options.GetHash()];
 	}
 	if(Result == nullptr)
 	{
