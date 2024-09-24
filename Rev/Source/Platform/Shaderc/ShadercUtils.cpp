@@ -137,7 +137,7 @@ FShadercSource FShadercUtils::LoadShaderSource(const FPath& InPath)
 	FShadercSource Result;
 	Result.FilePath = InPath;
 	Result.FileContent = FFileSystem::LoadBinaryFile(InPath);
-	if(Result.FileContent.Empty())
+	/*if(Result.FileContent.Empty())
 		return Result;
 
 	std::string_view SrcStr(Result.FileContent.DataAs<char>(), Result.FileContent.Size());
@@ -157,7 +157,7 @@ FShadercSource FShadercUtils::LoadShaderSource(const FPath& InPath)
 	else
 	{
 		REV_CORE_ASSERT(false, "Unknow shader source stage");
-	}
+	}*/
 
 	return Result;
 }

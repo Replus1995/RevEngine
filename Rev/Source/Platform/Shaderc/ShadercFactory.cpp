@@ -143,7 +143,7 @@ void FShadercFactory::CompileShaders(const FShadercSource& InSource, const FRHIS
 	REV_CORE_INFO("Shader '{0}' compile took {1} ms", OutData.Name.c_str(), timer.ElapsedMillis());
 }
 
-FShadercCompiledData FShadercFactory::LoadOrCompileShader(const FPath& InPath, const FRHIShaderCompileOptions& InOptions)
+FShadercCompiledData FShadercFactory::LoadOrCompileShader(const FPath& InPath, const FRHIShaderCompileOptions& InOptions, ERHIShaderStage InStage)
 {
 	FShadercCompiledData Result;
 	Result.Name = InPath.ToString(false);
@@ -168,6 +168,7 @@ FShadercCompiledData FShadercFactory::LoadOrCompileShader(const FPath& InPath, c
 	if (bNeedCompile)
 	{
 		auto ShaderSource = FShadercUtils::LoadShaderSource(InPath);
+		ShaderSource.Stage = InStage != ERHIShaderStage::Unknown ? InStage : DetectShaderStage(ShaderSource);
 		CompileShaders(ShaderSource, InOptions, Result);
 		//FShadercUtils::SaveShaderCompiledData(ShaderCachePath, Result);
 	}
@@ -177,6 +178,11 @@ FShadercCompiledData FShadercFactory::LoadOrCompileShader(const FPath& InPath, c
 #endif
 
 	return Result;
+}
+
+ERHIShaderStage FShadercFactory::DetectShaderStage(const FShadercSource& InSource)
+{
+	return ERHIShaderStage::Compute;
 }
 
 }

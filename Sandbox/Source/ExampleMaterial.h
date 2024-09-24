@@ -16,7 +16,7 @@ public:
 
     virtual void Compile() override
     {
-        mProgram = Rev::FRHIShaderLibrary::GetInstance().CreateGraphicsProgram("ExampleProgram", "/Game/Shaders/ExampleVS", "/Game/Shaders/ExampleFS");
+        mProgram = Rev::FRHIShaderLibrary::GetInstance().CreateGraphicsProgram("ExampleProgram", "/Game/Shaders/ExampleVS", "/Game/Shaders/ExamplePS");
     }
 
     virtual void PreDraw() override

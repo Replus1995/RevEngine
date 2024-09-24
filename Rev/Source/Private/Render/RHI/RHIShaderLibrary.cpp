@@ -5,7 +5,7 @@
 
 //Private
 #include "Shaderc/ShadercFactory.h"
-#include "OpenGL/OpenGLShaderFactory.h"
+#include "OpenGL/OpenGLShader.h"
 #include "VulkanRHI/VulkanShader.h"
 
 namespace Rev
@@ -34,16 +34,16 @@ FRHIShaderLibrary& FRHIShaderLibrary::GetInstance()
 Ref<FRHIShaderProgram> FRHIShaderLibrary::CreateGraphicsProgram(const std::string& InProgramName, const FRHIShaderCreateDesc& InVertexDesc, const FRHIShaderCreateDesc& InFragmentDesc, const FRHIShaderCreateDesc& InTessControlDesc, const FRHIShaderCreateDesc& InTessEvalDesc, const FRHIShaderCreateDesc& InGeometryDesc)
 {
 	FRHIGraphicsShaders Shaders;
-	Shaders.VertexShader = CreateShader(InVertexDesc);
-	Shaders.PixelShader = CreateShader(InFragmentDesc);
-	Shaders.HullShader = CreateShader(InTessControlDesc);
-	Shaders.DomainShader = CreateShader(InTessEvalDesc);
-	Shaders.GeometryShader = CreateShader(InGeometryDesc);
+	Shaders.VertexShader = CreateShader(InVertexDesc, ERHIShaderStage::Vertex);
+	Shaders.PixelShader = CreateShader(InFragmentDesc, ERHIShaderStage::Pixel);
+	Shaders.HullShader = CreateShader(InTessControlDesc, ERHIShaderStage::Hull);
+	Shaders.DomainShader = CreateShader(InTessEvalDesc, ERHIShaderStage::Domain);
+	Shaders.GeometryShader = CreateShader(InGeometryDesc, ERHIShaderStage::Geometry);
 
 	switch (GetRenderAPI())
 	{
 	case ERenderAPI::OpenGL:
-		return FOpenGLShaderFactory::CreateShaderProgram(InProgramName, Shaders);
+		return CreateRef<FOpenGLShaderProgram>(InProgramName, Shaders);
 	case ERenderAPI::Vulkan:
 		return CreateRef<FVulkanShaderProgram>(InProgramName, Shaders);
 	default:
@@ -53,9 +53,9 @@ Ref<FRHIShaderProgram> FRHIShaderLibrary::CreateGraphicsProgram(const std::strin
 	return nullptr;
 }
 
-Ref<FRHIShader> FRHIShaderLibrary::LoadOrCompileShader(const FPath& InPath, const FRHIShaderCompileOptions& InOptions)
+Ref<FRHIShader> FRHIShaderLibrary::LoadOrCompileShader(const FPath& InPath, const FRHIShaderCompileOptions& InOptions, ERHIShaderStage InStage)
 {
-	auto CompiledData = FShadercFactory::LoadOrCompileShader(InPath, InOptions);
+	auto CompiledData = FShadercFactory::LoadOrCompileShader(InPath, InOptions, InStage);
 	if (CompiledData.Empty())
 	{
 		REV_CORE_WARN("No shader complied for {0}", InPath.ToString().c_str());
@@ -66,7 +66,7 @@ Ref<FRHIShader> FRHIShaderLibrary::LoadOrCompileShader(const FPath& InPath, cons
 	{
 	case ERenderAPI::OpenGL:
 	{
-		auto pShader = FOpenGLShaderFactory::CreateShader(CompiledData);
+		auto pShader = CreateRef<FOpenGLShader>(CompiledData.Stage, CompiledData.Binary);
 		mShadersCache[CompiledData.Name].Add(InOptions.GetHash(), pShader);
 		return pShader;
 	}
@@ -83,7 +83,7 @@ Ref<FRHIShader> FRHIShaderLibrary::LoadOrCompileShader(const FPath& InPath, cons
 	return {};
 }
 
-Ref<FRHIShader> FRHIShaderLibrary::CreateShader(const FRHIShaderCreateDesc& InDesc)
+Ref<FRHIShader> FRHIShaderLibrary::CreateShader(const FRHIShaderCreateDesc& InDesc, ERHIShaderStage InStage)
 {
 	if (InDesc.Name.empty()) return nullptr;
 	Ref<FRHIShader> Result = nullptr;
@@ -93,7 +93,7 @@ Ref<FRHIShader> FRHIShaderLibrary::CreateShader(const FRHIShaderCreateDesc& InDe
 	}
 	if(Result == nullptr)
 	{
-		Result = LoadOrCompileShader(InDesc.Name + std::string(sRHIShaderExtension), InDesc.Options);
+		Result = LoadOrCompileShader(InDesc.Name + std::string(sRHIShaderExtension), InDesc.Options, InStage);
 	}
 	return Result;
 }

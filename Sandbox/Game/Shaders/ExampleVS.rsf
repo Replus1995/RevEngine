@@ -1,0 +1,17 @@
+struct VSInput
+{
+    float3 aPosition : POSITION0;
+};
+
+struct VSOutput
+{
+    float4 vPosition : SV_POSITION;
+};
+
+VSOutput main(VSInput Input)
+{
+    VSOutput Result;
+    Result.vPosition = float4(Input.aPosition, 1.0);
+    //Result.vPosition = Input.aPosition;
+    return Result;
+}

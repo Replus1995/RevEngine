@@ -23,8 +23,8 @@ public:
 
     void ClearShadersCache();
 private:
-    Ref<FRHIShader> LoadOrCompileShader(const FPath& InPath, const FRHIShaderCompileOptions& InOptions);
-    Ref<FRHIShader> CreateShader(const FRHIShaderCreateDesc& InDesc);
+    Ref<FRHIShader> LoadOrCompileShader(const FPath& InPath, const FRHIShaderCompileOptions& InOptions, ERHIShaderStage InStage = ERHIShaderStage::Unknown);
+    Ref<FRHIShader> CreateShader(const FRHIShaderCreateDesc& InDesc, ERHIShaderStage InStage = ERHIShaderStage::Unknown);
 
 private:
     FRHIShaderLibrary() = default;

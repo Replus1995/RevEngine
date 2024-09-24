@@ -9,7 +9,7 @@ namespace Rev
 struct REV_API FRHIShaderCompileOptions
 {
 public:
-    std::string Macros = 0;
+    std::string Macros;
 
     FRHIShaderCompileOptions() = default;
     ~FRHIShaderCompileOptions() = default;

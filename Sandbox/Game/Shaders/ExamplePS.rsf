@@ -1,11 +1,16 @@
-#include "/Engine/Shaders/Include/Global.rsh"
-
-struct VS_INPUT
+struct PSInput
 {
-    float3 aPosition : POSITION;
+    float4 vPosition : SV_POSITION;
 };
 
-struct VS_OUTPUT
+struct PSOutput
 {
-    float4 vPosition : POSITION;
+    float4 oColor : SV_Target;
 };
+
+PSOutput main(const PSInput Input)
+{
+    PSOutput Result;
+    Result.oColor = float4(1.0, 0.0, 1.0, 1.0);
+    return Result;
+}

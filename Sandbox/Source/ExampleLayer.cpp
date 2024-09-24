@@ -28,7 +28,7 @@ ExampleLayer::ExampleLayer()
 	mScene = CreateRef<Rev::FScene>();
 
 	auto pBoxMat = CreateRef<ExampleMaterial>();
-	//pBoxMat->Compile();
+	pBoxMat->Compile();
 
 	//FAssetLibrary::GetDefaultSurfaceMaterial();
 

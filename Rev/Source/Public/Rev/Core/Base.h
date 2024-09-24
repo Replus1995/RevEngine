@@ -3,6 +3,7 @@
 #include "Rev/Core/CoreTypes.h"
 #include <string>
 #include <sstream>
+#include <vector>
 
 namespace Rev
 {

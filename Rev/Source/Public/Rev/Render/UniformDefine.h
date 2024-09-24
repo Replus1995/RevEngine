@@ -45,21 +45,21 @@ public:
 
 };
 
-struct FCameraUniform
+struct alignas(16) FCameraUniform
 {
-	Math::FMatrix4 ProjMatrix;
+	Math::FVector4 ViewPos;
 	Math::FMatrix4 ViewMatrix;
+	Math::FMatrix4 ProjMatrix;
 	Math::FMatrix4 InvProjViewMatrix;
-	Math::FVector4 Position;
 };
 
-struct FSceneUniform
+struct alignas(16) FSceneUniform
 {
 	float ScreenWidth;
 	float ScreenHeight;
 };
 
-struct FModelUniform
+struct alignas(16) FModelUniform
 {
 	Math::FMatrix4 ModelMatrix;
 };
