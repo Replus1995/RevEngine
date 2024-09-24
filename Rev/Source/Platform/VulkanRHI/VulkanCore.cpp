@@ -88,6 +88,12 @@ VmaAllocator FVulkanCore::GetAllocator()
 	return sVulkanCore->Allocator;
 }
 
+FVulkanContext* FVulkanCore::GetContext()
+{
+	REV_CORE_ASSERT(GetRenderAPI() == ERenderAPI::Vulkan);
+	return static_cast<FVulkanContext*>(RenderCmd::GetContext());
+}
+
 VkCommandBuffer FVulkanCore::GetMainCmdBuffer()
 {
 	return GetContext()->GetMainCmdBuffer();
@@ -101,12 +107,6 @@ VkExtent2D FVulkanCore::GetSwapchainExtent()
 void FVulkanCore::ImmediateSubmit(std::function<void(VkCommandBuffer)>&& Func)
 {
 	GetContext()->ImmediateSubmit(std::move(Func));
-}
-
-FVulkanContext* FVulkanCore::GetContext()
-{
-	REV_CORE_ASSERT(GetRenderAPI() == ERenderAPI::Vulkan);
-	return static_cast<FVulkanContext*>(RenderCmd::GetContext());
 }
 
 

@@ -24,12 +24,10 @@ public:
 	static const FVulkanSwapChainSupport& GetSwapChainSupport();
 	static VmaAllocator GetAllocator();
 
+	static FVulkanContext* GetContext();
 	static VkCommandBuffer GetMainCmdBuffer();
 	static VkExtent2D GetSwapchainExtent();
 	static void ImmediateSubmit(std::function<void(VkCommandBuffer)>&& Func);
-
-private:
-	static FVulkanContext* GetContext();
 };
 
 }

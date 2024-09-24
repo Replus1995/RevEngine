@@ -135,6 +135,25 @@ void FVulkanUniformBuffer::UpdateSubData(const void* Data, uint32 Size, uint32 O
 	REV_CORE_ASSERT(Size + Offset <= mSize);
 	uint8* DstMem = (uint8*)GetMappedData() + Offset;
 	memcpy(DstMem, Data, Size);
+
+
+	VkDescriptorBufferInfo BufferInfo{};
+	BufferInfo.buffer = mBuffer;
+	BufferInfo.offset = 0;
+	BufferInfo.range = (uint32_t)Size;
+
+	VkWriteDescriptorSet DescriptorWrite{};
+	DescriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	DescriptorWrite.dstSet = FVulkanCore::GetContext()->GetFrameData()->;
+	DescriptorWrite.dstBinding = 0;
+	DescriptorWrite.dstArrayElement = 0;
+	DescriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	DescriptorWrite.descriptorCount = 1;
+	DescriptorWrite.pBufferInfo = &BufferInfo;
+	DescriptorWrite.pImageInfo = nullptr; // Optional
+	DescriptorWrite.pTexelBufferView = nullptr; // Optional
+
+	vkUpdateDescriptorSets(FVulkanCore::GetDevice(), 1, &DescriptorWrite, 0, nullptr);
 }
 
 }

@@ -6,6 +6,7 @@
 
 #include "Core/VulkanDefines.h"
 #include "Core/VulkanInit.h"
+#include "Core/VulkanDescriptor.h"
 #include "VulkanSwapchain.h"
 #include "VulkanFrameData.h"
 
@@ -57,6 +58,7 @@ private:
 
 private:
 	FVulkanSwapchain mSwapchain;
+	FVulkanDescriptorPool mDescriptorPool;
 
 	//frame data
 	uint32 mCurSwapchainImageIndex = 0;

@@ -3,7 +3,7 @@
 #include <vulkan/vulkan.h>
 #include <vector>
 
-namespace Rev::VkUtils
+namespace Rev
 {
 
 struct FVulkanDescriptorLayoutBuilder
@@ -17,13 +17,13 @@ public:
 
 };
 
-struct FVulkanDescriptorAllocator
+struct FVulkanDescriptorPool
 {
 public:
     VkDescriptorPool Pool;
 
-    void Init(VkDevice InDevice, const std::vector<VkDescriptorPoolSize>& InPoolSizes);
-    void Reset(VkDevice InDevice); //clear all descriptor sets
+    void CreatePool(VkDevice InDevice, const std::vector<VkDescriptorPoolSize>& InPoolSizes);
+    void ResetPool(VkDevice InDevice); //clear all descriptor sets
     void Cleanup(VkDevice InDevice);
     VkDescriptorSet Allocate(VkDevice InDevice, VkDescriptorSetLayout InLayout);
 };
