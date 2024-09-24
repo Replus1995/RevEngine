@@ -33,11 +33,12 @@ FVulkanContext::~FVulkanContext()
 void FVulkanContext::Init()
 {
 	mSwapchain.CreateSwapchain();
-	
-	
-	mDescriptorPool.CreatePool(FVulkanCore::GetDevice());
 
-
+	std::vector<VkDescriptorPoolSize> PoolSizes = {
+	
+	};
+	
+	mDescriptorPool.CreatePool(FVulkanCore::GetDevice(), PoolSizes);
 
 	InitFrameData(mFrameData, REV_VK_FRAME_OVERLAP);
 	CreateImmediateData();
