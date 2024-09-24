@@ -10,25 +10,28 @@
 namespace Rev
 {
 
-void FSceneProxy::Prepare(const Ref<FScene>& scene)
+void FSceneProxy::Prepare(const Ref<FScene>& Scene)
 {
-	if(!scene) return;
+	if(!Scene) return;
 
-	{
-		//Update Scene Uniform;
-		auto pWindow = Application::GetApp().GetWindow();
-		uScene.Data.ScreenWidth = pWindow->GetWidth();
-		uScene.Data.ScreenHeight = pWindow->GetHeight();
-	}
-	mCameraProxy.Prepare(scene);
-	mStaticMeshProxy.Prepare(scene);
-	mDirectionalLightProxy.Prepare(scene);
-	mSkyProxy.Prepare(scene);
+	mCameraProxy.Prepare(Scene);
+	mStaticMeshProxy.Prepare(Scene);
+	mDirectionalLightProxy.Prepare(Scene);
+	mSkyProxy.Prepare(Scene);
+}
+
+void FSceneProxy::SyncResource(const FRenderer* Renderer)
+{
+
+	//Should run on render thread
+	//Update uniform buffer
+	mCameraProxy.SyncResource(Renderer);
+	mDirectionalLightProxy.SyncResource();
+	mSkyProxy.SyncResource();
 }
 
 void FSceneProxy::FreeResource()
 {
-	uScene.FreeResource();
 	mCameraProxy.FreeResource();
 	mStaticMeshProxy.FreeResource();
 	mDirectionalLightProxy.FreeResource();
@@ -40,20 +43,10 @@ void FSceneProxy::Cleanup()
 	mSkyProxy.Cleanup();
 }
 
-void FSceneProxy::DrawScene() const
+void FSceneProxy::DrawScene(const FRenderer* Renderer)
 {
-	mStaticMeshProxy.DrawMeshes(MBM_Opaque);
+	mStaticMeshProxy.DrawMeshes(Renderer, mCameraProxy.GetViewProjMat(), MBM_Opaque);
 	mSkyProxy.DrawSkybox();
-}
-
-void FSceneProxy::SyncResource() const
-{
-	//Should run on render thread
-	//Update uniform buffer
-	uScene.Upload();
-	mCameraProxy.SyncResource();
-	mDirectionalLightProxy.SyncResource();
-	mSkyProxy.SyncResource();
 }
 
 }

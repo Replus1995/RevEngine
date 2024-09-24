@@ -6,20 +6,12 @@ namespace Rev
 {
 
 /*Vertex Buffer*/
-FOpenGLVertexBuffer::FOpenGLVertexBuffer(uint32 size)
+FOpenGLVertexBuffer::FOpenGLVertexBuffer(uint32 size, const float* vertices)
 	: FRHIVertexBuffer(size)
 {
 	glCreateBuffers(1, &mHandle);
 	glBindBuffer(GL_ARRAY_BUFFER, mHandle);
-	glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
-}
-
-FOpenGLVertexBuffer::FOpenGLVertexBuffer(const float* vertices, uint32 size)
-	: FRHIVertexBuffer(size)
-{
-	glCreateBuffers(1, &mHandle);
-	glBindBuffer(GL_ARRAY_BUFFER, mHandle);
-	glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, size, vertices, vertices ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW);
 }
 
 FOpenGLVertexBuffer::~FOpenGLVertexBuffer()
@@ -36,23 +28,12 @@ void FOpenGLVertexBuffer::UpdateSubData(const void* data, uint32 size, uint32 of
 }
 
 /*Index Buffer*/
-FOpenGLIndexBuffer::FOpenGLIndexBuffer(uint32 stride, uint32 count)
+FOpenGLIndexBuffer::FOpenGLIndexBuffer(uint32 stride, uint32 count, const void* indices)
 	: FRHIIndexBuffer(stride, count)
 {
 	glCreateBuffers(1, &mHandle);
 	glBindBuffer(GL_ARRAY_BUFFER, mHandle);
-	glBufferData(GL_ARRAY_BUFFER, count * stride, nullptr, GL_DYNAMIC_DRAW);
-}
-
-FOpenGLIndexBuffer::FOpenGLIndexBuffer(const void* indices, uint32 stride, uint32 count)
-	: FRHIIndexBuffer(stride, count)
-{
-	glCreateBuffers(1, &mHandle);
-
-	// GL_ELEMENT_ARRAY_BUFFER is not valid without an actively bound VAO
-	// Binding with GL_ARRAY_BUFFER allows the data to be loaded regardless of VAO state. 
-	glBindBuffer(GL_ARRAY_BUFFER, mHandle);
-	glBufferData(GL_ARRAY_BUFFER, count * stride, indices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, count * stride, indices, indices ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW);
 }
 
 FOpenGLIndexBuffer::~FOpenGLIndexBuffer()
@@ -174,6 +155,7 @@ void FOpenGLVertexArray::SetIndexBuffer(const Ref<FRHIIndexBuffer>& InIndexBuffe
 
 /*Uniform Buffer*/
 FOpenGLUniformBuffer::FOpenGLUniformBuffer(uint32 size)
+	: FRHIUniformBuffer(size)
 {
 	glCreateBuffers(1, &mHandle);
 	glNamedBufferData(mHandle, size, nullptr, GL_DYNAMIC_DRAW); // TODO: investigate usage hint

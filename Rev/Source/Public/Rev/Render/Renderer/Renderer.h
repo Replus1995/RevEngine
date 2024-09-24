@@ -1,30 +1,30 @@
 #pragma once
 #include "Rev/Render/RenderCore.h"
+#include "Rev/Render/UniformDefine.h"
+#include "Rev/Render/RHI/RHIBuffer.h"
 
 namespace Rev
 {
-
-struct FRenderContext
-{
-	uint32 Width;
-	uint32 Height;
-	class FSceneProxy* SceneProxy;
-};
-
+class FSceneProxy;
 class FRenderer
 {
 public:
-	FRenderer(const Ref<FRenderContext>& InContext);
-	virtual ~FRenderer() = default;
+	FRenderer(uint32 InWidth, uint32 InHeight, FSceneProxy* InSceneProxy);
+	virtual ~FRenderer();
 
-	virtual void BeginFrame() = 0;
-	virtual void DrawFrame() = 0;
-	virtual void EndFrame() = 0;
+	virtual void BeginFrame();
+	virtual void DrawFrame();
+	virtual void EndFrame();
 
-	const Ref<FRenderContext>& GetContext() const { return mContext; }
+	void SetScreenSize(uint32 InWidth, uint32 InHeight);
+	const Ref<FRHIUniformBuffer>& GetBuiltInUB() const { return mBuiltInUB; }
 
 protected:
-	Ref<FRenderContext> mContext;
+	FScreenUniform mSreenParams;
+	bool mScreenParamsDirty = true;
+	FSceneProxy* mSceneProxy = nullptr;
+
+	Ref<FRHIUniformBuffer> mBuiltInUB;
 
 };
 

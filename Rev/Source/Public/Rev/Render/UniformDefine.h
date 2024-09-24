@@ -45,24 +45,40 @@ public:
 
 };
 
+struct alignas(16) FScreenUniform
+{
+	uint32 Width;
+	uint32 Height;
+
+	FScreenUniform(uint32 InWidth, uint32 InHeight) : Width(InWidth), Height(InHeight) {}
+};
+
 struct alignas(16) FCameraUniform
 {
 	Math::FVector4 ViewPos;
-	Math::FMatrix4 ViewMatrix;
-	Math::FMatrix4 ProjMatrix;
-	Math::FMatrix4 InvProjViewMatrix;
-};
-
-struct alignas(16) FSceneUniform
-{
-	float ScreenWidth;
-	float ScreenHeight;
+	Math::FMatrix4 ViewMat;
+	Math::FMatrix4 ProjMat;
+	Math::FMatrix4 ViewProjMat;
+	Math::FMatrix4 InvViewProjMat;
 };
 
 struct alignas(16) FModelUniform
 {
-	Math::FMatrix4 ModelMatrix;
+	Math::FMatrix4 ModelMat;
+	Math::FMatrix4 MVPMat;
 };
+
+struct alignas(16) FBuiltInUB
+{
+	FScreenUniform uScreen;
+	FCameraUniform uCamera;
+	FModelUniform uModel;
+};
+
+#define REV_SCREEN_UNIFORM_OFFSET 0
+#define REV_CAMERA_UNIFORM_OFFSET sizeof(FScreenUniform) + REV_SCREEN_UNIFORM_OFFSET
+#define REV_MODEL_UNIFORM_OFFSET sizeof(FCameraUniform) + REV_CAMERA_UNIFORM_OFFSET
+#define REV_BUILTIN_UNIFORM_SIZE sizeof(FBuiltInUB)
 
 struct FShadowUniform
 {

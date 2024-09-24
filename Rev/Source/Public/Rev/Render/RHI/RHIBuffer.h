@@ -134,8 +134,11 @@ public:
 class REV_API FRHIUniformBuffer : public FRHIResource
 {
 public:
+	FRHIUniformBuffer(uint32 InSize) : mSize(InSize) {}
 	virtual ~FRHIUniformBuffer() = default;
 	virtual void UpdateSubData(const void* Data, uint32 Size, uint32 Offset = 0) = 0;
+protected:
+	uint32 mSize;
 };
 
 }

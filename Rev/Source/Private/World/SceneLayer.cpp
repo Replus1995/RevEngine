@@ -33,9 +33,10 @@ void SceneLayer::OnAttach()
 	{
 		mScene->OnRuntimeStart();
 	}
-	mRenderer = CreateRef<FForwardRenderer>(CreateRef<FRenderContext>());
-	mRenderer->GetContext()->SceneProxy = mSceneProxy.get();
 
+	uint32 WinWidth = Application::GetApp().GetWindow()->GetWidth();
+	uint32 WinHeight = Application::GetApp().GetWindow()->GetHeight();
+	mRenderer = CreateRef<FForwardRenderer>(WinWidth, WinHeight, mSceneProxy.get());
 
 	RenderCmd::SetClearColor(Math::FLinearColor(0, 0, 0));
 }

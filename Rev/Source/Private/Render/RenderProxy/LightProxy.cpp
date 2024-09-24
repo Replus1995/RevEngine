@@ -37,13 +37,13 @@ void FDirectionalLightProxy::Prepare(const Ref<FScene>& Scene)
 
 void FDirectionalLightProxy::SyncResource() const
 {
-	uLight.Upload(16 + uLight.Data.Count * sizeof(FDirectionalLightUniform::Info));
+	//uLight.Upload(16 + uLight.Data.Count * sizeof(FDirectionalLightUniform::Info));
 	//uLight.Upload();
 }
 
 void FDirectionalLightProxy::FreeResource()
 {
-	uLight.FreeResource();
+	//uLight.FreeResource();
 }
 
 }

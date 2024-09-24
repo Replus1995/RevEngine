@@ -12,27 +12,31 @@
 //Vulkan impl headers
 #include "VulkanRHI/VulkanCore.h"
 #include "VulkanRHI/VulkanContext.h"
+#include "VulkanRHI/VulkanBuffer.h"
+#include "VulkanRHI/VulkanSampler.h"
+#include "VulkanRHI/VulkanTexture.h"
+#include "VulkanRHI/VulkanRenderTarget.h"
 
 namespace Rev
 {
 
-namespace
-{
-
-template<class TRHIResource, typename... Args>
-Ref<TRHIResource> CreateRHIResource(Args&&... args)
-{
-	switch (GetRenderAPI())
-	{
-	case ERenderAPI::None:    REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
-	case ERenderAPI::OpenGL:  return CreateRef<TRHIResource>(std::forward<Args>(args)...);
-	}
-
-	REV_CORE_ASSERT(false, "Unknown RenderAPI!");
-	return nullptr;
-}
-
-}
+//namespace
+//{
+//
+//template<class TRHIResource, typename... Args>
+//Ref<TRHIResource> CreateRHIResource(Args&&... args)
+//{
+//	switch (GetRenderAPI())
+//	{
+//	case ERenderAPI::None:    REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
+//	case ERenderAPI::OpenGL:  return CreateRef<TRHIResource>(std::forward<Args>(args)...);
+//	}
+//
+//	REV_CORE_ASSERT(false, "Unknown RenderAPI!");
+//	return nullptr;
+//}
+//
+//}
 
 void FRHICore::Init()
 {
@@ -67,6 +71,7 @@ Ref<FRHIVertexBuffer> FRHICore::CreateVertexBuffer(uint32 InSize)
 	{
 	case ERenderAPI::None:    REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
 	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLVertexBuffer>(InSize);
+	case ERenderAPI::Vulkan:  return CreateRef<FVulkanVertexBuffer>(InSize);
 	}
 
 	REV_CORE_ASSERT(false, "Unknown RenderAPI!");
@@ -78,7 +83,8 @@ Ref<FRHIVertexBuffer> FRHICore::CreateVertexBuffer(const float* InVertices, uint
 	switch (GetRenderAPI())
 	{
 	case ERenderAPI::None:    REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
-	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLVertexBuffer>(InVertices, InSize);
+	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLVertexBuffer>(InSize, InVertices);
+	case ERenderAPI::Vulkan:  return CreateRef<FVulkanVertexBuffer>(InSize, InVertices);
 	}
 
 	REV_CORE_ASSERT(false, "Unknown RenderAPI!");
@@ -91,6 +97,7 @@ Ref<FRHIIndexBuffer> FRHICore::CreateIndexBuffer(uint32 InStride, uint32 InCount
 	{
 	case ERenderAPI::None:    REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
 	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLIndexBuffer>(InStride, InCount);
+	case ERenderAPI::Vulkan:  return CreateRef<FVulkanIndexBuffer>(InStride, InCount);
 	}
 
 	REV_CORE_ASSERT(false, "Unknown RenderAPI!");
@@ -102,7 +109,8 @@ Ref<FRHIIndexBuffer> FRHICore::CreateIndexBuffer(const void* InIndices, uint32 I
 	switch (GetRenderAPI())
 	{
 	case ERenderAPI::None:    REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
-	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLIndexBuffer>(InIndices, InStride, InCount);
+	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLIndexBuffer>(InStride, InCount, InIndices);
+	case ERenderAPI::Vulkan:  return CreateRef<FVulkanIndexBuffer>(InStride, InCount, InIndices);
 	}
 
 	REV_CORE_ASSERT(false, "Unknown RenderAPI!");
@@ -127,23 +135,25 @@ Ref<FRHIUniformBuffer> FRHICore::CreateUniformBuffer(uint32 InSize)
 	{
 	case ERenderAPI::None:    REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
 	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLUniformBuffer>(InSize);
+	case ERenderAPI::Vulkan:  return CreateRef<FVulkanUniformBuffer>(InSize);
 	}
 
 	REV_CORE_ASSERT(false, "Unknown RenderAPI!");
 	return nullptr;
 }
 
-//Ref<FRHISampler> FRHIResourceFactory::CreateSampler(const FSamplerDesc& InDesc)
-//{
-//	switch (GetRenderAPI())
-//	{
-//	case ERenderAPI::None:    RE_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
-//	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLSampler>(InDesc);
-//	}
-//
-//	RE_CORE_ASSERT(false, "Unknown RenderAPI!");
-//	return nullptr;
-//}
+Ref<FRHISampler> FRHICore::CreateSampler(const FSamplerDesc& InDesc)
+{
+	switch (GetRenderAPI())
+	{
+	case ERenderAPI::None:    REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
+	//case ERenderAPI::OpenGL:  return CreateRef<FOpenGLSampler>(InDesc);
+	case ERenderAPI::Vulkan:  return CreateRef<FVulkanSampler>(InDesc);
+	}
+
+	REV_CORE_ASSERT(false, "Unknown RenderAPI!");
+	return nullptr;
+}
 
 
 Ref<FRHITexture> FRHICore::CreateTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc)
@@ -152,6 +162,7 @@ Ref<FRHITexture> FRHICore::CreateTexture(const FTextureDesc& InDesc, const FSamp
 	{
 	case ERenderAPI::None:    REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
 	case ERenderAPI::OpenGL:  return CreateOpenGLTexture(InDesc, InSamplerDesc);
+	case ERenderAPI::Vulkan:  return CreateVulkanTexture(InDesc, InSamplerDesc);
 	}
 
 	REV_CORE_ASSERT(false, "Unknown RenderAPI!");
@@ -164,6 +175,7 @@ Ref<FRHIRenderTarget> FRHICore::CreateRenderTarget(const FRenderTargetDesc& InDe
 	{
 	case ERenderAPI::None:    REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
 	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLRenderTarget>(InDesc);
+	case ERenderAPI::Vulkan:  return CreateRef<FVulkanRenderTarget>(InDesc);
 	}
 
 	REV_CORE_ASSERT(false, "Unknown RenderAPI!");

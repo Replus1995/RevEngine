@@ -2,6 +2,7 @@
 #include "Rev/Render/Mesh/StaticMesh.h"
 #include "Rev/Render/Material/SurfaceMaterial.h"
 #include "Rev/Render/RenderCmd.h"
+#include "Rev/Render/Renderer/Renderer.h"
 #include "Rev/Render/UniformLayout.h"
 
 #include "Rev/World/Entity.h"
@@ -12,7 +13,7 @@ namespace Rev
 
 FStaticMeshRenderData::FStaticMeshRenderData(const Ref<StaticMesh>& InStaticMesh, const Math::FMatrix4& InModelMatrix)
 	: MeshData(InStaticMesh)
-	, UniformData({ InModelMatrix })
+	, ModelParams({ InModelMatrix })
 {
 }
 
@@ -46,14 +47,14 @@ void FStaticMeshProxy::Cleanup()
 
 void FStaticMeshProxy::FreeResource()
 {
-	uModel.FreeResource();
 }
 
-void FStaticMeshProxy::DrawMeshes(EMaterialBlendMode InBlend, bool bUseMeshMaterial) const
+void FStaticMeshProxy::DrawMeshes(const FRenderer* Renderer, const Math::FMatrix4& ViewProjMat, EMaterialBlendMode InBlend, bool bUseMeshMaterial)
 {
-	for (const auto& RenderData : mRenderDataArr)
+	for (auto& RenderData : mRenderDataArr)
 	{
-		uModel.Upload(&RenderData.UniformData, sizeof(FModelUniform));
+		RenderData.ModelParams.MVPMat = ViewProjMat * RenderData.ModelParams.ModelMat;
+		Renderer->GetBuiltInUB()->UpdateSubData(&RenderData.ModelParams, sizeof(FModelUniform), REV_MODEL_UNIFORM_OFFSET);
 		DrawPrimitives(RenderData, InBlend, bUseMeshMaterial);
 	}
 }

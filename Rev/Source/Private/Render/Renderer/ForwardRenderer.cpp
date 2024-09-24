@@ -7,8 +7,8 @@
 namespace Rev
 {
 
-FForwardRenderer::FForwardRenderer(const Ref<FRenderContext>& InContext)
-	: FRenderer(InContext)
+FForwardRenderer::FForwardRenderer(uint32 InWidth, uint32 InHeight, FSceneProxy* InSceneProxy)
+	: FRenderer(InWidth, InHeight, InSceneProxy)
 {
 }
 
@@ -18,6 +18,8 @@ FForwardRenderer::~FForwardRenderer()
 
 void FForwardRenderer::BeginFrame()
 {
+	FRenderer::BeginFrame();
+
 	//prepare resource
 	//if (!mLinearScreenTarget)
 	//{

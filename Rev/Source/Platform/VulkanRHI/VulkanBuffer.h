@@ -48,11 +48,11 @@ private:
 	VkDeviceAddress mDeviceAddress = 0;
 };
 
-class FVkIndexBuffer : public FRHIIndexBuffer, FVulkanBuffer
+class FVulkanIndexBuffer : public FRHIIndexBuffer, FVulkanBuffer
 {
 public:
-	FVkIndexBuffer(uint32 InStride, uint32 InCount, const void* InData = nullptr);
-	virtual ~FVkIndexBuffer();
+	FVulkanIndexBuffer(uint32 InStride, uint32 InCount, const void* InData = nullptr);
+	virtual ~FVulkanIndexBuffer();
 	virtual const void* GetNativeHandle() const override { return mBuffer; }
 	virtual void UpdateSubData(const void* Data, uint32 Count, uint32 Offset) override;
 
@@ -76,15 +76,13 @@ public:
 //	Ref<FRHIIndexBuffer> mIndexBuffer;
 //};
 
-class FVulkanUniformBuffer : public FRHIUniformBuffer
+class FVulkanUniformBuffer : public FRHIUniformBuffer, FVulkanBuffer
 {
 public:
 	FVulkanUniformBuffer(uint32 InSize);
 	virtual ~FVulkanUniformBuffer();
-	virtual const void* GetNativeHandle() const override { return &mHandle; }
-	virtual void UpdateSubData(const void* data, uint32 size, uint32 offset = 0) override;
-private:
-	uint32_t mHandle = 0;
+	virtual const void* GetNativeHandle() const override { return &mBuffer; }
+	virtual void UpdateSubData(const void* Data, uint32 Size, uint32 Offset) override;
 };
 
 

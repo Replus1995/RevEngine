@@ -7,8 +7,7 @@ namespace Rev
 class FOpenGLVertexBuffer : public FRHIVertexBuffer
 {
 public:
-	FOpenGLVertexBuffer(uint32 size);
-	FOpenGLVertexBuffer(const float* vertices, uint32 size);
+	FOpenGLVertexBuffer(uint32 size, const float* vertices = nullptr);
 	virtual ~FOpenGLVertexBuffer();
 	virtual const void* GetNativeHandle() const override { return &mHandle; }
 	virtual void UpdateSubData(const void* data, uint32 size, uint32 offset) override;
@@ -20,8 +19,7 @@ private:
 class FOpenGLIndexBuffer : public FRHIIndexBuffer
 {
 public:
-	FOpenGLIndexBuffer(uint32 stride, uint32 count);
-	FOpenGLIndexBuffer(const void* indices, uint32 stride, uint32 count);
+	FOpenGLIndexBuffer(uint32 stride, uint32 count, const void* indices = nullptr);
 	virtual ~FOpenGLIndexBuffer();
 	virtual const void* GetNativeHandle() const override { return &mHandle; }
 	virtual void UpdateSubData(const void* data, uint32 count, uint32 offset) override;

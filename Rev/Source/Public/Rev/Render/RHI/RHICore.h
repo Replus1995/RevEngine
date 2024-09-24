@@ -23,7 +23,7 @@ public:
 	static Ref<FRHIVertexArray> CreateVertexArray();
 	static Ref<FRHIUniformBuffer> CreateUniformBuffer(uint32 InSize);
 
-	//static Ref<FRHISampler> CreateSampler(const FSamplerDesc& InDesc);
+	static Ref<FRHISampler> CreateSampler(const FSamplerDesc& InDesc);
 	static Ref<FRHITexture> CreateTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc);
 	static Ref<FRHIRenderTarget> CreateRenderTarget(const FRenderTargetDesc& InDesc);
 

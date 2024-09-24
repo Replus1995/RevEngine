@@ -8,11 +8,12 @@
 
 namespace Rev
 {
+class FRenderer;
 class FScene;
 struct FStaticMeshRenderData
 {
 	Ref<StaticMesh> MeshData;
-	FModelUniform UniformData;
+	FModelUniform ModelParams;
 
 	FStaticMeshRenderData() = default;
 	FStaticMeshRenderData(const Ref<StaticMesh>& InStaticMesh, const Math::FMatrix4& InModelMatrix);
@@ -28,14 +29,14 @@ public:
 	void Cleanup();
 	void FreeResource();
 
-	void DrawMeshes(EMaterialBlendMode InBlend, bool bUseMeshMaterial = true) const;
+	void DrawMeshes(const FRenderer* Renderer, const Math::FMatrix4& ViewProjMat, EMaterialBlendMode InBlend, bool bUseMeshMaterial = true);
 
 private:
 	void DrawPrimitives(const FStaticMeshRenderData& InData, EMaterialBlendMode InBlend, bool bUseMeshMaterial = true) const;
 
 private:
 	std::vector<FStaticMeshRenderData> mRenderDataArr;
-	TUniform<FModelUniform, UL::BModel> uModel;
+	FModelUniform mModelParams;
 };
 
 }
