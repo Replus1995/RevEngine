@@ -61,6 +61,8 @@ void FVulkanContext::Cleanup()
 
 	vkDeviceWaitIdle(FVulkanCore::GetDevice());
 	CleanupFrameData(mFrameData, REV_VK_FRAME_OVERLAP);
+
+	mDescriptorPool.Cleanup(FVulkanCore::GetDevice());
 	mSwapchain.Cleanup();
 }
 
