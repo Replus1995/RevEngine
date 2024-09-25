@@ -12,10 +12,12 @@ FVulkanRenderPass::FVulkanRenderPass(const FRenderPassDesc& InDesc)
 	: FRHIRenderPass(InDesc)
 {
 	REV_CORE_ASSERT(mDesc.AttachmentCount <= (uint32)RTA_MaxColorAttachments);
+	CreateResource();
 }
 
 FVulkanRenderPass::~FVulkanRenderPass()
 {
+	ReleaseResource();
 }
 
 void FVulkanRenderPass::CreateResource()

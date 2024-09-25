@@ -154,11 +154,12 @@ void FOpenGLVertexArray::SetIndexBuffer(const Ref<FRHIIndexBuffer>& InIndexBuffe
 }
 
 /*Uniform Buffer*/
-FOpenGLUniformBuffer::FOpenGLUniformBuffer(uint32 size)
+FOpenGLUniformBuffer::FOpenGLUniformBuffer(uint32 size, uint32 binding)
 	: FRHIUniformBuffer(size)
 {
 	glCreateBuffers(1, &mHandle);
 	glNamedBufferData(mHandle, size, nullptr, GL_DYNAMIC_DRAW); // TODO: investigate usage hint
+	glBindBufferBase(GL_UNIFORM_BUFFER, binding, mHandle);
 }
 
 FOpenGLUniformBuffer::~FOpenGLUniformBuffer()

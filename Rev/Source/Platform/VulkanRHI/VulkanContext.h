@@ -40,7 +40,6 @@ public:
 	virtual void Bind(const Ref<FRHIVertexArray>& InVertexArray) override {};
 
 	virtual void Bind(const Ref<FRHIShaderProgram>& InProgram) override {};
-	virtual void Bind(const Ref<FRHIUniformBuffer>& InUniformBuffer, uint32 InUnit) override {};
 	virtual void Bind(const Ref<FRHITexture>& InTexture, uint32 InUnit) override {};
 	virtual void Bind(const Ref<FRHIRenderTarget>& InRenderTarget) override {};
 
@@ -50,6 +49,7 @@ public:
 	const FVulkanSwapchain& GetSwapchain() const { return mSwapchain; }
 	VkImage GetSwapchainImage() { return mSwapchain.GetImages()[mCurSwapchainImageIndex]; }
 	VkImageView GetSwapchainImageView() { return mSwapchain.GetImageViews()[mCurSwapchainImageIndex]; }
+	const FVulkanDescriptorPool& GetDescriptorPool() const { return mDescriptorPool; }
 
 	FVulkanFrameData& GetFrameData() { return mFrameData[mFrameDataIndex]; }
 	VkCommandBuffer GetMainCmdBuffer() { return mFrameData[mFrameDataIndex].MainCmdBuffer; }

@@ -10,6 +10,8 @@
 namespace Rev
 {
 
+class FVulkanRenderTarget;
+class FVulkanPrimitive;
 class FVulkanShader : public FRHIShader
 {
 public:
@@ -42,7 +44,7 @@ public:
 
 	virtual void SetUniformArray(uint16 location, const int* values, uint32_t count) override {};
 
-	void FlushResource();
+	void Prepare(const FVulkanRenderTarget* RenderTarget, const FVulkanPrimitive* Primitive);
 
 private:
 	static std::vector<VkPipelineShaderStageCreateInfo> MakeShaderStageInfo(const FRHIGraphicsShaders& InShaders);
@@ -50,6 +52,8 @@ private:
 private:
 	FVulkanPipeline mPipeline;
 	FRHIGraphicsShaders mShaders;
+	uint64 mIuputDescHashCache = 0;
+	uint32 mNumColorTargetsCache = 0;
 };
 
 }

@@ -58,31 +58,17 @@ public:
 
 };
 
-//class FVkVertexArray : public FRHIVertexArray
-//{
-//public:
-//	FVkVertexArray();
-//	virtual ~FVkVertexArray();
-//	virtual const void* GetNativeHandle() const override { return &mHandle; }
-//
-//	virtual void AddVertexBuffer(const Ref<FRHIVertexBuffer>& InVertexBuffer) override;
-//	virtual void SetIndexBuffer(const Ref<FRHIIndexBuffer>& InIndexBuffer) override;
-//
-//	virtual const std::vector<Ref<FRHIVertexBuffer>>& GetVertexBuffers() const { return mVertexBuffers; }
-//	virtual const Ref<FRHIIndexBuffer>& GetIndexBuffer() const { return mIndexBuffer; }
-//private:
-//	uint32 mHandle = 0;
-//	std::vector<Ref<FRHIVertexBuffer>> mVertexBuffers;
-//	Ref<FRHIIndexBuffer> mIndexBuffer;
-//};
-
 class FVulkanUniformBuffer : public FRHIUniformBuffer, FVulkanBuffer
 {
 public:
-	FVulkanUniformBuffer(uint32 InSize);
+	FVulkanUniformBuffer(uint32 InSize, uint32 InBinding);
 	virtual ~FVulkanUniformBuffer();
 	virtual const void* GetNativeHandle() const override { return &mBuffer; }
 	virtual void UpdateSubData(const void* Data, uint32 Size, uint32 Offset) override;
+
+private:
+	VkDescriptorSetLayout mDescSetLayout = VK_NULL_HANDLE;
+	VkDescriptorSet mDescSet = VK_NULL_HANDLE;
 };
 
 

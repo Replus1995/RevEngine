@@ -118,16 +118,33 @@ void FVulkanIndexBuffer::UpdateSubData(const void* Data, uint32 Count, uint32 Of
 	FVulkanUtils::ImmediateUploadBuffer(mBuffer, Data, Count * mStride, Offset * mStride);
 }
 
-FVulkanUniformBuffer::FVulkanUniformBuffer(uint32 InSize)
+FVulkanUniformBuffer::FVulkanUniformBuffer(uint32 InSize, uint32 InBinding)
 	: FRHIUniformBuffer(InSize)
 {
 	VkBufferUsageFlags BufferUsage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
 	Allocate(InSize, BufferUsage, VMA_MEMORY_USAGE_CPU_ONLY);
+
+	VkDescriptorSetLayoutBinding LayoutBinding{};
+	LayoutBinding.binding = InBinding;
+	LayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	LayoutBinding.descriptorCount = 1;
+	LayoutBinding.stageFlags = VK_SHADER_STAGE_ALL_GRAPHICS;
+	LayoutBinding.pImmutableSamplers = nullptr;
+
+	VkDescriptorSetLayoutCreateInfo LayoutCreateInfo{};
+	LayoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	LayoutCreateInfo.bindingCount = 1;
+	LayoutCreateInfo.pBindings = &LayoutBinding;
+
+	REV_VK_CHECK_THROW(vkCreateDescriptorSetLayout(FVulkanCore::GetDevice(), &LayoutCreateInfo, nullptr, &mDescSetLayout), "failed to create descriptor set layout!");
+
+	mDescSet = FVulkanCore::GetContext()->GetDescriptorPool().Allocate(FVulkanCore::GetDevice(), mDescSetLayout);
+
 }
 
 FVulkanUniformBuffer::~FVulkanUniformBuffer()
 {
-
+	vkDestroyDescriptorSetLayout(FVulkanCore::GetDevice(), mDescSetLayout, nullptr);
 }
 
 void FVulkanUniformBuffer::UpdateSubData(const void* Data, uint32 Size, uint32 Offset)
@@ -139,12 +156,12 @@ void FVulkanUniformBuffer::UpdateSubData(const void* Data, uint32 Size, uint32 O
 
 	VkDescriptorBufferInfo BufferInfo{};
 	BufferInfo.buffer = mBuffer;
-	BufferInfo.offset = 0;
+	BufferInfo.offset = (uint32_t)Offset;
 	BufferInfo.range = (uint32_t)Size;
 
 	VkWriteDescriptorSet DescriptorWrite{};
 	DescriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-	DescriptorWrite.dstSet = FVulkanCore::GetContext()->GetFrameData()->;
+	DescriptorWrite.dstSet = mDescSet;
 	DescriptorWrite.dstBinding = 0;
 	DescriptorWrite.dstArrayElement = 0;
 	DescriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;

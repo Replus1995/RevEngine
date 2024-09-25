@@ -16,6 +16,7 @@
 #include "VulkanRHI/VulkanSampler.h"
 #include "VulkanRHI/VulkanTexture.h"
 #include "VulkanRHI/VulkanRenderTarget.h"
+#include "VulkanRHI/VulkanPrimitive.h"
 
 namespace Rev
 {
@@ -136,6 +137,18 @@ Ref<FRHIUniformBuffer> FRHICore::CreateUniformBuffer(uint32 InSize)
 	case ERenderAPI::None:    REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
 	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLUniformBuffer>(InSize);
 	case ERenderAPI::Vulkan:  return CreateRef<FVulkanUniformBuffer>(InSize);
+	}
+
+	REV_CORE_ASSERT(false, "Unknown RenderAPI!");
+	return nullptr;
+}
+
+Ref<FRHIPrimitive> FRHICore::CreatePrimitive(EPrimitiveTopology InTopology)
+{
+	switch (GetRenderAPI())
+	{
+	case ERenderAPI::None:    REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
+	case ERenderAPI::Vulkan:  return CreateRef<FVulkanPrimitive>();
 	}
 
 	REV_CORE_ASSERT(false, "Unknown RenderAPI!");

@@ -1,9 +1,21 @@
 #include "VulkanShader.h"
 #include "VulkanCore.h"
+#include "VulkanRenderTarget.h"
+#include "VulkanPrimitive.h"
 #include "Rev/Core/Assert.h"
 
 namespace Rev
 {
+
+namespace
+{
+
+uint64 GetHash()
+{
+
+}
+
+}
 
 FVulkanShader::FVulkanShader(ERHIShaderStage InStage, const FBuffer& InCompiledData)
 	: FRHIShader(InStage)
@@ -54,14 +66,16 @@ FVulkanShaderProgram::~FVulkanShaderProgram()
 {
 }
 
-void FVulkanShaderProgram::FlushResource()
+void FVulkanShaderProgram::Prepare(const FVulkanRenderTarget* RenderTarget, const FVulkanPrimitive* Primitive)
 {
-	if(!mPipelineStateDirty)
+	if (!mPipelineStateDirty && mNumColorTargetsCache == RenderTarget->GetDesc().NumColorTargets && mIuputDescHashCache == Primitive->GetDescHash())
 		return;
 	mPipelineStateDirty = false;
+	mNumColorTargetsCache = RenderTarget->GetDesc().NumColorTargets;
+	mIuputDescHashCache = Primitive->GetDescHash();
 
-    std::vector<VkPipelineShaderStageCreateInfo> ShaderStages = MakeShaderStageInfo(mShaders);
-	mPipeline.Build(PipelineState, ShaderStages, 1);
+	std::vector<VkPipelineShaderStageCreateInfo> ShaderStages = MakeShaderStageInfo(mShaders);
+	mPipeline.Build(PipelineState, ShaderStages, RenderTarget, Primitive);
 }
 
 std::vector<VkPipelineShaderStageCreateInfo> FVulkanShaderProgram::MakeShaderStageInfo(const FRHIGraphicsShaders& InShaders)

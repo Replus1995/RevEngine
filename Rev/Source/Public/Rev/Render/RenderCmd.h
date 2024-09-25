@@ -9,6 +9,7 @@ struct FMeshPrimitive;
 class FRHIVertexArray;
 
 class FRHIShaderProgram;
+class FRHIPrimitive;
 class FRHIUniformBuffer;
 class FRHITexture;
 class FRHIRenderTarget;
@@ -29,13 +30,14 @@ public:
 	static void ClearBackBuffer();
 
 	static void BindProgram(const Ref<FRHIShaderProgram>& InProgram);
-	static void BindUniformBuffer(const Ref<FRHIUniformBuffer>& InUniformBuffer, uint32 InUnit);
 	static void BindTexture(const Ref<FRHITexture>& InTexture, uint32 InUnit);
 	static void BindRenderTarget(const Ref<FRHIRenderTarget>& InRenderTarget);
 
 	static void Draw(const Ref<FRHIVertexArray>& InVertexArray);
 	static void DrawPrimitive(const FMeshPrimitive* InPrimitive);
 	//static void DrawLines(const Ref<VertexArray>& vertexArray, uint32_t vertexCount, float lineWidth);
+
+	static void DrawPrimitive(const Ref<FRHIShaderProgram>& InProgram, const Ref<FRHIPrimitive>& InPrimitive);
 
 	static FRHIContext* GetContext();
 };

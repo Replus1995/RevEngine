@@ -12,6 +12,7 @@ public:
 	virtual ~FVulkanRenderPass();
 	virtual const void* GetNativeHandle() const override { return mRenderPass; }
 
+private:
 	void CreateResource();
 	void ReleaseResource();
 private:

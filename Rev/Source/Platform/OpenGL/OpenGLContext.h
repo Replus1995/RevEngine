@@ -26,7 +26,6 @@ public:
 	virtual void Bind(const Ref<FRHIVertexArray>& InVertexArray) override;
 
 	virtual void Bind(const Ref<FRHIShaderProgram>& InProgram) override;
-	virtual void Bind(const Ref<FRHIUniformBuffer>& InUniformBuffer, uint32 InUnit) override;
 	virtual void Bind(const Ref<FRHITexture>& InTexture, uint32 InUnit) override;
 	virtual void Bind(const Ref<FRHIRenderTarget>& InRenderTarget) override;
 

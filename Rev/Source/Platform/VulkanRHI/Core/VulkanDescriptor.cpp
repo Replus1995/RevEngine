@@ -38,13 +38,17 @@ VkDescriptorSetLayout FVulkanDescriptorLayoutBuilder::Build(VkDevice InDevice, V
     return set;
 }
 
-void FVulkanDescriptorPool::CreatePool(VkDevice InDevice, const std::vector<VkDescriptorPoolSize>& InPoolSizes)
+void FVulkanDescriptorPool::CreatePool(VkDevice InDevice, const std::vector<VkDescriptorPoolSize>& InPoolSizes, uint32 InMaxSets)
 {
-    uint32 MaxSets = 0;
-    for (auto& PoolSize : InPoolSizes)
+    uint32 MaxSets = InMaxSets;
+    if (MaxSets == 0)
     {
-        MaxSets += PoolSize.descriptorCount;
+        for (auto& PoolSize : InPoolSizes)
+        {
+            MaxSets += PoolSize.descriptorCount;
+        }
     }
+    
 
     VkDescriptorPoolCreateInfo CreateInfo{};
     CreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
@@ -66,7 +70,7 @@ void FVulkanDescriptorPool::Cleanup(VkDevice InDevice)
     vkDestroyDescriptorPool(InDevice, Pool, nullptr);
 }
 
-VkDescriptorSet FVulkanDescriptorPool::Allocate(VkDevice InDevice, VkDescriptorSetLayout InLayout)
+VkDescriptorSet FVulkanDescriptorPool::Allocate(VkDevice InDevice, VkDescriptorSetLayout InLayout) const
 {
     VkDescriptorSetAllocateInfo AllocateInfo{};
     AllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;

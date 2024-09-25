@@ -154,4 +154,38 @@ VkPipelineBindPoint FVulkanEnum::Translate(EPipelineBindPoint InBindPoint)
     }
 }
 
+VkFormat FVulkanEnum::Translate(EVertexElementType InType)
+{
+    switch (InType)
+    {
+    default:
+    case Rev::EVertexElementType::None:
+        break;
+    case Rev::EVertexElementType::Float:
+        return VK_FORMAT_R32_SFLOAT;
+    case Rev::EVertexElementType::Float2:
+        return VK_FORMAT_R32G32_SFLOAT;
+    case Rev::EVertexElementType::Float3:
+        return VK_FORMAT_R32G32B32_SFLOAT;
+    case Rev::EVertexElementType::Float4:
+        return VK_FORMAT_R32G32B32A32_SFLOAT;
+    case Rev::EVertexElementType::Mat3:
+        return VK_FORMAT_R32G32B32_SFLOAT;
+    case Rev::EVertexElementType::Mat4:
+        return VK_FORMAT_R32G32B32A32_SFLOAT;
+    case Rev::EVertexElementType::Int:
+        return VK_FORMAT_R32_SINT;
+    case Rev::EVertexElementType::Int2:
+        return VK_FORMAT_R32G32_SINT;
+    case Rev::EVertexElementType::Int3:
+        return VK_FORMAT_R32G32B32_SINT;
+    case Rev::EVertexElementType::Int4:
+        return VK_FORMAT_R32G32B32A32_SINT;
+    case Rev::EVertexElementType::Bool:
+        return VK_FORMAT_R8_SINT;
+    }
+
+    return VK_FORMAT_UNDEFINED;
+}
+
 }

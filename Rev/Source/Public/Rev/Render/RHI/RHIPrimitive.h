@@ -19,18 +19,18 @@ enum EPrimitiveTopology : uint8
 class FRHIPrimitive
 {
 public:
-	FRHIPrimitive(EPrimitiveTopology InTopology);
+	FRHIPrimitive(EPrimitiveTopology InTopology) : mTopology(InTopology) {}
+	virtual ~FRHIPrimitive() = default;
 
-	void AddVertexBuffer(const Ref<FRHIVertexBuffer>& InVertexBuffer);
-	void SetIndexBuffer(const Ref<FRHIIndexBuffer>& InIndexBuffer);
+	virtual void AddVertexBuffer(const Ref<FRHIVertexBuffer>& VertexBuffer) = 0;
+	virtual void SetIndexBuffer(const Ref<FRHIIndexBuffer>& IndexBuffer) = 0;
 
-	const std::vector<Ref<FRHIVertexBuffer>>& GetVertexBuffers() const { return mVertexBuffers; }
-	const Ref<FRHIIndexBuffer>& GetIndexBuffer() const { return mIndexBuffer; }
+	virtual const std::vector<Ref<FRHIVertexBuffer>>& GetVertexBuffers() const = 0;
+	virtual const Ref<FRHIIndexBuffer>& GetIndexBuffer() const = 0;
+	virtual void Prepare() = 0;
 
-private:
+protected:
 	EPrimitiveTopology mTopology;
-	std::vector<Ref<FRHIVertexBuffer>> mVertexBuffers;
-	Ref<FRHIIndexBuffer> mIndexBuffer;
 };
 
 }

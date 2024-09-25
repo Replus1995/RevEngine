@@ -71,11 +71,6 @@ void RenderCmd::BindProgram(const Ref<FRHIShaderProgram>& InProgram)
 	sContext->Bind(InProgram);
 }
 
-void RenderCmd::BindUniformBuffer(const Ref<FRHIUniformBuffer>& InUniformBuffer, uint32 InUnit)
-{
-	sContext->Bind(InUniformBuffer, InUnit);
-}
-
 void RenderCmd::BindTexture(const Ref<FRHITexture>& InTexture, uint32 InUnit)
 {
 	sContext->Bind(InTexture, InUnit);

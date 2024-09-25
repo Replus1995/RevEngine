@@ -6,14 +6,15 @@
 
 namespace Rev
 {
-
+class FVulkanRenderTarget;
+class FVulkanPrimitive;
 class FVulkanPipeline
 {
 public:
     FVulkanPipeline();
     ~FVulkanPipeline();
 
-    void Build(const FRHIGraphicsPipelineState& InState, const std::vector<VkPipelineShaderStageCreateInfo>& InShaderStageInfo, uint32 InColorAttachmentCount);
+    void Build(const FRHIGraphicsPipelineState& InState, const std::vector<VkPipelineShaderStageCreateInfo>& InShaderStageInfo, const FVulkanRenderTarget* InRenderTarget, const FVulkanPrimitive* InPrimitive);
     void Release();
 
     VkPipelineLayout GetPipelineLayout() const { return mPipelineLayout; }
@@ -31,7 +32,7 @@ public:
     ~FVulkanGraphicsPipelineBuilder();
 
     VkPipelineLayout BuildLayout(VkDevice InDevice);
-    VkPipeline Build(VkDevice InDevice, VkPipelineLayout InLayout, const std::vector<VkPipelineShaderStageCreateInfo>& InShaderStageInfo, uint32 InColorAttachmentCount = 1);
+    VkPipeline Build(VkDevice InDevice, VkPipelineLayout InLayout, const std::vector<VkPipelineShaderStageCreateInfo>& InShaderStageInfo, const FVulkanRenderTarget* InRenderTarget, const FVulkanPrimitive* InPrimitive);
 
 private:
     VkPipelineInputAssemblyStateCreateInfo MakeInputAssemblyStateInfo() const;

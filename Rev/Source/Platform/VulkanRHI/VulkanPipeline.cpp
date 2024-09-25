@@ -1,5 +1,7 @@
 #include "VulkanPipeline.h"
 #include "VulkanCore.h"
+#include "VulkanRenderTarget.h"
+#include "VulkanPrimitive.h"
 #include "Core/VulkanDefines.h"
 #include "Core/VulkanEnum.h"
 
@@ -15,12 +17,12 @@ FVulkanPipeline::~FVulkanPipeline()
     Release();
 }
 
-void FVulkanPipeline::Build(const FRHIGraphicsPipelineState& InState, const std::vector<VkPipelineShaderStageCreateInfo>& InShaderStageInfo, uint32 InColorAttachmentCount)
+void FVulkanPipeline::Build(const FRHIGraphicsPipelineState& InState, const std::vector<VkPipelineShaderStageCreateInfo>& InShaderStageInfo, const FVulkanRenderTarget* InRenderTarget, const FVulkanPrimitive* InPrimitive)
 {
     Release();
     FVulkanGraphicsPipelineBuilder Builder(InState);
     mPipelineLayout = Builder.BuildLayout(FVulkanCore::GetDevice());
-    mPipeline = Builder.Build(FVulkanCore::GetDevice(), mPipelineLayout, InShaderStageInfo, InColorAttachmentCount);
+    mPipeline = Builder.Build(FVulkanCore::GetDevice(), mPipelineLayout, InShaderStageInfo, InRenderTarget, InPrimitive);
 }
 
 void FVulkanPipeline::Release()
@@ -55,8 +57,10 @@ VkPipelineLayout FVulkanGraphicsPipelineBuilder::BuildLayout(VkDevice InDevice)
     return NewLayout;
 }
 
-VkPipeline FVulkanGraphicsPipelineBuilder::Build(VkDevice InDevice, VkPipelineLayout InLayout, const std::vector<VkPipelineShaderStageCreateInfo>& InShaderStageInfo, uint32 InColorAttachmentCount)
+VkPipeline FVulkanGraphicsPipelineBuilder::Build(VkDevice InDevice, VkPipelineLayout InLayout, const std::vector<VkPipelineShaderStageCreateInfo>& InShaderStageInfo, const FVulkanRenderTarget* InRenderTarget, const FVulkanPrimitive* InPrimitive)
 {
+    uint32 ColorAttachmentCount = InRenderTarget->GetDesc().NumColorTargets;
+
     VkPipelineColorBlendAttachmentState AttachemntState{};
     AttachemntState.blendEnable = mState.ColorBlendAttachmentState.BlendEnable;
     AttachemntState.srcColorBlendFactor = FVulkanEnum::Translate(mState.ColorBlendAttachmentState.SrcColorBlendFactor);
@@ -68,8 +72,8 @@ VkPipeline FVulkanGraphicsPipelineBuilder::Build(VkDevice InDevice, VkPipelineLa
     AttachemntState.colorWriteMask = FVulkanEnum::Translate(mState.ColorBlendAttachmentState.ColorWriteMask);
 
     std::vector<VkPipelineColorBlendAttachmentState> AttachemntStateVec;
-    AttachemntStateVec.reserve(InColorAttachmentCount);
-    for (uint32 i = 0; i < InColorAttachmentCount; i++)
+    AttachemntStateVec.reserve(ColorAttachmentCount);
+    for (uint32 i = 0; i < ColorAttachmentCount; i++)
     {
         AttachemntStateVec.push_back(AttachemntState);
     }
@@ -80,10 +84,10 @@ VkPipeline FVulkanGraphicsPipelineBuilder::Build(VkDevice InDevice, VkPipelineLa
     //TODO
     VkPipelineVertexInputStateCreateInfo VertexInputState{};
     VertexInputState.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    VertexInputState.vertexBindingDescriptionCount = 0;
-    VertexInputState.pVertexBindingDescriptions = nullptr; // Optional
-    VertexInputState.vertexAttributeDescriptionCount = 0;
-    VertexInputState.pVertexAttributeDescriptions = nullptr; // Optional
+    VertexInputState.vertexBindingDescriptionCount = (uint32_t)InPrimitive->GetBindingDescs().size();
+    VertexInputState.pVertexBindingDescriptions = InPrimitive->GetBindingDescs().data();
+    VertexInputState.vertexAttributeDescriptionCount = (uint32_t)InPrimitive->GetAttributeDescs().size();
+    VertexInputState.pVertexAttributeDescriptions = InPrimitive->GetAttributeDescs().data();
 
 
     VkPipelineInputAssemblyStateCreateInfo InputAssemblyState = MakeInputAssemblyStateInfo();

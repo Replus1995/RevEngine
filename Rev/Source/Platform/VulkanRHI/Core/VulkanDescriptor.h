@@ -22,10 +22,10 @@ struct FVulkanDescriptorPool
 public:
     VkDescriptorPool Pool;
 
-    void CreatePool(VkDevice InDevice, const std::vector<VkDescriptorPoolSize>& InPoolSizes);
+    void CreatePool(VkDevice InDevice, const std::vector<VkDescriptorPoolSize>& InPoolSizes, uint32 InMaxSets = 0);
     void ResetPool(VkDevice InDevice); //clear all descriptor sets
     void Cleanup(VkDevice InDevice);
-    VkDescriptorSet Allocate(VkDevice InDevice, VkDescriptorSetLayout InLayout);
+    VkDescriptorSet Allocate(VkDevice InDevice, VkDescriptorSetLayout InLayout) const;
 };
 
 }

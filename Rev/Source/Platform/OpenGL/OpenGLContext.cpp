@@ -204,12 +204,6 @@ void FOpenGLContext::Bind(const Ref<FRHIShaderProgram>& InProgram)
 	glUseProgram(ProgramName);
 }
 
-void FOpenGLContext::Bind(const Ref<FRHIUniformBuffer>& InUniformBuffer, uint32 InUnit)
-{
-	GLuint UniformBufferName = InUniformBuffer ? *(const GLuint*)InUniformBuffer->GetNativeHandle() : 0;
-	glBindBufferBase(GL_UNIFORM_BUFFER, InUnit, UniformBufferName);
-}
-
 void FOpenGLContext::Bind(const Ref<FRHITexture>& InTexture, uint32 InUnit)
 {
 	GLuint TextureName = InTexture ? *(const GLuint*)InTexture->GetNativeHandle() : 0;
