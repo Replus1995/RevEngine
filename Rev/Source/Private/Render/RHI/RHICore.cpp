@@ -130,13 +130,13 @@ Ref<FRHIVertexArray> FRHICore::CreateVertexArray()
 	return nullptr;
 }
 
-Ref<FRHIUniformBuffer> FRHICore::CreateUniformBuffer(uint32 InSize)
+Ref<FRHIUniformBuffer> FRHICore::CreateUniformBuffer(uint32 InSize, uint32 InBinding)
 {
 	switch (GetRenderAPI())
 	{
 	case ERenderAPI::None:    REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
-	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLUniformBuffer>(InSize);
-	case ERenderAPI::Vulkan:  return CreateRef<FVulkanUniformBuffer>(InSize);
+	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLUniformBuffer>(InSize, InBinding);
+	case ERenderAPI::Vulkan:  return CreateRef<FVulkanUniformBuffer>(InSize, InBinding);
 	}
 
 	REV_CORE_ASSERT(false, "Unknown RenderAPI!");
@@ -148,7 +148,7 @@ Ref<FRHIPrimitive> FRHICore::CreatePrimitive(EPrimitiveTopology InTopology)
 	switch (GetRenderAPI())
 	{
 	case ERenderAPI::None:    REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
-	case ERenderAPI::Vulkan:  return CreateRef<FVulkanPrimitive>();
+	case ERenderAPI::Vulkan:  return CreateRef<FVulkanPrimitive>(InTopology);
 	}
 
 	REV_CORE_ASSERT(false, "Unknown RenderAPI!");

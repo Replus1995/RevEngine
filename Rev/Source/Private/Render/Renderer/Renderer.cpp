@@ -9,7 +9,7 @@ FRenderer::FRenderer(uint32 InWidth, uint32 InHeight, FSceneProxy* InSceneProxy)
 	: mSreenParams(InWidth, InHeight)
 	, mSceneProxy(InSceneProxy)
 {
-	mBuiltInUB = FRHICore::CreateUniformBuffer(REV_BUILTIN_UNIFORM_SIZE);
+	mBuiltInUB = FRHICore::CreateUniformBuffer(REV_BUILTIN_UNIFORM_SIZE, 2);
 }
 
 FRenderer::~FRenderer()

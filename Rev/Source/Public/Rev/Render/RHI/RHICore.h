@@ -4,6 +4,7 @@
 #include "Rev/Render/RHI/RHISampler.h"
 #include "Rev/Render/RHI/RHITexture.h"
 #include "Rev/Render/RHI/RHIRenderTarget.h"
+#include "Rev/Render/RHI/RHIPrimitive.h"
 
 namespace Rev
 {
