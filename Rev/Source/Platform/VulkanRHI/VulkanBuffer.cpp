@@ -120,12 +120,13 @@ void FVulkanIndexBuffer::UpdateSubData(const void* Data, uint32 Count, uint32 Of
 
 FVulkanUniformBuffer::FVulkanUniformBuffer(uint32 InSize, uint32 InBinding)
 	: FRHIUniformBuffer(InSize)
+	, mBinding(InBinding)
 {
-	VkBufferUsageFlags BufferUsage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
-	Allocate(InSize, BufferUsage, VMA_MEMORY_USAGE_CPU_ONLY);
+	VkBufferUsageFlags BufferUsage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+	Allocate(InSize, BufferUsage, VMA_MEMORY_USAGE_CPU_TO_GPU);
 
 	VkDescriptorSetLayoutBinding LayoutBinding{};
-	LayoutBinding.binding = InBinding;
+	LayoutBinding.binding = mBinding;
 	LayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 	LayoutBinding.descriptorCount = 1;
 	LayoutBinding.stageFlags = VK_SHADER_STAGE_ALL_GRAPHICS;
@@ -162,7 +163,7 @@ void FVulkanUniformBuffer::UpdateSubData(const void* Data, uint32 Size, uint32 O
 	VkWriteDescriptorSet DescriptorWrite{};
 	DescriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 	DescriptorWrite.dstSet = mDescSet;
-	DescriptorWrite.dstBinding = 0;
+	DescriptorWrite.dstBinding = mBinding;
 	DescriptorWrite.dstArrayElement = 0;
 	DescriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 	DescriptorWrite.descriptorCount = 1;
