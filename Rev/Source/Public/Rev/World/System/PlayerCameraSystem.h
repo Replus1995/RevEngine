@@ -15,7 +15,7 @@ public:
 	virtual void OnUpdate(float dt) override;
 	virtual void OnDestroy() override;
 
-	void FillCameraUniform(FCameraUniform& OutUniform) const;
+	void FillCameraUniform(FSceneUniform& OutUniform) const;
 	bool SetPlayerCamera(FEntity e);
 	void SetPlayerCameraController(const Ref<CameraController>& c);
 	

@@ -22,7 +22,9 @@ public:
 	static Ref<FRHIIndexBuffer> CreateIndexBuffer(uint32 InStride, uint32 InCount); //Dynamic Data
 	static Ref<FRHIIndexBuffer> CreateIndexBuffer(const void* InIndices, uint32 InStride, uint32 InCount); //Static Data
 	static Ref<FRHIVertexArray> CreateVertexArray();
+
 	static Ref<FRHIUniformBuffer> CreateUniformBuffer(uint32 InSize, uint32 InBinding);
+	static Ref<FRHIUniformBufferDynamic> CreateUniformBufferDynamic(uint32 InSize, uint32 InBinding);
 
 	//Primitive
 	static Ref<FRHIPrimitive> CreatePrimitive(EPrimitiveTopology InTopology);

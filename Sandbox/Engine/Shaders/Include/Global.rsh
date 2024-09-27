@@ -2,14 +2,17 @@
 #define PS_SHADERMODEL ps_6_0
 #define PI 3.1415926
 #define EPSILON 0.00001
-struct ScreenUniform
+
+struct FRect2D
 {
+    uint X;
+    uint Y;
     uint Width;
     uint Height;
 };
-
-struct CameraUniform
+struct FSceneUniform
 {
+    FRect2D ViewExtent;
     float4 ViewPos;
 	float4x4 ViewMat;
     float4x4 ProjMat;
@@ -17,15 +20,18 @@ struct CameraUniform
     float4x4 InvViewProjMat;
 };
 
-struct ModelUniform
+struct FModelUniform
 {
     float4x4 ModelMat;
-    float4x4 MVPMat;
 };
 
-cbuffer BuiltInUB : register(b2, space0)
+cbuffer SceneUB : register(b2, space0) //update every frame
 {
-	ScreenUniform uScreen;
-    CameraUniform uCamera;
-    ModelUniform uModel;
+	FSceneUniform uScene;
 };
+
+cbuffer ModelUB : register(b3, space0) //update every model
+{
+    FModelUniform uModel;
+};
+

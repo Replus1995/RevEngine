@@ -32,6 +32,22 @@ void InitFrameData(FVulkanFrameData* Frames, uint32 Count)
 
 		REV_VK_CHECK_THROW(vkCreateSemaphore(Device, &SemaphoreCreateInf, nullptr, &Frames[i].SwapchainSemaphore), "[FVkFrameData] Failed to create swap chain semaphore!");
 		REV_VK_CHECK_THROW(vkCreateSemaphore(Device, &SemaphoreCreateInf, nullptr, &Frames[i].RenderSemaphore), "[FVkFrameData] Failed to create render semaphore!");
+
+		std::vector<VkDescriptorPoolSize> PoolSizes = {
+		{ VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
+		{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000 },
+		{ VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000 },
+		{ VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000 },
+		{ VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000 },
+		{ VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000 },
+		{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000 },
+		{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000 },
+		{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000 },
+		{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000 },
+		{ VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000 }
+		};
+
+		Frames[i].DescriptorPool.CreatePool(FVulkanCore::GetDevice(), PoolSizes, 1000);
 	}
 
 }
@@ -47,6 +63,8 @@ void CleanupFrameData(FVulkanFrameData* Frames, uint32 Count)
 		vkDestroyFence(Device, Frames[i].Fence, nullptr);
 		vkDestroySemaphore(Device, Frames[i].RenderSemaphore, nullptr);
 		vkDestroySemaphore(Device, Frames[i].SwapchainSemaphore, nullptr);
+
+		Frames[i].DescriptorPool.Cleanup(Device);
 	}
 }
 

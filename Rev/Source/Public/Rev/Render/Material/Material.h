@@ -41,6 +41,9 @@ public:
 	//const Ref<FRHIShaderProgram>& GetProgram() const { return mProgram; }
 
 	EMaterialDomain GetDomain() const { return mDomain; }
+
+	const Ref<FRHIShaderProgram>& GetProgram() const { return mProgram; }
+
 protected:
 	Ref<FRHIShaderProgram> mProgram = nullptr;
 	EMaterialDomain mDomain = MD_Surface;

@@ -1,49 +1,50 @@
 #include "Rev/Render/Mesh/MeshPrimitive.h"
+#include "Rev/Render/RHI/RHIPrimitive.h"
 
 namespace Rev
 {
 
 FMeshPrimitive::FMeshPrimitive()
 	: MaterialIndex(0)
-	, VertexData(nullptr)
+	, PrimitiveData(nullptr)
 {
 }
 
-FMeshPrimitive::FMeshPrimitive(uint32 InMaterialIndex, const Ref<FRHIVertexArray>& InVertexData)
+FMeshPrimitive::FMeshPrimitive(uint32 InMaterialIndex, const Ref<FRHIPrimitive>& InPrimitiveData)
 	: MaterialIndex(InMaterialIndex)
-	, VertexData(InVertexData)
+	, PrimitiveData(InPrimitiveData)
 {
 }
 
 FMeshPrimitive::FMeshPrimitive(const FMeshPrimitive& InPrimitive)
 	: MaterialIndex(InPrimitive.MaterialIndex)
-	, VertexData(InPrimitive.VertexData)
+	, PrimitiveData(InPrimitive.PrimitiveData)
 {
 }
 
 FMeshPrimitive::FMeshPrimitive(FMeshPrimitive&& InPrimitive) noexcept
 	: MaterialIndex(InPrimitive.MaterialIndex)
-	, VertexData(std::move(InPrimitive.VertexData))
+	, PrimitiveData(std::move(InPrimitive.PrimitiveData))
 {
 }
 
 FMeshPrimitive& FMeshPrimitive::operator=(const FMeshPrimitive& InPrimitive)
 {
 	MaterialIndex = InPrimitive.MaterialIndex;
-	VertexData = InPrimitive.VertexData;
+	PrimitiveData = InPrimitive.PrimitiveData;
 	return *this;
 }
 
 FMeshPrimitive& FMeshPrimitive::operator=(FMeshPrimitive&& InPrimitive) noexcept
 {
 	MaterialIndex = InPrimitive.MaterialIndex;
-	VertexData = std::move(InPrimitive.VertexData);
+	PrimitiveData = std::move(InPrimitive.PrimitiveData);
 	return *this;
 }
 
 bool FMeshPrimitive::Valid() const
 {
-	return VertexData != nullptr;
+	return PrimitiveData != nullptr;
 }
 
 }

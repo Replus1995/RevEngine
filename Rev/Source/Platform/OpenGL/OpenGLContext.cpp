@@ -87,6 +87,11 @@ void FOpenGLContext::ClearBackBuffer()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+void FOpenGLContext::DrawPrimitive(const Ref<FRHIPrimitive>& InPrimitive, const Ref<FRHIShaderProgram>& InProgram, const Ref<FRHIUniformBufferDynamic>& InUniformBufferDynamic, uint32 InDynamicOffset)
+{
+	REV_CORE_ASSERT(false);
+}
+
 //void FOpenGLContext::EnableDepthTest(bool bEnable)
 //{
 //	if(bEnable)
@@ -180,55 +185,55 @@ void FOpenGLContext::ClearBackBuffer()
 //	}
 //}
 
-void FOpenGLContext::Bind(const Ref<FRHIVertexBuffer>& InVertexBuffer)
-{
-	GLuint VertexBufferName = InVertexBuffer ? *(const GLuint*)InVertexBuffer->GetNativeHandle() : 0;
-	glBindBuffer(GL_ARRAY_BUFFER, VertexBufferName);
-}
-
-void FOpenGLContext::Bind(const Ref<FRHIIndexBuffer>& InIndexBuffer)
-{
-	GLuint IndexBufferName = InIndexBuffer ? *(const GLuint*)InIndexBuffer->GetNativeHandle() : 0;
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IndexBufferName);
-}
-
-void FOpenGLContext::Bind(const Ref<FRHIVertexArray>& InVertexArray)
-{
-	GLuint VertexArrayName = InVertexArray ? *(const GLuint*)InVertexArray->GetNativeHandle() : 0;
-	glBindVertexArray(VertexArrayName);
-}
-
-void FOpenGLContext::Bind(const Ref<FRHIShaderProgram>& InProgram)
-{
-	GLuint ProgramName = InProgram ? *(const GLuint*)InProgram->GetNativeHandle() : 0;
-	glUseProgram(ProgramName);
-}
-
-void FOpenGLContext::Bind(const Ref<FRHITexture>& InTexture, uint32 InUnit)
-{
-	GLuint TextureName = InTexture ? *(const GLuint*)InTexture->GetNativeHandle() : 0;
-	GLuint SamplerName = InTexture ? *(const GLuint*)InTexture->GetSampler()->GetNativeHandle() : 0;
-	glBindTextureUnit(InUnit, TextureName);
-	glBindSampler(InUnit, SamplerName);
-}
-
-void FOpenGLContext::Bind(const Ref<FRHIRenderTarget>& InRenderTarget)
-{
-	GLuint RenderTargetName = InRenderTarget ? *(const GLuint*)InRenderTarget->GetNativeHandle() : 0;
-	glBindFramebuffer(GL_FRAMEBUFFER, RenderTargetName);
-}
-
-void FOpenGLContext::Draw(const Ref<FRHIVertexArray>& InVertexArray)
-{
-	if(!InVertexArray)
-		return;
-	//GLenum DrawMode = TranslateDrawMode(InDrawMode);
-	GLenum DrawMode = GL_TRIANGLES;
-	uint32 IndexCount = InVertexArray->GetIndexBuffer()->GetCount();
-	GLenum IndexType = TranslateIndexType(InVertexArray->GetIndexBuffer()->GetStride());
-	Bind(InVertexArray);
-	glDrawElements(DrawMode, IndexCount, IndexType, nullptr);
-}
+//void FOpenGLContext::Bind(const Ref<FRHIVertexBuffer>& InVertexBuffer)
+//{
+//	GLuint VertexBufferName = InVertexBuffer ? *(const GLuint*)InVertexBuffer->GetNativeHandle() : 0;
+//	glBindBuffer(GL_ARRAY_BUFFER, VertexBufferName);
+//}
+//
+//void FOpenGLContext::Bind(const Ref<FRHIIndexBuffer>& InIndexBuffer)
+//{
+//	GLuint IndexBufferName = InIndexBuffer ? *(const GLuint*)InIndexBuffer->GetNativeHandle() : 0;
+//	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IndexBufferName);
+//}
+//
+//void FOpenGLContext::Bind(const Ref<FRHIVertexArray>& InVertexArray)
+//{
+//	GLuint VertexArrayName = InVertexArray ? *(const GLuint*)InVertexArray->GetNativeHandle() : 0;
+//	glBindVertexArray(VertexArrayName);
+//}
+//
+//void FOpenGLContext::Bind(const Ref<FRHIShaderProgram>& InProgram)
+//{
+//	GLuint ProgramName = InProgram ? *(const GLuint*)InProgram->GetNativeHandle() : 0;
+//	glUseProgram(ProgramName);
+//}
+//
+//void FOpenGLContext::Bind(const Ref<FRHITexture>& InTexture, uint32 InUnit)
+//{
+//	GLuint TextureName = InTexture ? *(const GLuint*)InTexture->GetNativeHandle() : 0;
+//	GLuint SamplerName = InTexture ? *(const GLuint*)InTexture->GetSampler()->GetNativeHandle() : 0;
+//	glBindTextureUnit(InUnit, TextureName);
+//	glBindSampler(InUnit, SamplerName);
+//}
+//
+//void FOpenGLContext::Bind(const Ref<FRHIRenderTarget>& InRenderTarget)
+//{
+//	GLuint RenderTargetName = InRenderTarget ? *(const GLuint*)InRenderTarget->GetNativeHandle() : 0;
+//	glBindFramebuffer(GL_FRAMEBUFFER, RenderTargetName);
+//}
+//
+//void FOpenGLContext::Draw(const Ref<FRHIVertexArray>& InVertexArray)
+//{
+//	if(!InVertexArray)
+//		return;
+//	//GLenum DrawMode = TranslateDrawMode(InDrawMode);
+//	GLenum DrawMode = GL_TRIANGLES;
+//	uint32 IndexCount = InVertexArray->GetIndexBuffer()->GetCount();
+//	GLenum IndexType = TranslateIndexType(InVertexArray->GetIndexBuffer()->GetStride());
+//	Bind(InVertexArray);
+//	glDrawElements(DrawMode, IndexCount, IndexType, nullptr);
+//}
 
 //GLenum FOpenGLContext::TranslateDrawMode(EDrawMode InDrawMode)
 //{

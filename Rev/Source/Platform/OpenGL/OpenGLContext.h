@@ -21,15 +21,7 @@ public:
 	virtual void SetClearColor(const Math::FLinearColor& color) override;
 	virtual void ClearBackBuffer() override;
 
-	virtual void Bind(const Ref<FRHIVertexBuffer>& InVertexBuffer) override;
-	virtual void Bind(const Ref<FRHIIndexBuffer>& InIndexBuffer) override;
-	virtual void Bind(const Ref<FRHIVertexArray>& InVertexArray) override;
-
-	virtual void Bind(const Ref<FRHIShaderProgram>& InProgram) override;
-	virtual void Bind(const Ref<FRHITexture>& InTexture, uint32 InUnit) override;
-	virtual void Bind(const Ref<FRHIRenderTarget>& InRenderTarget) override;
-
-	virtual void Draw(const Ref<FRHIVertexArray>& InVertexArray) override;
+	virtual void DrawPrimitive(const Ref<FRHIPrimitive>& InPrimitive, const Ref<FRHIShaderProgram>& InProgram, const Ref<FRHIUniformBufferDynamic>& InUniformBufferDynamic, uint32 InDynamicOffset) override;
 
 private:
 	//GLenum TranslateDrawMode(EDrawMode InDrawMode);

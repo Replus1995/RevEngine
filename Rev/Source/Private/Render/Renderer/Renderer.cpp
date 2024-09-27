@@ -6,24 +6,22 @@ namespace Rev
 
 
 FRenderer::FRenderer(uint32 InWidth, uint32 InHeight, FSceneProxy* InSceneProxy)
-	: mSreenParams(InWidth, InHeight)
-	, mSceneProxy(InSceneProxy)
+	: mSceneProxy(InSceneProxy)
 {
-	mBuiltInUB = FRHICore::CreateUniformBuffer(REV_BUILTIN_UNIFORM_SIZE, 2);
+	mSceneParams.ViewExtent = FRect2D{ 0, 0, InWidth, InHeight };
+	mSceneUB = FRHICore::CreateUniformBuffer(sizeof(FSceneUniform), UL::BScene);
+	mModelUB = FRHICore::CreateUniformBufferDynamic(REV_MODEL_UNIFROM_BUFFER_SIZE, UL::BModel);
 }
 
 FRenderer::~FRenderer()
 {
-	mBuiltInUB.reset();
+	mSceneUB.reset();
+	mModelUB.reset();
 }
 
 void FRenderer::BeginFrame()
 {
-	if (mScreenParamsDirty)
-	{
-		mScreenParamsDirty = false;
-		mBuiltInUB->UpdateSubData(&mSreenParams, sizeof(FScreenUniform), REV_SCREEN_UNIFORM_OFFSET);
-	}
+	mSceneUB->UpdateSubData(&mSceneParams, sizeof(FSceneUniform));
 }
 
 void FRenderer::DrawFrame()
@@ -36,15 +34,13 @@ void FRenderer::EndFrame()
 
 void FRenderer::SetScreenSize(uint32 InWidth, uint32 InHeight)
 {
-	if (InWidth > 0 && InWidth != mSreenParams.Width)
+	if (InWidth > 0 && InWidth != mSceneParams.ViewExtent.Width)
 	{
-		mSreenParams.Width = InWidth;
-		mScreenParamsDirty = true;
+		mSceneParams.ViewExtent.Width = InWidth;
 	}
-	if (InHeight > 0 && InHeight != mSreenParams.Height)
+	if (InHeight > 0 && InHeight != mSceneParams.ViewExtent.Height)
 	{
-		mSreenParams.Height = InHeight;
-		mScreenParamsDirty = true;
+		mSceneParams.ViewExtent.Height = InHeight;
 	}
 }
 

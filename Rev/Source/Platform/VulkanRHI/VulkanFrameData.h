@@ -2,6 +2,7 @@
 #include "Rev/Core/Base.h"
 #include "Rev/Core/Deleter.h"
 #include <vulkan/vulkan.h>
+#include "Core/VulkanDescriptor.h"
 
 namespace Rev
 {
@@ -15,6 +16,8 @@ public:
 	VkSemaphore SwapchainSemaphore;
 	VkSemaphore RenderSemaphore;
 	VkFence Fence;
+
+	FVulkanDescriptorPool DescriptorPool;
 };
 
 void InitFrameData(FVulkanFrameData* Frames, uint32 Count);

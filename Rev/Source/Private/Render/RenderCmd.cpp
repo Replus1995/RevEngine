@@ -66,31 +66,9 @@ void RenderCmd::ClearBackBuffer()
 	sContext->ClearBackBuffer();
 }
 
-void RenderCmd::BindProgram(const Ref<FRHIShaderProgram>& InProgram)
+void RenderCmd::DrawPrimitive(const Ref<FRHIPrimitive>& InPrimitive, const Ref<FRHIShaderProgram>& InProgram, const Ref<FRHIUniformBufferDynamic>& InUniformBufferDynamic, uint32 InDynamicOffset)
 {
-	sContext->Bind(InProgram);
-}
-
-void RenderCmd::BindTexture(const Ref<FRHITexture>& InTexture, uint32 InUnit)
-{
-	sContext->Bind(InTexture, InUnit);
-}
-
-void RenderCmd::BindRenderTarget(const Ref<FRHIRenderTarget>& InRenderTarget)
-{
-	sContext->Bind(InRenderTarget);
-}
-
-void RenderCmd::DrawPrimitive(const FMeshPrimitive* InPrimitive)
-{
-	if(!InPrimitive)
-		return;
-	sContext->Draw(InPrimitive->VertexData);
-}
-
-void RenderCmd::Draw(const Ref<FRHIVertexArray>& InVertexArray)
-{
-	sContext->Draw(InVertexArray);
+	sContext->DrawPrimitive(InPrimitive, InProgram, InUniformBufferDynamic, InDynamicOffset);
 }
 
 FRHIContext* RenderCmd::GetContext()

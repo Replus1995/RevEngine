@@ -8,12 +8,13 @@ namespace Rev
 {
 class FRHIVertexBuffer;
 class FRHIIndexBuffer;
-class FRHIVertexArray;
-
+class FRHIPrimitive;
 class FRHIShaderProgram;
 class FRHIUniformBuffer;
+class FRHIUniformBufferDynamic;
 class FRHITexture;
 class FRHIRenderTarget;
+class FRHIContext;
 
 class FRHIContext
 {
@@ -35,15 +36,6 @@ public:
 	virtual void SetClearColor(const Math::FLinearColor& color) = 0;
 	virtual void ClearBackBuffer() = 0; //to be removed
 
-	virtual void Bind(const Ref<FRHIVertexBuffer>& InVertexBuffer) = 0;
-	virtual void Bind(const Ref<FRHIIndexBuffer>& InIndexBuffer) = 0;
-	virtual void Bind(const Ref<FRHIVertexArray>& InVertexArray) = 0;
-
-	virtual void Bind(const Ref<FRHIShaderProgram>& InProgram) = 0;
-	virtual void Bind(const Ref<FRHITexture>& InTexture, uint32 InUnit) = 0;
-	virtual void Bind(const Ref<FRHIRenderTarget>& InRenderTarget) = 0;
-
-
-	virtual void Draw(const Ref<FRHIVertexArray>& InVertexArray) = 0;
+	virtual void DrawPrimitive(const Ref<FRHIPrimitive>& InPrimitive, const Ref<FRHIShaderProgram>& InProgram, const Ref<FRHIUniformBufferDynamic>& InUniformBufferDynamic, uint32 InDynamicOffset) = 0;
 };
 }

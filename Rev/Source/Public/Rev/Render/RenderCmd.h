@@ -5,15 +5,14 @@
 
 namespace Rev
 {
-struct FMeshPrimitive;
-class FRHIVertexArray;
-
-class FRHIShaderProgram;
 class FRHIPrimitive;
+class FRHIShaderProgram;
 class FRHIUniformBuffer;
+class FRHIUniformBufferDynamic;
 class FRHITexture;
 class FRHIRenderTarget;
 class FRHIContext;
+
 class REV_API RenderCmd
 {
 public:
@@ -29,15 +28,7 @@ public:
 	static void SetClearColor(const Math::FLinearColor& color);
 	static void ClearBackBuffer();
 
-	static void BindProgram(const Ref<FRHIShaderProgram>& InProgram);
-	static void BindTexture(const Ref<FRHITexture>& InTexture, uint32 InUnit);
-	static void BindRenderTarget(const Ref<FRHIRenderTarget>& InRenderTarget);
-
-	static void Draw(const Ref<FRHIVertexArray>& InVertexArray);
-	static void DrawPrimitive(const FMeshPrimitive* InPrimitive);
-	//static void DrawLines(const Ref<VertexArray>& vertexArray, uint32_t vertexCount, float lineWidth);
-
-	static void DrawPrimitive(const Ref<FRHIShaderProgram>& InProgram, const Ref<FRHIPrimitive>& InPrimitive);
+	static void DrawPrimitive(const Ref<FRHIPrimitive>& InPrimitive, const Ref<FRHIShaderProgram>& InProgram, const Ref<FRHIUniformBufferDynamic>& InUniformBufferDynamic, uint32 InDynamicOffset);
 
 	static FRHIContext* GetContext();
 };

@@ -30,7 +30,7 @@ void PlayerCameraSystem::OnDestroy()
 {
 }
 
-void PlayerCameraSystem::FillCameraUniform(FCameraUniform& OutUniform) const
+void PlayerCameraSystem::FillCameraUniform(FSceneUniform& OutUniform) const
 {
 	if (mCamEntity)
 	{

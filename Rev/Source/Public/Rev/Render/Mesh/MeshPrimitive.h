@@ -1,19 +1,18 @@
 #pragma once
 #include "Rev/Core/Base.h"
 #include "Rev/Render/RenderCore.h"
-#include "Rev/Render/RHI/RHIPrimitive.h"
 
 namespace Rev
 {
-class FRHIVertexArray;
+class FRHIPrimitive;
 struct FMeshPrimitive
 {
 public:
 	uint32 MaterialIndex;
-	Ref<FRHIVertexArray> VertexData;
+	Ref<FRHIPrimitive> PrimitiveData;
 
 	FMeshPrimitive();
-	FMeshPrimitive(uint32 InMaterialIndex, const Ref<FRHIVertexArray>& InVertexData);
+	FMeshPrimitive(uint32 InMaterialIndex, const Ref<FRHIPrimitive>& InVertexData);
 	FMeshPrimitive(const FMeshPrimitive& InPrimitive);
 	FMeshPrimitive(FMeshPrimitive&& InPrimitive) noexcept;
 

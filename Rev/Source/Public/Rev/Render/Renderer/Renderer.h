@@ -17,14 +17,15 @@ public:
 	virtual void EndFrame();
 
 	void SetScreenSize(uint32 InWidth, uint32 InHeight);
-	const Ref<FRHIUniformBuffer>& GetBuiltInUB() const { return mBuiltInUB; }
+	FSceneUniform& GetSceneParams() { return mSceneParams; }
+	const Ref<FRHIUniformBuffer>& GetSceneUB() const { return mSceneUB; }
+	const Ref<FRHIUniformBufferDynamic>& GetmModelUB() const { return mModelUB; }
 
 protected:
-	FScreenUniform mSreenParams;
-	bool mScreenParamsDirty = true;
 	FSceneProxy* mSceneProxy = nullptr;
-
-	Ref<FRHIUniformBuffer> mBuiltInUB;
+	FSceneUniform mSceneParams;
+	Ref<FRHIUniformBuffer> mSceneUB;
+	Ref<FRHIUniformBufferDynamic> mModelUB;
 
 };
 

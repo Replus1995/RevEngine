@@ -1,4 +1,5 @@
 #include "VulkanCore.h"
+#include "VulkanUniform.h"
 #include "Rev/Core/Assert.h"
 #include "Rev/Render/RenderCmd.h"
 
@@ -11,6 +12,8 @@ public:
 	FVulkanInstance Instance;
 	FVulkanDevice Device;
 	VmaAllocator Allocator = nullptr;
+	FVulkanUniformManager* UniformManager = nullptr;
+
 
 	FVulkanCorePrivate()
 	{
@@ -25,10 +28,14 @@ public:
 		AllocatorCreateInfo.instance = Instance.GetInstance();
 		AllocatorCreateInfo.flags = VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT;
 		vmaCreateAllocator(&AllocatorCreateInfo, &Allocator);
+
+		UniformManager = new FVulkanUniformManager();
 	}
 
 	~FVulkanCorePrivate()
 	{
+		delete UniformManager;
+
 		vmaDestroyAllocator(Allocator);
 		Device.Cleanup();
 		Instance.Cleanup();
@@ -107,6 +114,11 @@ VkExtent2D FVulkanCore::GetSwapchainExtent()
 void FVulkanCore::ImmediateSubmit(std::function<void(VkCommandBuffer)>&& Func)
 {
 	GetContext()->ImmediateSubmit(std::move(Func));
+}
+
+FVulkanUniformManager* FVulkanCore::GetUniformManager()
+{
+	return sVulkanCore->UniformManager;
 }
 
 

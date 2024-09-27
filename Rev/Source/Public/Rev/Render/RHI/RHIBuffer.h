@@ -120,23 +120,23 @@ protected:
 	uint32 mCount = 0;
 };
 
-class REV_API FRHIVertexArray : public FRHIResource
-{
-public:
-	virtual ~FRHIVertexArray() = default;
-	virtual void AddVertexBuffer(const Ref<FRHIVertexBuffer>& VertexBuffer) = 0;
-	virtual void SetIndexBuffer(const Ref<FRHIIndexBuffer>& IndexBuffer) = 0;
-
-	virtual const std::vector<Ref<FRHIVertexBuffer>>& GetVertexBuffers() const = 0;
-	virtual const Ref<FRHIIndexBuffer>& GetIndexBuffer() const = 0;
-};
-
 class REV_API FRHIUniformBuffer : public FRHIResource
 {
 public:
 	FRHIUniformBuffer(uint32 InSize) : mSize(InSize) {}
 	virtual ~FRHIUniformBuffer() = default;
 	virtual void UpdateSubData(const void* Data, uint32 Size, uint32 Offset = 0) = 0;
+protected:
+	uint32 mSize;
+};
+
+class REV_API FRHIUniformBufferDynamic : public FRHIResource
+{
+public:
+	FRHIUniformBufferDynamic(uint32 InSize) : mSize(InSize) {}
+	virtual ~FRHIUniformBufferDynamic() = default;
+	virtual uint32 UpdateSubData(const void* Data, uint32 Size) = 0;
+	virtual void Clear() = 0;
 protected:
 	uint32 mSize;
 };

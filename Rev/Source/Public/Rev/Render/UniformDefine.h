@@ -1,6 +1,7 @@
 #pragma once
 #include "Rev/Core/Base.h"
 #include "Rev/Math/Maths.h"
+#include "Rev/Utils/Rect2D.h"
 #include "Rev/Render/RenderCore.h"
 #include "Rev/Render/RenderCmd.h"
 #include "Rev/Render/UniformLayout.h"
@@ -10,7 +11,7 @@
 namespace Rev
 {
 
-template<typename T, UL::IndexType Binding>
+template<typename T, uint32 Binding>
 struct TUniform
 {
 public:
@@ -20,10 +21,8 @@ public:
 	TUniform() = default;
 	TUniform(const TUniform<T, Binding>&) = delete;
 
-	void FreeResource()
-	{
-		Resource.reset();
-	}
+	void AllocResource() { Resource = FRHICore::CreateUniformBuffer(sizeof(T), Binding); }
+	void FreeResource() { Resource.reset(); }
 
 	void Upload(uint32 InSize = 0, uint32 InOffset = 0) const
 	{
@@ -32,29 +31,16 @@ public:
 
 	void Upload(const void* InData, uint32 InSize = 0, uint32 InOffset = 0) const
 	{
-		if (!Resource)
-		{
-			TUniform<T, Binding>* pThis = const_cast<TUniform<T, Binding>*>(this);
-			pThis->Resource = FRHICore::CreateUniformBuffer(sizeof(T));
-			RenderCmd::BindUniformBuffer(Resource, Binding);
-		}
 		uint32 UploadSize = InSize > 0 ? InSize : sizeof(T);
 		const void* UploadData = InData ? InData : &Data;
 		Resource->UpdateSubData(UploadData, UploadSize, InOffset);
 	}
 
 };
-
-struct alignas(16) FScreenUniform
+ 
+struct alignas(16) FSceneUniform
 {
-	uint32 Width;
-	uint32 Height;
-
-	FScreenUniform(uint32 InWidth, uint32 InHeight) : Width(InWidth), Height(InHeight) {}
-};
-
-struct alignas(16) FCameraUniform
-{
+	FRect2D ViewExtent;
 	Math::FVector4 ViewPos;
 	Math::FMatrix4 ViewMat;
 	Math::FMatrix4 ProjMat;
@@ -62,23 +48,13 @@ struct alignas(16) FCameraUniform
 	Math::FMatrix4 InvViewProjMat;
 };
 
-struct alignas(16) FModelUniform
+struct alignas(16) FStaticMeshUniform
 {
 	Math::FMatrix4 ModelMat;
-	Math::FMatrix4 MVPMat;
 };
 
-struct alignas(16) FBuiltInUB
-{
-	FScreenUniform uScreen;
-	FCameraUniform uCamera;
-	FModelUniform uModel;
-};
 
-#define REV_SCREEN_UNIFORM_OFFSET 0
-#define REV_CAMERA_UNIFORM_OFFSET sizeof(FScreenUniform) + REV_SCREEN_UNIFORM_OFFSET
-#define REV_MODEL_UNIFORM_OFFSET sizeof(FCameraUniform) + REV_CAMERA_UNIFORM_OFFSET
-#define REV_BUILTIN_UNIFORM_SIZE sizeof(FBuiltInUB)
+#define REV_MODEL_UNIFROM_BUFFER_SIZE 1000 * sizeof(FStaticMeshUniform) //to be modified
 
 struct FShadowUniform
 {

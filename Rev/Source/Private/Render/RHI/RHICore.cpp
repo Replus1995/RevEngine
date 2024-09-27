@@ -13,6 +13,7 @@
 #include "VulkanRHI/VulkanCore.h"
 #include "VulkanRHI/VulkanContext.h"
 #include "VulkanRHI/VulkanBuffer.h"
+#include "VulkanRHI/VulkanUniform.h"
 #include "VulkanRHI/VulkanSampler.h"
 #include "VulkanRHI/VulkanTexture.h"
 #include "VulkanRHI/VulkanRenderTarget.h"
@@ -137,6 +138,18 @@ Ref<FRHIUniformBuffer> FRHICore::CreateUniformBuffer(uint32 InSize, uint32 InBin
 	case ERenderAPI::None:    REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
 	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLUniformBuffer>(InSize, InBinding);
 	case ERenderAPI::Vulkan:  return CreateRef<FVulkanUniformBuffer>(InSize, InBinding);
+	}
+
+	REV_CORE_ASSERT(false, "Unknown RenderAPI!");
+	return nullptr;
+}
+
+Ref<FRHIUniformBufferDynamic> FRHICore::CreateUniformBufferDynamic(uint32 InSize, uint32 InBinding)
+{
+	switch (GetRenderAPI())
+	{
+	case ERenderAPI::None:    REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
+	case ERenderAPI::Vulkan:  return CreateRef<FVulkanUniformBufferDynamic>(InSize, InBinding);
 	}
 
 	REV_CORE_ASSERT(false, "Unknown RenderAPI!");

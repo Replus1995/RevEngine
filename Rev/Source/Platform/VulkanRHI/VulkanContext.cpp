@@ -33,23 +33,6 @@ FVulkanContext::~FVulkanContext()
 void FVulkanContext::Init()
 {
 	mSwapchain.CreateSwapchain();
-
-	std::vector<VkDescriptorPoolSize> PoolSizes = {
-		{ VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
-		{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000 },
-		{ VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000 },
-		{ VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000 },
-		{ VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000 },
-		{ VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000 },
-		{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000 },
-		{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000 },
-		{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000 },
-		{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000 },
-		{ VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000 }
-	};
-	
-	mDescriptorPool.CreatePool(FVulkanCore::GetDevice(), PoolSizes, 1000);
-
 	InitFrameData(mFrameData, REV_VK_FRAME_OVERLAP);
 	CreateImmediateData();
 }
@@ -61,8 +44,6 @@ void FVulkanContext::Cleanup()
 
 	vkDeviceWaitIdle(FVulkanCore::GetDevice());
 	CleanupFrameData(mFrameData, REV_VK_FRAME_OVERLAP);
-
-	mDescriptorPool.Cleanup(FVulkanCore::GetDevice());
 	mSwapchain.Cleanup();
 }
 
@@ -212,6 +193,10 @@ void FVulkanContext::ClearBackBuffer()
 	vkCmdClearColorImage(GetMainCmdBuffer(), GetSwapchainImage(), VK_IMAGE_LAYOUT_GENERAL, &mClearColor, 1, &ColorImageRange);
 	/*VkImageSubresourceRange DepthImageRange = FVkInit::ImageSubresourceRange(VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT);
 	vkCmdClearDepthStencilImage(CmdBuffer, mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_GENERAL, &mClearDepthStencil, 1, &DepthImageRange);*/
+}
+
+void FVulkanContext::DrawPrimitive(const Ref<FRHIPrimitive>& InPrimitive, const Ref<FRHIShaderProgram>& InProgram, const Ref<FRHIUniformBufferDynamic>& InUniformBufferDynamic, uint32 InDynamicOffset)
+{
 }
 
 void FVulkanContext::CreateImmediateData()

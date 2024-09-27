@@ -66,7 +66,7 @@ FVulkanShaderProgram::~FVulkanShaderProgram()
 {
 }
 
-void FVulkanShaderProgram::Prepare(const FVulkanRenderTarget* RenderTarget, const FVulkanPrimitive* Primitive)
+void FVulkanShaderProgram::PrepareDraw(const FVulkanRenderTarget* RenderTarget, const FVulkanPrimitive* Primitive)
 {
 	if (!mPipelineStateDirty && mNumColorTargetsCache == RenderTarget->GetDesc().NumColorTargets && mIuputDescHashCache == Primitive->GetDescHash())
 		return;
