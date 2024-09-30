@@ -26,11 +26,30 @@ struct FShadercSource
 	}
 };
 
+enum EShadercUniformType : uint8
+{
+	SUT_Sampler,
+	SUT_Texture,
+	SUT_Buffer,
+};
+
+struct FShadercUniform
+{
+	std::string Name;
+	EShadercUniformType Type;
+	uint8 Num;
+	uint16 Binding;
+	uint8 TexComponent;
+	ETextureDimension TexDimension;
+	uint16 TexFormat;
+};
+
 struct FShadercCompiledData
 {
 	std::string Name;
 	ERHIShaderStage Stage = ERHIShaderStage::Unknown;
 	FBuffer Binary;
+	std::vector<FShadercUniform> Uniforms;
 
 	bool Empty() const
 	{

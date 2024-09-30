@@ -12,11 +12,11 @@ public:
 	virtual ~FVulkanUniformBuffer();
 	virtual const void* GetNativeHandle() const override { return &mBuffer; }
 	virtual void UpdateSubData(const void* Data, uint32 Size, uint32 Offset) override;
-	VkDescriptorSetLayout GetLayout() const { return mDescSetLayout; }
+	//VkDescriptorSetLayout GetLayout() const { return mDescSetLayout; }
 
 protected:
 	uint32 mBinding = 0;
-	VkDescriptorSetLayout mDescSetLayout = VK_NULL_HANDLE;
+	//VkDescriptorSetLayout mDescSetLayout = VK_NULL_HANDLE;
 };
 
 
@@ -28,12 +28,12 @@ public:
 	virtual const void* GetNativeHandle() const override { return &mBuffer; }
 	virtual uint32 UpdateSubData(const void* Data, uint32 Size) override;
 	virtual void Clear() override;
-	VkDescriptorSetLayout GetLayout() const { return mDescSetLayout; }
+	//VkDescriptorSetLayout GetLayout() const { return mDescSetLayout; }
 
 protected:
 	uint32 mDynamicOffset = 0;
 	uint32 mBinding = 0;
-	VkDescriptorSetLayout mDescSetLayout = VK_NULL_HANDLE;
+	//VkDescriptorSetLayout mDescSetLayout = VK_NULL_HANDLE;
 };
 
 class FVulkanUniformManager

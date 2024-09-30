@@ -2,10 +2,12 @@
 #include "Rev/Core/Assert.h"
 #include "Rev/Core/Clock.h"
 #include "Rev/Core/Log.h"
+#include "Rev/Render/RHI/RHITexture.h"
 #include <filesystem>
 
 #include <shaderc/shaderc.hpp>
 #include <spirv_cross/spirv_glsl.hpp>
+#include <spirv_cross/spirv_reflect.hpp>
 
 /*
 [[shader-stage-selection]]
@@ -22,9 +24,27 @@
 */
 
 namespace fs = std::filesystem;
-
 namespace Rev
 {
+
+constexpr uint8_t kSpirvSamplerShift = 16;
+
+ETextureDimension TranslateTextureDimension(spv::Dim InDim, bool bArray)
+{
+	switch (InDim)
+	{
+	case spv::Dim::Dim2D:
+		return bArray ? ETextureDimension::Texture2DArray : ETextureDimension::Texture2D;
+	case spv::Dim::Dim3D:
+		return ETextureDimension::Texture3D;
+	case spv::Dim::DimCube:
+		return bArray ? ETextureDimension::TextureCubeArray : ETextureDimension::TextureCube;
+	default:
+		REV_CORE_ASSERT(false, "Unknown texture dimension");
+		return ETextureDimension::Texture2D;
+	}
+}
+
 
 class ShaderIncluder : public shaderc::CompileOptions::IncluderInterface
 {
@@ -117,6 +137,55 @@ static void InitCompileOptions(shaderc::CompileOptions& Options)
 static void AddCompileMacros(shaderc::CompileOptions& Options, const std::string& InMacros)
 {
 	//todo
+}
+
+void FShadercFactory::ReflectUniformInfo(FShadercCompiledData& Data)
+{
+	spirv_cross::CompilerReflection Refl(Data.Binary.DataAs<uint32_t>(), Data.Binary.Size() / sizeof(uint32_t));
+	spirv_cross::ShaderResources ResourceRefl = Refl.get_shader_resources();
+
+	for (auto& Res : ResourceRefl.uniform_buffers)
+	{
+		FShadercUniform Uniform;
+		Uniform.Name = Refl.get_name(Res.id);
+		Uniform.Type = SUT_Buffer;
+		Uniform.Num = 1;
+		Uniform.Binding = Refl.get_decoration(Res.id, spv::Decoration::DecorationBinding);
+
+		Data.Uniforms.push_back(Uniform);
+	}
+	for (auto& Res : ResourceRefl.separate_images)
+	{
+		uint32 binding_index = Refl.get_decoration(Res.id, spv::Decoration::DecorationBinding);
+
+		auto imageType = Refl.get_type(Res.base_type_id).image;
+		auto componentType = Refl.get_type(imageType.type).basetype;
+
+		bool isCompareSampler = false;
+		for (auto& sampler : ResourceRefl.separate_samplers)
+		{
+			if (binding_index + kSpirvSamplerShift == Refl.get_decoration(sampler.id, spv::Decoration::DecorationBinding))
+			{
+				//std::string samplerName = Refl.get_name(sampler.id);
+				isCompareSampler = Refl.variable_is_depth_or_compare(sampler.id);
+				break;
+			}
+		}
+
+		FShadercUniform Uniform;
+		Uniform.Name = Refl.get_name(Res.id);
+		Uniform.Type = SUT_Texture;
+		Uniform.Num = 1;
+		Uniform.Binding = uint16(binding_index);
+
+		Uniform.TexComponent = textureComponentTypeToId(SpirvCrossBaseTypeToFormatType(componentType, imageType.depth));
+		Uniform.TexDimension = TranslateTextureDimension(imageType.dim, imageType.arrayed);
+		Uniform.TexFormat = uint16(imageType.format);
+
+
+		Data.Uniforms.push_back(Uniform);
+	}
+
 }
 
 void FShadercFactory::CompileShaders(const FShadercSource& InSource, const FRHIShaderCompileOptions& InOptions, FShadercCompiledData& OutData)

@@ -19,7 +19,7 @@ public:
 	void SetScreenSize(uint32 InWidth, uint32 InHeight);
 	FSceneUniform& GetSceneParams() { return mSceneParams; }
 	const Ref<FRHIUniformBuffer>& GetSceneUB() const { return mSceneUB; }
-	const Ref<FRHIUniformBufferDynamic>& GetmModelUB() const { return mModelUB; }
+	const Ref<FRHIUniformBufferDynamic>& GetModelUB() const { return mModelUB; }
 
 protected:
 	FSceneProxy* mSceneProxy = nullptr;

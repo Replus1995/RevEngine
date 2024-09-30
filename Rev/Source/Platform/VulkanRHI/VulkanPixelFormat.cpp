@@ -4,16 +4,26 @@
 namespace Rev
 {
 
-struct FVkFormatMapping
-{
-	EPixelFormat RevFormat;
-	FVulkanFormatInfo FormatInfo;
-};
+constexpr VkFormat sVkFormatMappings[] = {
+	VK_FORMAT_UNDEFINED,
+	VK_FORMAT_R8_UNORM,
+	VK_FORMAT_R8_UINT,
+	VK_FORMAT_R8_SINT,
+	VK_FORMAT_R16_UNORM,
+	VK_FORMAT_R16_UINT,
+	VK_FORMAT_R16_SINT,
+	VK_FORMAT_R16_SFLOAT,
+	VK_FORMAT_R32_UINT,
+	VK_FORMAT_R32_SINT,
+	VK_FORMAT_R32_SFLOAT,
+	VK_FORMAT_R8G8_UNORM,
+	VK_FORMAT_R16G16_UNORM,
+	VK_FORMAT_R16G16_SFLOAT,
+	VK_FORMAT_R32G32_SFLOAT,
 
-constexpr FVkFormatMapping sVkFormatMappings[] = {
-	{ PF_Unknown,		{ VK_FORMAT_UNDEFINED,				0, 0 } },
-	{ PF_R32G32B32A32F, { VK_FORMAT_R32G32B32A32_SFLOAT,	4, 4 } },
-	{ PF_R8G8B8A8,		{ VK_FORMAT_R8G8B8A8_UNORM,			4, 1 } },
+
+	{ PF_RGBA32F, { VK_FORMAT_R32G32B32A32_SFLOAT,	4, 4 } },
+	{ PF_RGBA8,		{ VK_FORMAT_R8G8B8A8_UNORM,			4, 1 } },
 	{ PF_R8,			{ VK_FORMAT_R8_UNORM,				1, 1 } },
 	{ PF_R16,			{ VK_FORMAT_R16_UNORM,				1, 2 } },
 	{ PF_RGB8,			{ VK_FORMAT_R8G8B8_UNORM,			3, 1 } },
@@ -22,27 +32,8 @@ constexpr FVkFormatMapping sVkFormatMappings[] = {
 };
 
 
-FVulkanFormatInfo FVkPixelFormat::TranslatePixelFormat(EPixelFormat InFormat, bool bSRGB)
+void FVkPixelFormat::InitPlatformFormats()
 {
-	REV_CORE_ASSERT(InFormat != EPixelFormat::PF_Unknown);
-	if (!bSRGB)
-	{
-		return sVkFormatMappings[InFormat].FormatInfo;
-	}
-	else
-	{
-		/*switch (InFormat)
-		{
-		case Rev::PF_R8G8B8A8:
-			return { GL_SRGB8_ALPHA8, GL_RGBA, GL_UNSIGNED_BYTE, 4 };
-		case Rev::PF_RGB8:
-			return { GL_SRGB8, GL_RGB, GL_UNSIGNED_BYTE, 3 };
-		default:
-			break;
-		}
-		REV_CORE_ASSERT(false, "Unknown SRGB format");*/
-		return { VK_FORMAT_UNDEFINED, 0, 0 };
-	}
 }
 
 }

@@ -15,7 +15,6 @@ public:
 	virtual const FRHISampler* GetSampler() const override;
 	virtual void ClearMipData(uint8 InMipLevel) override;
 
-	const FVulkanFormatInfo& GetFormatInfo() const { return mFormatInfo; }
 	void Transition(VkImageLayout DstLayout, VkCommandBuffer InCmdBuffer = VK_NULL_HANDLE);
 	void Transition(VkImageLayout SrcLayout, VkImageLayout DstLayout, VkCommandBuffer InCmdBuffer = VK_NULL_HANDLE);
 
@@ -29,7 +28,6 @@ protected:
 	VkExtent3D CalculateMipSize3D(uint32 InMipLevel);
 	VkClearValue GetClearValue();
 protected:
-	FVulkanFormatInfo mFormatInfo;
 	VkImage mImage = VK_NULL_HANDLE;
 	VkImageView mImageView = VK_NULL_HANDLE;
 	VkImageLayout mImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;

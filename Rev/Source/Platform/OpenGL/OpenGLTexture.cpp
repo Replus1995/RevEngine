@@ -45,13 +45,13 @@ void FOpenGLTexture::FillClearColor(FClearColorBuffer& OutBuffer)
 {
 	switch (mDesc.Format)
 	{
-	case PF_R32G32B32A32F:
+	case PF_RGBA32F:
 	{
 		Math::FLinearColor& ClearColor = *OutBuffer.DataAs<Math::FLinearColor>();
 		ClearColor = mDesc.ClearColor.RGBA;
 		break;
 	}
-	case PF_R8G8B8A8:
+	case PF_RGBA8:
 	case PF_RGB8:
 	{
 		Math::FColor& ClearColor = *OutBuffer.DataAs<Math::FColor>();

@@ -40,9 +40,9 @@ FVulkanTexture::FVulkanTexture(const FTextureDesc& InDesc, const FSamplerDesc& I
     : FRHITexture(InDesc)
     , mFormatInfo(FVkPixelFormat::TranslatePixelFormat(InDesc.Format, InDesc.bSRGB))
 {
-	if (FPixelFormatUtils::HasDepth(InDesc.Format))
+	if (FPixelFormatInfo::HasDepth(InDesc.Format))
 		mImageAspectFlags |= VK_IMAGE_ASPECT_DEPTH_BIT;
-	if (FPixelFormatUtils::HasStencil(InDesc.Format))
+	if (FPixelFormatInfo::HasStencil(InDesc.Format))
 		mImageAspectFlags |= VK_IMAGE_ASPECT_STENCIL_BIT;
 	if (mImageAspectFlags == VK_IMAGE_ASPECT_NONE)
 		mImageAspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;

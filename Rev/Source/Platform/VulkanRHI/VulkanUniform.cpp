@@ -13,7 +13,7 @@ FVulkanUniformBuffer::FVulkanUniformBuffer(uint32 InSize, uint32 InBinding)
 	VkBufferUsageFlags BufferUsage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
 	Allocate(InSize, BufferUsage, VMA_MEMORY_USAGE_CPU_TO_GPU);
 
-	VkDescriptorSetLayoutBinding LayoutBinding{};
+	/*VkDescriptorSetLayoutBinding LayoutBinding{};
 	LayoutBinding.binding = mBinding;
 	LayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 	LayoutBinding.descriptorCount = 1;
@@ -25,7 +25,7 @@ FVulkanUniformBuffer::FVulkanUniformBuffer(uint32 InSize, uint32 InBinding)
 	LayoutCreateInfo.bindingCount = 1;
 	LayoutCreateInfo.pBindings = &LayoutBinding;
 
-	REV_VK_CHECK_THROW(vkCreateDescriptorSetLayout(FVulkanCore::GetDevice(), &LayoutCreateInfo, nullptr, &mDescSetLayout), "failed to create descriptor set layout!");
+	REV_VK_CHECK_THROW(vkCreateDescriptorSetLayout(FVulkanCore::GetDevice(), &LayoutCreateInfo, nullptr, &mDescSetLayout), "failed to create descriptor set layout!");*/
 
 	//mDescSet = FVulkanCore::GetContext()->GetDescriptorPool().Allocate(FVulkanCore::GetDevice(), mDescSetLayout);
 
@@ -36,7 +36,7 @@ FVulkanUniformBuffer::~FVulkanUniformBuffer()
 {
 	FVulkanCore::GetUniformManager()->RemoveBuffer(this);
 
-	vkDestroyDescriptorSetLayout(FVulkanCore::GetDevice(), mDescSetLayout, nullptr);
+	//vkDestroyDescriptorSetLayout(FVulkanCore::GetDevice(), mDescSetLayout, nullptr);
 }
 
 void FVulkanUniformBuffer::UpdateSubData(const void* Data, uint32 Size, uint32 Offset)
@@ -73,7 +73,7 @@ FVulkanUniformBufferDynamic::FVulkanUniformBufferDynamic(uint32 InSize, uint32 I
 	VkBufferUsageFlags BufferUsage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
 	Allocate(InSize, BufferUsage, VMA_MEMORY_USAGE_CPU_TO_GPU);
 
-	VkDescriptorSetLayoutBinding LayoutBinding{};
+	/*VkDescriptorSetLayoutBinding LayoutBinding{};
 	LayoutBinding.binding = mBinding;
 	LayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
 	LayoutBinding.descriptorCount = 1;
@@ -85,7 +85,7 @@ FVulkanUniformBufferDynamic::FVulkanUniformBufferDynamic(uint32 InSize, uint32 I
 	LayoutCreateInfo.bindingCount = 1;
 	LayoutCreateInfo.pBindings = &LayoutBinding;
 
-	REV_VK_CHECK_THROW(vkCreateDescriptorSetLayout(FVulkanCore::GetDevice(), &LayoutCreateInfo, nullptr, &mDescSetLayout), "failed to create descriptor set layout!");
+	REV_VK_CHECK_THROW(vkCreateDescriptorSetLayout(FVulkanCore::GetDevice(), &LayoutCreateInfo, nullptr, &mDescSetLayout), "failed to create descriptor set layout!");*/
 
 	FVulkanCore::GetUniformManager()->AddBuffer(this);
 }
@@ -94,7 +94,7 @@ FVulkanUniformBufferDynamic::~FVulkanUniformBufferDynamic()
 {
 	FVulkanCore::GetUniformManager()->RemoveBuffer(this);
 
-	vkDestroyDescriptorSetLayout(FVulkanCore::GetDevice(), mDescSetLayout, nullptr);
+	//vkDestroyDescriptorSetLayout(FVulkanCore::GetDevice(), mDescSetLayout, nullptr);
 }
 
 uint32 FVulkanUniformBufferDynamic::UpdateSubData(const void* Data, uint32 Size)
@@ -146,14 +146,14 @@ void FVulkanUniformManager::RemoveBuffer(FVulkanUniformBufferDynamic* InBuffer)
 std::vector<VkDescriptorSetLayout> FVulkanUniformManager::GetLayouts() const
 {
 	std::vector<VkDescriptorSetLayout> Layouts;
-	for (const FVulkanUniformBuffer* Buffer : mBufferVec)
+	/*for (const FVulkanUniformBuffer* Buffer : mBufferVec)
 	{
 		Layouts.push_back(Buffer->GetLayout());
 	}
 	for (const FVulkanUniformBufferDynamic* Buffer : mBufferDynamicVec)
 	{
 		Layouts.push_back(Buffer->GetLayout());
-	}
+	}*/
 	return Layouts;
 }
 

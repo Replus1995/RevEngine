@@ -103,7 +103,7 @@ EPixelFormat FSTBImage2D::GetDesiredFormat(int InChannels, int InPixelDepth)
 	{
 		switch (InPixelDepth)
 		{
-		case 8: return PF_R8G8B8A8;
+		case 8: return PF_RGBA8;
 		default: break;
 		}
 		break;

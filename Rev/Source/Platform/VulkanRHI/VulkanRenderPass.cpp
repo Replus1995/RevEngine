@@ -35,12 +35,12 @@ void FVulkanRenderPass::CreateResource()
 		AttachmentDesc.samples = VK_SAMPLE_COUNT_1_BIT;
 		AttachmentDesc.loadOp = FVulkanEnum::Translate(InAttachmentDesc.LoadOp);
 		AttachmentDesc.storeOp = FVulkanEnum::Translate(InAttachmentDesc.StoreOp);
-		AttachmentDesc.stencilLoadOp = FPixelFormatUtils::HasStencil(InFormat) ? FVulkanEnum::Translate(InAttachmentDesc.StencilLoadOp) : VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-		AttachmentDesc.stencilStoreOp = FPixelFormatUtils::HasStencil(InFormat) ? FVulkanEnum::Translate(InAttachmentDesc.StencilStoreOp) : VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		AttachmentDesc.stencilLoadOp = FPixelFormatInfo::HasStencil(InFormat) ? FVulkanEnum::Translate(InAttachmentDesc.StencilLoadOp) : VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		AttachmentDesc.stencilStoreOp = FPixelFormatInfo::HasStencil(InFormat) ? FVulkanEnum::Translate(InAttachmentDesc.StencilStoreOp) : VK_ATTACHMENT_STORE_OP_DONT_CARE;
 		AttachmentDesc.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		AttachmentDesc.finalLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
 
-		if (FPixelFormatUtils::HasDepth(InFormat))
+		if (FPixelFormatInfo::HasDepth(InFormat))
 			nDepthStencilAttachmentIndex = i;
 
 		AttachmentDescs.emplace_back(std::move(AttachmentDesc));
