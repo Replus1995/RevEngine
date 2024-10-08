@@ -119,18 +119,6 @@ Ref<FRHIIndexBuffer> FRHICore::CreateIndexBuffer(const void* InIndices, uint32 I
 	return nullptr;
 }
 
-Ref<FRHIVertexArray> FRHICore::CreateVertexArray()
-{
-	switch (GetRenderAPI())
-	{
-	case ERenderAPI::None:    REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
-	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLVertexArray>();
-	}
-
-	REV_CORE_ASSERT(false, "Unknown RenderAPI!");
-	return nullptr;
-}
-
 Ref<FRHIUniformBuffer> FRHICore::CreateUniformBuffer(uint32 InSize, uint32 InBinding)
 {
 	switch (GetRenderAPI())

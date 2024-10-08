@@ -71,7 +71,7 @@ void FSkyProxy::SyncResource() const
 {
 	if (auto& EnvTex = mSkybox.GetEnvironmentTexture(); EnvTex)
 	{
-		RenderCmd::BindTexture(EnvTex->GetResource(), UL::SEnviornmentTex);
+		//RenderCmd::BindTexture(EnvTex->GetResource(), UL::SEnviornmentTex);
 	}
 	if (!mSkyboxMat)
 	{

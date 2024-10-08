@@ -55,9 +55,9 @@ public:
             Ref<FRHIIndexBuffer> boxIndices = FRHICore::CreateIndexBuffer(sBoxIndices, sizeof(uint32), boxIndicesCount);
 
             FMeshPrimitive boxMeshPrim;
-            boxMeshPrim.VertexData = FRHICore::CreateVertexArray();
-            boxMeshPrim.VertexData->AddVertexBuffer(boxVertices);
-            boxMeshPrim.VertexData->SetIndexBuffer(boxIndices);
+            boxMeshPrim.PrimitiveData = FRHICore::CreatePrimitive(PT_Triangles);
+            boxMeshPrim.PrimitiveData->AddVertexBuffer(boxVertices);
+            boxMeshPrim.PrimitiveData->SetIndexBuffer(boxIndices);
 
             boxPrimArr.emplace_back(std::move(boxMeshPrim));
         }

@@ -37,7 +37,7 @@ public:
 	}
 
 };
- 
+
 struct alignas(16) FSceneUniform
 {
 	FRect2D ViewExtent;

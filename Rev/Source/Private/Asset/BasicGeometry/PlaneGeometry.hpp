@@ -29,7 +29,7 @@ public:
         std::vector<FMeshPrimitive> planePrimArr;
         {
             FMeshPrimitive planeMeshPrim;
-            planeMeshPrim.VertexData = MakeVertexData();
+            planeMeshPrim.PrimitiveData = MakeVertexData();
             planePrimArr.emplace_back(std::move(planeMeshPrim));
         }
 
@@ -39,7 +39,7 @@ public:
         return OutMesh;
     }
 
-    static Ref<FRHIVertexArray> MakeVertexData()
+    static Ref<FRHIPrimitive> MakeVertexData()
     {
         constexpr uint32 planeVerticesSize = sizeof(sPlaneVertices);
         Ref<FRHIVertexBuffer> planeVertices = FRHICore::CreateVertexBuffer(sPlaneVertices, planeVerticesSize);
@@ -51,7 +51,7 @@ public:
         constexpr uint32 planeIndicesCount = sizeof(sPlaneIndices) / sizeof(uint32);
         Ref<FRHIIndexBuffer> planeIndices = FRHICore::CreateIndexBuffer(sPlaneIndices, sizeof(uint32), planeIndicesCount);
 
-        Ref<FRHIVertexArray> Result = FRHICore::CreateVertexArray();
+        Ref<FRHIPrimitive> Result = FRHICore::CreatePrimitive(PT_Triangles);
         Result->AddVertexBuffer(planeVertices);
         Result->SetIndexBuffer(planeIndices);
         return Result;

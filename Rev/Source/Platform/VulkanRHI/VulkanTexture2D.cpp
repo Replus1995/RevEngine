@@ -34,7 +34,7 @@ void FVulkanTexture2D::UpdateLayerData(const void* InData, uint32 InSize, uint8 
     REV_CORE_ASSERT(InMipLevel < mDesc.NumMips, "MipLevel out of range");
 
     VkExtent2D MipSize = CalculateMipSize2D(InMipLevel);
-    REV_CORE_ASSERT(InSize == MipSize.width * MipSize.height * mFormatInfo.Channels * mFormatInfo.PixelDepth, "Data size mismatch");
+    REV_CORE_ASSERT(InSize == MipSize.width * MipSize.height * GPixelFormats[mDesc.Format].BlockBytes, "Data size mismatch");
 
     FVulkanUtils::ImmediateUploadImage(mImage, mImageAspectFlags, { MipSize.width, MipSize.height, 1 }, InData, InSize, InMipLevel, 0, 0);
 }
@@ -53,13 +53,15 @@ void FVulkanTexture2D::CreateResource()
     REV_CORE_ASSERT(FVulkanCore::GetDevice());
     REV_CORE_ASSERT(FVulkanCore::GetAllocator());
 
+    VkFormat ImageFormat = (VkFormat)GPixelFormats[mDesc.Format].PlatformFormat;
+
     VkImageCreateInfo ImageCreateInfo{};
     ImageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     ImageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
     ImageCreateInfo.extent = GetExtent();
     ImageCreateInfo.mipLevels = mDesc.NumMips;
     ImageCreateInfo.arrayLayers = mDesc.ArraySize;
-    ImageCreateInfo.format = mFormatInfo.Format;
+    ImageCreateInfo.format = ImageFormat;
     ImageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
     ImageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
     ImageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
@@ -80,7 +82,7 @@ void FVulkanTexture2D::CreateResource()
     ImageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
     ImageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
     ImageViewCreateInfo.image = mImage;
-    ImageViewCreateInfo.format = mFormatInfo.Format;
+    ImageViewCreateInfo.format = ImageFormat;
     ImageViewCreateInfo.subresourceRange.baseMipLevel = 0;
     ImageViewCreateInfo.subresourceRange.levelCount = 1;
     ImageViewCreateInfo.subresourceRange.baseArrayLayer = 0;

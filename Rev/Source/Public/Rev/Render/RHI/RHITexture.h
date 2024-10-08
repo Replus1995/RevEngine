@@ -58,7 +58,7 @@ struct FTextureDesc
 	uint16 Depth = 1; //For 3D Texture
 	uint16 ArraySize = 1; //For Texture Array
 	ETextureDimension Dimension = ETextureDimension::Texture2D;
-	EPixelFormat Format = PF_RGBA8;
+	EPixelFormat Format = PF_R8G8B8A8;
 	bool bSRGB = false;
 	uint8 NumMips = 1;
 	uint8 NumSamples = 1; //For MSAA

@@ -7,7 +7,6 @@ namespace Rev
 {
 
 class SurfaceMaterial;
-class FRHIVertexArray;
 class REV_API Mesh
 {
 public:

@@ -19,7 +19,7 @@ FStaticMeshProxy::~FStaticMeshProxy()
 {
 }
 
-void FStaticMeshProxy::Prepare(const Ref<FScene>& Scene, FRenderer* Renderer)
+void FStaticMeshProxy::Prepare(const Ref<FScene>& Scene)
 {
 	// Todo:
 		// update data only if dirty
@@ -32,7 +32,6 @@ void FStaticMeshProxy::Prepare(const Ref<FScene>& Scene, FRenderer* Renderer)
 		FStaticMeshRenderData RenderData;
 		RenderData.MeshData = MeshComp.StaticMesh;
 		RenderData.ModelParams.ModelMat = TransComp.Transform.ToMatrix();
-		RenderData.DynamicOffset = Renderer->GetModelUB()->UpdateSubData(&RenderData.ModelParams, sizeof(FStaticMeshUniform));
 		mRenderDataArr.emplace_back(std::move(RenderData));
 	}
 
@@ -47,15 +46,15 @@ void FStaticMeshProxy::FreeResource()
 {
 }
 
-void FStaticMeshProxy::DrawMeshes(const FRenderer* Renderer, EMaterialBlendMode InBlend, bool bUseMeshMaterial)
+void FStaticMeshProxy::DrawMeshes(EMaterialBlendMode InBlend, bool bUseMeshMaterial)
 {
 	for (auto& RenderData : mRenderDataArr)
 	{
-		DrawPrimitives(RenderData, Renderer, InBlend, bUseMeshMaterial);
+		DrawPrimitives(RenderData, InBlend, bUseMeshMaterial);
 	}
 }
 
-void FStaticMeshProxy::DrawPrimitives(const FStaticMeshRenderData& InData, const FRenderer* Renderer, EMaterialBlendMode InBlend, bool bUseMeshMaterial) const
+void FStaticMeshProxy::DrawPrimitives(const FStaticMeshRenderData& InData, EMaterialBlendMode InBlend, bool bUseMeshMaterial) const
 {
 	for (uint32 i = 0; i < InData.MeshData->GetMaterialCount(); i++)
 	{
@@ -73,7 +72,7 @@ void FStaticMeshProxy::DrawPrimitives(const FStaticMeshRenderData& InData, const
 
 			for (auto& pPrimitive : vPrimitives)
 			{
-				RenderCmd::DrawPrimitive(pPrimitive->PrimitiveData, pMat->GetProgram(), Renderer->GetModelUB(), InData.DynamicOffset);
+				RenderCmd::DrawPrimitive(pPrimitive->PrimitiveData, pMat->GetProgram());
 			}
 
 			if (bUseMeshMaterial)

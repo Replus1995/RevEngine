@@ -38,7 +38,6 @@ void FVulkanTexture::Transition(VkImageLayout SrcLayout, VkImageLayout DstLayout
 
 FVulkanTexture::FVulkanTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc)
     : FRHITexture(InDesc)
-    , mFormatInfo(FVkPixelFormat::TranslatePixelFormat(InDesc.Format, InDesc.bSRGB))
 {
 	if (FPixelFormatInfo::HasDepth(InDesc.Format))
 		mImageAspectFlags |= VK_IMAGE_ASPECT_DEPTH_BIT;
@@ -74,7 +73,7 @@ VkClearValue FVulkanTexture::GetClearValue()
 		for (size_t i = 0; i < 4; i++)
 		{
 			ClearValue.color.float32[i] = mDesc.ClearColor.RGBA[i];
-			switch (mFormatInfo.PixelDepth)
+			switch (GPixelFormats[mDesc.Format].NumComponents)
 			{
 			case 1:
 				ClearValue.color.int32[i] = int32(mDesc.ClearColor.RGBA.R * float(0x7F));

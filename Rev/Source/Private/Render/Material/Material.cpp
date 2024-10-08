@@ -14,7 +14,7 @@ Material::~Material()
 
 void Material::PreDraw()
 {
-	RenderCmd::BindProgram(mProgram);
+	//RenderCmd::BindProgram(mProgram);
 }
 
 void Material::PostDraw()

@@ -42,14 +42,14 @@ FMeshPrimitive FMeshPrimitiveStorage::CreateVertexData()
 	if (TangentData.Empty())
 		CalculateTangents();
 
-	Ref<FRHIVertexArray> VertexArr = FRHICore::CreateVertexArray();
+	Ref<FRHIPrimitive> Primitive = FRHICore::CreatePrimitive(PT_Triangles);
 	//Position
 	{
 		Ref<FRHIVertexBuffer> PositionBuffer = FRHICore::CreateVertexBuffer(PositonData.DataAs<float>(), PositonData.Size());
 		PositionBuffer->SetLayout({
 			{"Position", EVertexElementType::Float3,  0}
 			});
-		VertexArr->AddVertexBuffer(PositionBuffer);
+		Primitive->AddVertexBuffer(PositionBuffer);
 	}
 	//Normal
 	{
@@ -57,7 +57,7 @@ FMeshPrimitive FMeshPrimitiveStorage::CreateVertexData()
 		NormalBuffer->SetLayout({
 			{"Normal", EVertexElementType::Float3,  1}
 			});
-		VertexArr->AddVertexBuffer(NormalBuffer);
+		Primitive->AddVertexBuffer(NormalBuffer);
 	}
 	//Tangent
 	{
@@ -65,7 +65,7 @@ FMeshPrimitive FMeshPrimitiveStorage::CreateVertexData()
 		TangentBuffer->SetLayout({
 			{"Tangent", EVertexElementType::Float4,  2}
 			});
-		VertexArr->AddVertexBuffer(TangentBuffer);
+		Primitive->AddVertexBuffer(TangentBuffer);
 	}
 	//TexCoord
 	{
@@ -73,15 +73,15 @@ FMeshPrimitive FMeshPrimitiveStorage::CreateVertexData()
 		TexCoordBuffer->SetLayout({
 			{"TexCoord0", EVertexElementType::Float2,  3}
 			});
-		VertexArr->AddVertexBuffer(TexCoordBuffer);
+		Primitive->AddVertexBuffer(TexCoordBuffer);
 	}
 
 	Ref<FRHIIndexBuffer> IndexBuffer = FRHICore::CreateIndexBuffer(IndexData.Data(), IndexStride, IndexCount);
-	VertexArr->SetIndexBuffer(IndexBuffer);
+	Primitive->SetIndexBuffer(IndexBuffer);
 
 	FMeshPrimitive Result;
 	Result.MaterialIndex = MaterialIndex;
-	Result.VertexData = VertexArr;
+	Result.PrimitiveData = Primitive;
 	return Result;
 }
 

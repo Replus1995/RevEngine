@@ -28,7 +28,7 @@ public:
 	static void SetClearColor(const Math::FLinearColor& color);
 	static void ClearBackBuffer();
 
-	static void DrawPrimitive(const Ref<FRHIPrimitive>& InPrimitive, const Ref<FRHIShaderProgram>& InProgram, const Ref<FRHIUniformBufferDynamic>& InUniformBufferDynamic, uint32 InDynamicOffset);
+	static void DrawPrimitive(const Ref<FRHIPrimitive>& InPrimitive, const Ref<FRHIShaderProgram>& InProgram);
 
 	static FRHIContext* GetContext();
 };

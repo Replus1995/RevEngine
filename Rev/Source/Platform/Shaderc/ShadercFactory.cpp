@@ -178,7 +178,7 @@ void FShadercFactory::ReflectUniformInfo(FShadercCompiledData& Data)
 		Uniform.Num = 1;
 		Uniform.Binding = uint16(binding_index);
 
-		Uniform.TexComponent = textureComponentTypeToId(SpirvCrossBaseTypeToFormatType(componentType, imageType.depth));
+		Uniform.TexComponent = TextureComponentTypeToId(SpirvCrossBaseTypeToFormatType(componentType, imageType.depth));
 		Uniform.TexDimension = TranslateTextureDimension(imageType.dim, imageType.arrayed);
 		Uniform.TexFormat = uint16(imageType.format);
 

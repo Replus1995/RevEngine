@@ -1,5 +1,6 @@
 #include "VulkanCore.h"
 #include "VulkanUniform.h"
+#include "VulkanPixelFormat.h"
 #include "Rev/Core/Assert.h"
 #include "Rev/Render/RenderCmd.h"
 

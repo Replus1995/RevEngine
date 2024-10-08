@@ -4,7 +4,7 @@
 
 namespace Rev
 {
-class FVkPixelFormat
+class FVulkanPixelFormat
 {
 public:
 	static void InitPlatformFormats();

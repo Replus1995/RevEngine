@@ -1,10 +1,11 @@
 #pragma once
 #include "Rev/Core/Base.h"
 #include "Rev/Render/RenderCore.h"
+#include "Rev/Render/RHI/RHIPrimitive.h"
 
 namespace Rev
 {
-class FRHIPrimitive;
+
 struct FMeshPrimitive
 {
 public:

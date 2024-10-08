@@ -137,7 +137,7 @@ EPixelFormat FGLTFUtils::TranslateImageFormat(const tinygltf::Image& InImage)
 		switch (InImage.pixel_type)
 		{
 		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
-			return PF_RGB8;
+			return PF_R8G8B8;
 		default:
 			break;
 		}
@@ -148,9 +148,9 @@ EPixelFormat FGLTFUtils::TranslateImageFormat(const tinygltf::Image& InImage)
 		switch (InImage.pixel_type)
 		{
 		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
-			return PF_RGBA8;
+			return PF_R8G8B8A8;
 		case TINYGLTF_COMPONENT_TYPE_FLOAT:
-			return PF_RGBA32F;
+			return PF_R32G32B32A32_FLOAT;
 		default:
 			break;
 		}

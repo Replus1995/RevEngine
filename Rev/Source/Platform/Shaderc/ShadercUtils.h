@@ -5,6 +5,7 @@
 #include "Rev/Render/RenderCore.h"
 #include "Rev/Render/RHI/RHIShader.h"
 #include "Rev/Render/RHI/RHIShaderCompile.h"
+#include "Rev/Render/RHI/RHITexture.h"
 #include <map>
 #include <filesystem>
 

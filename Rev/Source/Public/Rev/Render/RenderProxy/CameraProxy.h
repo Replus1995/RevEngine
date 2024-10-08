@@ -24,7 +24,7 @@ public:
 	const Math::FMatrix4& GetInvViewProjMat() const { return mCameraParams.InvViewProjMat; }
 
 private:
-	FCameraUniform mCameraParams;
+	FSceneUniform mCameraParams;
 };
 
 }

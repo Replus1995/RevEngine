@@ -45,7 +45,7 @@ void PBRMaterial::PreDraw()
 	//FAssetLibrary::GetDefaultWhiteTexture()->GetResource()->Bind(0);
 	//FAssetLibrary::GetDefaultNormalTexture()->GetResource()->Bind(1);
 	
-	if (BaseColorTexture)
+	/*if (BaseColorTexture)
 		RenderCmd::BindTexture(BaseColorTexture->GetResource(), UL::SBaseColorTex);
 	if (MetallicRoughnessTexture)
 		RenderCmd::BindTexture(MetallicRoughnessTexture->GetResource(), UL::SMetallicRoughnessTex);
@@ -54,7 +54,7 @@ void PBRMaterial::PreDraw()
 	if (OcclusionTexture)
 		RenderCmd::BindTexture(OcclusionTexture->GetResource(), UL::SOcclusionTex);
 	if (EmissiveTexture)
-		RenderCmd::BindTexture(EmissiveTexture->GetResource(), UL::SEmissiveTex);
+		RenderCmd::BindTexture(EmissiveTexture->GetResource(), UL::SEmissiveTex);*/
 }
 
 }

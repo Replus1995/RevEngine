@@ -6,8 +6,8 @@
 namespace Rev
 {
 
-static Ref<FRHIVertexArray> sScreenQuad = nullptr;
-static Ref<FRHIVertexArray> CreateScreenQuad()
+static Ref<FRHIPrimitive> sScreenQuad = nullptr;
+static Ref<FRHIPrimitive> CreateScreenQuad()
 {
     constexpr float ScreenQuadVertices[] = {
         -1.0, -1.0, 0.0,
@@ -30,10 +30,10 @@ static Ref<FRHIVertexArray> CreateScreenQuad()
     constexpr uint32 IndexCount = sizeof(ScreenQuadIndices) / sizeof(uint16);
     Ref<FRHIIndexBuffer> IndexBuffer = FRHICore::CreateIndexBuffer(ScreenQuadIndices, sizeof(uint16), IndexCount);
 
-    Ref<FRHIVertexArray> VertexArray = FRHICore::CreateVertexArray();
-    VertexArray->AddVertexBuffer(VertexBuffer);
-    VertexArray->SetIndexBuffer(IndexBuffer);
-    return VertexArray;
+    Ref<FRHIPrimitive> Primitive = FRHICore::CreatePrimitive(PT_Triangles);
+    Primitive->AddVertexBuffer(VertexBuffer);
+    Primitive->SetIndexBuffer(IndexBuffer);
+    return Primitive;
 }
 
 void RenderUtils::Init()
@@ -49,7 +49,7 @@ void RenderUtils::Shutdown()
 
 void RenderUtils::DrawScreenQuad()
 {
-    RenderCmd::Draw(sScreenQuad);
+    //RenderCmd::DrawPrimitive(sScreenQuad,)
 }
 
 }

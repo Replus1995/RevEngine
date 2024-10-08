@@ -18,7 +18,7 @@ FRenderPass::~FRenderPass()
 void FRenderPass::BeginPass()
 {
 	mInPass = true;
-	RenderCmd::BindRenderTarget(mRenderTarget);
+	//RenderCmd::BindRenderTarget(mRenderTarget);
 }
 
 void FRenderPass::EndPass()

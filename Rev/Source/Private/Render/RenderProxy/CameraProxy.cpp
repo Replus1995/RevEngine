@@ -25,7 +25,7 @@ void FCameraProxy::Prepare(const Ref<FScene>& Scene)
 
 void FCameraProxy::SyncResource(const FRenderer* Renderer)
 {
-	Renderer->GetBuiltInUB()->UpdateSubData(&mCameraParams, sizeof(FCameraUniform), REV_CAMERA_UNIFORM_OFFSET);
+	//Renderer->GetBuiltInUB()->UpdateSubData(&mCameraParams, sizeof(FCameraUniform), REV_CAMERA_UNIFORM_OFFSET);
 }
 
 void FCameraProxy::FreeResource()
