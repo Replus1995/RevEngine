@@ -7,8 +7,8 @@
 namespace Rev
 {
 
-FForwardRenderer::FForwardRenderer(uint32 InWidth, uint32 InHeight, FSceneProxy* InSceneProxy)
-	: FRenderer(InWidth, InHeight, InSceneProxy)
+FForwardRenderer::FForwardRenderer(FSceneProxy* InSceneProxy)
+	: FRenderer(InSceneProxy)
 {
 }
 

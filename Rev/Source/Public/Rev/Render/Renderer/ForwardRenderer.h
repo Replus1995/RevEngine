@@ -9,7 +9,7 @@ namespace Rev
 class FForwardRenderer : public FRenderer
 {
 public:
-	FForwardRenderer(uint32 InWidth, uint32 InHeight, FSceneProxy* InSceneProxy);
+	FForwardRenderer(FSceneProxy* InSceneProxy);
 	virtual ~FForwardRenderer();
 
 	virtual void BeginFrame() override;

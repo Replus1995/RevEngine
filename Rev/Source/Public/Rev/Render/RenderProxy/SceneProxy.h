@@ -10,7 +10,6 @@
 
 namespace Rev
 {
-class FRenderer;
 class FScene;
 class FSceneProxy
 {
@@ -20,13 +19,15 @@ public:
 
 
 	void Prepare(const Ref<FScene>& Scene);
-	void SyncResource(const FRenderer* Renderer);
+	void SyncResource();
 	void FreeResource();
 	void Cleanup();
 
-	void DrawScene(const FRenderer* Renderer);
+	void DrawScene();
 
 protected:
+	FSceneUniform mSceneParams;
+	Ref<FRHIUniformBuffer> mSceneUB;
 
 	FCameraProxy mCameraProxy;
 	FStaticMeshProxy mStaticMeshProxy;

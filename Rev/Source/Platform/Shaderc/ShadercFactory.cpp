@@ -187,16 +187,35 @@ void FShadercFactory::ReflectUniformInfo(FShadercCompiledData& Data)
 	spirv_cross::CompilerReflection Refl(Data.Binary.DataAs<uint32_t>(), Data.Binary.Size() / sizeof(uint32_t));
 	spirv_cross::ShaderResources ResourceRefl = Refl.get_shader_resources();
 
+#ifdef REV_DEBUG
+	REV_CORE_TRACE("Shaderc::Reflect - {0} {1}", Data.Name.c_str(), FShadercUtils::ShaderStageToString(Data.Stage));
+	REV_CORE_TRACE("Buffers:");
+#endif
+
 	for (auto& Res : ResourceRefl.uniform_buffers)
 	{
+		const auto& BufferType = Refl.get_type(Res.base_type_id);
+		size_t BufferSize = Refl.get_declared_struct_size(BufferType);
+		size_t MemberCount = BufferType.member_types.size();
+
 		FShadercUniform Uniform;
-		Uniform.Name = Refl.get_name(Res.id);
+		Uniform.Name = Res.name;
 		Uniform.Type = SUT_Buffer;
 		Uniform.Num = 1;
 		Uniform.Binding = Refl.get_decoration(Res.id, spv::Decoration::DecorationBinding);
 
 		Data.Uniforms.push_back(Uniform);
+
+
+#ifdef REV_DEBUG
+		REV_CORE_TRACE("  {0}: Binding = {1}, Size = {2}, Members = {3}", Uniform.Name.c_str(), Uniform.Binding, BufferSize, MemberCount);
+#endif
 	}
+
+#ifdef REV_DEBUG
+	REV_CORE_TRACE("Images:");
+#endif
+
 	for (auto& Res : ResourceRefl.separate_images)
 	{
 		uint32 binding_index = Refl.get_decoration(Res.id, spv::Decoration::DecorationBinding);
@@ -216,14 +235,17 @@ void FShadercFactory::ReflectUniformInfo(FShadercCompiledData& Data)
 		}
 
 		FShadercUniform Uniform;
-		Uniform.Name = Refl.get_name(Res.id);
-		Uniform.Type = SUT_Texture;
+		Uniform.Name = Res.name;
+		Uniform.Type = SUT_Image;
 		Uniform.Num = 1;
 		Uniform.Binding = uint16(binding_index);
 
 		Uniform.TexFormat = sSpirvFormatMapping[uint32(imageType.format)];
 		Uniform.TexDimension = TranslateTextureDimension(imageType.dim, imageType.arrayed);
 
+#ifdef REV_DEBUG
+		REV_CORE_TRACE("	Texture: {0} -> {1}", Uniform.Name.c_str(), Uniform.Binding);
+#endif
 
 		Data.Uniforms.push_back(Uniform);
 	}
@@ -239,8 +261,16 @@ void FShadercFactory::CompileShaders(const FShadercSource& InSource, const FRHIS
 	InitCompileOptions(options);
 	AddCompileMacros(options, InOptions.Macros);
 
+	shaderc_shader_kind kind = ShaderStageToShadercKind(InSource.Stage);
+
 	{
-		shaderc::SpvCompilationResult CompileResult = compiler.CompileGlslToSpv(InSource.FileContent.DataAs<char>(), InSource.FileContent.Size(), ShaderStageToShadercKind(InSource.Stage), NativeFilePath.c_str(), options);
+		/*shaderc::PreprocessedSourceCompilationResult PreprocessResult = compiler.PreprocessGlsl(InSource.FileContent.DataAs<char>(), kind, NativeFilePath.c_str(), options);
+		if (PreprocessResult.GetCompilationStatus() != shaderc_compilation_status_success) {
+			REV_CORE_ERROR(PreprocessResult.GetErrorMessage());
+			REV_CORE_ASSERT(false);
+		}*/
+
+		shaderc::SpvCompilationResult CompileResult = compiler.CompileGlslToSpv(InSource.FileContent.DataAs<char>(), InSource.FileContent.Size(), kind, NativeFilePath.c_str(), options);
 		if (CompileResult.GetCompilationStatus() != shaderc_compilation_status_success)
 		{
 			REV_CORE_ERROR(CompileResult.GetErrorMessage());
@@ -281,18 +311,16 @@ FShadercCompiledData FShadercFactory::LoadOrCompileShader(const FPath& InPath, c
 		auto ShaderSource = FShadercUtils::LoadShaderSource(InPath);
 		ShaderSource.Stage = InStage != ERHIShaderStage::Unknown ? InStage : DetectShaderStage(ShaderSource);
 		CompileShaders(ShaderSource, InOptions, Result);
+		ReflectUniformInfo(Result);
 		//FShadercUtils::SaveShaderCompiledData(ShaderCachePath, Result);
 	}
-
-#ifdef REV_DEBUG
-	FShadercUtils::DumpShaderInfo(Result);
-#endif
 
 	return Result;
 }
 
 ERHIShaderStage FShadercFactory::DetectShaderStage(const FShadercSource& InSource)
 {
+	//TODO
 	return ERHIShaderStage::Compute;
 }
 

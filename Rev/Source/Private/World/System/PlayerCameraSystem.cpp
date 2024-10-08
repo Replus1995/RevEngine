@@ -30,7 +30,7 @@ void PlayerCameraSystem::OnDestroy()
 {
 }
 
-void PlayerCameraSystem::FillCameraUniform(FSceneUniform& OutUniform) const
+void PlayerCameraSystem::FillCameraData(Math::FVector3& ViewPos, Math::FMatrix4& ViewMatrix, Math::FMatrix4& ProjMatrix) const
 {
 	if (mCamEntity)
 	{
@@ -41,20 +41,18 @@ void PlayerCameraSystem::FillCameraUniform(FSceneUniform& OutUniform) const
 			float asp = float(window->GetWidth()) / float(window->GetHeight());
 			cameraComp.Camera.SetAspectRatio(asp);
 		}
-		OutUniform.ProjMat = cameraComp.Camera.GetProjectionMatrix();
-		OutUniform.ViewMat = transformComp.GetMatrix().Inverse();
-		OutUniform.ViewPos = Math::FVector4(transformComp.Location(), 1.0f);
+		ProjMatrix = cameraComp.Camera.GetProjectionMatrix();
+		ViewMatrix = transformComp.GetMatrix().Inverse();
+		ViewPos = transformComp.Location();
 	}
 	else
 	{
 		auto window = Application::GetApp().GetWindow();
 		float asp = float(window->GetWidth()) / float(window->GetHeight());
-		OutUniform.ProjMat = Math::FMatrix4::Perspective(Math::Radians(45.0f), asp, 0.01f, 1000.0f);
-		OutUniform.ViewMat = Math::FMatrix4(1.0f);
-		OutUniform.ViewPos = Math::FVector4(0, 0, 0, 1);
+		ProjMatrix = Math::FMatrix4::Perspective(Math::Radians(45.0f), asp, 0.01f, 1000.0f);
+		ViewMatrix = Math::FMatrix4(1.0f);
+		ViewPos = Math::FVector3(0, 0, 0);
 	}
-	OutUniform.ViewProjMat = (OutUniform.ProjMat * OutUniform.ViewMat);
-	OutUniform.InvViewProjMat = OutUniform.ViewProjMat.Inverse();
 }
 
 bool PlayerCameraSystem::SetPlayerCamera(FEntity e)

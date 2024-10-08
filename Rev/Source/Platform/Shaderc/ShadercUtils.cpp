@@ -7,9 +7,9 @@
 #include <vector>
 #include <filesystem>
 #include <regex>
-#include <spirv_cross/spirv_cross.hpp>
-#include <spirv_cross/spirv_reflect.hpp>
-#include <spirv-tools/optimizer.hpp>
+//#include <spirv_cross/spirv_cross.hpp>
+//#include <spirv_cross/spirv_reflect.hpp>
+//#include <spirv-tools/optimizer.hpp>
 
 #include <iostream>
 
@@ -195,35 +195,6 @@ bool FShadercUtils::SaveShaderCompiledData(const std::filesystem::path& ShaderCa
 	}
 
 	return false;
-}
-
-void FShadercUtils::DumpShaderInfo(const FShadercCompiledData& InData)
-{
-	//for (auto&& [Stage, CompiledData] : InData.CompiledDataMap)
-	{
-		spirv_cross::Compiler Refl(InData.Binary.DataAs<uint32_t>(), InData.Binary.Size() / sizeof(uint32_t));
-		spirv_cross::ShaderResources ResourceRefl = Refl.get_shader_resources();
-
-		REV_CORE_TRACE("Shaderc::Reflect - {0} {1}", InData.Name.c_str(), ShaderStageToString(InData.Stage));
-		REV_CORE_TRACE("    {0} uniform buffers", ResourceRefl.uniform_buffers.size());
-		REV_CORE_TRACE("    {0} sampled images", ResourceRefl.sampled_images.size());
-		//REV_CORE_TRACE("    {0} separate images", resources.separate_images.size());
-		//REV_CORE_TRACE("    {0} separate samplers", resources.separate_samplers.size());
-
-		//REV_CORE_TRACE("Uniform buffers:");
-		//for (const auto& resource : resources.uniform_buffers)
-		//{
-		//	const auto& bufferType = compiler.get_type(resource.base_type_id);
-		//	size_t bufferSize = compiler.get_declared_struct_size(bufferType);
-		//	uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
-		//	size_t memberCount = bufferType.member_types.size();
-
-		//	REV_CORE_TRACE("  {0}", resource.name);
-		//	REV_CORE_TRACE("    Size = {0}", bufferSize);
-		//	REV_CORE_TRACE("    Binding = {0}", binding);
-		//	REV_CORE_TRACE("    Members = {0}", memberCount);
-		//}
-	}
 }
 
 }

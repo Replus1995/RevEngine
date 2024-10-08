@@ -38,13 +38,11 @@ constexpr IndexType SEmissiveTex			= LPbrStart + 4;
 constexpr IndexType SEnviornmentTex = 11;
 
 //Uniform Buffer Binding
-constexpr IndexType BApp = 0;
-constexpr IndexType BScene = 1;
-constexpr IndexType BModel = 2;
-
+constexpr IndexType BScene = 0;
+constexpr IndexType BStaticMesh = 1;
 
 constexpr IndexType BShadow = 4;
-constexpr IndexType BForwardLight = 5;
+constexpr IndexType BLight = 5;
 
 }
 }

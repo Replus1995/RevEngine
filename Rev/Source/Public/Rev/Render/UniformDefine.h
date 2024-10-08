@@ -53,9 +53,6 @@ struct alignas(16) FStaticMeshUniform
 	Math::FMatrix4 ModelMat;
 };
 
-
-#define REV_MODEL_UNIFROM_BUFFER_SIZE 1000 * sizeof(FStaticMeshUniform) //to be modified
-
 struct FShadowUniform
 {
 	Math::FMatrix4 LightProjMats[6];

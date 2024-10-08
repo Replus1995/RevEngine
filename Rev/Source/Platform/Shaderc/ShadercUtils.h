@@ -31,7 +31,7 @@ struct FShadercSource
 enum EShadercUniformType : uint8
 {
 	SUT_Sampler,
-	SUT_Texture,
+	SUT_Image,
 	SUT_Buffer,
 };
 
@@ -80,7 +80,6 @@ public:
 	static FShadercSource LoadShaderSource(const FPath& InPath);
 	static bool LoadShaderCompiledData(const std::filesystem::path& ShaderCachePath, FShadercCompiledData& OutCompiledData);
 	static bool SaveShaderCompiledData(const std::filesystem::path& ShaderCachePath, FShadercCompiledData& InCompiledData);
-	static void DumpShaderInfo(const FShadercCompiledData& InData);
 };
 
 }

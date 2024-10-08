@@ -7,23 +7,15 @@
 namespace Rev
 {
 
-namespace
-{
-
-uint64 GetHash()
-{
-
-}
-
-}
-
-FVulkanShader::FVulkanShader(ERHIShaderStage InStage, const FBuffer& InCompiledData)
-	: FRHIShader(InStage)
+FVulkanShader::FVulkanShader(const FShadercCompiledData& InCompiledData)
+	: FRHIShader(InCompiledData.Stage)
+	, mDebugName(InCompiledData.Name)
+	, mStageFlags(TranslateShaderStage(InCompiledData.Stage))
 {
 	VkShaderModuleCreateInfo ShaderModuleCreateInfo{};
 	ShaderModuleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-	ShaderModuleCreateInfo.codeSize = InCompiledData.Size();
-	ShaderModuleCreateInfo.pCode = InCompiledData.DataAs<uint32_t>();
+	ShaderModuleCreateInfo.codeSize = InCompiledData.Binary.Size();
+	ShaderModuleCreateInfo.pCode = InCompiledData.Binary.DataAs<uint32_t>();
 
 	REV_VK_CHECK_THROW(vkCreateShaderModule(FVulkanCore::GetDevice(), &ShaderModuleCreateInfo, nullptr, &mModule), "[FVkShader] Failed to create shader module!");
 }
@@ -56,6 +48,33 @@ VkShaderStageFlagBits FVulkanShader::TranslateShaderStage(ERHIShaderStage InStag
 	return VkShaderStageFlagBits(0);
 }
 
+void FVulkanShader::InitBindings(const FShadercCompiledData& InCompiledData)
+{
+	uint16 Index = 0;
+	for (const FShadercUniform& Uniform : InCompiledData.Uniforms)
+	{
+		switch (Uniform.Type)
+		{
+		case SUT_Buffer:
+		{
+			VkDescriptorSetLayoutBinding& Binding = mBindings[Index];
+			Binding.stageFlags = mStageFlags;
+			Binding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+			Binding.binding = Uniform.Binding;
+			Binding.pImmutableSamplers = NULL;
+			Binding.descriptorCount = 1;
+
+			Index++;
+		}
+		break;
+		
+		default:
+			break;
+		}
+	}
+	mNumBindings = Index;
+}
+
 FVulkanShaderProgram::FVulkanShaderProgram(const std::string& InName, const FRHIGraphicsShaders& InShaders)
 	: FRHIShaderProgram(InName)
     , mShaders(InShaders)
@@ -75,7 +94,8 @@ void FVulkanShaderProgram::PrepareDraw(const FVulkanRenderTarget* RenderTarget, 
 	mIuputDescHashCache = Primitive->GetDescHash();
 
 	std::vector<VkPipelineShaderStageCreateInfo> ShaderStages = MakeShaderStageInfo(mShaders);
-	mPipeline.Build(PipelineState, ShaderStages, RenderTarget, Primitive);
+	std::vector<VkDescriptorSetLayoutBinding> LayoutBindings = MakeLayoutBindings(mShaders);
+	mPipeline.Build(PipelineState, LayoutBindings, ShaderStages, RenderTarget, Primitive);
 }
 
 std::vector<VkPipelineShaderStageCreateInfo> FVulkanShaderProgram::MakeShaderStageInfo(const FRHIGraphicsShaders& InShaders)
@@ -96,6 +116,33 @@ std::vector<VkPipelineShaderStageCreateInfo> FVulkanShaderProgram::MakeShaderSta
         StageInfoVec.emplace_back(std::move(StageInfo));
     }
     return StageInfoVec;
+}
+
+std::vector<VkDescriptorSetLayoutBinding> FVulkanShaderProgram::MakeLayoutBindings(const FRHIGraphicsShaders& InShaders)
+{
+	std::vector<VkDescriptorSetLayoutBinding> AllBindings;
+	for (uint8 i = 0; i < (uint8)ERHIShaderStage::Count; i++)
+	{
+		const auto& pShader = InShaders[(ERHIShaderStage)i];
+		if (!pShader)
+			continue;
+		FVulkanShader* pVulkanShader = static_cast<FVulkanShader*>(pShader.get());
+		for (uint16 j = 0; j < pVulkanShader->GetNumBindings(); j++)
+		{
+			const VkDescriptorSetLayoutBinding& Binding = pVulkanShader->GetBindings()[j];
+			if (auto iter = std::find_if(AllBindings.begin(), AllBindings.end(), [Binding](const VkDescriptorSetLayoutBinding& Elem) { return Elem.binding == Binding.binding; });
+				iter != AllBindings.end())
+			{
+				REV_CORE_ASSERT(iter->descriptorType == Binding.descriptorType);
+				iter->stageFlags |= pVulkanShader->GetStageFlags();
+			}
+			else
+			{
+				AllBindings.push_back(Binding);
+			}
+		}
+	}
+	return AllBindings;
 }
 
 }

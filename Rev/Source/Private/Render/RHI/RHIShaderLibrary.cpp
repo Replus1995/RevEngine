@@ -63,7 +63,7 @@ Ref<FRHIShader> FRHIShaderLibrary::LoadOrCompileShader(const FPath& InPath, cons
 	{
 	case ERenderAPI::Vulkan:
 	{
-		auto pShader = CreateRef<FVulkanShader>(CompiledData.Stage, CompiledData.Binary);
+		auto pShader = CreateRef<FVulkanShader>(CompiledData);
 		mShadersCache[CompiledData.Name].Add(InOptions.GetHash(), pShader);
 		return pShader;
 	}

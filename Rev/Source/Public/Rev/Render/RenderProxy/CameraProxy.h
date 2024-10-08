@@ -15,16 +15,18 @@ public:
 	~FCameraProxy();
 
 	void Prepare(const Ref<FScene>& Scene);
-	void SyncResource(const FRenderer* Renderer);
+	void SyncResource();
 	void FreeResource();
 
-	const Math::FMatrix4& GetViewMat() const { return mCameraParams.ViewMat; }
-	const Math::FMatrix4& GetProjMat() const { return mCameraParams.ProjMat; }
-	const Math::FMatrix4& GetViewProjMat() const { return mCameraParams.ViewProjMat; }
-	const Math::FMatrix4& GetInvViewProjMat() const { return mCameraParams.InvViewProjMat; }
+	const Math::FVector3& GetViewPos() const { return mViewPos; }
+	const Math::FMatrix4& GetViewMat() const { return mViewMatrix; }
+	const Math::FMatrix4& GetProjMat() const { return mProjMatrix; }
+	Math::FMatrix4 GetViewProjMat() const { return mProjMatrix * mViewMatrix; }
 
 private:
-	FSceneUniform mCameraParams;
+	Math::FVector3 mViewPos;
+	Math::FMatrix4 mViewMatrix;
+	Math::FMatrix4 mProjMatrix;
 };
 
 }

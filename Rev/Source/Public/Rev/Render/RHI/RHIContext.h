@@ -36,6 +36,8 @@ public:
 	virtual void SetClearColor(const Math::FLinearColor& color) = 0;
 	virtual void ClearBackBuffer() = 0; //to be removed
 
+	virtual void BindUniformBuffer(const Ref<FRHIUniformBuffer>& InBuffer, uint16 InBinding) = 0;
+
 	virtual void DrawPrimitive(const Ref<FRHIPrimitive>& InPrimitive, const Ref<FRHIShaderProgram>& InProgram) = 0;
 };
 }

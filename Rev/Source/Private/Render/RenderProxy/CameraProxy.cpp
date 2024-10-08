@@ -19,13 +19,12 @@ void FCameraProxy::Prepare(const Ref<FScene>& Scene)
 	PlayerCameraSystem* pSystem = Scene->GetSystem<PlayerCameraSystem>();
 	if (pSystem)
 	{
-		pSystem->FillCameraUniform(mCameraParams);
+		pSystem->FillCameraData(mViewPos, mViewMatrix, mProjMatrix);
 	}
 }
 
-void FCameraProxy::SyncResource(const FRenderer* Renderer)
+void FCameraProxy::SyncResource()
 {
-	//Renderer->GetBuiltInUB()->UpdateSubData(&mCameraParams, sizeof(FCameraUniform), REV_CAMERA_UNIFORM_OFFSET);
 }
 
 void FCameraProxy::FreeResource()

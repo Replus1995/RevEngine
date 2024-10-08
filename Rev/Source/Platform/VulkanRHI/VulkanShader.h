@@ -3,9 +3,10 @@
 #include "Rev/Render/RHI/RHIShaderCompile.h"
 #include "Rev/Core/Buffer.h"
 #include <map>
-#include <vulkan/vulkan.h>
+#include "Core/VulkanDefines.h"
 #include "VulkanPipeline.h"
 #include "../Shaderc/ShadercFactory.h"
+
 
 namespace Rev
 {
@@ -15,14 +16,25 @@ class FVulkanPrimitive;
 class FVulkanShader : public FRHIShader
 {
 public:
-	FVulkanShader(ERHIShaderStage InStage, const FBuffer& InCompiledData);
+	FVulkanShader(const FShadercCompiledData& InCompiledData);
 	virtual ~FVulkanShader();
 	virtual const void* GetNativeHandle() const override { return mModule; }
 
 	static VkShaderStageFlagBits TranslateShaderStage(ERHIShaderStage InStage);
+
+	VkShaderStageFlagBits GetStageFlags() const { return mStageFlags; }
+	const VkDescriptorSetLayoutBinding* GetBindings() const { return &mBindings[0]; }
+	uint16 GetNumBindings() const { return mNumBindings; }
+
+private:
+	void InitBindings(const FShadercCompiledData& InCompiledData);
+
 private:
 	VkShaderModule mModule = VK_NULL_HANDLE;
-	//VkPipelineShaderStageCreateInfo mStageCreateInfo;
+	std::string mDebugName;
+	VkShaderStageFlagBits mStageFlags = VK_SHADER_STAGE_ALL;
+	VkDescriptorSetLayoutBinding mBindings[REV_VK_MAX_SHADER_UNIFORMS];
+	uint16 mNumBindings = 0;
 };
 
 class FVulkanShaderProgram : public FRHIShaderProgram
@@ -48,6 +60,7 @@ public:
 
 private:
 	static std::vector<VkPipelineShaderStageCreateInfo> MakeShaderStageInfo(const FRHIGraphicsShaders& InShaders);
+	static std::vector< VkDescriptorSetLayoutBinding> MakeLayoutBindings(const FRHIGraphicsShaders& InShaders);
 
 private:
 	FVulkanPipeline mPipeline;

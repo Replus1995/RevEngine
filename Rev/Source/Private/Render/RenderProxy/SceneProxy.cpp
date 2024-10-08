@@ -20,14 +20,31 @@ void FSceneProxy::Prepare(const Ref<FScene>& Scene)
 	mSkyProxy.Prepare(Scene);
 }
 
-void FSceneProxy::SyncResource(const FRenderer* Renderer)
+void FSceneProxy::SyncResource()
 {
+	if(!mSceneUB)
+		mSceneUB = FRHICore::CreateUniformBuffer(sizeof(FSceneUniform), UL::BScene);
 
 	//Should run on render thread
 	//Update uniform buffer
-	mCameraProxy.SyncResource(Renderer);
+	mCameraProxy.SyncResource();
 	mDirectionalLightProxy.SyncResource();
 	mSkyProxy.SyncResource();
+
+	{
+		auto pWindow = Application::GetApp().GetWindow();
+
+		//Update scene uniform
+		mSceneParams.ViewExtent = {0, 0, pWindow->GetWidth(), pWindow->GetHeight()};
+		mSceneParams.ViewPos = mCameraProxy.GetViewPos();
+		mSceneParams.ViewMat = mCameraProxy.GetViewProjMat();
+		mSceneParams.ProjMat = mCameraProxy.GetProjMat();
+		mSceneParams.ViewProjMat = mCameraProxy.GetViewProjMat();
+		mSceneParams.InvViewProjMat = mSceneParams.ViewProjMat.Inverse();
+
+		mSceneUB->UpdateSubData(&mSceneParams, sizeof(FSceneUniform));
+	}
+
 }
 
 void FSceneProxy::FreeResource()
@@ -41,9 +58,11 @@ void FSceneProxy::Cleanup()
 {
 	mStaticMeshProxy.Cleanup();
 	mSkyProxy.Cleanup();
+
+	mSceneUB.reset();
 }
 
-void FSceneProxy::DrawScene(const FRenderer* Renderer)
+void FSceneProxy::DrawScene()
 {
 	mStaticMeshProxy.DrawMeshes(MBM_Opaque);
 	mSkyProxy.DrawSkybox();

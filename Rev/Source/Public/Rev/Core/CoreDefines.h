@@ -51,3 +51,4 @@
 #define BIT(x) (1 << x)
 #define REV_EXPAND_MACRO(x) x
 #define REV_STRINGIFY_MACRO(x) #x
+#define ARRAY_LENGTH(Array) sizeof(Array) / sizeof(Array[0])

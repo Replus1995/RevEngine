@@ -8,7 +8,6 @@ namespace Rev
 class FRHIPrimitive;
 class FRHIShaderProgram;
 class FRHIUniformBuffer;
-class FRHIUniformBufferDynamic;
 class FRHITexture;
 class FRHIRenderTarget;
 class FRHIContext;
@@ -27,6 +26,8 @@ public:
 	static void SetViewport(uint32 x, uint32 y, uint32 width, uint32 height);
 	static void SetClearColor(const Math::FLinearColor& color);
 	static void ClearBackBuffer();
+
+	static void BindUniformBuffer(const Ref<FRHIUniformBuffer>& InBuffer, uint16 InBinding);
 
 	static void DrawPrimitive(const Ref<FRHIPrimitive>& InPrimitive, const Ref<FRHIShaderProgram>& InProgram);
 

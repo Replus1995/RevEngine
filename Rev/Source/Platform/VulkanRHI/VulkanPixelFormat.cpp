@@ -60,7 +60,8 @@ constexpr VkFormat sVkFormatMappings[] = {
 
 void FVulkanPixelFormat::InitPlatformFormats()
 {
-	static_assert(sizeof(sVkFormatMappings) / sizeof(VkFormat) == PF_Count);
+	//static_assert(sizeof(sVkFormatMappings) / sizeof(VkFormat) == PF_Count);
+	static_assert(ARRAY_LENGTH(sVkFormatMappings) == PF_Count);
 
 	for (uint16 i = 0; i < PF_Count; i++)
 	{

@@ -17,11 +17,12 @@ FVulkanPipeline::~FVulkanPipeline()
     Release();
 }
 
-void FVulkanPipeline::Build(const FRHIGraphicsPipelineState& InState, const std::vector<VkPipelineShaderStageCreateInfo>& InShaderStageInfo, const FVulkanRenderTarget* InRenderTarget, const FVulkanPrimitive* InPrimitive)
+void FVulkanPipeline::Build(const FRHIGraphicsPipelineState& InState, const std::vector<VkDescriptorSetLayoutBinding>& InBindingInfo, const std::vector<VkPipelineShaderStageCreateInfo>& InShaderStageInfo, const FVulkanRenderTarget* InRenderTarget, const FVulkanPrimitive* InPrimitive)
 {
     Release();
     FVulkanGraphicsPipelineBuilder Builder(InState);
-    mPipelineLayout = Builder.BuildLayout(FVulkanCore::GetDevice());
+    mDescriptorSetLayout = Builder.BuildDescriptorSetLayout(FVulkanCore::GetDevice(), InBindingInfo);
+    mPipelineLayout = Builder.BuildLayout(FVulkanCore::GetDevice(), mDescriptorSetLayout);
     mPipeline = Builder.Build(FVulkanCore::GetDevice(), mPipelineLayout, InShaderStageInfo, InRenderTarget, InPrimitive);
 }
 
@@ -42,13 +43,30 @@ FVulkanGraphicsPipelineBuilder::~FVulkanGraphicsPipelineBuilder()
 {
 }
 
-VkPipelineLayout FVulkanGraphicsPipelineBuilder::BuildLayout(VkDevice InDevice)
+VkDescriptorSetLayout FVulkanGraphicsPipelineBuilder::BuildDescriptorSetLayout(VkDevice InDevice, const std::vector<VkDescriptorSetLayoutBinding>& InBindingInfo)
 {
+    VkDescriptorSetLayout NewLayout = VK_NULL_HANDLE;
+
+    VkDescriptorSetLayoutCreateInfo LayoutCreateInfo{};
+    LayoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    LayoutCreateInfo.pNext = NULL;
+    LayoutCreateInfo.flags = 0;
+    LayoutCreateInfo.bindingCount = (uint32_t)InBindingInfo.size();
+    LayoutCreateInfo.pBindings = InBindingInfo.data();
+
+    REV_VK_CHECK_THROW(vkCreateDescriptorSetLayout(InDevice, &LayoutCreateInfo, nullptr, &NewLayout), "failed to create descriptor set layout");
+
+    return NewLayout;
+}
+
+VkPipelineLayout FVulkanGraphicsPipelineBuilder::BuildLayout(VkDevice InDevice, VkDescriptorSetLayout InDescriptorSetLayout)
+{
+
     VkPipelineLayout NewLayout = VK_NULL_HANDLE;
     VkPipelineLayoutCreateInfo GraphicsLayout{};
     GraphicsLayout.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    GraphicsLayout.setLayoutCount = 0; // Optional
-    GraphicsLayout.pSetLayouts = nullptr; // Optional
+    GraphicsLayout.setLayoutCount = (InDescriptorSetLayout == VK_NULL_HANDLE ? 0 : 1);
+    GraphicsLayout.pSetLayouts = &InDescriptorSetLayout;
     GraphicsLayout.pushConstantRangeCount = 0; // Optional
     GraphicsLayout.pPushConstantRanges = nullptr; // Optional
 

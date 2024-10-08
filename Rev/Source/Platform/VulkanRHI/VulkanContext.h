@@ -2,6 +2,7 @@
 #include "Rev/Render/RHI/RHIContext.h"
 #include "Rev/Core/Deleter.h"
 #include <vector>
+#include <map>
 #include <vulkan/vulkan.h>
 
 #include "Core/VulkanDefines.h"
@@ -34,6 +35,8 @@ public:
 	virtual void SetClearDepthStencil(float InDepth, uint32 InStencil);
 	virtual void ClearBackBuffer() override;
 
+	virtual void BindUniformBuffer(const Ref<FRHIUniformBuffer>& InBuffer, uint16 InBinding) override;
+
 	virtual void DrawPrimitive(const Ref<FRHIPrimitive>& InPrimitive, const Ref<FRHIShaderProgram>& InProgram) override;
 
 
@@ -43,8 +46,10 @@ public:
 
 	FVulkanFrameData& GetFrameData() { return mFrameData[mFrameDataIndex]; }
 	VkCommandBuffer GetMainCmdBuffer() { return mFrameData[mFrameDataIndex].MainCmdBuffer; }
-
 	FVulkanDescriptorPool& GetDescriptorPool() { return mFrameData[mFrameDataIndex].DescriptorPool; }
+
+	const std::map<uint16, Ref<FRHIUniformBuffer>>& GetUniformBufferMap() const { return mUniformBuffers; };
+
 
 private:
 	void CreateImmediateData();
@@ -66,6 +71,10 @@ private:
 	VkFence mImmFence;
 	VkCommandBuffer mImmCmdBuffer;
 	VkCommandPool mImmCmdPool;
+
+	//uniform buffer
+	std::map<uint16, Ref<FRHIUniformBuffer>> mUniformBuffers;
+
 };
 
 

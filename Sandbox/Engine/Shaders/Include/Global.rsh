@@ -20,18 +20,7 @@ struct FSceneUniform
     float4x4 InvViewProjMat;
 };
 
-struct FModelUniform
+struct FStaticMeshUniform
 {
     float4x4 ModelMat;
 };
-
-cbuffer SceneUB : register(b2, space0) //update every frame
-{
-	FSceneUniform uScene;
-};
-
-cbuffer ModelUB : register(b3, space0) //update every model
-{
-    FModelUniform uModel;
-};
-

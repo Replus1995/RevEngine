@@ -79,7 +79,7 @@ void FVulkanContext::BeginFrame(bool bClearBackBuffer)
 	{
 		FVulkanUtils::TransitionImage(CmdBuffer, GetSwapchainImage(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 	}
-	
+
 }
 
 void FVulkanContext::EndFrame()
@@ -108,6 +108,9 @@ void FVulkanContext::EndFrame()
 	//submit command buffer to the queue and execute it.
 	//Fence will now block until the graphic commands finish execution
 	REV_VK_CHECK(vkQueueSubmit2(FVulkanCore::GetQueue(VQK_Graphics), 1, &SubmitInfo, FrameData.Fence));
+
+	//clear bindings
+	mUniformBuffers.clear();
 }
 
 void FVulkanContext::PresentFrame()
@@ -193,6 +196,11 @@ void FVulkanContext::ClearBackBuffer()
 	vkCmdClearColorImage(GetMainCmdBuffer(), GetSwapchainImage(), VK_IMAGE_LAYOUT_GENERAL, &mClearColor, 1, &ColorImageRange);
 	/*VkImageSubresourceRange DepthImageRange = FVkInit::ImageSubresourceRange(VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT);
 	vkCmdClearDepthStencilImage(CmdBuffer, mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_GENERAL, &mClearDepthStencil, 1, &DepthImageRange);*/
+}
+
+void FVulkanContext::BindUniformBuffer(const Ref<FRHIUniformBuffer>& InBuffer, uint16 InBinding)
+{
+	mUniformBuffers[InBinding] = InBuffer;
 }
 
 void FVulkanContext::DrawPrimitive(const Ref<FRHIPrimitive>& InPrimitive, const Ref<FRHIShaderProgram>& InProgram)
