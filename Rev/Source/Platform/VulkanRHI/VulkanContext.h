@@ -34,7 +34,7 @@ public:
 	virtual void SetClearDepthStencil(float InDepth, uint32 InStencil);
 	virtual void ClearBackBuffer() override;
 
-	virtual void DrawPrimitive(const Ref<FRHIPrimitive>& InPrimitive, const Ref<FRHIShaderProgram>& InProgram, const Ref<FRHIUniformBufferDynamic>& InUniformBufferDynamic, uint32 InDynamicOffset) override;
+	virtual void DrawPrimitive(const Ref<FRHIPrimitive>& InPrimitive, const Ref<FRHIShaderProgram>& InProgram) override;
 
 
 	const FVulkanSwapchain& GetSwapchain() const { return mSwapchain; }

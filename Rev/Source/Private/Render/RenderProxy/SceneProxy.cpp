@@ -45,7 +45,7 @@ void FSceneProxy::Cleanup()
 
 void FSceneProxy::DrawScene(const FRenderer* Renderer)
 {
-	mStaticMeshProxy.DrawMeshes(Renderer, mCameraProxy.GetViewProjMat(), MBM_Opaque);
+	mStaticMeshProxy.DrawMeshes(MBM_Opaque);
 	mSkyProxy.DrawSkybox();
 }
 

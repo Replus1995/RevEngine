@@ -42,18 +42,32 @@ constexpr VkFormat sVkFormatMappings[] = {
 	VK_FORMAT_D24_UNORM_S8_UINT,
 	VK_FORMAT_D32_SFLOAT,
 
+	VK_FORMAT_R8_SNORM,
+	VK_FORMAT_R16_SNORM,
+	VK_FORMAT_R8G8_SNORM,
+	VK_FORMAT_R8G8_SINT,
+	VK_FORMAT_R8G8_UINT,
+	VK_FORMAT_R16G16_SNORM,
+	VK_FORMAT_R16G16_SINT,
+	VK_FORMAT_R16G16_UINT,
+	VK_FORMAT_R32G32_SINT,
+	VK_FORMAT_R32G32_UINT,
+
+	VK_FORMAT_UNDEFINED,
+	VK_FORMAT_UNDEFINED,
 };
 
 
 void FVulkanPixelFormat::InitPlatformFormats()
 {
+	static_assert(sizeof(sVkFormatMappings) / sizeof(VkFormat) == PF_Count);
 
 	for (uint16 i = 0; i < PF_Count; i++)
 	{
 		GPixelFormats[i].PlatformFormat = sVkFormatMappings[i];
 		if (i >= PF_DepthStencil)
 		{
-			GPixelFormats[i].Supported = true;
+			GPixelFormats[i].Supported = sVkFormatMappings[i] != VK_FORMAT_UNDEFINED;
 		}
 	}
 

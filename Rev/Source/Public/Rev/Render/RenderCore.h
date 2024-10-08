@@ -8,8 +8,7 @@ namespace Rev
 enum class ERenderAPI : uint8
 {
     None = 0,
-    OpenGL = 1,
-    Vulkan = 2
+    Vulkan = 1
 };
 REV_API ERenderAPI GetRenderAPI();
 

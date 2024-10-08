@@ -2,13 +2,6 @@
 #include "Rev/Render/RenderCore.h"
 #include "Rev/Core/Assert.h"
 
-//OpenGL impl headers
-#include "OpenGL/OpenGLContext.h"
-#include "OpenGL/OpenGLBuffer.h"
-#include "OpenGL/OpenGLSampler.h"
-#include "OpenGL/OpenGLTexture.h"
-#include "OpenGL/OpenGLRenderTarget.h"
-
 //Vulkan impl headers
 #include "VulkanRHI/VulkanCore.h"
 #include "VulkanRHI/VulkanContext.h"
@@ -57,8 +50,6 @@ Scope<FRHIContext> FRHICore::CreateContext()
 	case Rev::ERenderAPI::None:
 		REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!");
 		return nullptr;
-	case Rev::ERenderAPI::OpenGL:
-		return CreateScope<FOpenGLContext>();
 	case Rev::ERenderAPI::Vulkan:
 		return CreateScope<FVulkanContext>();
 	}
@@ -72,7 +63,6 @@ Ref<FRHIVertexBuffer> FRHICore::CreateVertexBuffer(uint32 InSize)
 	switch (GetRenderAPI())
 	{
 	case ERenderAPI::None:    REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
-	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLVertexBuffer>(InSize);
 	case ERenderAPI::Vulkan:  return CreateRef<FVulkanVertexBuffer>(InSize);
 	}
 
@@ -85,7 +75,6 @@ Ref<FRHIVertexBuffer> FRHICore::CreateVertexBuffer(const float* InVertices, uint
 	switch (GetRenderAPI())
 	{
 	case ERenderAPI::None:    REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
-	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLVertexBuffer>(InSize, InVertices);
 	case ERenderAPI::Vulkan:  return CreateRef<FVulkanVertexBuffer>(InSize, InVertices);
 	}
 
@@ -98,7 +87,6 @@ Ref<FRHIIndexBuffer> FRHICore::CreateIndexBuffer(uint32 InStride, uint32 InCount
 	switch (GetRenderAPI())
 	{
 	case ERenderAPI::None:    REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
-	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLIndexBuffer>(InStride, InCount);
 	case ERenderAPI::Vulkan:  return CreateRef<FVulkanIndexBuffer>(InStride, InCount);
 	}
 
@@ -111,7 +99,6 @@ Ref<FRHIIndexBuffer> FRHICore::CreateIndexBuffer(const void* InIndices, uint32 I
 	switch (GetRenderAPI())
 	{
 	case ERenderAPI::None:    REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
-	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLIndexBuffer>(InStride, InCount, InIndices);
 	case ERenderAPI::Vulkan:  return CreateRef<FVulkanIndexBuffer>(InStride, InCount, InIndices);
 	}
 
@@ -124,7 +111,6 @@ Ref<FRHIUniformBuffer> FRHICore::CreateUniformBuffer(uint32 InSize, uint32 InBin
 	switch (GetRenderAPI())
 	{
 	case ERenderAPI::None:    REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
-	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLUniformBuffer>(InSize, InBinding);
 	case ERenderAPI::Vulkan:  return CreateRef<FVulkanUniformBuffer>(InSize, InBinding);
 	}
 
@@ -156,26 +142,11 @@ Ref<FRHIPrimitive> FRHICore::CreatePrimitive(EPrimitiveTopology InTopology)
 	return nullptr;
 }
 
-Ref<FRHISampler> FRHICore::CreateSampler(const FSamplerDesc& InDesc)
-{
-	switch (GetRenderAPI())
-	{
-	case ERenderAPI::None:    REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
-	//case ERenderAPI::OpenGL:  return CreateRef<FOpenGLSampler>(InDesc);
-	case ERenderAPI::Vulkan:  return CreateRef<FVulkanSampler>(InDesc);
-	}
-
-	REV_CORE_ASSERT(false, "Unknown RenderAPI!");
-	return nullptr;
-}
-
-
 Ref<FRHITexture> FRHICore::CreateTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc)
 {
 	switch (GetRenderAPI())
 	{
 	case ERenderAPI::None:    REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
-	case ERenderAPI::OpenGL:  return CreateOpenGLTexture(InDesc, InSamplerDesc);
 	case ERenderAPI::Vulkan:  return CreateVulkanTexture(InDesc, InSamplerDesc);
 	}
 
@@ -188,7 +159,6 @@ Ref<FRHIRenderTarget> FRHICore::CreateRenderTarget(const FRenderTargetDesc& InDe
 	switch (GetRenderAPI())
 	{
 	case ERenderAPI::None:    REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
-	case ERenderAPI::OpenGL:  return CreateRef<FOpenGLRenderTarget>(InDesc);
 	case ERenderAPI::Vulkan:  return CreateRef<FVulkanRenderTarget>(InDesc);
 	}
 

@@ -28,7 +28,7 @@ public:
 	//Primitive
 	static Ref<FRHIPrimitive> CreatePrimitive(EPrimitiveTopology InTopology);
 
-	static Ref<FRHISampler> CreateSampler(const FSamplerDesc& InDesc);
+	//Texture
 	static Ref<FRHITexture> CreateTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc);
 	static Ref<FRHIRenderTarget> CreateRenderTarget(const FRenderTargetDesc& InDesc);
 

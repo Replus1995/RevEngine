@@ -3,6 +3,7 @@
 #include "Rev/Core/Buffer.h"
 #include "Rev/Core/FileSystem.h"
 #include "Rev/Render/RenderCore.h"
+#include "Rev/Render/PixelFormat.h"
 #include "Rev/Render/RHI/RHIShader.h"
 #include "Rev/Render/RHI/RHIShaderCompile.h"
 #include "Rev/Render/RHI/RHITexture.h"
@@ -40,9 +41,9 @@ struct FShadercUniform
 	EShadercUniformType Type;
 	uint8 Num;
 	uint16 Binding;
-	uint8 TexComponent;
+
+	EPixelFormat TexFormat;
 	ETextureDimension TexDimension;
-	uint16 TexFormat;
 };
 
 struct FShadercCompiledData

@@ -46,6 +46,20 @@ enum EPixelFormat : uint16
 
 	PF_DepthStencil			= 33,
 	PF_ShadowDepth			= 34,
+	
+	PF_R8_SNORM				= 35,
+	PF_R16_SNORM			= 36,
+	PF_R8G8_SNORM			= 37,
+	PF_R8G8_SINT			= 38,
+	PF_R8G8_UINT			= 39,
+	PF_R16G16_SNORM			= 40,
+	PF_R16G16_SINT			= 41,
+	PF_R16G16_UINT			= 42,
+	PF_R32G32_SINT			= 43,
+	PF_R32G32_UINT			= 44,
+
+	PF_R11G11B10_FLOAT		= 45,
+	PF_R10G10B10A2			= 46,
 
 	PF_Count
 };

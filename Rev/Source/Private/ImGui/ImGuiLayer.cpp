@@ -261,9 +261,6 @@ void ImGuiLayer::OnAttach()
 
     switch (GetRenderAPI())
     {
-    case ERenderAPI::OpenGL:
-        ImGui_ImplOpenGL3_Init("#version 450");
-        break;
     case ERenderAPI::Vulkan:
         mPlatformData = ImGuiLayer_Vulkan_Init();
         break;
@@ -278,9 +275,6 @@ void ImGuiLayer::OnDetach()
 {
     switch (GetRenderAPI())
     {
-    case ERenderAPI::OpenGL:
-        ImGui_ImplOpenGL3_Shutdown();
-        break;
     case ERenderAPI::Vulkan:
         ImGuiLayer_Vulkan_Shutdown((VkDescriptorPool)mPlatformData);
         mPlatformData = nullptr;
@@ -302,9 +296,6 @@ void ImGuiLayer::OnUpdate(float dt)
 
     switch (GetRenderAPI())
     {
-    case ERenderAPI::OpenGL:
-        ImGui_ImplOpenGL3_NewFrame();
-        break;
     case ERenderAPI::Vulkan:
         ImGui_ImplVulkan_NewFrame();
         break;
@@ -338,9 +329,6 @@ void ImGuiLayer::OnDraw()
 {
     switch (GetRenderAPI())
     {
-    case ERenderAPI::OpenGL:
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        break;
     case ERenderAPI::Vulkan:
         ImGuiLayer_Vulkan_Draw();
         break;

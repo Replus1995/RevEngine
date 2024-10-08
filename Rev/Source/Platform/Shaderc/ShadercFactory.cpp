@@ -29,6 +29,52 @@ namespace Rev
 
 constexpr uint8_t kSpirvSamplerShift = 16;
 
+static EPixelFormat sSpirvFormatMapping[] =
+{
+	PF_Unknown,					// spv::ImageFormatUnknown = 0
+	PF_R32G32B32A32_FLOAT,		// spv::ImageFormatRgba32f = 1
+	PF_R16G16B16A16_FLOAT,		// spv::ImageFormatRgba16f = 2
+	PF_R32_FLOAT,				// spv::ImageFormatR32f = 3
+	PF_R8G8B8A8,				// spv::ImageFormatRgba8 = 4
+	PF_R8G8B8A8_SNORM,			// spv::ImageFormatRgba8Snorm = 5
+	PF_R32G32_FLOAT,			// spv::ImageFormatRg32f = 6
+	PF_R16G16_FLOAT,			// spv::ImageFormatRg16f = 7
+	PF_R11G11B10_FLOAT,			// spv::ImageFormatR11fG11fB10f = 8
+	PF_R16_FLOAT,				// spv::ImageFormatR16f = 9
+	PF_R16G16B16A16,			// spv::ImageFormatRgba16 = 10
+	PF_R10G10B10A2,				// spv::ImageFormatRgb10A2 = 11
+	PF_R16G16,					// spv::ImageFormatRg16 = 12
+	PF_R8G8,					// spv::ImageFormatRg8 = 13
+	PF_R16,						// spv::ImageFormatR16 = 14
+	PF_R8,						// spv::ImageFormatR8 = 15
+	PF_R16G16B16A16_SNORM,		// spv::ImageFormatRgba16Snorm = 16
+	PF_R16G16_SNORM,			// spv::ImageFormatRg16Snorm = 17
+	PF_R8G8_SNORM,				// spv::ImageFormatRg8Snorm = 18
+	PF_R16_SNORM,				// spv::ImageFormatR16Snorm = 19
+	PF_R8_SNORM,				// spv::ImageFormatR8Snorm = 20
+	PF_R32G32B32A32_SINT,		// spv::ImageFormatRgba32i = 21
+	PF_R16G16B16A16_SINT,		// spv::ImageFormatRgba16i = 22
+	PF_R8G8B8A8_SINT,			// spv::ImageFormatRgba8i = 23
+	PF_R32_SINT,				// spv::ImageFormatR32i = 24
+	PF_R32G32_SINT,				// spv::ImageFormatRg32i = 25
+	PF_R16G16_SINT,				// spv::ImageFormatRg16i = 26
+	PF_R8G8_SINT,				// spv::ImageFormatRg8i = 27
+	PF_R16_SINT,				// spv::ImageFormatR16i = 28
+	PF_R8_SINT,					// spv::ImageFormatR8i = 29
+	PF_R32G32B32A32_UINT,		// spv::ImageFormatRgba32ui = 30
+	PF_R16G16B16A16_UINT,		// spv::ImageFormatRgba16ui = 31
+	PF_R8G8B8A8_UINT,			// spv::ImageFormatRgba8ui = 32
+	PF_R32_UINT,				// spv::ImageFormatR32ui = 33
+	PF_Unknown,					// spv::ImageFormatRgb10a2ui = 34
+	PF_R32G32_UINT,				// spv::ImageFormatRg32ui = 35
+	PF_R16G16_UINT,				// spv::ImageFormatRg16ui = 36
+	PF_R8G8_UINT,				// spv::ImageFormatRg8ui = 37
+	PF_R16_UINT,				// spv::ImageFormatR16ui = 38
+	PF_R8_UINT,					// spv::ImageFormatR8ui = 39
+	PF_Unknown,					// spv::ImageFormatR64ui = 40
+	PF_Unknown,					// spv::ImageFormatR64i = 41
+};
+
 ETextureDimension TranslateTextureDimension(spv::Dim InDim, bool bArray)
 {
 	switch (InDim)
@@ -114,9 +160,6 @@ static void InitCompileOptions(shaderc::CompileOptions& Options)
 {
 	switch (GetRenderAPI())
 	{
-	case Rev::ERenderAPI::OpenGL:
-		Options.SetTargetEnvironment(shaderc_target_env_opengl, shaderc_env_version_opengl_4_5);
-		break;
 	case Rev::ERenderAPI::Vulkan:
 		Options.SetTargetEnvironment(shaderc_target_env_vulkan, shaderc_env_version_vulkan_1_3);
 		break;
@@ -178,9 +221,8 @@ void FShadercFactory::ReflectUniformInfo(FShadercCompiledData& Data)
 		Uniform.Num = 1;
 		Uniform.Binding = uint16(binding_index);
 
-		Uniform.TexComponent = TextureComponentTypeToId(SpirvCrossBaseTypeToFormatType(componentType, imageType.depth));
+		Uniform.TexFormat = sSpirvFormatMapping[uint32(imageType.format)];
 		Uniform.TexDimension = TranslateTextureDimension(imageType.dim, imageType.arrayed);
-		Uniform.TexFormat = uint16(imageType.format);
 
 
 		Data.Uniforms.push_back(Uniform);

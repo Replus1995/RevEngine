@@ -65,6 +65,20 @@ FPixelFormatInfo GPixelFormats[PF_Count] = {
 
 	FPixelFormatInfo(PF_DepthStencil,		"DepthStencil",			1,			1,			1,			4,			1,			0),
 	FPixelFormatInfo(PF_ShadowDepth,		"ShadowDepth",			1,			1,			1,			4,			1,			0),
+
+	FPixelFormatInfo(PF_R8_SNORM,			"R8_SNORM",				1,			1,			1,			1,			1,			0),
+	FPixelFormatInfo(PF_R16_SNORM,			"R16_SNORM",			1,			1,			1,			2,			1,			0),
+	FPixelFormatInfo(PF_R8G8_SNORM,			"R8G8_SNORM",			1,			1,			1,			2,			2,			0),
+	FPixelFormatInfo(PF_R8G8_SINT,			"R8G8_SINT",			1,			1,			1,			2,			2,			0),
+	FPixelFormatInfo(PF_R8G8_UINT,			"R8G8_UINT",			1,			1,			1,			2,			2,			0),
+	FPixelFormatInfo(PF_R16G16_SNORM,		"R16G16_SNORM",			1,			1,			1,			4,			2,			0),
+	FPixelFormatInfo(PF_R16G16_SINT,		"R16G16_SINT",			1,			1,			1,			4,			2,			0),
+	FPixelFormatInfo(PF_R16G16_UINT,		"R16G16_UINT",			1,			1,			1,			4,			2,			0),
+	FPixelFormatInfo(PF_R32G32_SINT,		"R32G32_SINT",			1,			1,			1,			8,			2,			0),
+	FPixelFormatInfo(PF_R32G32_UINT,		"R32G32_UINT",			1,			1,			1,			8,			2,			0),
+
+	FPixelFormatInfo(PF_R11G11B10_FLOAT,	"R11G11B10_FLOAT",		1,			1,			1,			4,			3,			0),
+	FPixelFormatInfo(PF_R10G10B10A2,		"R32G32_UINT",			1,			1,			1,			4,			4,			0),
 };
 
 

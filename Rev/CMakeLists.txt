@@ -58,6 +58,8 @@ if(WIN32)
         shaderc_shared
         spirv-cross-core
         spirv-cross-glsl
+        spirv-cross-hlsl
+        spirv-cross-reflect
         GPUOpen::VulkanMemoryAllocator
         imgui
         cityhash

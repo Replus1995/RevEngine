@@ -66,9 +66,9 @@ void RenderCmd::ClearBackBuffer()
 	sContext->ClearBackBuffer();
 }
 
-void RenderCmd::DrawPrimitive(const Ref<FRHIPrimitive>& InPrimitive, const Ref<FRHIShaderProgram>& InProgram, const Ref<FRHIUniformBufferDynamic>& InUniformBufferDynamic, uint32 InDynamicOffset)
+void RenderCmd::DrawPrimitive(const Ref<FRHIPrimitive>& InPrimitive, const Ref<FRHIShaderProgram>& InProgram)
 {
-	sContext->DrawPrimitive(InPrimitive, InProgram, InUniformBufferDynamic, InDynamicOffset);
+	sContext->DrawPrimitive(InPrimitive, InProgram);
 }
 
 FRHIContext* RenderCmd::GetContext()
