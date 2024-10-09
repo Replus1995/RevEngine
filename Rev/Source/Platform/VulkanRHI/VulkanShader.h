@@ -10,7 +10,6 @@
 
 namespace Rev
 {
-
 class FVulkanRenderTarget;
 class FVulkanPrimitive;
 class FVulkanShader : public FRHIShader
@@ -23,18 +22,13 @@ public:
 	static VkShaderStageFlagBits TranslateShaderStage(ERHIShaderStage InStage);
 
 	VkShaderStageFlagBits GetStageFlags() const { return mStageFlags; }
-	const VkDescriptorSetLayoutBinding* GetBindings() const { return &mBindings[0]; }
-	uint16 GetNumBindings() const { return mNumBindings; }
-
-private:
-	void InitBindings(const FShadercCompiledData& InCompiledData);
+	const std::vector<FRHIUniformInfo>& GetStageUniforms() const { return mStageUniforms; }
 
 private:
 	VkShaderModule mModule = VK_NULL_HANDLE;
 	std::string mDebugName;
 	VkShaderStageFlagBits mStageFlags = VK_SHADER_STAGE_ALL;
-	VkDescriptorSetLayoutBinding mBindings[REV_VK_MAX_SHADER_UNIFORMS];
-	uint16 mNumBindings = 0;
+	std::vector<FRHIUniformInfo> mStageUniforms;
 };
 
 class FVulkanShaderProgram : public FRHIShaderProgram
@@ -60,13 +54,16 @@ public:
 
 private:
 	static std::vector<VkPipelineShaderStageCreateInfo> MakeShaderStageInfo(const FRHIGraphicsShaders& InShaders);
-	static std::vector< VkDescriptorSetLayoutBinding> MakeLayoutBindings(const FRHIGraphicsShaders& InShaders);
+	std::vector<VkDescriptorSetLayoutBinding> MakeLayoutBindings(const FRHIGraphicsShaders& InShaders);
+
+	VkDescriptorSet GetDescriptorSet();
 
 private:
 	FVulkanPipeline mPipeline;
 	FRHIGraphicsShaders mShaders;
 	uint64 mIuputDescHashCache = 0;
 	uint32 mNumColorTargetsCache = 0;
+	std::vector<FRHIUniformInfo> mProgramUniforms;
 };
 
 }

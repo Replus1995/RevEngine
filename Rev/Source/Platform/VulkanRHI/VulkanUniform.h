@@ -10,7 +10,7 @@ class FVulkanUniformBuffer : public FRHIUniformBuffer, FVulkanBuffer
 public:
 	FVulkanUniformBuffer(uint32 InSize, uint32 InBinding);
 	virtual ~FVulkanUniformBuffer();
-	virtual const void* GetNativeHandle() const override { return &mBuffer; }
+	virtual const void* GetNativeHandle() const override { return mBuffer; }
 	virtual void UpdateSubData(const void* Data, uint32 Size, uint32 Offset) override;
 	//VkDescriptorSetLayout GetLayout() const { return mDescSetLayout; }
 
@@ -25,7 +25,7 @@ class FVulkanUniformBufferDynamic : public FRHIUniformBufferDynamic, FVulkanBuff
 public:
 	FVulkanUniformBufferDynamic(uint32 InSize, uint32 InBinding);
 	virtual ~FVulkanUniformBufferDynamic();
-	virtual const void* GetNativeHandle() const override { return &mBuffer; }
+	virtual const void* GetNativeHandle() const override { return mBuffer; }
 	virtual uint32 UpdateSubData(const void* Data, uint32 Size) override;
 	virtual void Clear() override;
 	//VkDescriptorSetLayout GetLayout() const { return mDescSetLayout; }

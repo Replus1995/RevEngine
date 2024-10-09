@@ -8,6 +8,24 @@
 namespace Rev
 {
 
+enum class ERHIUniformType : uint8
+{
+    Sampler,
+    Image,
+    Buffer,
+};
+
+struct FRHIUniformInfo
+{
+    std::string Name;
+    ERHIUniformType Type;
+    uint8 Num;
+    uint16 Binding;
+
+    EPixelFormat TexFormat;
+    ETextureDimension TexDimension;
+};
+
 enum class ERHIShaderStage : uint8
 {
     Unknown = 0,

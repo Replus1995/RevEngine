@@ -2,6 +2,7 @@
 #include "VulkanCore.h"
 #include "VulkanRenderTarget.h"
 #include "VulkanPrimitive.h"
+#include "VulkanUniform.h"
 #include "Rev/Core/Assert.h"
 
 namespace Rev
@@ -18,6 +19,8 @@ FVulkanShader::FVulkanShader(const FShadercCompiledData& InCompiledData)
 	ShaderModuleCreateInfo.pCode = InCompiledData.Binary.DataAs<uint32_t>();
 
 	REV_VK_CHECK_THROW(vkCreateShaderModule(FVulkanCore::GetDevice(), &ShaderModuleCreateInfo, nullptr, &mModule), "[FVkShader] Failed to create shader module!");
+
+	mStageUniforms = InCompiledData.Uniforms;
 }
 
 FVulkanShader::~FVulkanShader()
@@ -46,33 +49,6 @@ VkShaderStageFlagBits FVulkanShader::TranslateShaderStage(ERHIShaderStage InStag
 	}
 	REV_CORE_ASSERT(false);
 	return VkShaderStageFlagBits(0);
-}
-
-void FVulkanShader::InitBindings(const FShadercCompiledData& InCompiledData)
-{
-	uint16 Index = 0;
-	for (const FShadercUniform& Uniform : InCompiledData.Uniforms)
-	{
-		switch (Uniform.Type)
-		{
-		case SUT_Buffer:
-		{
-			VkDescriptorSetLayoutBinding& Binding = mBindings[Index];
-			Binding.stageFlags = mStageFlags;
-			Binding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-			Binding.binding = Uniform.Binding;
-			Binding.pImmutableSamplers = NULL;
-			Binding.descriptorCount = 1;
-
-			Index++;
-		}
-		break;
-		
-		default:
-			break;
-		}
-	}
-	mNumBindings = Index;
 }
 
 FVulkanShaderProgram::FVulkanShaderProgram(const std::string& InName, const FRHIGraphicsShaders& InShaders)
@@ -120,6 +96,8 @@ std::vector<VkPipelineShaderStageCreateInfo> FVulkanShaderProgram::MakeShaderSta
 
 std::vector<VkDescriptorSetLayoutBinding> FVulkanShaderProgram::MakeLayoutBindings(const FRHIGraphicsShaders& InShaders)
 {
+	mProgramUniforms.clear();
+
 	std::vector<VkDescriptorSetLayoutBinding> AllBindings;
 	for (uint8 i = 0; i < (uint8)ERHIShaderStage::Count; i++)
 	{
@@ -127,22 +105,100 @@ std::vector<VkDescriptorSetLayoutBinding> FVulkanShaderProgram::MakeLayoutBindin
 		if (!pShader)
 			continue;
 		FVulkanShader* pVulkanShader = static_cast<FVulkanShader*>(pShader.get());
-		for (uint16 j = 0; j < pVulkanShader->GetNumBindings(); j++)
+		const std::vector<FRHIUniformInfo>& StageUniforms = pVulkanShader->GetStageUniforms();
+		for (const FRHIUniformInfo& StageUniform : StageUniforms)
 		{
-			const VkDescriptorSetLayoutBinding& Binding = pVulkanShader->GetBindings()[j];
-			if (auto iter = std::find_if(AllBindings.begin(), AllBindings.end(), [Binding](const VkDescriptorSetLayoutBinding& Elem) { return Elem.binding == Binding.binding; });
+			
+			if (auto iter = std::find_if(AllBindings.begin(), AllBindings.end(), [&StageUniform](const VkDescriptorSetLayoutBinding& Elem) { return Elem.binding == StageUniform.Binding; });
 				iter != AllBindings.end())
 			{
-				REV_CORE_ASSERT(iter->descriptorType == Binding.descriptorType);
+				//REV_CORE_ASSERT(iter->descriptorType == Binding.descriptorType);
 				iter->stageFlags |= pVulkanShader->GetStageFlags();
 			}
 			else
 			{
-				AllBindings.push_back(Binding);
+				bool bUniformValid = false;
+
+				switch (StageUniform.Type)
+				{
+				case ERHIUniformType::Buffer:
+				{
+					VkDescriptorSetLayoutBinding Binding{};
+					Binding.stageFlags = pVulkanShader->GetStageFlags();
+					Binding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+					Binding.binding = StageUniform.Binding;
+					Binding.pImmutableSamplers = NULL;
+					Binding.descriptorCount = 1;
+
+					AllBindings.push_back(Binding);
+					bUniformValid = true;
+				}
+				break;
+
+				default:
+					break;
+				}
+
+				if(bUniformValid)
+					mProgramUniforms.push_back(StageUniform);
 			}
 		}
 	}
+
+	REV_CORE_ASSERT(mProgramUniforms.size() <= REV_VK_MAX_DESCRIPTORSETS);
+
 	return AllBindings;
+}
+
+VkDescriptorSet FVulkanShaderProgram::GetDescriptorSet()
+{
+	VkDescriptorSetLayout DescLayout = mPipeline.GetDescriptorSetLayout();
+
+	VkDescriptorSet DescSet;
+	VkDescriptorSetAllocateInfo DescAllocateInfo{};
+	DescAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+	DescAllocateInfo.pNext = NULL;
+	DescAllocateInfo.descriptorPool = FVulkanCore::GetContext()->GetDescriptorPool().Pool;
+	DescAllocateInfo.descriptorSetCount = 1;
+	DescAllocateInfo.pSetLayouts = &DescLayout;
+
+	REV_VK_CHECK(vkAllocateDescriptorSets(FVulkanCore::GetDevice(), &DescAllocateInfo, &DescSet));
+
+
+	VkDescriptorBufferInfo BufferInfos[REV_VK_MAX_SHADER_UNIFORM_BUFFERS] = {};
+	VkWriteDescriptorSet Writes[REV_VK_MAX_DESCRIPTORSETS] = {};
+	uint32 WriteCount = 0;
+	uint32_t BufferCount = 0;
+
+	for (const FRHIUniformInfo& Uniform : mProgramUniforms)
+	{
+		uint32 BindingIdx = Uniform.Binding;
+		FRHIUniformBuffer* UniformBuffer = FVulkanCore::GetContext()->FindUniformBuffer(BindingIdx);
+		if(!UniformBuffer)
+			continue;
+
+		BufferInfos[BufferCount].buffer = (VkBuffer)UniformBuffer->GetNativeHandle();
+		BufferInfos[BufferCount].offset = 0;
+		BufferInfos[BufferCount].range = UniformBuffer->GetSize();
+
+		Writes[WriteCount].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		Writes[WriteCount].pNext = NULL;
+		Writes[WriteCount].dstSet = DescSet;
+		Writes[WriteCount].dstBinding = BindingIdx;
+		Writes[WriteCount].dstArrayElement = 0;
+		Writes[WriteCount].descriptorCount = 1;
+		Writes[WriteCount].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+		Writes[WriteCount].pImageInfo = NULL;
+		Writes[WriteCount].pBufferInfo = &BufferInfos[BufferCount];
+		Writes[WriteCount].pTexelBufferView = NULL;
+
+		++WriteCount;
+		++BufferCount;
+	}
+
+	vkUpdateDescriptorSets(FVulkanCore::GetDevice(), WriteCount, Writes, 0, NULL);
+
+	return DescSet;
 }
 
 }

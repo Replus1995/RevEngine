@@ -49,6 +49,7 @@ public:
 	FVulkanDescriptorPool& GetDescriptorPool() { return mFrameData[mFrameDataIndex].DescriptorPool; }
 
 	const std::map<uint16, Ref<FRHIUniformBuffer>>& GetUniformBufferMap() const { return mUniformBuffers; };
+	FRHIUniformBuffer* FindUniformBuffer(uint16 BindingIdx) const;
 
 
 private:

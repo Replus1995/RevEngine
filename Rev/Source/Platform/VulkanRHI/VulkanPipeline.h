@@ -17,6 +17,7 @@ public:
     void Build(const FRHIGraphicsPipelineState& InState, const std::vector<VkDescriptorSetLayoutBinding>& InBindingInfo, const std::vector<VkPipelineShaderStageCreateInfo>& InShaderStageInfo, const FVulkanRenderTarget* InRenderTarget, const FVulkanPrimitive* InPrimitive);
     void Release();
 
+    VkDescriptorSetLayout GetDescriptorSetLayout() const { return mDescriptorSetLayout; }
     VkPipelineLayout GetPipelineLayout() const { return mPipelineLayout; }
     VkPipeline GetPipeline() const { return mPipeline; }
 

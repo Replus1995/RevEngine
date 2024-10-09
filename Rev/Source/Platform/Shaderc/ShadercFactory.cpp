@@ -198,9 +198,9 @@ void FShadercFactory::ReflectUniformInfo(FShadercCompiledData& Data)
 		size_t BufferSize = Refl.get_declared_struct_size(BufferType);
 		size_t MemberCount = BufferType.member_types.size();
 
-		FShadercUniform Uniform;
+		FRHIUniformInfo Uniform;
 		Uniform.Name = Res.name;
-		Uniform.Type = SUT_Buffer;
+		Uniform.Type = ERHIUniformType::Buffer;
 		Uniform.Num = 1;
 		Uniform.Binding = Refl.get_decoration(Res.id, spv::Decoration::DecorationBinding);
 
@@ -234,9 +234,9 @@ void FShadercFactory::ReflectUniformInfo(FShadercCompiledData& Data)
 			}
 		}
 
-		FShadercUniform Uniform;
+		FRHIUniformInfo Uniform;
 		Uniform.Name = Res.name;
-		Uniform.Type = SUT_Image;
+		Uniform.Type = ERHIUniformType::Image;
 		Uniform.Num = 1;
 		Uniform.Binding = uint16(binding_index);
 
@@ -244,7 +244,7 @@ void FShadercFactory::ReflectUniformInfo(FShadercCompiledData& Data)
 		Uniform.TexDimension = TranslateTextureDimension(imageType.dim, imageType.arrayed);
 
 #ifdef REV_DEBUG
-		REV_CORE_TRACE("	Texture: {0} -> {1}", Uniform.Name.c_str(), Uniform.Binding);
+		REV_CORE_TRACE(" {0}: Binding = {1}", Uniform.Name.c_str(), Uniform.Binding);
 #endif
 
 		Data.Uniforms.push_back(Uniform);

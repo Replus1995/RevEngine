@@ -207,6 +207,15 @@ void FVulkanContext::DrawPrimitive(const Ref<FRHIPrimitive>& InPrimitive, const 
 {
 }
 
+FRHIUniformBuffer* FVulkanContext::FindUniformBuffer(uint16 BindingIdx) const
+{
+	if (auto iter = mUniformBuffers.find(BindingIdx); iter != mUniformBuffers.end())
+	{
+		return iter->second.get();
+	}
+	return nullptr;
+}
+
 void FVulkanContext::CreateImmediateData()
 {
 	VkCommandPoolCreateInfo CmdPoolCreateInfo = FVulkanInit::CmdPoolCreateInfo(FVulkanCore::GetQueueFamily(VQK_Graphics), VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
