@@ -28,8 +28,10 @@ public:
 	static void ClearBackBuffer();
 
 	static void BindUniformBuffer(const Ref<FRHIUniformBuffer>& InBuffer, uint16 InBinding);
+	static void BindTexture(const Ref<FRHITexture>& InTexture, uint16 InBinding);
+	static void BindProgram(const Ref<FRHIShaderProgram>& InProgram);
 
-	static void DrawPrimitive(const Ref<FRHIPrimitive>& InPrimitive, const Ref<FRHIShaderProgram>& InProgram);
+	static void DrawPrimitive(const Ref<FRHIPrimitive>& InPrimitive);
 
 	static FRHIContext* GetContext();
 };

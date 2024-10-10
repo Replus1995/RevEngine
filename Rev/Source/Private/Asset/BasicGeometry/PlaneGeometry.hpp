@@ -49,7 +49,7 @@ public:
             });
 
         constexpr uint32 planeIndicesCount = sizeof(sPlaneIndices) / sizeof(uint32);
-        Ref<FRHIIndexBuffer> planeIndices = FRHICore::CreateIndexBuffer(sPlaneIndices, sizeof(uint32), planeIndicesCount);
+        Ref<FRHIIndexBuffer> planeIndices = FRHICore::CreateIndexBuffer(sPlaneIndices, EIndexElementType::UInt32, planeIndicesCount);
 
         Ref<FRHIPrimitive> Result = FRHICore::CreatePrimitive(PT_Triangles);
         Result->AddVertexBuffer(planeVertices);

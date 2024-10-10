@@ -99,10 +99,16 @@ protected:
 	FRHIVertexLayout mLayout;
 };
 
+enum class EIndexElementType : uint8
+{
+	UInt16 = 0,
+	UInt32 = 1
+};
+
 class REV_API FRHIIndexBuffer : public FRHIResource
 {
 public:
-	FRHIIndexBuffer(uint32 InStride, uint32 InCount) : mStride(InStride), mCount(InCount) {}
+	FRHIIndexBuffer(EIndexElementType InType, uint32 InCount) : mType(InType), mCount(InCount) {}
 	virtual ~FRHIIndexBuffer() = default;
 	/**
 	* @brief Update index buffer data
@@ -112,11 +118,12 @@ public:
 	*/
 	virtual void UpdateSubData(const void* Data, uint32 Count, uint32 Offset = 0) = 0;
 
-	uint32 GetStride() const { return mStride; };
+	EIndexElementType GetType() const { return mType; }
+	uint32 GetStride() const { return (uint32(mType) + 1) * 2; }
 	uint32 GetCount() const { return mCount; }
-	uint32 GetCapacity() const { return mStride * mCount; };
+	uint32 GetCapacity() const { return GetStride() * mCount; }
 protected:
-	uint32 mStride = 0;
+	EIndexElementType mType = EIndexElementType::UInt16;
 	uint32 mCount = 0;
 };
 

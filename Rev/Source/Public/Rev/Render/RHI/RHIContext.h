@@ -11,9 +11,10 @@ class FRHIIndexBuffer;
 class FRHIPrimitive;
 class FRHIShaderProgram;
 class FRHIUniformBuffer;
-class FRHIUniformBufferDynamic;
 class FRHITexture;
 class FRHIRenderTarget;
+class FRHIRenderPass;
+
 class FRHIContext;
 
 class FRHIContext
@@ -36,8 +37,15 @@ public:
 	virtual void SetClearColor(const Math::FLinearColor& color) = 0;
 	virtual void ClearBackBuffer() = 0; //to be removed
 
-	virtual void BindUniformBuffer(const Ref<FRHIUniformBuffer>& InBuffer, uint16 InBinding) = 0;
+	virtual void BeginRenderPass(const Ref<FRHIRenderPass>& InRenderPass) = 0;
+	virtual void EndRenderPass() = 0;
+	virtual void NextSubpass() = 0;
 
-	virtual void DrawPrimitive(const Ref<FRHIPrimitive>& InPrimitive, const Ref<FRHIShaderProgram>& InProgram) = 0;
+
+	virtual void BindUniformBuffer(const Ref<FRHIUniformBuffer>& InBuffer, uint16 InBinding) = 0;
+	virtual void BindTexture(const Ref<FRHITexture>& InTexture, uint16 InBinding) = 0;
+	virtual void BindProgram(const Ref<FRHIShaderProgram>& InProgram) = 0;
+
+	virtual void DrawPrimitive(const Ref<FRHIPrimitive>& InPrimitive) = 0;
 };
 }

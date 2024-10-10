@@ -52,7 +52,7 @@ public:
                 });
 
             constexpr uint32 boxIndicesCount = sizeof(sBoxIndices) / sizeof(uint32);
-            Ref<FRHIIndexBuffer> boxIndices = FRHICore::CreateIndexBuffer(sBoxIndices, sizeof(uint32), boxIndicesCount);
+            Ref<FRHIIndexBuffer> boxIndices = FRHICore::CreateIndexBuffer(sBoxIndices, EIndexElementType::UInt32, boxIndicesCount);
 
             FMeshPrimitive boxMeshPrim;
             boxMeshPrim.PrimitiveData = FRHICore::CreatePrimitive(PT_Triangles);

@@ -10,7 +10,7 @@ class FVulkanRenderTarget : public FRHIRenderTarget
 public:
 	FVulkanRenderTarget(const FRenderTargetDesc& InDesc);
 	virtual ~FVulkanRenderTarget();
-	virtual const void* GetNativeHandle() const override { return &mFramebuffer; }
+	virtual const void* GetNativeHandle() const override { return mFramebuffer; }
 
 	virtual void ResizeTargets(uint16 InWidth, uint16 InHeight) override;
 	virtual void ClearTarget(ERenderTargetAttachment Index) override {};

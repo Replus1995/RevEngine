@@ -15,21 +15,50 @@ FVulkanPipeline::FVulkanPipeline()
 FVulkanPipeline::~FVulkanPipeline()
 {
     Release();
+    ReleaseLayout();
 }
 
-void FVulkanPipeline::Build(const FRHIGraphicsPipelineState& InState, const std::vector<VkDescriptorSetLayoutBinding>& InBindingInfo, const std::vector<VkPipelineShaderStageCreateInfo>& InShaderStageInfo, const FVulkanRenderTarget* InRenderTarget, const FVulkanPrimitive* InPrimitive)
+void FVulkanPipeline::BuildLayout(const std::vector<VkDescriptorSetLayoutBinding>& InBindingInfo)
 {
+    VkDescriptorSetLayoutCreateInfo DescSetLayoutCreateInfo{};
+    DescSetLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    DescSetLayoutCreateInfo.pNext = NULL;
+    DescSetLayoutCreateInfo.flags = 0;
+    DescSetLayoutCreateInfo.bindingCount = (uint32_t)InBindingInfo.size();
+    DescSetLayoutCreateInfo.pBindings = InBindingInfo.data();
+
+    REV_VK_CHECK_THROW(vkCreateDescriptorSetLayout(FVulkanCore::GetDevice(), &DescSetLayoutCreateInfo, nullptr, &mDescriptorSetLayout), "failed to create descriptor set layout");
+
+    VkPipelineLayoutCreateInfo GraphicsLayoutCreateInfo{};
+    GraphicsLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    GraphicsLayoutCreateInfo.setLayoutCount = 1;
+    GraphicsLayoutCreateInfo.pSetLayouts = &mDescriptorSetLayout;
+    GraphicsLayoutCreateInfo.pushConstantRangeCount = 0; // Optional
+    GraphicsLayoutCreateInfo.pPushConstantRanges = nullptr; // Optional
+
+    REV_VK_CHECK_THROW(vkCreatePipelineLayout(FVulkanCore::GetDevice(), &GraphicsLayoutCreateInfo, nullptr, &mPipelineLayout), "failed to create pipeline layout");
+}
+
+void FVulkanPipeline::Build(const FRHIGraphicsPipelineState& InState, const std::vector<VkPipelineShaderStageCreateInfo>& InShaderStageInfo, const FVulkanRenderTarget* InRenderTarget, const FVulkanPrimitive* InPrimitive)
+{
+    if(!mPipelineLayout)
+        return;
     Release();
     FVulkanGraphicsPipelineBuilder Builder(InState);
-    mDescriptorSetLayout = Builder.BuildDescriptorSetLayout(FVulkanCore::GetDevice(), InBindingInfo);
-    mPipelineLayout = Builder.BuildLayout(FVulkanCore::GetDevice(), mDescriptorSetLayout);
     mPipeline = Builder.Build(FVulkanCore::GetDevice(), mPipelineLayout, InShaderStageInfo, InRenderTarget, InPrimitive);
+    mPipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+}
+
+void FVulkanPipeline::ReleaseLayout()
+{
+    if (mPipelineLayout)
+        vkDestroyPipelineLayout(FVulkanCore::GetDevice(), mPipelineLayout, nullptr);
+    if (mDescriptorSetLayout)
+        vkDestroyDescriptorSetLayout(FVulkanCore::GetDevice(), mDescriptorSetLayout, nullptr);
 }
 
 void FVulkanPipeline::Release()
 {
-    if(mPipelineLayout)
-        vkDestroyPipelineLayout(FVulkanCore::GetDevice(), mPipelineLayout, nullptr);
     if (mPipeline)
         vkDestroyPipeline(FVulkanCore::GetDevice(), mPipeline, nullptr);
 }
@@ -41,38 +70,6 @@ FVulkanGraphicsPipelineBuilder::FVulkanGraphicsPipelineBuilder(const FRHIGraphic
 
 FVulkanGraphicsPipelineBuilder::~FVulkanGraphicsPipelineBuilder()
 {
-}
-
-VkDescriptorSetLayout FVulkanGraphicsPipelineBuilder::BuildDescriptorSetLayout(VkDevice InDevice, const std::vector<VkDescriptorSetLayoutBinding>& InBindingInfo)
-{
-    VkDescriptorSetLayout NewLayout = VK_NULL_HANDLE;
-
-    VkDescriptorSetLayoutCreateInfo LayoutCreateInfo{};
-    LayoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    LayoutCreateInfo.pNext = NULL;
-    LayoutCreateInfo.flags = 0;
-    LayoutCreateInfo.bindingCount = (uint32_t)InBindingInfo.size();
-    LayoutCreateInfo.pBindings = InBindingInfo.data();
-
-    REV_VK_CHECK_THROW(vkCreateDescriptorSetLayout(InDevice, &LayoutCreateInfo, nullptr, &NewLayout), "failed to create descriptor set layout");
-
-    return NewLayout;
-}
-
-VkPipelineLayout FVulkanGraphicsPipelineBuilder::BuildLayout(VkDevice InDevice, VkDescriptorSetLayout InDescriptorSetLayout)
-{
-
-    VkPipelineLayout NewLayout = VK_NULL_HANDLE;
-    VkPipelineLayoutCreateInfo GraphicsLayout{};
-    GraphicsLayout.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    GraphicsLayout.setLayoutCount = (InDescriptorSetLayout == VK_NULL_HANDLE ? 0 : 1);
-    GraphicsLayout.pSetLayouts = &InDescriptorSetLayout;
-    GraphicsLayout.pushConstantRangeCount = 0; // Optional
-    GraphicsLayout.pPushConstantRanges = nullptr; // Optional
-
-    REV_VK_CHECK_THROW(vkCreatePipelineLayout(InDevice, &GraphicsLayout, nullptr, &NewLayout), "failed to create pipeline layout");
-
-    return NewLayout;
 }
 
 VkPipeline FVulkanGraphicsPipelineBuilder::Build(VkDevice InDevice, VkPipelineLayout InLayout, const std::vector<VkPipelineShaderStageCreateInfo>& InShaderStageInfo, const FVulkanRenderTarget* InRenderTarget, const FVulkanPrimitive* InPrimitive)

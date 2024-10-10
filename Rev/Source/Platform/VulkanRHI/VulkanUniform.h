@@ -8,32 +8,24 @@ namespace Rev
 class FVulkanUniformBuffer : public FRHIUniformBuffer, FVulkanBuffer
 {
 public:
-	FVulkanUniformBuffer(uint32 InSize, uint32 InBinding);
+	FVulkanUniformBuffer(uint32 InSize);
 	virtual ~FVulkanUniformBuffer();
 	virtual const void* GetNativeHandle() const override { return mBuffer; }
 	virtual void UpdateSubData(const void* Data, uint32 Size, uint32 Offset) override;
-	//VkDescriptorSetLayout GetLayout() const { return mDescSetLayout; }
-
-protected:
-	uint32 mBinding = 0;
-	//VkDescriptorSetLayout mDescSetLayout = VK_NULL_HANDLE;
 };
 
 
 class FVulkanUniformBufferDynamic : public FRHIUniformBufferDynamic, FVulkanBuffer
 {
 public:
-	FVulkanUniformBufferDynamic(uint32 InSize, uint32 InBinding);
+	FVulkanUniformBufferDynamic(uint32 InSize);
 	virtual ~FVulkanUniformBufferDynamic();
 	virtual const void* GetNativeHandle() const override { return mBuffer; }
 	virtual uint32 UpdateSubData(const void* Data, uint32 Size) override;
 	virtual void Clear() override;
-	//VkDescriptorSetLayout GetLayout() const { return mDescSetLayout; }
 
 protected:
 	uint32 mDynamicOffset = 0;
-	uint32 mBinding = 0;
-	//VkDescriptorSetLayout mDescSetLayout = VK_NULL_HANDLE;
 };
 
 class FVulkanUniformManager

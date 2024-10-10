@@ -72,7 +72,7 @@ void FStaticMeshProxy::DrawPrimitives(const FStaticMeshRenderData& InData, EMate
 
 			for (auto& pPrimitive : vPrimitives)
 			{
-				RenderCmd::DrawPrimitive(pPrimitive->PrimitiveData, pMat->GetProgram());
+				RenderCmd::DrawPrimitive(pPrimitive->PrimitiveData);
 			}
 
 			if (bUseMeshMaterial)

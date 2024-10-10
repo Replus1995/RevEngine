@@ -14,17 +14,22 @@ public:
     FVulkanPipeline();
     ~FVulkanPipeline();
 
-    void Build(const FRHIGraphicsPipelineState& InState, const std::vector<VkDescriptorSetLayoutBinding>& InBindingInfo, const std::vector<VkPipelineShaderStageCreateInfo>& InShaderStageInfo, const FVulkanRenderTarget* InRenderTarget, const FVulkanPrimitive* InPrimitive);
+    void BuildLayout(const std::vector<VkDescriptorSetLayoutBinding>& InBindingInfo);
+    void Build(const FRHIGraphicsPipelineState& InState, const std::vector<VkPipelineShaderStageCreateInfo>& InShaderStageInfo, const FVulkanRenderTarget* InRenderTarget, const FVulkanPrimitive* InPrimitive);
+    
+    void ReleaseLayout();
     void Release();
 
     VkDescriptorSetLayout GetDescriptorSetLayout() const { return mDescriptorSetLayout; }
     VkPipelineLayout GetPipelineLayout() const { return mPipelineLayout; }
     VkPipeline GetPipeline() const { return mPipeline; }
+    VkPipelineBindPoint GetPipelineBindPoint() const { return mPipelineBindPoint; }
 
 private:
     VkDescriptorSetLayout mDescriptorSetLayout = VK_NULL_HANDLE;
     VkPipelineLayout mPipelineLayout = VK_NULL_HANDLE;
     VkPipeline mPipeline = VK_NULL_HANDLE;
+    VkPipelineBindPoint mPipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
 };
 
 class FVulkanGraphicsPipelineBuilder
@@ -33,8 +38,6 @@ public:
     FVulkanGraphicsPipelineBuilder(const FRHIGraphicsPipelineState& InState);
     ~FVulkanGraphicsPipelineBuilder();
 
-    VkDescriptorSetLayout BuildDescriptorSetLayout(VkDevice InDevice, const std::vector<VkDescriptorSetLayoutBinding>& InBindingInfo);
-    VkPipelineLayout BuildLayout(VkDevice InDevice, VkDescriptorSetLayout InDescriptorSetLayout);
     VkPipeline Build(VkDevice InDevice, VkPipelineLayout InLayout, const std::vector<VkPipelineShaderStageCreateInfo>& InShaderStageInfo, const FVulkanRenderTarget* InRenderTarget, const FVulkanPrimitive* InPrimitive);
 
 private:

@@ -25,7 +25,7 @@ FMeshPrimitiveStorage::FMeshPrimitiveStorage(FMeshPrimitiveStorage&& InStorage) 
 	//WeightIndexData = std::move(InStorage.WeightIndexData);
 
 	IndexCount = InStorage.IndexCount;
-	IndexStride = InStorage.IndexStride;
+	IndexType = InStorage.IndexType;
 	IndexData = std::move(InStorage.IndexData);
 }
 
@@ -76,7 +76,7 @@ FMeshPrimitive FMeshPrimitiveStorage::CreateVertexData()
 		Primitive->AddVertexBuffer(TexCoordBuffer);
 	}
 
-	Ref<FRHIIndexBuffer> IndexBuffer = FRHICore::CreateIndexBuffer(IndexData.Data(), IndexStride, IndexCount);
+	Ref<FRHIIndexBuffer> IndexBuffer = FRHICore::CreateIndexBuffer(IndexData.Data(), IndexType, IndexCount);
 	Primitive->SetIndexBuffer(IndexBuffer);
 
 	FMeshPrimitive Result;
@@ -95,17 +95,9 @@ bool FMeshPrimitiveStorage::GetVertexIndices(uint32 TriIndex, uint32& A, uint32&
 	if(TriIndex >= NumTriangles())
 		return false;
 
-	switch (IndexStride)
+	switch (IndexType)
 	{
-	case 1:
-	{
-		const uint8* Indices = IndexData.DataAs<uint8>();
-		A = Indices[TriIndex * 3];
-		B = Indices[TriIndex * 3 + 1];
-		C = Indices[TriIndex * 3 + 2];
-		break;
-	}
-	case 2:
+	case EIndexElementType::UInt16:
 	{
 		const uint16* Indices = IndexData.DataAs<uint16>();
 		A = Indices[TriIndex * 3];
@@ -113,7 +105,7 @@ bool FMeshPrimitiveStorage::GetVertexIndices(uint32 TriIndex, uint32& A, uint32&
 		C = Indices[TriIndex * 3 + 2];
 		break;
 	}
-	case 4:
+	case EIndexElementType::UInt32:
 	{
 		const uint32* Indices = IndexData.DataAs<uint32>();
 		A = Indices[TriIndex * 3];

@@ -1,6 +1,13 @@
 #include "VulkanContext.h"
 #include "VulkanCore.h"
 #include "VulkanUtils.h"
+#include "VulkanUniform.h"
+#include "VulkanShader.h"
+#include "VulkanTexture.h"
+#include "VulkanRenderTarget.h"
+#include "VulkanPrimitive.h"
+#include "VulkanRenderPass.h"
+#include "Core/VulkanEnum.h"
 
 #include "Rev/Core/Base.h"
 #include "Rev/Core/Assert.h"
@@ -64,6 +71,8 @@ void FVulkanContext::BeginFrame(bool bClearBackBuffer)
 	mDrawExtent.width = mSwapchain.GetExtent().width;
 	mDrawExtent.height = mSwapchain.GetExtent().height;
 
+	FrameData.DescriptorPool.ResetPool(FVulkanCore::GetDevice());
+
 	VkCommandBuffer CmdBuffer = FrameData.MainCmdBuffer;
 	REV_VK_CHECK(vkResetCommandBuffer(CmdBuffer, 0));
 	VkCommandBufferBeginInfo CmdBufferBeginInfo = FVulkanInit::CmdBufferBeginInfo(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
@@ -111,6 +120,8 @@ void FVulkanContext::EndFrame()
 
 	//clear bindings
 	mUniformBuffers.clear();
+	mCurProgram = nullptr;
+	mCurRenderPass = nullptr;
 }
 
 void FVulkanContext::PresentFrame()
@@ -198,16 +209,106 @@ void FVulkanContext::ClearBackBuffer()
 	vkCmdClearDepthStencilImage(CmdBuffer, mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_GENERAL, &mClearDepthStencil, 1, &DepthImageRange);*/
 }
 
+void FVulkanContext::BeginRenderPass(const Ref<FRHIRenderPass>& InRenderPass)
+{
+	mCurRenderPass = std::static_pointer_cast<FVulkanRenderPass>(InRenderPass);
+	if(!mCurRenderPass)
+		return;
+	if (!mCurRenderPass->GetRenderTarget())
+	{
+		mCurRenderPass = nullptr;
+		return;
+	}
+
+	VkRenderPassBeginInfo RenderPassInfo{};
+	RenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+	RenderPassInfo.pNext = NULL;
+	RenderPassInfo.renderPass = (VkRenderPass)mCurRenderPass->GetNativeHandle();
+	RenderPassInfo.framebuffer = (VkFramebuffer)mCurRenderPass->GetRenderTarget()->GetNativeHandle();
+	RenderPassInfo.renderArea.offset.x = 0;
+	RenderPassInfo.renderArea.offset.y = 0;
+	RenderPassInfo.renderArea.extent.width = mCurRenderPass->GetRenderTarget()->GetWidth();
+	RenderPassInfo.renderArea.extent.height = mCurRenderPass->GetRenderTarget()->GetHeight();
+	RenderPassInfo.clearValueCount = 0;
+	RenderPassInfo.pClearValues = NULL;
+
+	VkSubpassBeginInfo SubpassBeginInfo{};
+	SubpassBeginInfo.sType = VK_STRUCTURE_TYPE_SUBPASS_BEGIN_INFO;
+	SubpassBeginInfo.pNext = NULL;
+	SubpassBeginInfo.contents = VK_SUBPASS_CONTENTS_INLINE;
+
+	vkCmdBeginRenderPass2(GetMainCmdBuffer(), &RenderPassInfo, &SubpassBeginInfo);
+}
+
+void FVulkanContext::EndRenderPass()
+{
+	VkSubpassEndInfo SubpassEndInfo{};
+	SubpassEndInfo.sType = VK_STRUCTURE_TYPE_SUBPASS_END_INFO;
+	SubpassEndInfo.pNext = NULL;
+
+	vkCmdEndRenderPass2(GetMainCmdBuffer(), &SubpassEndInfo);
+}
+
+void FVulkanContext::NextSubpass()
+{
+	VkSubpassBeginInfo SubpassBeginInfo{};
+	SubpassBeginInfo.sType = VK_STRUCTURE_TYPE_SUBPASS_BEGIN_INFO;
+	SubpassBeginInfo.pNext = NULL;
+	SubpassBeginInfo.contents = VK_SUBPASS_CONTENTS_INLINE;
+
+	VkSubpassEndInfo SubpassEndInfo{};
+	SubpassEndInfo.sType = VK_STRUCTURE_TYPE_SUBPASS_END_INFO;
+	SubpassEndInfo.pNext = NULL;
+
+	vkCmdNextSubpass2(GetMainCmdBuffer(), &SubpassBeginInfo, &SubpassEndInfo);
+}
+
 void FVulkanContext::BindUniformBuffer(const Ref<FRHIUniformBuffer>& InBuffer, uint16 InBinding)
 {
-	mUniformBuffers[InBinding] = InBuffer;
+	mUniformBuffers[InBinding] = std::static_pointer_cast<FVulkanUniformBuffer>(InBuffer);
 }
 
-void FVulkanContext::DrawPrimitive(const Ref<FRHIPrimitive>& InPrimitive, const Ref<FRHIShaderProgram>& InProgram)
+void FVulkanContext::BindTexture(const Ref<FRHITexture>& InTexture, uint16 InBinding)
 {
+	mTextures[InBinding] = std::static_pointer_cast<FVulkanTexture>(InTexture);
 }
 
-FRHIUniformBuffer* FVulkanContext::FindUniformBuffer(uint16 BindingIdx) const
+void FVulkanContext::BindProgram(const Ref<FRHIShaderProgram>& InProgram)
+{
+	mCurProgram = std::static_pointer_cast<FVulkanShaderProgram>(InProgram);
+}
+
+void FVulkanContext::DrawPrimitive(const Ref<FRHIPrimitive>& InPrimitive)
+{
+	if (!mCurRenderPass || !mCurProgram || !InPrimitive)
+	{
+		return;
+	}
+
+	const FVulkanRenderTarget* RenderTarget = static_cast<FVulkanRenderTarget*>(mCurRenderPass->GetRenderTarget().get());
+	const FVulkanPrimitive* Primitive = static_cast<FVulkanPrimitive*>(InPrimitive.get());
+
+	mCurProgram->PrepareDraw(RenderTarget, Primitive);
+
+	VkBuffer VertexBuffers[REV_VK_MAX_VERTEX_STREAMS];
+	VkDeviceSize VertexOffsets[REV_VK_MAX_VERTEX_STREAMS];
+	uint32 VertexStreamCount = Primitive->GetVertexBuffers().size();
+
+	REV_CORE_ASSERT(VertexStreamCount < REV_VK_MAX_VERTEX_STREAMS);
+
+	for (uint32 i = 0; i < VertexStreamCount; i++)
+	{
+		const Ref<FRHIVertexBuffer>& VertexBuffer = Primitive->GetVertexBuffers()[i];
+		VertexBuffers[i] = (VkBuffer)VertexBuffer->GetNativeHandle();
+		VertexOffsets[i] = 0; //temp, to be modifed
+	}
+
+	vkCmdBindVertexBuffers2(GetMainCmdBuffer(), 0, VertexStreamCount, VertexBuffers, VertexOffsets, NULL, NULL);
+	vkCmdBindIndexBuffer(GetMainCmdBuffer(), (VkBuffer)Primitive->GetIndexBuffer()->GetNativeHandle(), 0, FVulkanEnum::Translate(Primitive->GetIndexBuffer()->GetType()));
+	vkCmdDrawIndexed(GetMainCmdBuffer(), Primitive->GetIndexBuffer()->GetCount(), 1, 0, 0, 0);
+}
+
+FVulkanUniformBuffer* FVulkanContext::FindUniformBuffer(uint16 BindingIdx) const
 {
 	if (auto iter = mUniformBuffers.find(BindingIdx); iter != mUniformBuffers.end())
 	{

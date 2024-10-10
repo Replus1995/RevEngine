@@ -55,6 +55,8 @@ FVulkanShaderProgram::FVulkanShaderProgram(const std::string& InName, const FRHI
 	: FRHIShaderProgram(InName)
     , mShaders(InShaders)
 {
+	std::vector<VkDescriptorSetLayoutBinding> LayoutBindings = MakeLayoutBindings(mShaders);
+	mPipeline.BuildLayout(LayoutBindings);
 }
 
 FVulkanShaderProgram::~FVulkanShaderProgram()
@@ -63,15 +65,21 @@ FVulkanShaderProgram::~FVulkanShaderProgram()
 
 void FVulkanShaderProgram::PrepareDraw(const FVulkanRenderTarget* RenderTarget, const FVulkanPrimitive* Primitive)
 {
-	if (!mPipelineStateDirty && mNumColorTargetsCache == RenderTarget->GetDesc().NumColorTargets && mIuputDescHashCache == Primitive->GetDescHash())
-		return;
-	mPipelineStateDirty = false;
-	mNumColorTargetsCache = RenderTarget->GetDesc().NumColorTargets;
-	mIuputDescHashCache = Primitive->GetDescHash();
+	if (mPipelineStateDirty || mNumColorTargetsCache != RenderTarget->GetDesc().NumColorTargets || mIuputDescHashCache != Primitive->GetDescHash())
+	{
 
-	std::vector<VkPipelineShaderStageCreateInfo> ShaderStages = MakeShaderStageInfo(mShaders);
-	std::vector<VkDescriptorSetLayoutBinding> LayoutBindings = MakeLayoutBindings(mShaders);
-	mPipeline.Build(PipelineState, LayoutBindings, ShaderStages, RenderTarget, Primitive);
+		mPipelineStateDirty = false;
+		mNumColorTargetsCache = RenderTarget->GetDesc().NumColorTargets;
+		mIuputDescHashCache = Primitive->GetDescHash();
+
+		std::vector<VkPipelineShaderStageCreateInfo> ShaderStages = MakeShaderStageInfo(mShaders);
+		mPipeline.Build(PipelineState, ShaderStages, RenderTarget, Primitive);
+	}
+
+	VkDescriptorSet DescSet = GetDescriptorSet();
+	vkCmdBindDescriptorSets(FVulkanCore::GetMainCmdBuffer(), mPipeline.GetPipelineBindPoint(), mPipeline.GetPipelineLayout(), 0, 1, &DescSet, 0, nullptr);
+
+	vkCmdBindPipeline(FVulkanCore::GetMainCmdBuffer(), mPipeline.GetPipelineBindPoint(), mPipeline.GetPipeline());
 }
 
 std::vector<VkPipelineShaderStageCreateInfo> FVulkanShaderProgram::MakeShaderStageInfo(const FRHIGraphicsShaders& InShaders)
@@ -99,7 +107,7 @@ std::vector<VkDescriptorSetLayoutBinding> FVulkanShaderProgram::MakeLayoutBindin
 	mProgramUniforms.clear();
 
 	std::vector<VkDescriptorSetLayoutBinding> AllBindings;
-	for (uint8 i = 0; i < (uint8)ERHIShaderStage::Count; i++)
+	for (uint8 i = (uint8)ERHIShaderStage::Vertex; i < (uint8)ERHIShaderStage::Compute; i++)
 	{
 		const auto& pShader = InShaders[(ERHIShaderStage)i];
 		if (!pShader)

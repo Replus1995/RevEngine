@@ -63,30 +63,39 @@ FBuffer LoadBufferData(const tinygltf::Accessor& InAccessor, const tinygltf::Mod
 }
 
 
-uint32 FGLTFUtils::GetComponentSize(int InComponentType)
+uint32 FGLTFUtils::GetIndexStride(int InComponentType)
 {
 	switch (InComponentType)
 	{
 	case TINYGLTF_COMPONENT_TYPE_BYTE:
-		return sizeof(int8);
 	case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
-		return sizeof(uint8);
 	case TINYGLTF_COMPONENT_TYPE_SHORT:
-		return sizeof(int16);
 	case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
 		return sizeof(uint16);
 	case TINYGLTF_COMPONENT_TYPE_INT:
-		return sizeof(int32);
 	case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
 		return sizeof(uint32);
-	case TINYGLTF_COMPONENT_TYPE_FLOAT:
-		return sizeof(float);
-	case TINYGLTF_COMPONENT_TYPE_DOUBLE:
-		return sizeof(double);
 	default:
 		return 0;
 	}
 }
+
+EIndexElementType FGLTFUtils::GetIndexType(uint32 InStride)
+{
+	switch (InStride)
+	{
+	case 2:
+		return EIndexElementType::UInt16;
+	case 4:
+		return EIndexElementType::UInt32;
+	default:
+		break;
+	}
+	REV_CORE_ASSERT("Unsupported index type")
+
+	return EIndexElementType(0);
+}
+
 
 EPrimitiveTopology FGLTFUtils::TranslatePrimitiveTopology(int InPrimitiveTopology)
 {
@@ -289,9 +298,12 @@ Ref<FMeshPrimitiveStorage> FGLTFUtils::ImportMeshPrimitive(const tinygltf::Primi
 		REV_CORE_ASSERT(InPrimitive.indices >= 0 && InPrimitive.indices < InModel.accessors.size());
 		const tinygltf::Accessor&  RefAccessor = InModel.accessors[InPrimitive.indices];
 		REV_CORE_ASSERT(RefAccessor.type == TINYGLTF_TYPE_SCALAR);
+
+		uint32 IndexStride = GetIndexStride(RefAccessor.componentType);
+
 		OutStorage->IndexCount = RefAccessor.count;
-		OutStorage->IndexStride = GetComponentSize(RefAccessor.componentType);
-		OutStorage->IndexData = LoadBufferData(RefAccessor, InModel, OutStorage->IndexStride);
+		OutStorage->IndexType = GetIndexType(IndexStride);
+		OutStorage->IndexData = LoadBufferData(RefAccessor, InModel, IndexStride);
 	}
 
 	return OutStorage;

@@ -101,11 +101,11 @@ void FVulkanVertexBuffer::UpdateSubData(const void* Data, uint32 Size, uint32 Of
 	FVulkanUtils::ImmediateUploadBuffer(mBuffer, Data, Size, Offset);
 }
 
-FVulkanIndexBuffer::FVulkanIndexBuffer(uint32 InStride, uint32 InCount, const void* InData)
-	: FRHIIndexBuffer(InStride, InCount)
+FVulkanIndexBuffer::FVulkanIndexBuffer(EIndexElementType InType, uint32 InCount, const void* InData)
+	: FRHIIndexBuffer(InType, InCount)
 {
 	VkBufferUsageFlags BufferUsage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
-	Allocate(InStride * InCount, BufferUsage, VMA_MEMORY_USAGE_GPU_ONLY);
+	Allocate(GetCapacity(), BufferUsage, VMA_MEMORY_USAGE_GPU_ONLY);
 }
 
 FVulkanIndexBuffer::~FVulkanIndexBuffer()
@@ -115,7 +115,7 @@ FVulkanIndexBuffer::~FVulkanIndexBuffer()
 void FVulkanIndexBuffer::UpdateSubData(const void* Data, uint32 Count, uint32 Offset)
 {
 	REV_CORE_ASSERT(Count + Offset <= mCount);
-	FVulkanUtils::ImmediateUploadBuffer(mBuffer, Data, Count * mStride, Offset * mStride);
+	FVulkanUtils::ImmediateUploadBuffer(mBuffer, Data, Count * GetStride(), Offset * GetStride());
 }
 
 }

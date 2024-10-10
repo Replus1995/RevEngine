@@ -3,6 +3,7 @@
 #include "Rev/Math/Maths.h"
 #include "Rev/Render/RHI/RHIResource.h"
 #include "Rev/Render/RHI/RHIPipeline.h"
+#include "Rev/Render/RHI/RHITexture.h"
 #include <unordered_map>
 
 namespace Rev

@@ -23,7 +23,7 @@ void FSceneProxy::Prepare(const Ref<FScene>& Scene)
 void FSceneProxy::SyncResource()
 {
 	if(!mSceneUB)
-		mSceneUB = FRHICore::CreateUniformBuffer(sizeof(FSceneUniform), UL::BScene);
+		mSceneUB = FRHICore::CreateUniformBuffer(sizeof(FSceneUniform));
 
 	//Should run on render thread
 	//Update uniform buffer

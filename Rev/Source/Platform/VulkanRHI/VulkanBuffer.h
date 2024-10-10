@@ -51,7 +51,7 @@ private:
 class FVulkanIndexBuffer : public FRHIIndexBuffer, FVulkanBuffer
 {
 public:
-	FVulkanIndexBuffer(uint32 InStride, uint32 InCount, const void* InData = nullptr);
+	FVulkanIndexBuffer(EIndexElementType InType, uint32 InCount, const void* InData = nullptr);
 	virtual ~FVulkanIndexBuffer();
 	virtual const void* GetNativeHandle() const override { return mBuffer; }
 	virtual void UpdateSubData(const void* Data, uint32 Count, uint32 Offset) override;

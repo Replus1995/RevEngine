@@ -28,7 +28,7 @@ static Ref<FRHIPrimitive> CreateScreenQuad()
         });
 
     constexpr uint32 IndexCount = sizeof(ScreenQuadIndices) / sizeof(uint16);
-    Ref<FRHIIndexBuffer> IndexBuffer = FRHICore::CreateIndexBuffer(ScreenQuadIndices, sizeof(uint16), IndexCount);
+    Ref<FRHIIndexBuffer> IndexBuffer = FRHICore::CreateIndexBuffer(ScreenQuadIndices, EIndexElementType::UInt16, IndexCount);
 
     Ref<FRHIPrimitive> Primitive = FRHICore::CreatePrimitive(PT_Triangles);
     Primitive->AddVertexBuffer(VertexBuffer);

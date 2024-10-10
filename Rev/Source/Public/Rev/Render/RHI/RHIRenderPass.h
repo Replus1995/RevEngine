@@ -68,6 +68,9 @@ public:
 	FRHIRenderPass(const FRenderPassDesc& InDesc) : mDesc(InDesc) {}
 	virtual ~FRHIRenderPass() = default;
 
+	const FRenderPassDesc& GetDesc() const { return mDesc; }
+	const Ref<FRHIRenderTarget>& GetRenderTarget() const { return mRenderTarget; }
+
 protected:
 	FRenderPassDesc mDesc;
 	Ref<FRHIRenderTarget> mRenderTarget;

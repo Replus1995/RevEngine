@@ -13,6 +13,11 @@
 namespace Rev
 {
 
+class FVulkanRenderPass;
+class FVulkanShaderProgram;
+class FVulkanUniformBuffer;
+class FVulkanTexture;
+
 class FVulkanContext : public FRHIContext
 {
 public:
@@ -35,9 +40,16 @@ public:
 	virtual void SetClearDepthStencil(float InDepth, uint32 InStencil);
 	virtual void ClearBackBuffer() override;
 
-	virtual void BindUniformBuffer(const Ref<FRHIUniformBuffer>& InBuffer, uint16 InBinding) override;
+//Draw
+	virtual void BeginRenderPass(const Ref<FRHIRenderPass>& InRenderPass) override;
+	virtual void EndRenderPass() override;
+	virtual void NextSubpass() override;
 
-	virtual void DrawPrimitive(const Ref<FRHIPrimitive>& InPrimitive, const Ref<FRHIShaderProgram>& InProgram) override;
+	virtual void BindUniformBuffer(const Ref<FRHIUniformBuffer>& InBuffer, uint16 InBinding) override;
+	virtual void BindTexture(const Ref<FRHITexture>& InTexture, uint16 InBinding) override;
+	virtual void BindProgram(const Ref<FRHIShaderProgram>& InProgram) override;
+
+	virtual void DrawPrimitive(const Ref<FRHIPrimitive>& InPrimitive) override;
 
 
 	const FVulkanSwapchain& GetSwapchain() const { return mSwapchain; }
@@ -48,8 +60,8 @@ public:
 	VkCommandBuffer GetMainCmdBuffer() { return mFrameData[mFrameDataIndex].MainCmdBuffer; }
 	FVulkanDescriptorPool& GetDescriptorPool() { return mFrameData[mFrameDataIndex].DescriptorPool; }
 
-	const std::map<uint16, Ref<FRHIUniformBuffer>>& GetUniformBufferMap() const { return mUniformBuffers; };
-	FRHIUniformBuffer* FindUniformBuffer(uint16 BindingIdx) const;
+	const std::map<uint16, Ref<FVulkanUniformBuffer>>& GetUniformBufferMap() const { return mUniformBuffers; };
+	FVulkanUniformBuffer* FindUniformBuffer(uint16 BindingIdx) const;
 
 
 private:
@@ -73,8 +85,11 @@ private:
 	VkCommandBuffer mImmCmdBuffer;
 	VkCommandPool mImmCmdPool;
 
-	//uniform buffer
-	std::map<uint16, Ref<FRHIUniformBuffer>> mUniformBuffers;
+	//per frame data
+	Ref<FRHIRenderPass> mCurRenderPass = nullptr;
+	Ref<FVulkanShaderProgram> mCurProgram = nullptr;
+	std::map<uint16, Ref<FVulkanUniformBuffer>> mUniformBuffers;
+	std::map<uint16, Ref<FVulkanTexture>> mTextures;
 
 };
 

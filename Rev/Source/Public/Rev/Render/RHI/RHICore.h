@@ -19,11 +19,11 @@ public:
 	//Buffer
 	static Ref<FRHIVertexBuffer> CreateVertexBuffer(uint32 InSize); //Dynamic Data
 	static Ref<FRHIVertexBuffer> CreateVertexBuffer(const float* InVertices, uint32 InSize); //Static Data
-	static Ref<FRHIIndexBuffer> CreateIndexBuffer(uint32 InStride, uint32 InCount); //Dynamic Data
-	static Ref<FRHIIndexBuffer> CreateIndexBuffer(const void* InIndices, uint32 InStride, uint32 InCount); //Static Data
+	static Ref<FRHIIndexBuffer> CreateIndexBuffer(EIndexElementType InType, uint32 InCount); //Dynamic Data
+	static Ref<FRHIIndexBuffer> CreateIndexBuffer(const void* InIndices, EIndexElementType InType, uint32 InCount); //Static Data
 
-	static Ref<FRHIUniformBuffer> CreateUniformBuffer(uint32 InSize, uint32 InBinding);
-	static Ref<FRHIUniformBufferDynamic> CreateUniformBufferDynamic(uint32 InSize, uint32 InBinding);
+	static Ref<FRHIUniformBuffer> CreateUniformBuffer(uint32 InSize);
+	static Ref<FRHIUniformBufferDynamic> CreateUniformBufferDynamic(uint32 InSize);
 
 	//Primitive
 	static Ref<FRHIPrimitive> CreatePrimitive(EPrimitiveTopology InTopology);

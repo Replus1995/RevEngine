@@ -121,6 +121,9 @@ public:
 	virtual void ClearTargets() = 0;
 	virtual const Ref<FRHITexture> GetTargetTexture(ERenderTargetAttachment Index) const = 0;
 
+	uint16 GetWidth() const { return mDesc.Width; }
+	uint16 GetHeight() const { return mDesc.Height; }
+
 	//Use textures created by user
 	/*virtual void Attach(ERenderTargetAttachment Index, const Ref<FRHITexture>& InTexture, uint8 InMipLevel = 0, int32 InArrayIndex = -1) = 0;
 	virtual void Detach(ERenderTargetAttachment Index) = 0;

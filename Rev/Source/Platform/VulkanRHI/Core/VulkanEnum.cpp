@@ -188,4 +188,18 @@ VkFormat FVulkanEnum::Translate(EVertexElementType InType)
     return VK_FORMAT_UNDEFINED;
 }
 
+VkIndexType FVulkanEnum::Translate(EIndexElementType InType)
+{
+    switch (InType)
+    {
+    default:
+    case Rev::EIndexElementType::UInt16 :
+        return VK_INDEX_TYPE_UINT16;
+    case Rev::EIndexElementType::UInt32:
+        return VK_INDEX_TYPE_UINT32;
+    }
+
+    return VK_INDEX_TYPE_UINT16;
+}
+
 }

@@ -82,48 +82,48 @@ Ref<FRHIVertexBuffer> FRHICore::CreateVertexBuffer(const float* InVertices, uint
 	return nullptr;
 }
 
-Ref<FRHIIndexBuffer> FRHICore::CreateIndexBuffer(uint32 InStride, uint32 InCount)
+Ref<FRHIIndexBuffer> FRHICore::CreateIndexBuffer(EIndexElementType InType, uint32 InCount)
 {
 	switch (GetRenderAPI())
 	{
 	case ERenderAPI::None:    REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
-	case ERenderAPI::Vulkan:  return CreateRef<FVulkanIndexBuffer>(InStride, InCount);
+	case ERenderAPI::Vulkan:  return CreateRef<FVulkanIndexBuffer>(InType, InCount);
 	}
 
 	REV_CORE_ASSERT(false, "Unknown RenderAPI!");
 	return nullptr;
 }
 
-Ref<FRHIIndexBuffer> FRHICore::CreateIndexBuffer(const void* InIndices, uint32 InStride, uint32 InCount)
+Ref<FRHIIndexBuffer> FRHICore::CreateIndexBuffer(const void* InIndices, EIndexElementType InType, uint32 InCount)
 {
 	switch (GetRenderAPI())
 	{
 	case ERenderAPI::None:    REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
-	case ERenderAPI::Vulkan:  return CreateRef<FVulkanIndexBuffer>(InStride, InCount, InIndices);
+	case ERenderAPI::Vulkan:  return CreateRef<FVulkanIndexBuffer>(InType, InCount, InIndices);
 	}
 
 	REV_CORE_ASSERT(false, "Unknown RenderAPI!");
 	return nullptr;
 }
 
-Ref<FRHIUniformBuffer> FRHICore::CreateUniformBuffer(uint32 InSize, uint32 InBinding)
+Ref<FRHIUniformBuffer> FRHICore::CreateUniformBuffer(uint32 InSize)
 {
 	switch (GetRenderAPI())
 	{
 	case ERenderAPI::None:    REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
-	case ERenderAPI::Vulkan:  return CreateRef<FVulkanUniformBuffer>(InSize, InBinding);
+	case ERenderAPI::Vulkan:  return CreateRef<FVulkanUniformBuffer>(InSize);
 	}
 
 	REV_CORE_ASSERT(false, "Unknown RenderAPI!");
 	return nullptr;
 }
 
-Ref<FRHIUniformBufferDynamic> FRHICore::CreateUniformBufferDynamic(uint32 InSize, uint32 InBinding)
+Ref<FRHIUniformBufferDynamic> FRHICore::CreateUniformBufferDynamic(uint32 InSize)
 {
 	switch (GetRenderAPI())
 	{
 	case ERenderAPI::None:    REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
-	case ERenderAPI::Vulkan:  return CreateRef<FVulkanUniformBufferDynamic>(InSize, InBinding);
+	case ERenderAPI::Vulkan:  return CreateRef<FVulkanUniformBufferDynamic>(InSize);
 	}
 
 	REV_CORE_ASSERT(false, "Unknown RenderAPI!");
