@@ -50,7 +50,8 @@ FVulkanTexture::FVulkanTexture(const FTextureDesc& InDesc, const FSamplerDesc& I
 
 VkExtent3D FVulkanTexture::GetExtent()
 {
-    return { mDesc.Width, mDesc.Height, mDesc.Depth };
+	uint32 Depth = mDesc.Depth <= 0 ? 1 : mDesc.Depth;
+    return { mDesc.Width, mDesc.Height, Depth };
 }
 
 VkExtent2D FVulkanTexture::CalculateMipSize2D(uint32 InMipLevel)

@@ -51,6 +51,11 @@ void RenderCmd::PresentFrame()
 	sContext->PresentFrame();
 }
 
+void RenderCmd::SetVSync(bool bEnable)
+{
+	sContext->SetVSync(bEnable);
+}
+
 void RenderCmd::SetViewport(uint32 x, uint32 y, uint32 width, uint32 height)
 {
 	sContext->SetViewport(x, y, width, height);
@@ -64,6 +69,21 @@ void RenderCmd::SetClearColor(const Math::FLinearColor& color)
 void RenderCmd::ClearBackBuffer()
 {
 	sContext->ClearBackBuffer();
+}
+
+void RenderCmd::BeginRenderPass(const Ref<FRHIRenderPass>& InRenderPass)
+{
+	sContext->BeginRenderPass(InRenderPass);
+}
+
+void RenderCmd::EndRenderPass()
+{
+	sContext->EndRenderPass();
+}
+
+void RenderCmd::NextSubpass()
+{
+	sContext->NextSubpass();
 }
 
 void RenderCmd::BindUniformBuffer(const Ref<FRHIUniformBuffer>& InBuffer, uint16 InBinding)

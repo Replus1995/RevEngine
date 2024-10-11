@@ -1,6 +1,7 @@
 #include "VulkanRenderPass.h"
 #include "VulkanPixelFormat.h"
 #include "VulkanCore.h"
+#include "VulkanRenderTarget.h"
 #include "Core/VulkanEnum.h"
 #include "Core/VulkanDefines.h"
 #include "Rev/Core/Assert.h"
@@ -11,7 +12,7 @@ namespace Rev
 FVulkanRenderPass::FVulkanRenderPass(const FRenderPassDesc& InDesc)
 	: FRHIRenderPass(InDesc)
 {
-	REV_CORE_ASSERT(mDesc.AttachmentCount <= (uint32)RTA_MaxColorAttachments);
+	REV_CORE_ASSERT(mDesc.NumColorAttachments <= (uint32)RTA_MaxColorAttachments);
 	CreateResource();
 }
 
@@ -22,11 +23,11 @@ FVulkanRenderPass::~FVulkanRenderPass()
 
 void FVulkanRenderPass::CreateResource()
 {
-	uint32 nDepthStencilAttachmentIndex = 0;
-	std::vector<VkAttachmentDescription2> AttachmentDescs(mDesc.AttachmentCount);
-	for (uint32 i = 0; i < mDesc.AttachmentCount; i++)
+	int32 nDepthStencilAttachmentIndex = -1;
+	std::vector<VkAttachmentDescription2> AttachmentDescs;
+	for (uint32 i = 0; i < mDesc.NumColorAttachments; i++)
 	{
-		const FRenderPassAttachmentDesc& InAttachmentDesc = mDesc.Attachments[i];
+		const FColorAttachmentDesc& InAttachmentDesc = mDesc.ColorAttachments[i];
 		EPixelFormat InFormat = InAttachmentDesc.Format;
 
 		VkAttachmentDescription2 AttachmentDesc{};
@@ -35,15 +36,37 @@ void FVulkanRenderPass::CreateResource()
 		AttachmentDesc.samples = VK_SAMPLE_COUNT_1_BIT;
 		AttachmentDesc.loadOp = FVulkanEnum::Translate(InAttachmentDesc.LoadOp);
 		AttachmentDesc.storeOp = FVulkanEnum::Translate(InAttachmentDesc.StoreOp);
-		AttachmentDesc.stencilLoadOp = FPixelFormatInfo::HasStencil(InFormat) ? FVulkanEnum::Translate(InAttachmentDesc.StencilLoadOp) : VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-		AttachmentDesc.stencilStoreOp = FPixelFormatInfo::HasStencil(InFormat) ? FVulkanEnum::Translate(InAttachmentDesc.StencilStoreOp) : VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		AttachmentDesc.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		AttachmentDesc.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
 		AttachmentDesc.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		AttachmentDesc.finalLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
 
-		if (FPixelFormatInfo::HasDepth(InFormat))
-			nDepthStencilAttachmentIndex = i;
+		AttachmentDescs.emplace_back(std::move(AttachmentDesc));
+	}
+
+	if (FPixelFormatInfo::HasDepth(mDesc.DepthStencilAttchment.Format))
+	{
+		nDepthStencilAttachmentIndex = AttachmentDescs.size();
+
+		EPixelFormat DepthFormat = mDesc.DepthStencilAttchment.Format;
+		bool bHasStencil = FPixelFormatInfo::HasStencil(DepthFormat);
+
+		VkAttachmentDescription2 AttachmentDesc{};
+		AttachmentDesc.sType = VK_STRUCTURE_TYPE_ATTACHMENT_DESCRIPTION_2;
+		AttachmentDesc.format = (VkFormat)GPixelFormats[DepthFormat].PlatformFormat;
+		AttachmentDesc.samples = VK_SAMPLE_COUNT_1_BIT;
+		AttachmentDesc.loadOp = FVulkanEnum::Translate(mDesc.DepthStencilAttchment.LoadOp);
+		AttachmentDesc.storeOp = FVulkanEnum::Translate(mDesc.DepthStencilAttchment.StoreOp);
+		AttachmentDesc.stencilLoadOp = bHasStencil ? FVulkanEnum::Translate(mDesc.DepthStencilAttchment.StencilLoadOp) : VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		AttachmentDesc.stencilStoreOp = bHasStencil ? FVulkanEnum::Translate(mDesc.DepthStencilAttchment.StencilStoreOp) : VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		AttachmentDesc.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+		AttachmentDesc.finalLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
 
 		AttachmentDescs.emplace_back(std::move(AttachmentDesc));
+	}
+	else
+	{
+		mDesc.DepthStencilAttchment.Format = PF_Unknown;
 	}
 
 	struct FSubpassAttachmentRef
@@ -64,10 +87,10 @@ void FVulkanRenderPass::CreateResource()
 		FSubpassAttachmentRef& AttachmentRef = SubpassAttachmentRefs[i];
 		VkSubpassDescription2& SubpassDesc = SubpassDescs[i];
 
-		REV_CORE_ASSERT(AttachmentRef.ColorAttachmentCount > 0);
+		REV_CORE_ASSERT(InSubpassDesc.NumColorAttachments > 0);
 
-		AttachmentRef.InputAttachmentCount = InSubpassDesc.InputAttachmentCount;
-		for (size_t ii = 0; ii < InSubpassDesc.InputAttachmentCount; ii++)
+		AttachmentRef.InputAttachmentCount = InSubpassDesc.NumInputAttachments;
+		for (size_t ii = 0; ii < InSubpassDesc.NumInputAttachments; ii++)
 		{
 			VkAttachmentReference2& Ref = AttachmentRef.InputAttachments[ii];
 			Ref.sType = VK_STRUCTURE_TYPE_ATTACHMENT_REFERENCE_2;
@@ -78,8 +101,8 @@ void FVulkanRenderPass::CreateResource()
 		}
 
 		bool bEnableResolve = false;
-		AttachmentRef.ColorAttachmentCount = InSubpassDesc.ColorAttachmentCount;
-		for (size_t ii = 0; ii < InSubpassDesc.ColorAttachmentCount; ii++)
+		AttachmentRef.ColorAttachmentCount = InSubpassDesc.NumColorAttachments;
+		for (size_t ii = 0; ii < InSubpassDesc.NumColorAttachments; ii++)
 		{
 			VkAttachmentReference2& Ref = AttachmentRef.ColorAttachments[ii];
 			Ref.sType = VK_STRUCTURE_TYPE_ATTACHMENT_REFERENCE_2;
@@ -104,12 +127,12 @@ void FVulkanRenderPass::CreateResource()
 		}
 
 		bool bEnableDepthStencil = false;
-		if (InSubpassDesc.DepthStencilAttachment != RTA_EmptyAttachment)
+		if (InSubpassDesc.DepthStencilAttachment != RTA_EmptyAttachment && nDepthStencilAttachmentIndex >= 0)
 		{
 			VkAttachmentReference2& Ref = AttachmentRef.DepthStencilAttachment;
 			Ref.sType = VK_STRUCTURE_TYPE_ATTACHMENT_REFERENCE_2;
 			Ref.pNext = nullptr;
-			Ref.attachment = nDepthStencilAttachmentIndex;
+			Ref.attachment = (uint32)nDepthStencilAttachmentIndex;
 			Ref.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 			Ref.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
 
@@ -128,7 +151,7 @@ void FVulkanRenderPass::CreateResource()
 
 
 	VkRenderPassCreateInfo2 RenderPassInfo{};
-	RenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+	RenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO_2;
 	RenderPassInfo.attachmentCount = (uint32_t)AttachmentDescs.size();
 	RenderPassInfo.pAttachments = AttachmentDescs.data();
 	RenderPassInfo.subpassCount = (uint32_t)SubpassDescs.size();

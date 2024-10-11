@@ -15,8 +15,6 @@ class FRHITexture;
 class FRHIRenderTarget;
 class FRHIRenderPass;
 
-class FRHIContext;
-
 class FRHIContext
 {
 public:

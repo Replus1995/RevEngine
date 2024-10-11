@@ -12,10 +12,10 @@ public:
 	EPipelineBindPoint PipelineBindPoint = PBP_Graphics;
 	ERenderTargetAttachment ColorAttachments[RTA_MaxColorAttachments];
 	ERenderTargetAttachment ResolveAttachments[RTA_MaxColorAttachments];
-	ERenderTargetAttachment DepthStencilAttachment;
+	ERenderTargetAttachment DepthStencilAttachment = RTA_EmptyAttachment;
 	ERenderTargetAttachment InputAttachments[RTA_MaxColorAttachments + 2];
-	uint32 ColorAttachmentCount = 0;
-	uint32 InputAttachmentCount = 0;
+	uint32 NumColorAttachments = 0;
+	uint32 NumInputAttachments = 0;
 };
 
 struct FSubpassDependDesc
@@ -42,22 +42,29 @@ enum EAttachmentStoreOp : uint8
 	ASO_DontCare
 };
 
-struct FRenderPassAttachmentDesc
+struct FColorAttachmentDesc
 {
 public:
 	EPixelFormat Format;
 	EAttachmentLoadOp LoadOp;
 	EAttachmentStoreOp StoreOp;
+};
+
+struct FDepthStencilAttachmentDesc : public FColorAttachmentDesc
+{
+public:
 	EAttachmentLoadOp StencilLoadOp;
 	EAttachmentStoreOp StencilStoreOp;
 };
 
 
+
 struct FRenderPassDesc
 {
 public:
-	uint32 AttachmentCount = 0;
-	FRenderPassAttachmentDesc Attachments[RTA_MaxColorAttachments + 1];
+	FColorAttachmentDesc ColorAttachments[RTA_MaxColorAttachments];
+	uint32 NumColorAttachments = 0;
+	FDepthStencilAttachmentDesc DepthStencilAttchment;
 	std::vector<FSubpassDesc> SubpassDescs;
 	std::vector<FSubpassDependDesc> SubpassDependDescs;
 };
@@ -69,7 +76,8 @@ public:
 	virtual ~FRHIRenderPass() = default;
 
 	const FRenderPassDesc& GetDesc() const { return mDesc; }
-	const Ref<FRHIRenderTarget>& GetRenderTarget() const { return mRenderTarget; }
+	const Ref<FRHIRenderTarget>& GetRenderTarget() const { return mRenderTarget; } 
+	bool SetRenderTarget(const Ref<FRHIRenderTarget>& InRenderTarget);
 
 protected:
 	FRenderPassDesc mDesc;

@@ -75,7 +75,7 @@ void FVulkanTexture2D::CreateResource()
     ImageAllocinfo.requiredFlags = VkMemoryPropertyFlags(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
     //allocate and create the image
-    vmaCreateImage(FVulkanCore::GetAllocator(), &ImageCreateInfo, &ImageAllocinfo, &mImage, &mAllocation, nullptr);
+    REV_VK_CHECK(vmaCreateImage(FVulkanCore::GetAllocator(), &ImageCreateInfo, &ImageAllocinfo, &mImage, &mAllocation, nullptr));
 
     //build a image-view for the draw image to use for rendering
     VkImageViewCreateInfo ImageViewCreateInfo{}; // = FVkInit::ImageViewCreateInfo2D(mFormatInfo.Format, mImage, VK_IMAGE_ASPECT_COLOR_BIT);

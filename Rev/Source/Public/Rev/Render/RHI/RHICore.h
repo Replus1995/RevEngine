@@ -5,6 +5,7 @@
 #include "Rev/Render/RHI/RHITexture.h"
 #include "Rev/Render/RHI/RHIRenderTarget.h"
 #include "Rev/Render/RHI/RHIPrimitive.h"
+#include "Rev/Render/RHI/RHIRenderPass.h"
 
 namespace Rev
 {
@@ -32,7 +33,8 @@ public:
 	static Ref<FRHITexture> CreateTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc);
 	static Ref<FRHIRenderTarget> CreateRenderTarget(const FRenderTargetDesc& InDesc);
 
-	//State
+	//Pipeline
+	static Ref<FRHIRenderPass> CreateRenderPass(const FRenderPassDesc& InDesc);
 
 };
 

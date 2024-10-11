@@ -25,6 +25,9 @@ public:
 
 	void DrawScene();
 
+	uint32 GetFrameWidth() const;
+	uint32 GetFrameHeight() const;
+
 protected:
 	FSceneUniform mSceneParams;
 	Ref<FRHIUniformBuffer> mSceneUB;

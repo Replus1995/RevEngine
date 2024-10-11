@@ -227,6 +227,8 @@ void FVulkanContext::BeginRenderPass(const Ref<FRHIRenderPass>& InRenderPass)
 		mCurRenderPass = nullptr;
 		return;
 	}
+	FVulkanRenderTarget* pRenderTarget = static_cast<FVulkanRenderTarget*>(mCurRenderPass->GetRenderTarget().get());
+	pRenderTarget->FlushResource((VkRenderPass)mCurRenderPass->GetNativeHandle());
 
 	VkRenderPassBeginInfo RenderPassInfo{};
 	RenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -250,6 +252,9 @@ void FVulkanContext::BeginRenderPass(const Ref<FRHIRenderPass>& InRenderPass)
 
 void FVulkanContext::EndRenderPass()
 {
+	if(!mCurRenderPass)
+		return;
+
 	VkSubpassEndInfo SubpassEndInfo{};
 	SubpassEndInfo.sType = VK_STRUCTURE_TYPE_SUBPASS_END_INFO;
 	SubpassEndInfo.pNext = NULL;

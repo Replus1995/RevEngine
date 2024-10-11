@@ -11,6 +11,7 @@
 #include "VulkanRHI/VulkanTexture.h"
 #include "VulkanRHI/VulkanRenderTarget.h"
 #include "VulkanRHI/VulkanPrimitive.h"
+#include "VulkanRHI/VulkanRenderPass.h"
 
 namespace Rev
 {
@@ -160,6 +161,17 @@ Ref<FRHIRenderTarget> FRHICore::CreateRenderTarget(const FRenderTargetDesc& InDe
 	{
 	case ERenderAPI::None:    REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
 	case ERenderAPI::Vulkan:  return CreateRef<FVulkanRenderTarget>(InDesc);
+	}
+
+	REV_CORE_ASSERT(false, "Unknown RenderAPI!");
+	return nullptr;
+}
+Ref<FRHIRenderPass> FRHICore::CreateRenderPass(const FRenderPassDesc& InDesc)
+{
+	switch (GetRenderAPI())
+	{
+	case ERenderAPI::None:    REV_CORE_ASSERT(false, "ERenderAPI::None is currently not supported!"); return nullptr;
+	case ERenderAPI::Vulkan:  return CreateRef<FVulkanRenderPass>(InDesc);
 	}
 
 	REV_CORE_ASSERT(false, "Unknown RenderAPI!");

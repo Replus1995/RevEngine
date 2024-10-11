@@ -45,6 +45,7 @@ static std::unique_ptr<FVulkanCorePrivate> sVulkanCore;
 
 void FVulkanCore::Init()
 {
+	FVulkanPixelFormat::InitPlatformFormats();
 	if(!sVulkanCore)
 		sVulkanCore = std::make_unique<FVulkanCorePrivate>();
 }
