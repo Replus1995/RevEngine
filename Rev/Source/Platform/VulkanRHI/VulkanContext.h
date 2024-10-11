@@ -35,6 +35,7 @@ public:
 	virtual void ImmediateSubmit(std::function<void(VkCommandBuffer)>&& Func);
 
 //Command
+	virtual void SetVSync(bool bEnable) override;
 	virtual void SetViewport(uint32 InX, uint32 InY, uint32 InWidth, uint32 InHeight) override;
 	virtual void SetClearColor(const Math::FLinearColor& InColor) override;
 	virtual void SetClearDepthStencil(float InDepth, uint32 InStencil);
@@ -69,6 +70,8 @@ private:
 
 private:
 	FVulkanSwapchain mSwapchain;
+	VkPresentModeKHR mCurPresentMode = VK_PRESENT_MODE_MAILBOX_KHR;
+	VkPresentModeKHR mTargetPresentMode = VK_PRESENT_MODE_MAILBOX_KHR;
 
 	//frame data
 	uint32 mCurSwapchainImageIndex = 0;

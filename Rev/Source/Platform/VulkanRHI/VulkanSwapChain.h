@@ -6,12 +6,10 @@
 namespace Rev
 {
 
-class FVulkanInstance;
-class FVulkanDevice;
 class FVulkanSwapchain
 {
 public:
-	void CreateSwapchain();
+	void CreateSwapchain(VkPresentModeKHR InPresentMode);
 	void Cleanup();
 
 	const VkSwapchainKHR& GetSwapchain() const { return mSwapchain; }
@@ -22,7 +20,7 @@ public:
 
 private:
 	static VkSurfaceFormatKHR ChooseSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& InAvailableFormats);
-	static VkPresentModeKHR ChoosePresentMode(const std::vector<VkPresentModeKHR>& InAvailablePresentModes);
+	static VkPresentModeKHR ChoosePresentMode(const std::vector<VkPresentModeKHR>& InAvailablePresentModes, VkPresentModeKHR InTargetPresentMode);
 	static VkExtent2D ChooseExtent(const VkSurfaceCapabilitiesKHR& InCapabilities);
 	void CreateImageViews();
 

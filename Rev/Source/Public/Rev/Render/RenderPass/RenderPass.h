@@ -17,7 +17,6 @@ public:
 
 	const Ref<FRHIRenderTarget>& GetRenderTarget() const;
 	void SetRenderTarget(const Ref<FRHIRenderTarget>& InTarget);
-	void ClearRenderTarget();
 
 protected:
 	std::string mName;

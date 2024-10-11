@@ -72,6 +72,7 @@ void FStaticMeshProxy::DrawMeshes(EMaterialBlendMode InBlend, bool bUseMeshMater
 
 void FStaticMeshProxy::DrawPrimitives(const FStaticMeshRenderData& InData, EMaterialBlendMode InBlend, bool bUseMeshMaterial) const
 {
+	RenderCmd::BindUniformBuffer(InData.MeshUB, UL::BStaticMesh);
 	for (uint32 i = 0; i < InData.MeshData->GetMaterialCount(); i++)
 	{
 		auto& pMat = InData.MeshData->GetMaterial(i);

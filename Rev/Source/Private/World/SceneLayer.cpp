@@ -71,12 +71,10 @@ void SceneLayer::OnDraw()
 	//uint32 WinWidth = Application::GetApp().GetWindow()->GetWidth();
 	//uint32 WinHeight = Application::GetApp().GetWindow()->GetHeight();
 
-	/*mRenderer->GetContext()->Width = WinWidth;
-	mRenderer->GetContext()->Height = WinHeight;
 
 	mRenderer->BeginFrame();
 	mRenderer->DrawFrame();
-	mRenderer->EndFrame();*/
+	mRenderer->EndFrame();
 
 
 	//RenderCmd::BeginFrame(true);

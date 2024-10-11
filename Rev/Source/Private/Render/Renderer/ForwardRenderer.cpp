@@ -18,8 +18,6 @@ FForwardRenderer::~FForwardRenderer()
 
 void FForwardRenderer::BeginFrame()
 {
-	FRenderer::BeginFrame();
-
 	//prepare resource
 	//if (!mLinearScreenTarget)
 	//{

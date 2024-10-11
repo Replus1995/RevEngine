@@ -11,7 +11,6 @@ struct FVulkanCorePrivate
 {
 public:
 	FVulkanInstance Instance;
-	FVulkanDevice Device;
 	VmaAllocator Allocator = nullptr;
 	FVulkanUniformManager* UniformManager = nullptr;
 
@@ -20,12 +19,12 @@ public:
 	{
 		Instance.CreateInstance();
 		Instance.CreateSurface();
-		Device.PickPhysicalDevice(&Instance);
-		Device.CreateLogicalDevice(&Instance);
+		Instance.PickPhysicalDevice();
+		Instance.CreateLogicalDevice();
 		
 		VmaAllocatorCreateInfo AllocatorCreateInfo = {};
-		AllocatorCreateInfo.physicalDevice = Device.GetPhysicalDevice();
-		AllocatorCreateInfo.device = Device.GetDevice();
+		AllocatorCreateInfo.physicalDevice = Instance.GetPhysicalDevice();
+		AllocatorCreateInfo.device = Instance.GetDevice();
 		AllocatorCreateInfo.instance = Instance.GetInstance();
 		AllocatorCreateInfo.flags = VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT;
 		vmaCreateAllocator(&AllocatorCreateInfo, &Allocator);
@@ -38,7 +37,6 @@ public:
 		delete UniformManager;
 
 		vmaDestroyAllocator(Allocator);
-		Device.Cleanup();
 		Instance.Cleanup();
 	}
 };
@@ -68,27 +66,27 @@ VkSurfaceKHR FVulkanCore::GetSurface()
 
 VkPhysicalDevice FVulkanCore::GetPhysicalDevice()
 {
-	return sVulkanCore->Device.GetPhysicalDevice();
+	return sVulkanCore->Instance.GetPhysicalDevice();
 }
 
 VkDevice FVulkanCore::GetDevice()
 {
-	return sVulkanCore->Device.GetDevice();
+	return sVulkanCore->Instance.GetDevice();
 }
 
 VkQueue FVulkanCore::GetQueue(EVulkanQueueKind InKind)
 {
-	return sVulkanCore->Device.GetQueue(InKind);
+	return sVulkanCore->Instance.GetQueue(InKind);
 }
 
 uint32 FVulkanCore::GetQueueFamily(EVulkanQueueKind InKind)
 {
-	return sVulkanCore->Device.GetQueueFamily(InKind);
+	return sVulkanCore->Instance.GetQueueFamily(InKind);
 }
 
-const FVulkanSwapChainSupport& FVulkanCore::GetSwapChainSupport()
+const FVulkanSurfaceSupport& FVulkanCore::GetSurfaceSupport()
 {
-	return sVulkanCore->Device.GetSwapChainSupport();
+	return sVulkanCore->Instance.GetSurfaceSupport();
 }
 
 VmaAllocator FVulkanCore::GetAllocator()

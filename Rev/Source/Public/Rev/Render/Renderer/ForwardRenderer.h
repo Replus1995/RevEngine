@@ -1,6 +1,5 @@
 #pragma once
 #include "Rev/Render/Renderer/Renderer.h"
-#include "Rev/Render/RenderPass/SurfacePass.h"
 #include "Rev/Render/RenderPass/GammaPass.h"
 
 namespace Rev
@@ -18,7 +17,6 @@ public:
 
 private:
 	Ref<class FRHIRenderTarget> mLinearScreenTarget = nullptr;
-	FForwardSurfacePass mForwardSurfacePass;
 	FGammaCorrectPass mGammaCorrectPass;
 };
 

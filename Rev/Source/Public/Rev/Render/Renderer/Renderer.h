@@ -12,9 +12,9 @@ public:
 	FRenderer(FSceneProxy* InSceneProxy);
 	virtual ~FRenderer();
 
-	virtual void BeginFrame();
-	virtual void DrawFrame();
-	virtual void EndFrame();
+	virtual void BeginFrame() = 0;
+	virtual void DrawFrame() = 0;
+	virtual void EndFrame() = 0;
 
 protected:
 	FSceneProxy* mSceneProxy = nullptr;

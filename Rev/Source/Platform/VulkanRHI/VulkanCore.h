@@ -1,6 +1,5 @@
 #pragma once
 #include "Core/VulkanInstance.h"
-#include "Core/VulkanDevice.h"
 #include "VulkanContext.h"
 #include <vk_mem_alloc.h>
 
@@ -22,7 +21,7 @@ public:
 	static VkDevice GetDevice();
 	static VkQueue GetQueue(EVulkanQueueKind InKind);
 	static uint32 GetQueueFamily(EVulkanQueueKind InKind);
-	static const FVulkanSwapChainSupport& GetSwapChainSupport();
+	static const FVulkanSurfaceSupport& GetSurfaceSupport();
 	static VmaAllocator GetAllocator();
 
 	static FVulkanContext* GetContext();

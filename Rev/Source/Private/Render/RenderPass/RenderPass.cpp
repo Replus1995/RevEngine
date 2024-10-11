@@ -42,16 +42,4 @@ void FRenderPass::SetRenderTarget(const Ref<FRHIRenderTarget>& InTarget)
 	mRenderTarget = InTarget;
 }
 
-void FRenderPass::ClearRenderTarget()
-{
-	if (mRenderTarget)
-	{
-		mRenderTarget->ClearTargets();
-	}
-	else
-	{
-		RenderCmd::ClearBackBuffer();
-	}
-}
-
 }

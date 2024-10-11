@@ -14,16 +14,4 @@ FRenderer::~FRenderer()
 {
 }
 
-void FRenderer::BeginFrame()
-{
-}
-
-void FRenderer::DrawFrame()
-{
-}
-
-void FRenderer::EndFrame()
-{
-}
-
 }

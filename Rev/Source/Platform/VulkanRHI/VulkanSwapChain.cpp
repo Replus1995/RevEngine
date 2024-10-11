@@ -12,17 +12,17 @@
 namespace Rev
 {
 
-void FVulkanSwapchain::CreateSwapchain()
+void FVulkanSwapchain::CreateSwapchain(VkPresentModeKHR InPresentMode)
 {
-    const FVulkanSwapChainSupport& SwapChainSupport = FVulkanCore::GetSwapChainSupport();
+    const FVulkanSurfaceSupport& SurfaceSupport = FVulkanCore::GetSurfaceSupport();
 
-    VkSurfaceFormatKHR SurfaceFormat = ChooseSurfaceFormat(SwapChainSupport.Formats);
-    VkPresentModeKHR PresentMode = ChoosePresentMode(SwapChainSupport.PresentModes);
-    VkExtent2D Extent = ChooseExtent(SwapChainSupport.Capabilities);
+    VkSurfaceFormatKHR SurfaceFormat = ChooseSurfaceFormat(SurfaceSupport.Formats);
+    VkPresentModeKHR PresentMode = ChoosePresentMode(SurfaceSupport.PresentModes, InPresentMode);
+    VkExtent2D Extent = ChooseExtent(SurfaceSupport.Capabilities);
 
-    uint32 ImageCount = SwapChainSupport.Capabilities.minImageCount + 1;
-    if (SwapChainSupport.Capabilities.maxImageCount > 0 && ImageCount > SwapChainSupport.Capabilities.maxImageCount) {
-        ImageCount = SwapChainSupport.Capabilities.maxImageCount;
+    uint32 ImageCount = SurfaceSupport.Capabilities.minImageCount + 1;
+    if (SurfaceSupport.Capabilities.maxImageCount > 0 && ImageCount > SurfaceSupport.Capabilities.maxImageCount) {
+        ImageCount = SurfaceSupport.Capabilities.maxImageCount;
     }
 
     VkSwapchainCreateInfoKHR SwapChainCreateInfo{};
@@ -53,7 +53,7 @@ void FVulkanSwapchain::CreateSwapchain()
 
     }
     
-    SwapChainCreateInfo.preTransform = SwapChainSupport.Capabilities.currentTransform;
+    SwapChainCreateInfo.preTransform = SurfaceSupport.Capabilities.currentTransform;
     SwapChainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
     SwapChainCreateInfo.presentMode = PresentMode;
     SwapChainCreateInfo.clipped = VK_TRUE;
@@ -89,10 +89,10 @@ VkSurfaceFormatKHR FVulkanSwapchain::ChooseSurfaceFormat(const std::vector<VkSur
     return InAvailableFormats[0];
 }
 
-VkPresentModeKHR FVulkanSwapchain::ChoosePresentMode(const std::vector<VkPresentModeKHR>& InAvailablePresentModes)
+VkPresentModeKHR FVulkanSwapchain::ChoosePresentMode(const std::vector<VkPresentModeKHR>& InAvailablePresentModes, VkPresentModeKHR InTargetPresentMode)
 {
     for (const auto& AvailablePresentMode : InAvailablePresentModes) {
-        if (AvailablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
+        if (AvailablePresentMode == InTargetPresentMode) {
             return AvailablePresentMode;
         }
     }

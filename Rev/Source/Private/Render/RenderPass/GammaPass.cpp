@@ -49,7 +49,6 @@ void FGammaCorrectPass::BeginPass()
 
 void FGammaCorrectPass::RunPass()
 {
-	ClearRenderTarget();
 	mMaterial->PreDraw();
 	RenderUtils::DrawScreenQuad();
 	mMaterial->PostDraw();

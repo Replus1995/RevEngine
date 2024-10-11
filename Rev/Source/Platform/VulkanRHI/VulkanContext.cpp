@@ -39,7 +39,8 @@ FVulkanContext::~FVulkanContext()
 
 void FVulkanContext::Init()
 {
-	mSwapchain.CreateSwapchain();
+	mCurPresentMode = mTargetPresentMode;
+	mSwapchain.CreateSwapchain(mCurPresentMode);
 	InitFrameData(mFrameData, REV_VK_FRAME_OVERLAP);
 	CreateImmediateData();
 }
@@ -140,11 +141,12 @@ void FVulkanContext::PresentFrame()
 	PresentInfo.pImageIndices = &mCurSwapchainImageIndex;
 	auto PresentRes = vkQueuePresentKHR(FVulkanCore::GetQueue(VQK_Graphics), &PresentInfo);
 
-	if (PresentRes == VK_ERROR_OUT_OF_DATE_KHR || PresentRes == VK_SUBOPTIMAL_KHR)
+	if (PresentRes == VK_ERROR_OUT_OF_DATE_KHR || PresentRes == VK_SUBOPTIMAL_KHR || mCurPresentMode != mTargetPresentMode)
 	{
 		vkDeviceWaitIdle(FVulkanCore::GetDevice());
 		mSwapchain.Cleanup();
-		mSwapchain.CreateSwapchain();
+		mCurPresentMode = mTargetPresentMode;
+		mSwapchain.CreateSwapchain(mCurPresentMode);
 	}
 	else if (PresentRes != VK_SUCCESS)
 	{
@@ -174,6 +176,11 @@ void FVulkanContext::ImmediateSubmit(std::function<void(VkCommandBuffer)>&& Func
 	//  _renderFence will now block until the graphic commands finish execution
 	REV_VK_CHECK(vkQueueSubmit2(FVulkanCore::GetQueue(VQK_Graphics), 1, &SubmitInfo, mImmFence));
 	REV_VK_CHECK(vkWaitForFences(FVulkanCore::GetDevice(), 1, &mImmFence, true, 9999999999));
+}
+
+void FVulkanContext::SetVSync(bool bEnable)
+{
+	mTargetPresentMode = bEnable ? VK_PRESENT_MODE_FIFO_KHR : VK_PRESENT_MODE_MAILBOX_KHR;
 }
 
 void FVulkanContext::SetViewport(uint32 InX, uint32 InY, uint32 InWidth, uint32 InHeight)
