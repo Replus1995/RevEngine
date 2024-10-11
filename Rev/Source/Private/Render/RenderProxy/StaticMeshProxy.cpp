@@ -22,24 +22,40 @@ FStaticMeshProxy::~FStaticMeshProxy()
 void FStaticMeshProxy::Prepare(const Ref<FScene>& Scene)
 {
 	// Todo:
-		// update data only if dirty
 		// sort all static meshes by depth
 		// do frustum culling
 	
+	uint32 MeshCount = 0;
 	auto EntityView = Scene->EntityView<StaticMeshComponent, TransformComponent>();
 	for (const auto& [Entiny, MeshComp, TransComp] : EntityView.each())
 	{
-		FStaticMeshRenderData RenderData;
-		RenderData.MeshData = MeshComp.StaticMesh;
-		RenderData.ModelParams.ModelMat = TransComp.Transform.ToMatrix();
-		mRenderDataArr.emplace_back(std::move(RenderData));
+		if (MeshCount < mRenderDataArr.size())
+		{
+			FStaticMeshRenderData& RenderData = mRenderDataArr[MeshCount];
+			RenderData.MeshData = MeshComp.StaticMesh;
+			RenderData.MeshParams.ModelMat = TransComp.Transform.ToMatrix();
+			RenderData.MeshUB->UpdateSubData(&RenderData.MeshParams, sizeof(FStaticMeshUniform));
+		}
+		else
+		{
+			FStaticMeshRenderData RenderData;
+			RenderData.MeshData = MeshComp.StaticMesh;
+			RenderData.MeshParams.ModelMat = TransComp.Transform.ToMatrix();
+			RenderData.MeshUB = FRHICore::CreateUniformBuffer(sizeof(FStaticMeshUniform));
+			RenderData.MeshUB->UpdateSubData(&RenderData.MeshParams, sizeof(FStaticMeshUniform));
+			mRenderDataArr.emplace_back(std::move(RenderData));
+		}
+		MeshCount++;
 	}
 
 }
 
 void FStaticMeshProxy::Cleanup()
 {
-	mRenderDataArr.clear();
+	for (size_t i = 0; i < mRenderDataArr.size(); i++)
+	{
+		mRenderDataArr[i].MeshData = nullptr;
+	}
 }
 
 void FStaticMeshProxy::FreeResource()

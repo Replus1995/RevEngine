@@ -119,6 +119,7 @@ void FVulkanContext::EndFrame()
 	REV_VK_CHECK(vkQueueSubmit2(FVulkanCore::GetQueue(VQK_Graphics), 1, &SubmitInfo, FrameData.Fence));
 
 	//clear bindings
+	mTextures.clear();
 	mUniformBuffers.clear();
 	mCurProgram = nullptr;
 	mCurRenderPass = nullptr;

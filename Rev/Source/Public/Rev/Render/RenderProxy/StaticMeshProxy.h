@@ -12,7 +12,8 @@ class FScene;
 struct FStaticMeshRenderData
 {
 	Ref<StaticMesh> MeshData;
-	FStaticMeshUniform ModelParams;
+	FStaticMeshUniform MeshParams;
+	Ref<FRHIUniformBuffer> MeshUB;
 };
 
 class FStaticMeshProxy

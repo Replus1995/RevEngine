@@ -43,6 +43,8 @@ void FSceneProxy::SyncResource()
 		mSceneParams.InvViewProjMat = mSceneParams.ViewProjMat.Inverse();
 
 		mSceneUB->UpdateSubData(&mSceneParams, sizeof(FSceneUniform));
+
+		RenderCmd::BindUniformBuffer(mSceneUB, UL::BScene);
 	}
 
 }
