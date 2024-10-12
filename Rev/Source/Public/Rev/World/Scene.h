@@ -36,6 +36,7 @@ public:
 	FEntity CreateEntity(const std::string& name = std::string());
 	FEntity CreateEntityWithUUID(UUID uuid, const std::string& name = std::string());
 	void DestroyEntity(FEntity entity);
+	void DestroyAllEntities();
 	FEntity DuplicateEntity(FEntity entity);
 
 	FEntity FindEntityByName(std::string_view name);

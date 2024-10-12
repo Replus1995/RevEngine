@@ -119,7 +119,7 @@ public:
 	virtual void ResizeTargets(uint16 InWidth, uint16 InHeight) = 0;
 	virtual void ClearTarget(ERenderTargetAttachment Index) = 0;
 	virtual void ClearTargets() = 0;
-	virtual const Ref<FRHITexture> GetTargetTexture(ERenderTargetAttachment Index) const = 0;
+	virtual const FRHITexture* GetTargetTexture(ERenderTargetAttachment Index) const = 0;
 
 	uint16 GetWidth() const { return mDesc.Width; }
 	uint16 GetHeight() const { return mDesc.Height; }

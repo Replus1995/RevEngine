@@ -37,7 +37,7 @@ public:
 	virtual void ClearBackBuffer() = 0; //to be removed
 
 	virtual void BeginRenderPass(const Ref<FRHIRenderPass>& InRenderPass) = 0;
-	virtual void EndRenderPass() = 0;
+	virtual void EndRenderPass(bool bBlitToBack = false) = 0;
 	virtual void NextSubpass() = 0;
 
 

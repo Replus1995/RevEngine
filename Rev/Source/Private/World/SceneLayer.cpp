@@ -44,6 +44,7 @@ void SceneLayer::OnDetach()
 	if (mScene)
 	{
 		mScene->OnRuntimeStop();
+		mScene->DestroyAllEntities();
 	}
 	mSceneProxy->FreeResource();
 }

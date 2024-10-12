@@ -43,7 +43,7 @@ public:
 
 //Draw
 	virtual void BeginRenderPass(const Ref<FRHIRenderPass>& InRenderPass) override;
-	virtual void EndRenderPass() override;
+	virtual void EndRenderPass(bool bBlitToBack) override;
 	virtual void NextSubpass() override;
 
 	virtual void BindUniformBuffer(const Ref<FRHIUniformBuffer>& InBuffer, uint16 InBinding) override;

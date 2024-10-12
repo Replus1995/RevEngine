@@ -83,21 +83,21 @@ ExampleLayer::ExampleLayer()
 	//	transformComp.SetRotation(Math::FRotator(0, 0, 45.0f));
 	//}
 
-	//{
-	//	auto camEntity = mScene->CreateEntity();
-	//	auto& camComp = camEntity.AddComponent<CameraComponent>();
-	//	camComp.AutoAspectRatio = true;
-	//	//camComp.Camera.SetPerspective(30.0f, 0.01f, 10000.0f);
-	//	auto& transformComp = camEntity.GetComponent<TransformComponent>();
-	//	transformComp.SetLocation(Math::FVector3(0, 2, 0));
-	//	transformComp.SetRotation(Math::FRotator(-30.0f, 0, 0));
+	{
+		auto camEntity = mScene->CreateEntity();
+		auto& camComp = camEntity.AddComponent<CameraComponent>();
+		camComp.AutoAspectRatio = true;
+		//camComp.Camera.SetPerspective(30.0f, 0.01f, 10000.0f);
+		auto& transformComp = camEntity.GetComponent<TransformComponent>();
+		transformComp.SetLocation(Math::FVector3(0, 2, 0));
+		transformComp.SetRotation(Math::FRotator(-30.0f, 0, 0));
 
-	//	auto camSys = mScene->GetSystem<PlayerCameraSystem>();
-	//	if (camSys)
-	//	{
-	//		camSys->SetPlayerCamera(camEntity);
-	//	}
-	//}
+		auto camSys = mScene->GetSystem<PlayerCameraSystem>();
+		if (camSys)
+		{
+			camSys->SetPlayerCamera(camEntity);
+		}
+	}
 
 	//{
 	//	//CubeMap
@@ -121,5 +121,4 @@ ExampleLayer::ExampleLayer()
 
 ExampleLayer::~ExampleLayer()
 {
-	
 }

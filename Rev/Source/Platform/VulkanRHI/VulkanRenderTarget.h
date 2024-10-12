@@ -15,7 +15,7 @@ public:
 	virtual void ResizeTargets(uint16 InWidth, uint16 InHeight) override;
 	virtual void ClearTarget(ERenderTargetAttachment Index) override {};
 	virtual void ClearTargets() override {};
-	virtual const Ref<FRHITexture> GetTargetTexture(ERenderTargetAttachment Index) const override;
+	virtual const FRHITexture* GetTargetTexture(ERenderTargetAttachment Index) const override;
 
 	void FlushResource(VkRenderPass InRenderPass);
 	const VkClearValue* GetClearValues() const { return mClearValues; }

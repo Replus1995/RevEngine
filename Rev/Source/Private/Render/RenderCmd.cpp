@@ -76,9 +76,9 @@ void RenderCmd::BeginRenderPass(const Ref<FRHIRenderPass>& InRenderPass)
 	sContext->BeginRenderPass(InRenderPass);
 }
 
-void RenderCmd::EndRenderPass()
+void RenderCmd::EndRenderPass(bool bBlitToBack)
 {
-	sContext->EndRenderPass();
+	sContext->EndRenderPass(bBlitToBack);
 }
 
 void RenderCmd::NextSubpass()

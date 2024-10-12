@@ -52,6 +52,7 @@ namespace Rev
 		for (auto layer : mLayers)
 		{
 			layer->OnDetach();
+			delete layer;//Temp
 		}
 		mLayers.clear();
 		mLayerInsertIndex = 0;

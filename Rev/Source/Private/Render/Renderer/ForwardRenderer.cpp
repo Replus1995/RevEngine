@@ -74,7 +74,7 @@ void FForwardRenderer::DrawFrame()
 	mSceneProxy->SyncResource();
 	mSceneProxy->DrawScene();
 
-	RenderCmd::EndRenderPass();
+	RenderCmd::EndRenderPass(true);
 
 	/*
 	RenderCmd::SetCullFaceMode(CFM_Back);

@@ -30,7 +30,7 @@ public:
 	static void ClearBackBuffer();
 
 	static void BeginRenderPass(const Ref<FRHIRenderPass>& InRenderPass);
-	static void EndRenderPass();
+	static void EndRenderPass(bool bBlitToBack = false);
 	static void NextSubpass();
 
 	static void BindUniformBuffer(const Ref<FRHIUniformBuffer>& InBuffer, uint16 InBinding);
