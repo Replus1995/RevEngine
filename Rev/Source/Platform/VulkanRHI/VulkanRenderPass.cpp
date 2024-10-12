@@ -28,11 +28,11 @@ void FVulkanRenderPass::CreateResource()
 	for (uint32 i = 0; i < mDesc.NumColorAttachments; i++)
 	{
 		const FColorAttachmentDesc& InAttachmentDesc = mDesc.ColorAttachments[i];
-		EPixelFormat InFormat = InAttachmentDesc.Format;
+		EPixelFormat ColorFormat = InAttachmentDesc.Format;
 
 		VkAttachmentDescription2 AttachmentDesc{};
 		AttachmentDesc.sType = VK_STRUCTURE_TYPE_ATTACHMENT_DESCRIPTION_2;
-		AttachmentDesc.format = (VkFormat)GPixelFormats[InFormat].PlatformFormat;
+		AttachmentDesc.format = (VkFormat)GPixelFormats[ColorFormat].PlatformFormat;
 		AttachmentDesc.samples = VK_SAMPLE_COUNT_1_BIT;
 		AttachmentDesc.loadOp = FVulkanEnum::Translate(InAttachmentDesc.LoadOp);
 		AttachmentDesc.storeOp = FVulkanEnum::Translate(InAttachmentDesc.StoreOp);

@@ -16,7 +16,7 @@ public:
 
 	virtual const std::vector<Ref<FRHIVertexBuffer>>& GetVertexBuffers() const override { return mVertexBuffers; };
 	virtual const Ref<FRHIIndexBuffer>& GetIndexBuffer() const override { return mIndexBuffer; };
-	virtual void Prepare() override;
+	void PrepareDraw();
 
 	const std::vector<VkVertexInputBindingDescription>& GetBindingDescs() const { return mBindingDescs; }
 	const std::vector<VkVertexInputAttributeDescription>& GetAttributeDescs() const { return mAttributeDescs; }

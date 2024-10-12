@@ -70,6 +70,7 @@ void SceneLayer::OnDraw()
 
 	//uint32 WinWidth = Application::GetApp().GetWindow()->GetWidth();
 	//uint32 WinHeight = Application::GetApp().GetWindow()->GetHeight();
+	RenderCmd::SetViewport(0, 0, mSceneProxy->GetFrameWidth(), mSceneProxy->GetFrameHeight());
 
 
 	mRenderer->BeginFrame();

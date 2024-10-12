@@ -1,12 +1,12 @@
 #pragma once
-#include <Rev/Render/Material/Material.h>
+#include <Rev/Render/Material/SurfaceMaterial.h>
 #include <Rev/Math/Maths.h>
 #include <Rev/Render/RHI/RHIShaderLibrary.h>
 
-class ExampleMaterial : public Rev::Material
+class ExampleMaterial : public Rev::SurfaceMaterial
 {
 public:
-    ExampleMaterial() : Rev::Material() {}
+    ExampleMaterial() {}
     virtual ~ExampleMaterial() {}
 
     void SetColor(const Rev::Math::FVector4& color)

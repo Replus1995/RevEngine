@@ -8,7 +8,6 @@ namespace Rev
 {
 
 class FVulkanContext;
-class FVulkanUniformManager;
 class FVulkanCore
 {
 public:
@@ -29,8 +28,6 @@ public:
 	static VkCommandBuffer GetMainCmdBuffer();
 	static VkExtent2D GetSwapchainExtent();
 	static void ImmediateSubmit(std::function<void(VkCommandBuffer)>&& Func);
-
-	static FVulkanUniformManager* GetUniformManager();
 };
 
 }

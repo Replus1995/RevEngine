@@ -17,7 +17,7 @@ void FSceneProxy::Prepare(const Ref<FScene>& Scene)
 	mCameraProxy.Prepare(Scene);
 	mStaticMeshProxy.Prepare(Scene);
 	mDirectionalLightProxy.Prepare(Scene);
-	mSkyProxy.Prepare(Scene);
+	//mSkyProxy.Prepare(Scene);
 
 	auto pWindow = Application::GetApp().GetWindow();
 	mSceneParams.ViewExtent = { 0, 0, pWindow->GetWidth(), pWindow->GetHeight() };
@@ -32,7 +32,7 @@ void FSceneProxy::SyncResource()
 	//Update uniform buffer
 	mCameraProxy.SyncResource();
 	mDirectionalLightProxy.SyncResource();
-	mSkyProxy.SyncResource();
+	//mSkyProxy.SyncResource();
 
 	{
 		
@@ -59,15 +59,13 @@ void FSceneProxy::FreeResource()
 void FSceneProxy::Cleanup()
 {
 	mStaticMeshProxy.Cleanup();
-	mSkyProxy.Cleanup();
-
-	mSceneUB.reset();
+	//mSkyProxy.Cleanup();
 }
 
 void FSceneProxy::DrawScene()
 {
 	mStaticMeshProxy.DrawMeshes(MBM_Opaque);
-	mSkyProxy.DrawSkybox();
+	//mSkyProxy.DrawSkybox();
 }
 
 uint32 FSceneProxy::GetFrameWidth() const

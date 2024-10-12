@@ -21,7 +21,7 @@ void PlayerCameraSystem::OnUpdate(float dt)
 {
 	if (mCamEntity)
 	{
-		const auto& [transformComp, cameraComp] = mCamEntity.GetComponent<TransformComponent, CameraComponent>();
+		const auto& [transformComp, cameraComp] = mCamEntity.GetComponents<TransformComponent, CameraComponent>();
 		mCamController->OnUpdate(dt, cameraComp.Camera, transformComp.Transform);
 	}
 }
@@ -30,11 +30,12 @@ void PlayerCameraSystem::OnDestroy()
 {
 }
 
-void PlayerCameraSystem::FillCameraData(Math::FVector3& ViewPos, Math::FMatrix4& ViewMatrix, Math::FMatrix4& ProjMatrix) const
+void PlayerCameraSystem::FillCameraData(Math::FVector3& ViewPos, Math::FMatrix4& ViewMatrix, Math::FMatrix4& ProjMatrix)
 {
 	if (mCamEntity)
 	{
-		const auto& [transformComp, cameraComp] = mCamEntity.GetComponent<TransformComponent, CameraComponent>();
+		auto Comps = mCamEntity.GetComponents<TransformComponent, CameraComponent>();
+		auto& [transformComp, cameraComp] = Comps;
 		if (cameraComp.AutoAspectRatio)
 		{
 			auto window = Application::GetApp().GetWindow();

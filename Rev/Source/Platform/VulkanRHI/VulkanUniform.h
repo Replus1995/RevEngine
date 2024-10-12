@@ -28,23 +28,4 @@ protected:
 	uint32 mDynamicOffset = 0;
 };
 
-class FVulkanUniformManager
-{
-public:
-	FVulkanUniformManager();
-	~FVulkanUniformManager();
-
-	void AddBuffer(FVulkanUniformBuffer* InBuffer);
-	void AddBuffer(FVulkanUniformBufferDynamic* InBuffer);
-	void RemoveBuffer(FVulkanUniformBuffer* InBuffer);
-	void RemoveBuffer(FVulkanUniformBufferDynamic* InBuffer);
-	std::vector<VkDescriptorSetLayout> GetLayouts() const;
-
-	void PrepareDraw();
-
-private:
-	std::set<FVulkanUniformBuffer*> mBufferVec;
-	std::set<FVulkanUniformBufferDynamic*> mBufferDynamicVec;
-};
-
 }

@@ -11,14 +11,10 @@ FVulkanUniformBuffer::FVulkanUniformBuffer(uint32 InSize)
 {
 	VkBufferUsageFlags BufferUsage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
 	Allocate(InSize, BufferUsage, VMA_MEMORY_USAGE_CPU_TO_GPU);
-
-
-	FVulkanCore::GetUniformManager()->AddBuffer(this);
 }
 
 FVulkanUniformBuffer::~FVulkanUniformBuffer()
 {
-	FVulkanCore::GetUniformManager()->RemoveBuffer(this);
 }
 
 void FVulkanUniformBuffer::UpdateSubData(const void* Data, uint32 Size, uint32 Offset)
@@ -33,14 +29,10 @@ FVulkanUniformBufferDynamic::FVulkanUniformBufferDynamic(uint32 InSize)
 {
 	VkBufferUsageFlags BufferUsage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
 	Allocate(InSize, BufferUsage, VMA_MEMORY_USAGE_CPU_TO_GPU);
-
-
-	FVulkanCore::GetUniformManager()->AddBuffer(this);
 }
 
 FVulkanUniformBufferDynamic::~FVulkanUniformBufferDynamic()
 {
-	FVulkanCore::GetUniformManager()->RemoveBuffer(this);
 }
 
 uint32 FVulkanUniformBufferDynamic::UpdateSubData(const void* Data, uint32 Size)
@@ -57,58 +49,6 @@ uint32 FVulkanUniformBufferDynamic::UpdateSubData(const void* Data, uint32 Size)
 void FVulkanUniformBufferDynamic::Clear()
 {
 	mDynamicOffset = 0;
-}
-
-FVulkanUniformManager::FVulkanUniformManager()
-{
-}
-
-FVulkanUniformManager::~FVulkanUniformManager()
-{
-	REV_CORE_ASSERT(mBufferVec.empty());
-	REV_CORE_ASSERT(mBufferDynamicVec.empty());
-}
-
-void FVulkanUniformManager::AddBuffer(FVulkanUniformBuffer* InBuffer)
-{
-	mBufferVec.insert(InBuffer);
-}
-
-void FVulkanUniformManager::AddBuffer(FVulkanUniformBufferDynamic* InBuffer)
-{
-	mBufferDynamicVec.insert(InBuffer);
-}
-
-void FVulkanUniformManager::RemoveBuffer(FVulkanUniformBuffer* InBuffer)
-{
-	mBufferVec.erase(InBuffer);
-}
-
-void FVulkanUniformManager::RemoveBuffer(FVulkanUniformBufferDynamic* InBuffer)
-{
-	mBufferDynamicVec.erase(InBuffer);
-}
-
-std::vector<VkDescriptorSetLayout> FVulkanUniformManager::GetLayouts() const
-{
-	std::vector<VkDescriptorSetLayout> Layouts;
-	/*for (const FVulkanUniformBuffer* Buffer : mBufferVec)
-	{
-		Layouts.push_back(Buffer->GetLayout());
-	}
-	for (const FVulkanUniformBufferDynamic* Buffer : mBufferDynamicVec)
-	{
-		Layouts.push_back(Buffer->GetLayout());
-	}*/
-	return Layouts;
-}
-
-void FVulkanUniformManager::PrepareDraw()
-{
-	for (FVulkanUniformBufferDynamic* Buffer : mBufferDynamicVec)
-	{
-		Buffer->Clear();
-	}
 }
 
 }

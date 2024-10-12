@@ -65,7 +65,7 @@ public:
 	FColorAttachmentDesc ColorAttachments[RTA_MaxColorAttachments];
 	uint32 NumColorAttachments = 0;
 	FDepthStencilAttachmentDesc DepthStencilAttchment;
-	std::vector<FSubpassDesc> SubpassDescs;
+	std::vector<FSubpassDesc> SubpassDescs;  //TODO: define MAX_SUB_PASS to make this member as an array
 	std::vector<FSubpassDependDesc> SubpassDependDescs;
 };
 

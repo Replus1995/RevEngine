@@ -1,6 +1,6 @@
 #include "VulkanPipeline.h"
 #include "VulkanCore.h"
-#include "VulkanRenderTarget.h"
+#include "VulkanRenderPass.h"
 #include "VulkanPrimitive.h"
 #include "Core/VulkanDefines.h"
 #include "Core/VulkanEnum.h"
@@ -39,13 +39,13 @@ void FVulkanPipeline::BuildLayout(const std::vector<VkDescriptorSetLayoutBinding
     REV_VK_CHECK_THROW(vkCreatePipelineLayout(FVulkanCore::GetDevice(), &GraphicsLayoutCreateInfo, nullptr, &mPipelineLayout), "failed to create pipeline layout");
 }
 
-void FVulkanPipeline::Build(const FRHIGraphicsPipelineState& InState, const std::vector<VkPipelineShaderStageCreateInfo>& InShaderStageInfo, const FVulkanRenderTarget* InRenderTarget, const FVulkanPrimitive* InPrimitive)
+void FVulkanPipeline::Build(const FRHIGraphicsPipelineState& InState, const std::vector<VkPipelineShaderStageCreateInfo>& InShaderStageInfo, const FVulkanRenderPass* RenderPass, const FVulkanPrimitive* InPrimitive)
 {
     if(!mPipelineLayout)
         return;
     Release();
     FVulkanGraphicsPipelineBuilder Builder(InState);
-    mPipeline = Builder.Build(FVulkanCore::GetDevice(), mPipelineLayout, InShaderStageInfo, InRenderTarget, InPrimitive);
+    mPipeline = Builder.Build(FVulkanCore::GetDevice(), mPipelineLayout, InShaderStageInfo, RenderPass, InPrimitive);
     mPipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
 }
 
@@ -72,9 +72,10 @@ FVulkanGraphicsPipelineBuilder::~FVulkanGraphicsPipelineBuilder()
 {
 }
 
-VkPipeline FVulkanGraphicsPipelineBuilder::Build(VkDevice InDevice, VkPipelineLayout InLayout, const std::vector<VkPipelineShaderStageCreateInfo>& InShaderStageInfo, const FVulkanRenderTarget* InRenderTarget, const FVulkanPrimitive* InPrimitive)
+VkPipeline FVulkanGraphicsPipelineBuilder::Build(VkDevice InDevice, VkPipelineLayout InLayout, const std::vector<VkPipelineShaderStageCreateInfo>& InShaderStageInfo, const FVulkanRenderPass* RenderPass, const FVulkanPrimitive* InPrimitive)
 {
-    uint32 ColorAttachmentCount = InRenderTarget->GetDesc().NumColorTargets;
+    const FRenderPassDesc& RenderPassDesc = RenderPass->GetDesc();
+    uint32 ColorAttachmentCount = RenderPassDesc.NumColorAttachments;
 
     VkPipelineColorBlendAttachmentState AttachemntState{};
     AttachemntState.blendEnable = mState.ColorBlendAttachmentState.BlendEnable;
@@ -96,7 +97,14 @@ VkPipeline FVulkanGraphicsPipelineBuilder::Build(VkDevice InDevice, VkPipelineLa
     std::vector<VkDynamicState> DynamicStates = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
     //std::vector<VkDynamicState> DynamicStates = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR, VK_DYNAMIC_STATE_PRIMITIVE_TOPOLOGY };
 
-    //TODO
+    std::vector<VkFormat> ColorFormats;
+    ColorFormats.reserve(ColorAttachmentCount);
+    for (uint32 i = 0; i < ColorAttachmentCount; i++)
+    {
+        ColorFormats.push_back((VkFormat)GPixelFormats[RenderPassDesc.ColorAttachments[i].Format].PlatformFormat);
+    }
+    VkFormat DepthFormat = (VkFormat)GPixelFormats[RenderPassDesc.DepthStencilAttchment.Format].PlatformFormat;
+    
     VkPipelineVertexInputStateCreateInfo VertexInputState{};
     VertexInputState.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
     VertexInputState.vertexBindingDescriptionCount = (uint32_t)InPrimitive->GetBindingDescs().size();
@@ -113,12 +121,13 @@ VkPipeline FVulkanGraphicsPipelineBuilder::Build(VkDevice InDevice, VkPipelineLa
     VkPipelineDepthStencilStateCreateInfo DepthStencilState = MakeDepthStencilStateInfo();
     VkPipelineColorBlendStateCreateInfo ColorBlendState = MakeColorBlendStateInfo(AttachemntStateVec);
     VkPipelineDynamicStateCreateInfo DynamicState = MakeDynamicStateInfo(DynamicStates);
-    VkPipelineRenderingCreateInfo Rendering = MakeRenderingInfo();
+    VkPipelineRenderingCreateInfo Rendering = MakeRenderingInfo(ColorFormats, DepthFormat);
 
     // build the actual pipeline
     // we now use all of the info structs we have been writing into into this one
     // to create the pipeline
-    VkGraphicsPipelineCreateInfo PipelineInfo = { .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO };
+    VkGraphicsPipelineCreateInfo PipelineInfo{};
+    PipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
     // connect the renderInfo to the pNext extension mechanism
     PipelineInfo.pNext = &Rendering;
 
@@ -133,6 +142,9 @@ VkPipeline FVulkanGraphicsPipelineBuilder::Build(VkDevice InDevice, VkPipelineLa
     PipelineInfo.pColorBlendState = &ColorBlendState;
     PipelineInfo.pDynamicState = &DynamicState;
     PipelineInfo.layout = InLayout;
+    PipelineInfo.renderPass = (VkRenderPass)RenderPass->GetNativeHandle();
+    PipelineInfo.subpass = 0;
+
 
     // its easy to error out on create graphics pipeline, so we handle it a bit
    // better than the common VK_CHECK case
@@ -172,6 +184,7 @@ VkPipelineViewportStateCreateInfo FVulkanGraphicsPipelineBuilder::MakeViewportSt
 VkPipelineRasterizationStateCreateInfo FVulkanGraphicsPipelineBuilder::MakeRasterizationStateInfo() const
 {
     VkPipelineRasterizationStateCreateInfo StateInfo{};
+    StateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
     StateInfo.depthClampEnable = mState.DepthClampEnable;
     StateInfo.rasterizerDiscardEnable = VK_FALSE;
     StateInfo.polygonMode = FVulkanEnum::Translate(mState.PolygonMode);
@@ -181,7 +194,8 @@ VkPipelineRasterizationStateCreateInfo FVulkanGraphicsPipelineBuilder::MakeRaste
     StateInfo.depthBiasConstantFactor = mState.DepthBiasConstantFactor;
     StateInfo.depthBiasClamp = mState.DepthBiasClamp;
     StateInfo.depthBiasSlopeFactor = mState.DepthBiasSlopeFactor;
-    StateInfo.lineWidth = mState.LineWidth;
+    //StateInfo.lineWidth = mState.LineWidth;
+    StateInfo.lineWidth = 1.0;
     return StateInfo;
 }
 
@@ -241,17 +255,14 @@ VkPipelineDynamicStateCreateInfo FVulkanGraphicsPipelineBuilder::MakeDynamicStat
     return StateInfo;
 }
 
-VkPipelineRenderingCreateInfo FVulkanGraphicsPipelineBuilder::MakeRenderingInfo() const
+VkPipelineRenderingCreateInfo FVulkanGraphicsPipelineBuilder::MakeRenderingInfo(const std::vector<VkFormat>& InColorFomats, VkFormat InDepthFormat) const
 {
-    //TODO: generate rendering info from rendertarget
-    VkFormat ColorFormat, DepthFormat, StencilFomat;
-
    VkPipelineRenderingCreateInfo StateInfo{};
    StateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO;
-   StateInfo.pColorAttachmentFormats = &ColorFormat;
-   StateInfo.colorAttachmentCount = 1;
-   StateInfo.depthAttachmentFormat = DepthFormat;
-   StateInfo.stencilAttachmentFormat = StencilFomat;
+   StateInfo.pColorAttachmentFormats = InColorFomats.data();
+   StateInfo.colorAttachmentCount = (uint32_t)InColorFomats.size();
+   StateInfo.depthAttachmentFormat = InDepthFormat;
+   StateInfo.stencilAttachmentFormat = InDepthFormat;
    return StateInfo;
 }
 

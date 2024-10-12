@@ -27,7 +27,6 @@ public:
 
 	virtual const std::vector<Ref<FRHIVertexBuffer>>& GetVertexBuffers() const = 0;
 	virtual const Ref<FRHIIndexBuffer>& GetIndexBuffer() const = 0;
-	virtual void Prepare() = 0;
 
 protected:
 	EPrimitiveTopology mTopology;

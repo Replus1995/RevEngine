@@ -82,7 +82,7 @@ FVulkanStageBuffer::~FVulkanStageBuffer()
 FVulkanVertexBuffer::FVulkanVertexBuffer(uint32 InSize, const float* InData)
 	: FRHIVertexBuffer(InSize)
 {
-	VkBufferUsageFlags BufferUsage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT;
+	VkBufferUsageFlags BufferUsage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT;
 	Allocate(InSize, BufferUsage, VMA_MEMORY_USAGE_GPU_ONLY);
 
 	VkBufferDeviceAddressInfo DeviceAddressInfo{};

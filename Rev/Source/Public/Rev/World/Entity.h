@@ -31,15 +31,29 @@ public:
 		return component;
 	}
 
+	template<typename T>
+	T& GetComponent()
+	{
+		REV_CORE_ASSERT(HasComponent<T>(), "Entity does not have component!");
+		return mScene->mRegistry.get<T>(mHandle);
+	}
+
+	template<typename T>
+	const T& GetComponent() const
+	{
+		REV_CORE_ASSERT(HasComponent<T>(), "Entity does not have component!");
+		return mScene->mRegistry.get<T>(mHandle);
+	}
+	
 	template<typename... T>
-	auto GetComponent()
+	auto GetComponents()
 	{
 		REV_CORE_ASSERT(HasComponent<T...>(), "Entity does not have component!");
 		return mScene->mRegistry.get<T...>(mHandle);
 	}
 
 	template<typename... T>
-	const auto& GetComponent() const
+	auto GetComponents() const
 	{
 		REV_CORE_ASSERT(HasComponent<T...>(), "Entity does not have component!");
 		return mScene->mRegistry.get<T...>(mHandle);

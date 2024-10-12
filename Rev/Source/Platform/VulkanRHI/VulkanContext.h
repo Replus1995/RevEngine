@@ -61,7 +61,7 @@ public:
 	VkCommandBuffer GetMainCmdBuffer() { return mFrameData[mFrameDataIndex].MainCmdBuffer; }
 	FVulkanDescriptorPool& GetDescriptorPool() { return mFrameData[mFrameDataIndex].DescriptorPool; }
 
-	const std::map<uint16, Ref<FVulkanUniformBuffer>>& GetUniformBufferMap() const { return mUniformBuffers; };
+	const std::map<uint16, FVulkanUniformBuffer*>& GetUniformBufferMap() const { return mUniformBuffers; };
 	FVulkanUniformBuffer* FindUniformBuffer(uint16 BindingIdx) const;
 
 
@@ -78,10 +78,13 @@ private:
 	uint32 mFrameDataIndex = 0;
 	FVulkanFrameData mFrameData[REV_VK_FRAME_OVERLAP];
 
-	//
+	//dynamic state
 	VkClearColorValue mClearColor;
 	VkClearDepthStencilValue mClearDepthStencil;
 	VkExtent2D mDrawExtent = {0, 0};
+	VkViewport mViewport;
+	VkRect2D mScissor;
+	
 
 	//immediate draw
 	VkFence mImmFence;
@@ -91,8 +94,8 @@ private:
 	//per frame data
 	Ref<FRHIRenderPass> mCurRenderPass = nullptr;
 	Ref<FVulkanShaderProgram> mCurProgram = nullptr;
-	std::map<uint16, Ref<FVulkanUniformBuffer>> mUniformBuffers;
-	std::map<uint16, Ref<FVulkanTexture>> mTextures;
+	std::map<uint16, FVulkanUniformBuffer*> mUniformBuffers;
+	std::map<uint16, FVulkanTexture*> mTextures;
 
 };
 

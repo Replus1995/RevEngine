@@ -29,7 +29,7 @@ void FVulkanPrimitive::SetIndexBuffer(const Ref<FRHIIndexBuffer>& IndexBuffer)
 	mIndexBuffer = IndexBuffer;
 }
 
-void FVulkanPrimitive::Prepare()
+void FVulkanPrimitive::PrepareDraw()
 {
 	if(!mInputDescDirty)
 		return;

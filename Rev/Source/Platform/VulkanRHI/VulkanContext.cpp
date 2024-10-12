@@ -185,14 +185,17 @@ void FVulkanContext::SetVSync(bool bEnable)
 
 void FVulkanContext::SetViewport(uint32 InX, uint32 InY, uint32 InWidth, uint32 InHeight)
 {
-	VkViewport Viewport{};
-	Viewport.x = InX;
-	Viewport.y = InY;
-	Viewport.width = InWidth;
-	Viewport.height = InHeight;
-	Viewport.minDepth = 0.0f;
-	Viewport.maxDepth = 1.0f;
-	vkCmdSetViewport(GetMainCmdBuffer(), 0, 1, &Viewport);
+	mViewport.x = InX;
+	mViewport.y = InY;
+	mViewport.width = InWidth;
+	mViewport.height = InHeight;
+	mViewport.minDepth = 0.0f;
+	mViewport.maxDepth = 1.0f;
+
+	mScissor.offset.x = InX;
+	mScissor.offset.y = InY;
+	mScissor.extent.width = InWidth;
+	mScissor.extent.height = InHeight;
 }
 
 void FVulkanContext::SetClearColor(const Math::FLinearColor& InColor)
@@ -248,6 +251,9 @@ void FVulkanContext::BeginRenderPass(const Ref<FRHIRenderPass>& InRenderPass)
 	SubpassBeginInfo.contents = VK_SUBPASS_CONTENTS_INLINE;
 
 	vkCmdBeginRenderPass2(GetMainCmdBuffer(), &RenderPassInfo, &SubpassBeginInfo);
+
+	vkCmdSetViewport(GetMainCmdBuffer(), 0, 1, &mViewport);
+	vkCmdSetScissor(GetMainCmdBuffer(), 0, 1, &mScissor);
 }
 
 void FVulkanContext::EndRenderPass()
@@ -278,12 +284,14 @@ void FVulkanContext::NextSubpass()
 
 void FVulkanContext::BindUniformBuffer(const Ref<FRHIUniformBuffer>& InBuffer, uint16 InBinding)
 {
-	mUniformBuffers[InBinding] = std::static_pointer_cast<FVulkanUniformBuffer>(InBuffer);
+	if(!InBuffer) return;
+	mUniformBuffers[InBinding] = static_cast<FVulkanUniformBuffer*>(InBuffer.get());
 }
 
 void FVulkanContext::BindTexture(const Ref<FRHITexture>& InTexture, uint16 InBinding)
 {
-	mTextures[InBinding] = std::static_pointer_cast<FVulkanTexture>(InTexture);
+	if (!InTexture) return;
+	mTextures[InBinding] = static_cast<FVulkanTexture*>(InTexture.get());
 }
 
 void FVulkanContext::BindProgram(const Ref<FRHIShaderProgram>& InProgram)
@@ -298,10 +306,11 @@ void FVulkanContext::DrawPrimitive(const Ref<FRHIPrimitive>& InPrimitive)
 		return;
 	}
 
-	const FVulkanRenderTarget* RenderTarget = static_cast<FVulkanRenderTarget*>(mCurRenderPass->GetRenderTarget().get());
-	const FVulkanPrimitive* Primitive = static_cast<FVulkanPrimitive*>(InPrimitive.get());
+	FVulkanRenderPass* RenderPass = static_cast<FVulkanRenderPass*>(mCurRenderPass.get());
+	FVulkanPrimitive* Primitive = static_cast<FVulkanPrimitive*>(InPrimitive.get());
 
-	mCurProgram->PrepareDraw(RenderTarget, Primitive);
+	Primitive->PrepareDraw();
+	mCurProgram->PrepareDraw(RenderPass, Primitive);
 
 	VkBuffer VertexBuffers[REV_VK_MAX_VERTEX_STREAMS];
 	VkDeviceSize VertexOffsets[REV_VK_MAX_VERTEX_STREAMS];
@@ -325,7 +334,7 @@ FVulkanUniformBuffer* FVulkanContext::FindUniformBuffer(uint16 BindingIdx) const
 {
 	if (auto iter = mUniformBuffers.find(BindingIdx); iter != mUniformBuffers.end())
 	{
-		return iter->second.get();
+		return iter->second;
 	}
 	return nullptr;
 }

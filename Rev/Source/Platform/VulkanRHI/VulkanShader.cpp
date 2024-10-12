@@ -1,6 +1,6 @@
 #include "VulkanShader.h"
 #include "VulkanCore.h"
-#include "VulkanRenderTarget.h"
+#include "VulkanRenderPass.h"
 #include "VulkanPrimitive.h"
 #include "VulkanUniform.h"
 #include "Rev/Core/Assert.h"
@@ -63,17 +63,17 @@ FVulkanShaderProgram::~FVulkanShaderProgram()
 {
 }
 
-void FVulkanShaderProgram::PrepareDraw(const FVulkanRenderTarget* RenderTarget, const FVulkanPrimitive* Primitive)
+void FVulkanShaderProgram::PrepareDraw(const FVulkanRenderPass* RenderPass, const FVulkanPrimitive* Primitive)
 {
-	if (mPipelineStateDirty || mNumColorTargetsCache != RenderTarget->GetDesc().NumColorTargets || mIuputDescHashCache != Primitive->GetDescHash())
+	if (mPipelineStateDirty || mRenderPassDescHash != RenderPass->GetDesc().NumColorAttachments || mIuputDescHash != Primitive->GetDescHash())
 	{
 
 		mPipelineStateDirty = false;
-		mNumColorTargetsCache = RenderTarget->GetDesc().NumColorTargets;
-		mIuputDescHashCache = Primitive->GetDescHash();
+		mRenderPassDescHash = RenderPass->GetDesc().NumColorAttachments;
+		mIuputDescHash = Primitive->GetDescHash();
 
 		std::vector<VkPipelineShaderStageCreateInfo> ShaderStages = MakeShaderStageInfo(mShaders);
-		mPipeline.Build(PipelineState, ShaderStages, RenderTarget, Primitive);
+		mPipeline.Build(PipelineState, ShaderStages, RenderPass, Primitive);
 	}
 
 	VkDescriptorSet DescSet = GetDescriptorSet();
@@ -85,7 +85,7 @@ void FVulkanShaderProgram::PrepareDraw(const FVulkanRenderTarget* RenderTarget, 
 std::vector<VkPipelineShaderStageCreateInfo> FVulkanShaderProgram::MakeShaderStageInfo(const FRHIGraphicsShaders& InShaders)
 {
     std::vector<VkPipelineShaderStageCreateInfo> StageInfoVec;
-    for (uint8 i = 0; i < (uint8)ERHIShaderStage::Count; i++)
+    for (uint8 i = (uint8)ERHIShaderStage::Vertex; i < (uint8)ERHIShaderStage::Compute; i++)
     {
         const auto& pShader = InShaders[(ERHIShaderStage)i];
         if(!pShader)
@@ -195,7 +195,7 @@ VkDescriptorSet FVulkanShaderProgram::GetDescriptorSet()
 		Writes[WriteCount].dstBinding = BindingIdx;
 		Writes[WriteCount].dstArrayElement = 0;
 		Writes[WriteCount].descriptorCount = 1;
-		Writes[WriteCount].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+		Writes[WriteCount].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 		Writes[WriteCount].pImageInfo = NULL;
 		Writes[WriteCount].pBufferInfo = &BufferInfos[BufferCount];
 		Writes[WriteCount].pTexelBufferView = NULL;

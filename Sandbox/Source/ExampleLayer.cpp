@@ -27,12 +27,9 @@ ExampleLayer::ExampleLayer()
 	//Create Sandbox Scene
 	mScene = CreateRef<Rev::FScene>();
 
-	auto pBoxMat = CreateRef<ExampleMaterial>();
-	pBoxMat->Compile();
-
 	//FAssetLibrary::GetDefaultSurfaceMaterial();
 
-	/*{
+	{
 		auto pBoxMat = CreateRef<ExampleMaterial>();
 		pBoxMat->Compile();
 		pBoxMat->SetColor(Math::FLinearColor(.7, .9, .8, 1));
@@ -42,7 +39,7 @@ ExampleLayer::ExampleLayer()
 		meshComp.StaticMesh = FAssetLibrary::CreateBasicGeometry(EBasicGeometry::Box, pBoxMat);
 		auto& transformComp = meshEntity.GetComponent<TransformComponent>();
 		transformComp.SetLocation(Math::FVector3(0, 0.6, -5));
-	}*/
+	}
 
 	//{
 	//	//auto importRes = FAssetLibrary::ImportMesh(FPath("/Game/Assets/Models/Cube/Cube.gltf"));

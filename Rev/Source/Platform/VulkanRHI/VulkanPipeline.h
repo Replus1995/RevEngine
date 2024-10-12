@@ -6,7 +6,7 @@
 
 namespace Rev
 {
-class FVulkanRenderTarget;
+class FVulkanRenderPass;
 class FVulkanPrimitive;
 class FVulkanPipeline
 {
@@ -15,7 +15,7 @@ public:
     ~FVulkanPipeline();
 
     void BuildLayout(const std::vector<VkDescriptorSetLayoutBinding>& InBindingInfo);
-    void Build(const FRHIGraphicsPipelineState& InState, const std::vector<VkPipelineShaderStageCreateInfo>& InShaderStageInfo, const FVulkanRenderTarget* InRenderTarget, const FVulkanPrimitive* InPrimitive);
+    void Build(const FRHIGraphicsPipelineState& InState, const std::vector<VkPipelineShaderStageCreateInfo>& InShaderStageInfo, const FVulkanRenderPass* RenderPass, const FVulkanPrimitive* InPrimitive);
     
     void ReleaseLayout();
     void Release();
@@ -38,7 +38,7 @@ public:
     FVulkanGraphicsPipelineBuilder(const FRHIGraphicsPipelineState& InState);
     ~FVulkanGraphicsPipelineBuilder();
 
-    VkPipeline Build(VkDevice InDevice, VkPipelineLayout InLayout, const std::vector<VkPipelineShaderStageCreateInfo>& InShaderStageInfo, const FVulkanRenderTarget* InRenderTarget, const FVulkanPrimitive* InPrimitive);
+    VkPipeline Build(VkDevice InDevice, VkPipelineLayout InLayout, const std::vector<VkPipelineShaderStageCreateInfo>& InShaderStageInfo, const FVulkanRenderPass* RenderPass, const FVulkanPrimitive* InPrimitive);
 
 private:
     VkPipelineInputAssemblyStateCreateInfo MakeInputAssemblyStateInfo() const;
@@ -49,7 +49,7 @@ private:
     VkPipelineDepthStencilStateCreateInfo MakeDepthStencilStateInfo() const;
     VkPipelineColorBlendStateCreateInfo MakeColorBlendStateInfo(const std::vector<VkPipelineColorBlendAttachmentState>& InAttachmentStates) const;
     VkPipelineDynamicStateCreateInfo MakeDynamicStateInfo(const std::vector<VkDynamicState>& InDynaimcStates) const;
-    VkPipelineRenderingCreateInfo MakeRenderingInfo() const;
+    VkPipelineRenderingCreateInfo MakeRenderingInfo(const std::vector<VkFormat>& InColorFomats, VkFormat InDepthFormat) const;
 
 private:
     FRHIGraphicsPipelineState mState;
