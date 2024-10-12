@@ -11,6 +11,6 @@ struct PSOutput
 PSOutput main(const PSInput Input)
 {
     PSOutput Result;
-    Result.oColor = float4(1.0, 0.0, 1.0, 1.0);
+    Result.oColor = float4(1.0, 1.0, 1.0, 1.0);
     return Result;
 }
