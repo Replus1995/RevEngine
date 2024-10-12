@@ -98,6 +98,14 @@ void FVulkanContext::EndFrame()
 	auto& FrameData = GetFrameData();
 	VkCommandBuffer CmdBuffer = FrameData.MainCmdBuffer;
 
+	if (mCurRenderPass)
+	{
+		auto& ColorTex = mCurRenderPass->GetRenderTarget()->GetTargetTexture(RTA_ColorAttachment0);
+		FVulkanUtils::TransitionImage(CmdBuffer, (VkImage)ColorTex->GetNativeHandle(), VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+		FVulkanUtils::TransitionImage(CmdBuffer, mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+		FVulkanUtils::BlitImage(CmdBuffer, (VkImage)ColorTex->GetNativeHandle(), mSwapchain.GetImages()[mCurSwapchainImageIndex], mDrawExtent, mSwapchain.GetExtent());
+		FVulkanUtils::TransitionImage(CmdBuffer, mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+	}
 
 	/*FVkUtils::TransitionImage(CmdBuffer, mSwapchain.GetBackImage().Image, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
 	FVkUtils::TransitionImage(CmdBuffer, mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);

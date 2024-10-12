@@ -160,7 +160,7 @@ Ref<FVulkanTexture> FVulkanRenderTarget::CreateColorTexture(const FColorTargetDe
     if (InDesc.Format == PF_Unknown)
         return nullptr;
     FTextureDesc TexDesc((ETextureDimension)mDesc.Dimension, InDesc.Format, false, mDesc.Width, mDesc.Height, 0, mDesc.ArraySize, InDesc.ClearColor, 1, mDesc.NumSamples);
-    VkImageUsageFlags UsageFlags = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+    VkImageUsageFlags UsageFlags = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
     return CreateRef<FVulkanTexture2D>(TexDesc, FSamplerDesc(), UsageFlags);
 }
 

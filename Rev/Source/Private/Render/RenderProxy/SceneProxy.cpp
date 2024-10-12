@@ -37,7 +37,7 @@ void FSceneProxy::SyncResource()
 	{
 		
 		mSceneParams.ViewPos = mCameraProxy.GetViewPos();
-		mSceneParams.ViewMat = mCameraProxy.GetViewProjMat();
+		mSceneParams.ViewMat = mCameraProxy.GetViewMat();
 		mSceneParams.ProjMat = mCameraProxy.GetProjMat();
 		mSceneParams.ViewProjMat = mCameraProxy.GetViewProjMat();
 		mSceneParams.InvViewProjMat = mSceneParams.ViewProjMat.Inverse();

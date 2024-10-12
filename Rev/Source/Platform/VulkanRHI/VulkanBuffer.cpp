@@ -89,6 +89,11 @@ FVulkanVertexBuffer::FVulkanVertexBuffer(uint32 InSize, const float* InData)
 	DeviceAddressInfo.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
 	DeviceAddressInfo.buffer = mBuffer;
 	mDeviceAddress = vkGetBufferDeviceAddress(FVulkanCore::GetDevice(), &DeviceAddressInfo);
+
+	if (InData)
+	{
+		FVulkanUtils::ImmediateUploadBuffer(mBuffer, InData, InSize, 0);
+	}
 }
 
 FVulkanVertexBuffer::~FVulkanVertexBuffer()
@@ -106,6 +111,11 @@ FVulkanIndexBuffer::FVulkanIndexBuffer(EIndexElementType InType, uint32 InCount,
 {
 	VkBufferUsageFlags BufferUsage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
 	Allocate(GetCapacity(), BufferUsage, VMA_MEMORY_USAGE_GPU_ONLY);
+
+	if (InData)
+	{
+		FVulkanUtils::ImmediateUploadBuffer(mBuffer, InData, mCount * GetStride(), 0);
+	}
 }
 
 FVulkanIndexBuffer::~FVulkanIndexBuffer()
