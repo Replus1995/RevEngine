@@ -18,6 +18,8 @@ public:
 	virtual const Ref<FRHITexture> GetTargetTexture(ERenderTargetAttachment Index) const override;
 
 	void FlushResource(VkRenderPass InRenderPass);
+	const VkClearValue* GetClearValues() const { return mClearValues; }
+	uint32 GetNumClearValues() const { return mNumClearValues; }
 
 protected:
 	bool IsEmptyTarget() const;
@@ -40,6 +42,8 @@ protected:
 	FAttachment mDepthStencilAttachment;
 	bool mAttachmentsDirty = false;
 	bool mNeedResize = true;
+	VkClearValue mClearValues[RTA_MaxColorAttachments];
+	uint32 mNumClearValues = 0;
 };
 
 }

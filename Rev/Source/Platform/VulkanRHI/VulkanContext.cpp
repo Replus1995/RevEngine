@@ -234,13 +234,13 @@ void FVulkanContext::BeginRenderPass(const Ref<FRHIRenderPass>& InRenderPass)
 	RenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 	RenderPassInfo.pNext = NULL;
 	RenderPassInfo.renderPass = (VkRenderPass)mCurRenderPass->GetNativeHandle();
-	RenderPassInfo.framebuffer = (VkFramebuffer)mCurRenderPass->GetRenderTarget()->GetNativeHandle();
+	RenderPassInfo.framebuffer = (VkFramebuffer)pRenderTarget->GetNativeHandle();
 	RenderPassInfo.renderArea.offset.x = 0;
 	RenderPassInfo.renderArea.offset.y = 0;
 	RenderPassInfo.renderArea.extent.width = mCurRenderPass->GetRenderTarget()->GetWidth();
 	RenderPassInfo.renderArea.extent.height = mCurRenderPass->GetRenderTarget()->GetHeight();
-	RenderPassInfo.clearValueCount = 0;
-	RenderPassInfo.pClearValues = NULL;
+	RenderPassInfo.clearValueCount = pRenderTarget->GetNumClearValues();
+	RenderPassInfo.pClearValues = pRenderTarget->GetClearValues();
 
 	VkSubpassBeginInfo SubpassBeginInfo{};
 	SubpassBeginInfo.sType = VK_STRUCTURE_TYPE_SUBPASS_BEGIN_INFO;

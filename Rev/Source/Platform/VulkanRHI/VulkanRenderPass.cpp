@@ -39,7 +39,7 @@ void FVulkanRenderPass::CreateResource()
 		AttachmentDesc.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 		AttachmentDesc.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
 		AttachmentDesc.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		AttachmentDesc.finalLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+		AttachmentDesc.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
 		AttachmentDescs.emplace_back(std::move(AttachmentDesc));
 	}
@@ -60,7 +60,7 @@ void FVulkanRenderPass::CreateResource()
 		AttachmentDesc.stencilLoadOp = bHasStencil ? FVulkanEnum::Translate(mDesc.DepthStencilAttchment.StencilLoadOp) : VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 		AttachmentDesc.stencilStoreOp = bHasStencil ? FVulkanEnum::Translate(mDesc.DepthStencilAttchment.StencilStoreOp) : VK_ATTACHMENT_STORE_OP_DONT_CARE;
 		AttachmentDesc.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		AttachmentDesc.finalLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+		AttachmentDesc.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
 		AttachmentDescs.emplace_back(std::move(AttachmentDesc));
 	}

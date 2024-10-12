@@ -10,7 +10,15 @@ FVulkanTexture2D::FVulkanTexture2D(const FTextureDesc& InDesc, const FSamplerDes
 	: FVulkanTexture(InDesc, InSamplerDesc)
 {
 	REV_CORE_ASSERT(InDesc.Dimension == ETextureDimension::Texture2D);
-	CreateResource();
+    VkImageUsageFlags UsageFlags = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+	CreateResource(UsageFlags);
+}
+
+FVulkanTexture2D::FVulkanTexture2D(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc, VkImageUsageFlags InUsageFlags)
+    : FVulkanTexture(InDesc, InSamplerDesc)
+{
+    REV_CORE_ASSERT(InDesc.Dimension == ETextureDimension::Texture2D);
+    CreateResource(InUsageFlags);
 }
 
 FVulkanTexture2D::~FVulkanTexture2D()
@@ -48,7 +56,7 @@ void FVulkanTexture2D::ClearLayerData(uint8 InMipLevel, uint16 InArrayIndex, int
     FVulkanUtils::ImmediateClearImage(mImage, mImageAspectFlags, GetClearValue(), InMipLevel, 1, 0, 0);
 }
 
-void FVulkanTexture2D::CreateResource()
+void FVulkanTexture2D::CreateResource(VkImageUsageFlags InUsageFlags)
 {
     REV_CORE_ASSERT(FVulkanCore::GetDevice());
     REV_CORE_ASSERT(FVulkanCore::GetAllocator());
@@ -64,7 +72,7 @@ void FVulkanTexture2D::CreateResource()
     ImageCreateInfo.format = ImageFormat;
     ImageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
     ImageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    ImageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+    ImageCreateInfo.usage = InUsageFlags;
     ImageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
     ImageCreateInfo.samples = (VkSampleCountFlagBits)mDesc.NumSamples;
     ImageCreateInfo.flags = 0;

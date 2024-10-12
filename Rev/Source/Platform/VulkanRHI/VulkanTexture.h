@@ -20,13 +20,13 @@ public:
 
 	VkImage GetImage() const { return mImage; } //For easy to understand
 	VkImageView GetImageView() const { return mImageView; }
+	VkClearValue GetClearValue();
 
 protected:
 	FVulkanTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc);
 	VkExtent3D GetExtent();
 	VkExtent2D CalculateMipSize2D(uint32 InMipLevel);
 	VkExtent3D CalculateMipSize3D(uint32 InMipLevel);
-	VkClearValue GetClearValue();
 protected:
 	VkImage mImage = VK_NULL_HANDLE;
 	VkImageView mImageView = VK_NULL_HANDLE;

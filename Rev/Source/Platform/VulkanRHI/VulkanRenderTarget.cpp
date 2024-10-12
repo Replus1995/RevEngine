@@ -1,6 +1,7 @@
 #include "VulkanRenderTarget.h"
 #include "VulkanCore.h"
-#include "Core/VulkanDefines.h"
+#include "VulkanTexture2D.h"
+
 
 namespace Rev
 {
@@ -87,16 +88,21 @@ void FVulkanRenderTarget::CreateTextures()
     if (IsEmptyTarget())
         return;
 
+    mNumClearValues = 0;
     for (uint32 i = 0; i < mDesc.NumColorTargets; i++)
     {
         if (auto ColorTexture = CreateColorTexture(mDesc.ColorTargets[i]); ColorTexture)
         {
             mColorAttachments[i].Texture = std::move(ColorTexture);
+            mClearValues[mNumClearValues] = mColorAttachments[i].Texture->GetClearValue();
+            mNumClearValues++;
         }
     }
     if (auto DepthTexture = CreateDepthStencilTexture(mDesc.DepthStencilTarget); DepthTexture)
     {
         mDepthStencilAttachment.Texture = std::move(DepthTexture);
+        mClearValues[mNumClearValues] = mDepthStencilAttachment.Texture->GetClearValue();
+        mNumClearValues++;
     }
 }
 
@@ -154,7 +160,8 @@ Ref<FVulkanTexture> FVulkanRenderTarget::CreateColorTexture(const FColorTargetDe
     if (InDesc.Format == PF_Unknown)
         return nullptr;
     FTextureDesc TexDesc((ETextureDimension)mDesc.Dimension, InDesc.Format, false, mDesc.Width, mDesc.Height, 0, mDesc.ArraySize, InDesc.ClearColor, 1, mDesc.NumSamples);
-    return CreateVulkanTexture(TexDesc, FSamplerDesc());
+    VkImageUsageFlags UsageFlags = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+    return CreateRef<FVulkanTexture2D>(TexDesc, FSamplerDesc(), UsageFlags);
 }
 
 Ref<FVulkanTexture> FVulkanRenderTarget::CreateDepthStencilTexture(const FDepthStencilTargetDesc& InDesc)
@@ -163,7 +170,8 @@ Ref<FVulkanTexture> FVulkanRenderTarget::CreateDepthStencilTexture(const FDepthS
     if (InDesc.Format != PF_ShadowDepth && InDesc.Format != PF_DepthStencil)
         return nullptr;
     FTextureDesc TexDesc((ETextureDimension)mDesc.Dimension, InDesc.Format, false, mDesc.Width, mDesc.Height, 0, mDesc.ArraySize, { InDesc.ClearDepth, InDesc.ClearStencil }, 1, mDesc.NumSamples);
-    return CreateVulkanTexture(TexDesc, FSamplerDesc());
+    VkImageUsageFlags UsageFlags = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+    return CreateRef<FVulkanTexture2D>(TexDesc, FSamplerDesc(), UsageFlags);
 }
 
 }

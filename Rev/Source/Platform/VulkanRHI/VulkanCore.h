@@ -1,4 +1,5 @@
 #pragma once
+#include "Core/VulkanDefines.h"
 #include "Core/VulkanInstance.h"
 #include "VulkanContext.h"
 #include <vk_mem_alloc.h>
