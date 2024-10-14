@@ -185,9 +185,9 @@ void FVulkanContext::SetVSync(bool bEnable)
 void FVulkanContext::SetViewport(uint32 InX, uint32 InY, uint32 InWidth, uint32 InHeight)
 {
 	mViewport.x = InX;
-	mViewport.y = InY;
+	mViewport.y = InY + InHeight;
 	mViewport.width = InWidth;
-	mViewport.height = InHeight;
+	mViewport.height = InHeight * -1.0f;
 	mViewport.minDepth = 0.0f;
 	mViewport.maxDepth = 1.0f;
 

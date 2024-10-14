@@ -56,7 +56,7 @@ FVulkanShaderProgram::FVulkanShaderProgram(const std::string& InName, const FRHI
     , mShaders(InShaders)
 {
 	std::vector<VkDescriptorSetLayoutBinding> LayoutBindings = MakeLayoutBindings(mShaders);
-	mPipeline.BuildLayout(LayoutBindings);
+	mPipelineLayout.Build(LayoutBindings);
 }
 
 FVulkanShaderProgram::~FVulkanShaderProgram()
@@ -65,21 +65,35 @@ FVulkanShaderProgram::~FVulkanShaderProgram()
 
 void FVulkanShaderProgram::PrepareDraw(const FVulkanRenderPass* RenderPass, const FVulkanPrimitive* Primitive)
 {
-	if (mPipelineStateDirty || mRenderPassDescHash != RenderPass->GetDesc().NumColorAttachments || mIuputDescHash != Primitive->GetDescHash())
+	if (mGraphicsStateDirty)
 	{
+		mGraphicsStateDirty = false;
+		mPipelineCache.Clear();
+		mPipeline.reset();
+	}
 
-		mPipelineStateDirty = false;
-		mRenderPassDescHash = RenderPass->GetDesc().NumColorAttachments;
-		mIuputDescHash = Primitive->GetDescHash();
+	FVulkanPipelineKey NewKey = { (VkRenderPass)RenderPass->GetNativeHandle(), Primitive->GetDescHash() };
 
-		std::vector<VkPipelineShaderStageCreateInfo> ShaderStages = MakeShaderStageInfo(mShaders);
-		mPipeline.Build(PipelineState, ShaderStages, RenderPass, Primitive);
+	if (!mPipeline || mPipelineKey != NewKey)
+	{
+		mPipelineKey = NewKey;
+		if (Ref<FVulkanPipeline> CachedPipeline = mPipelineCache.Find(NewKey); CachedPipeline != nullptr)
+		{
+			mPipeline = CachedPipeline;
+		}
+		else
+		{
+			mPipeline = CreateRef<FVulkanPipeline>();
+			std::vector<VkPipelineShaderStageCreateInfo> ShaderStages = MakeShaderStageInfo(mShaders);
+			mPipeline->Build(mPipelineLayout, GraphicsState, ShaderStages, RenderPass, Primitive);
+			mPipelineCache.Add(NewKey, mPipeline);
+		}
+
 	}
 
 	VkDescriptorSet DescSet = GetDescriptorSet();
-	vkCmdBindDescriptorSets(FVulkanCore::GetMainCmdBuffer(), mPipeline.GetPipelineBindPoint(), mPipeline.GetPipelineLayout(), 0, 1, &DescSet, 0, nullptr);
-
-	vkCmdBindPipeline(FVulkanCore::GetMainCmdBuffer(), mPipeline.GetPipelineBindPoint(), mPipeline.GetPipeline());
+	vkCmdBindDescriptorSets(FVulkanCore::GetMainCmdBuffer(), mPipeline->GetPipelineBindPoint(), mPipelineLayout.GetPipelineLayout(), 0, 1, &DescSet, 0, nullptr);
+	vkCmdBindPipeline(FVulkanCore::GetMainCmdBuffer(), mPipeline->GetPipelineBindPoint(), mPipeline->GetPipeline());
 }
 
 std::vector<VkPipelineShaderStageCreateInfo> FVulkanShaderProgram::MakeShaderStageInfo(const FRHIGraphicsShaders& InShaders)
@@ -160,7 +174,7 @@ std::vector<VkDescriptorSetLayoutBinding> FVulkanShaderProgram::MakeLayoutBindin
 
 VkDescriptorSet FVulkanShaderProgram::GetDescriptorSet()
 {
-	VkDescriptorSetLayout DescLayout = mPipeline.GetDescriptorSetLayout();
+	VkDescriptorSetLayout DescLayout = mPipelineLayout.GetDescriptorSetLayout();
 
 	VkDescriptorSet DescSet;
 	VkDescriptorSetAllocateInfo DescAllocateInfo{};

@@ -23,7 +23,8 @@ struct VSOutput
 VSOutput main(VSInput Input)
 {
     VSOutput Result;
-    Result.vPosition = float4(Input.aPosition, 1.0) * uStaticMesh.ModelMat * uScene.ViewProjMat;
+    //Result.vPosition = float4(Input.aPosition, 1.0) * uStaticMesh.ModelMat * uScene.ViewProjMat;
+    Result.vPosition = mul(uScene.ViewProjMat, mul(uStaticMesh.ModelMat, float4(Input.aPosition, 1.0)));
     //Result.vPosition = Input.aPosition;
     return Result;
 }

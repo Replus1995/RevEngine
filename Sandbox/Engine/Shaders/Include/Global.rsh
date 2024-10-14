@@ -14,13 +14,13 @@ struct FSceneUniform
 {
     FRect2D ViewExtent;
     float4 ViewPos;
-	matrix ViewMat;
-    matrix ProjMat;
-    matrix ViewProjMat;
-    matrix InvViewProjMat;
+	column_major matrix ViewMat;
+    column_major matrix ProjMat;
+    column_major matrix ViewProjMat;
+    column_major matrix InvViewProjMat;
 };
 
 struct FStaticMeshUniform
 {
-    matrix ModelMat;
+    column_major matrix ModelMat;
 };

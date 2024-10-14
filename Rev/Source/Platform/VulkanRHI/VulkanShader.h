@@ -33,7 +33,7 @@ class FVulkanShaderProgram : public FRHIShaderProgram
 public:
 	FVulkanShaderProgram(const std::string& InName, const FRHIGraphicsShaders& InShaders);
 	virtual ~FVulkanShaderProgram();
-	virtual const void* GetNativeHandle() const override { return mPipeline.GetPipeline(); }
+	virtual const void* GetNativeHandle() const override { return mPipeline->GetPipeline(); }
 
 	virtual uint16 GetUniformLocation(std::string_view name) override { return 0; };
 
@@ -56,10 +56,11 @@ private:
 	VkDescriptorSet GetDescriptorSet();
 
 private:
-	FVulkanPipeline mPipeline;
+	FVulkanPipelineLayout mPipelineLayout;
+	Ref<FVulkanPipeline> mPipeline;
+	FVulkanPipelineKey mPipelineKey;
+	FVulkanPipelineCache mPipelineCache;
 	FRHIGraphicsShaders mShaders;
-	uint64 mIuputDescHash = 0;
-	uint32 mRenderPassDescHash = 0;
 	std::vector<FRHIUniformInfo> mProgramUniforms;
 };
 

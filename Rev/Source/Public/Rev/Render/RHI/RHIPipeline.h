@@ -89,7 +89,7 @@ public:
 	EColorComponentMask ColorWriteMask = CCM_RGBA;
 };
 
-struct FRHIGraphicsPipelineState
+struct FRHIGraphicsState
 {
 public:
 	//InputAssembly
