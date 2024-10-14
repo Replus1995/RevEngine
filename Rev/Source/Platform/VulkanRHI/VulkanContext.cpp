@@ -187,7 +187,7 @@ void FVulkanContext::SetViewport(uint32 InX, uint32 InY, uint32 InWidth, uint32 
 	mViewport.x = InX;
 	mViewport.y = InY + InHeight;
 	mViewport.width = InWidth;
-	mViewport.height = InHeight * -1.0f;
+	mViewport.height = InHeight * -1.0f; //flip viewport to use opengl coordinates
 	mViewport.minDepth = 0.0f;
 	mViewport.maxDepth = 1.0f;
 
