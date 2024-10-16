@@ -1,5 +1,5 @@
 #include "VulkanPipeline.h"
-#include "VulkanCore.h"
+#include "VulkanDynamicRHI.h"
 #include "VulkanRenderPass.h"
 #include "VulkanPrimitive.h"
 #include "Core/VulkanDefines.h"
@@ -137,7 +137,7 @@ VkPipelineRasterizationStateCreateInfo FVulkanGraphicsPipelineBuilder::MakeRaste
     StateInfo.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
     StateInfo.depthBiasEnable = mState.DepthBiasEnable;
     StateInfo.depthBiasConstantFactor = mState.DepthBiasConstantFactor;
-    StateInfo.depthBiasClamp = mState.DepthBiasClamp;
+    StateInfo.depthBiasClamp = mState.DepthBiasEnable ? mState.DepthBiasClamp : 0.0f;
     StateInfo.depthBiasSlopeFactor = mState.DepthBiasSlopeFactor;
     //StateInfo.lineWidth = mState.LineWidth;
     StateInfo.lineWidth = 1.0;
@@ -229,7 +229,7 @@ void FVulkanPipelineLayout::Build(const std::vector<VkDescriptorSetLayoutBinding
     DescSetLayoutCreateInfo.bindingCount = (uint32_t)InBindingInfo.size();
     DescSetLayoutCreateInfo.pBindings = InBindingInfo.data();
 
-    REV_VK_CHECK_THROW(vkCreateDescriptorSetLayout(FVulkanCore::GetDevice(), &DescSetLayoutCreateInfo, nullptr, &mDescriptorSetLayout), "failed to create descriptor set layout");
+    REV_VK_CHECK_THROW(vkCreateDescriptorSetLayout(FVulkanDynamicRHI::GetDevice(), &DescSetLayoutCreateInfo, nullptr, &mDescriptorSetLayout), "failed to create descriptor set layout");
 
     VkPipelineLayoutCreateInfo GraphicsLayoutCreateInfo{};
     GraphicsLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -238,15 +238,15 @@ void FVulkanPipelineLayout::Build(const std::vector<VkDescriptorSetLayoutBinding
     GraphicsLayoutCreateInfo.pushConstantRangeCount = 0; // Optional
     GraphicsLayoutCreateInfo.pPushConstantRanges = nullptr; // Optional
 
-    REV_VK_CHECK_THROW(vkCreatePipelineLayout(FVulkanCore::GetDevice(), &GraphicsLayoutCreateInfo, nullptr, &mPipelineLayout), "failed to create pipeline layout");
+    REV_VK_CHECK_THROW(vkCreatePipelineLayout(FVulkanDynamicRHI::GetDevice(), &GraphicsLayoutCreateInfo, nullptr, &mPipelineLayout), "failed to create pipeline layout");
 }
 
 void FVulkanPipelineLayout::Release()
 {
     if (mPipelineLayout)
-        vkDestroyPipelineLayout(FVulkanCore::GetDevice(), mPipelineLayout, nullptr);
+        vkDestroyPipelineLayout(FVulkanDynamicRHI::GetDevice(), mPipelineLayout, nullptr);
     if (mDescriptorSetLayout)
-        vkDestroyDescriptorSetLayout(FVulkanCore::GetDevice(), mDescriptorSetLayout, nullptr);
+        vkDestroyDescriptorSetLayout(FVulkanDynamicRHI::GetDevice(), mDescriptorSetLayout, nullptr);
 }
 
 void FVulkanPipeline::Build(const FVulkanPipelineLayout& InLayout, const FRHIGraphicsState& InState, const std::vector<VkPipelineShaderStageCreateInfo>& InShaderStageInfo, const FVulkanRenderPass* RenderPass, const FVulkanPrimitive* InPrimitive)
@@ -255,7 +255,7 @@ void FVulkanPipeline::Build(const FVulkanPipelineLayout& InLayout, const FRHIGra
         return;
     Release();
     FVulkanGraphicsPipelineBuilder Builder(InState);
-    mPipeline = Builder.Build(FVulkanCore::GetDevice(), InLayout.GetPipelineLayout(), InShaderStageInfo, RenderPass, InPrimitive);
+    mPipeline = Builder.Build(FVulkanDynamicRHI::GetDevice(), InLayout.GetPipelineLayout(), InShaderStageInfo, RenderPass, InPrimitive);
     mPipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
 }
 
@@ -268,12 +268,10 @@ FVulkanPipeline::~FVulkanPipeline()
     Release();
 }
 
-
-
 void FVulkanPipeline::Release()
 {
     if (mPipeline)
-        vkDestroyPipeline(FVulkanCore::GetDevice(), mPipeline, nullptr);
+        vkDestroyPipeline(FVulkanDynamicRHI::GetDevice(), mPipeline, nullptr);
 }
 
 FVulkanPipelineCache::~FVulkanPipelineCache()

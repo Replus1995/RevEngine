@@ -1,6 +1,6 @@
 #include "VulkanRenderTarget.h"
-#include "VulkanCore.h"
 #include "VulkanTexture2D.h"
+#include "VulkanDynamicRHI.h"
 
 
 namespace Rev
@@ -129,7 +129,7 @@ void FVulkanRenderTarget::CreateFramebuffer(VkRenderPass InRenderPass)
     FramebufferInfo.height = (uint32_t)mDesc.Height;
     FramebufferInfo.layers = 1;
 
-    if (vkCreateFramebuffer(FVulkanCore::GetDevice(), &FramebufferInfo, nullptr, &mFramebuffer) != VK_SUCCESS) {
+    if (vkCreateFramebuffer(FVulkanDynamicRHI::GetDevice(), &FramebufferInfo, nullptr, &mFramebuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to create framebuffer!");
     }
 }
@@ -150,7 +150,7 @@ void FVulkanRenderTarget::ReleaseResource()
     mDepthStencilAttachment.Texture.reset();
 
     if(mFramebuffer)
-        vkDestroyFramebuffer(FVulkanCore::GetDevice(), mFramebuffer, nullptr);
+        vkDestroyFramebuffer(FVulkanDynamicRHI::GetDevice(), mFramebuffer, nullptr);
 }
 
 Ref<FVulkanTexture> FVulkanRenderTarget::CreateColorTexture(const FColorTargetDesc& InDesc)

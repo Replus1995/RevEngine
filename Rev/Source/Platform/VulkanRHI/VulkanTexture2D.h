@@ -11,8 +11,7 @@ public:
 	FVulkanTexture2D(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc, VkImageUsageFlags InUsageFlags);
 	virtual ~FVulkanTexture2D();
 
-	virtual void UpdateLayerData(const void* InData, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex, int32 InDepth) override;
-	virtual void ClearLayerData(uint8 InMipLevel, uint16 InArrayIndex, int32 InDepth) override;
+	virtual void UpdateContent(FVulkanContext* Context, const void* InContent, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex) override;
 
 private:
 	void CreateResource(VkImageUsageFlags InUsageFlags);

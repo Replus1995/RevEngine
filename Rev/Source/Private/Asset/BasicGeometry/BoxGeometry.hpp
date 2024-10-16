@@ -3,7 +3,8 @@
 #include "Rev/Render/Material/Material.h"
 #include "Rev/Render/Mesh/StaticMesh.h"
 #include "Rev/Render/RHI/RHIBuffer.h"
-#include "Rev/Render/RHI/RHICore.h"
+#include "Rev/Render/RHI/DynamicRHI.h"
+#include "Rev/Render/RHI/RHIContext.h"
 
 namespace Rev
 {
@@ -44,7 +45,8 @@ public:
         std::vector<FMeshPrimitive> boxPrimArr;
         {
             constexpr uint32 boxVerticesSize = sizeof(sBoxVertices);
-            Ref<FRHIVertexBuffer> boxVertices = FRHICore::CreateVertexBuffer(sBoxVertices, boxVerticesSize);
+            Ref<FRHIVertexBuffer> boxVertices = GDynamicRHI->CreateVertexBuffer(boxVerticesSize);
+            FRenderCore::GetMainContext()->UpdateBufferData(boxVertices, sBoxVertices, boxVerticesSize);
             boxVertices->SetLayout({
                 {"Position", EVertexElementType::Float3,  0}
                 //{EShaderDataType::Float3, "a_Normal"},
@@ -52,10 +54,11 @@ public:
                 });
 
             constexpr uint32 boxIndicesCount = sizeof(sBoxIndices) / sizeof(uint32);
-            Ref<FRHIIndexBuffer> boxIndices = FRHICore::CreateIndexBuffer(sBoxIndices, EIndexElementType::UInt32, boxIndicesCount);
+            Ref<FRHIIndexBuffer> boxIndices = GDynamicRHI->CreateIndexBuffer(sizeof(uint32), boxIndicesCount);
+            FRenderCore::GetMainContext()->UpdateBufferData(boxIndices, sBoxIndices, sizeof(sBoxIndices));
 
             FMeshPrimitive boxMeshPrim;
-            boxMeshPrim.PrimitiveData = FRHICore::CreatePrimitive(PT_Triangles);
+            boxMeshPrim.PrimitiveData = GDynamicRHI->CreatePrimitive(PT_Triangles);
             boxMeshPrim.PrimitiveData->AddVertexBuffer(boxVertices);
             boxMeshPrim.PrimitiveData->SetIndexBuffer(boxIndices);
 

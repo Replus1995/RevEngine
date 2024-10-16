@@ -13,7 +13,7 @@ public:
 	virtual ~PBRMaterial();
 
 	virtual void Compile() override;
-	virtual void PreDraw() override;
+	virtual void PreDraw(FRHICommandList& RHICmdList) override;
 
 	Math::FLinearColor BaseColorFactor = Math::FLinearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	Ref<Texture> BaseColorTexture = nullptr;

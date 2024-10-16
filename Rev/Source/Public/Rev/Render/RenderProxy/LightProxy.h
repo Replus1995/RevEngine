@@ -18,7 +18,7 @@ public:
 	void FreeResource();
 
 private:
-	TUniform<FDirectionalLightUniform, 10> uLight;
+	//TUniform<FDirectionalLightUniform, 10> uLight;
 };
 
 }

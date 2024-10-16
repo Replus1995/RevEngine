@@ -41,6 +41,12 @@ public:
 	virtual void SetClearDepthStencil(float InDepth, uint32 InStencil);
 	virtual void ClearBackBuffer() override;
 
+//Data transfer
+	virtual void UpdateTexture(const Ref<FRHITexture>& InTexture, const void* InContent, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex) override;
+	virtual void ClearTexture(const Ref<FRHITexture>& InTexture, uint8 InMipLevel, uint8 InMipCount, uint16 InArrayIndex, uint16 InArrayCount) override;
+	virtual void UpdateBufferData(const Ref<FRHIVertexBuffer>& Buffer, const void* Content, uint32 Size, uint32 Offset) override;
+	virtual void UpdateBufferData(const Ref<FRHIIndexBuffer>& Buffer, const void* Content, uint32 Size, uint32 Offset) override;
+
 //Draw
 	virtual void BeginRenderPass(const Ref<FRHIRenderPass>& InRenderPass) override;
 	virtual void EndRenderPass(bool bBlitToBack) override;
@@ -57,13 +63,15 @@ public:
 	VkImage GetSwapchainImage() { return mSwapchain.GetImages()[mCurSwapchainImageIndex]; }
 	VkImageView GetSwapchainImageView() { return mSwapchain.GetImageViews()[mCurSwapchainImageIndex]; }
 
-	FVulkanFrameData& GetFrameData() { return mFrameData[mFrameDataIndex]; }
-	VkCommandBuffer GetMainCmdBuffer() { return mFrameData[mFrameDataIndex].MainCmdBuffer; }
-	FVulkanDescriptorPool& GetDescriptorPool() { return mFrameData[mFrameDataIndex].DescriptorPool; }
+	FVulkanFrameData& GetActiveFrameData() { return mFrameData[mFrameDataIndex]; }
+	VkCommandBuffer GetActiveCmdBuffer() { return mFrameData[mFrameDataIndex].CmdBuffer; }
+	FVulkanDescriptorPool& GetActiveDescriptorPool() { return mFrameData[mFrameDataIndex].DescriptorPool; }
 
 	const std::map<uint16, FVulkanUniformBuffer*>& GetUniformBufferMap() const { return mUniformBuffers; };
 	FVulkanUniformBuffer* FindUniformBuffer(uint16 BindingIdx) const;
 
+public:
+	static FVulkanContext* Cast(FRHIContext* InContext);
 
 private:
 	void CreateImmediateData();

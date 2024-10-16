@@ -14,7 +14,7 @@ public:
 	virtual ~FForwardRenderer();
 
 	virtual void BeginFrame() override;
-	virtual void DrawFrame() override;
+	virtual void DrawFrame(FRHICommandList& RHICmdList) override;
 	virtual void EndFrame() override;
 
 private:

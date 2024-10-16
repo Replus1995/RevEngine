@@ -16,4 +16,16 @@ enum class ERenderAPI : uint8
 };
 REV_API ERenderAPI GetRenderAPI();
 
+
+class FRHIContext;
+class REV_API FRenderCore
+{
+public:
+    static void Init(ERenderAPI InAPI);
+    static void Cleanup();
+
+    static ERenderAPI GetRenderAPI();
+    static FRHIContext* GetMainContext();
+};
+
 }

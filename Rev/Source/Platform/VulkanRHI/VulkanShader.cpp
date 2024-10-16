@@ -1,8 +1,9 @@
 #include "VulkanShader.h"
-#include "VulkanCore.h"
+#include "VulkanContext.h"
 #include "VulkanRenderPass.h"
 #include "VulkanPrimitive.h"
 #include "VulkanUniform.h"
+#include "VulkanDynamicRHI.h"
 #include "Rev/Core/Assert.h"
 
 namespace Rev
@@ -18,14 +19,14 @@ FVulkanShader::FVulkanShader(const FShadercCompiledData& InCompiledData)
 	ShaderModuleCreateInfo.codeSize = InCompiledData.Binary.Size();
 	ShaderModuleCreateInfo.pCode = InCompiledData.Binary.DataAs<uint32_t>();
 
-	REV_VK_CHECK_THROW(vkCreateShaderModule(FVulkanCore::GetDevice(), &ShaderModuleCreateInfo, nullptr, &mModule), "[FVkShader] Failed to create shader module!");
+	REV_VK_CHECK_THROW(vkCreateShaderModule(FVulkanDynamicRHI::GetDevice(), &ShaderModuleCreateInfo, nullptr, &mModule), "[FVkShader] Failed to create shader module!");
 
 	mStageUniforms = InCompiledData.Uniforms;
 }
 
 FVulkanShader::~FVulkanShader()
 {
-	vkDestroyShaderModule(FVulkanCore::GetDevice(), mModule, nullptr);
+	vkDestroyShaderModule(FVulkanDynamicRHI::GetDevice(), mModule, nullptr);
 }
 
 VkShaderStageFlagBits FVulkanShader::TranslateShaderStage(ERHIShaderStage InStage)
@@ -63,7 +64,7 @@ FVulkanShaderProgram::~FVulkanShaderProgram()
 {
 }
 
-void FVulkanShaderProgram::PrepareDraw(const FVulkanRenderPass* RenderPass, const FVulkanPrimitive* Primitive)
+void FVulkanShaderProgram::PrepareDraw(FVulkanContext* Context, const FVulkanRenderPass* RenderPass, const FVulkanPrimitive* Primitive)
 {
 	if (mGraphicsStateDirty)
 	{
@@ -91,9 +92,9 @@ void FVulkanShaderProgram::PrepareDraw(const FVulkanRenderPass* RenderPass, cons
 
 	}
 
-	VkDescriptorSet DescSet = GetDescriptorSet();
-	vkCmdBindDescriptorSets(FVulkanCore::GetMainCmdBuffer(), mPipeline->GetPipelineBindPoint(), mPipelineLayout.GetPipelineLayout(), 0, 1, &DescSet, 0, nullptr);
-	vkCmdBindPipeline(FVulkanCore::GetMainCmdBuffer(), mPipeline->GetPipelineBindPoint(), mPipeline->GetPipeline());
+	VkDescriptorSet DescSet = GetDescriptorSet(Context);
+	vkCmdBindDescriptorSets(Context->GetActiveCmdBuffer(), mPipeline->GetPipelineBindPoint(), mPipelineLayout.GetPipelineLayout(), 0, 1, &DescSet, 0, nullptr);
+	vkCmdBindPipeline(Context->GetActiveCmdBuffer(), mPipeline->GetPipelineBindPoint(), mPipeline->GetPipeline());
 }
 
 std::vector<VkPipelineShaderStageCreateInfo> FVulkanShaderProgram::MakeShaderStageInfo(const FRHIGraphicsShaders& InShaders)
@@ -172,7 +173,7 @@ std::vector<VkDescriptorSetLayoutBinding> FVulkanShaderProgram::MakeLayoutBindin
 	return AllBindings;
 }
 
-VkDescriptorSet FVulkanShaderProgram::GetDescriptorSet()
+VkDescriptorSet FVulkanShaderProgram::GetDescriptorSet(FVulkanContext* Context)
 {
 	VkDescriptorSetLayout DescLayout = mPipelineLayout.GetDescriptorSetLayout();
 
@@ -180,11 +181,11 @@ VkDescriptorSet FVulkanShaderProgram::GetDescriptorSet()
 	VkDescriptorSetAllocateInfo DescAllocateInfo{};
 	DescAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 	DescAllocateInfo.pNext = NULL;
-	DescAllocateInfo.descriptorPool = FVulkanCore::GetContext()->GetDescriptorPool().Pool;
+	DescAllocateInfo.descriptorPool = Context->GetActiveDescriptorPool().Pool;
 	DescAllocateInfo.descriptorSetCount = 1;
 	DescAllocateInfo.pSetLayouts = &DescLayout;
 
-	REV_VK_CHECK(vkAllocateDescriptorSets(FVulkanCore::GetDevice(), &DescAllocateInfo, &DescSet));
+	REV_VK_CHECK(vkAllocateDescriptorSets(FVulkanDynamicRHI::GetDevice(), &DescAllocateInfo, &DescSet));
 
 
 	VkDescriptorBufferInfo BufferInfos[REV_VK_MAX_SHADER_UNIFORM_BUFFERS] = {};
@@ -195,7 +196,7 @@ VkDescriptorSet FVulkanShaderProgram::GetDescriptorSet()
 	for (const FRHIUniformInfo& Uniform : mProgramUniforms)
 	{
 		uint32 BindingIdx = Uniform.Binding;
-		FRHIUniformBuffer* UniformBuffer = FVulkanCore::GetContext()->FindUniformBuffer(BindingIdx);
+		FVulkanUniformBuffer* UniformBuffer = Context->FindUniformBuffer(BindingIdx);
 		if(!UniformBuffer)
 			continue;
 
@@ -218,7 +219,7 @@ VkDescriptorSet FVulkanShaderProgram::GetDescriptorSet()
 		++BufferCount;
 	}
 
-	vkUpdateDescriptorSets(FVulkanCore::GetDevice(), WriteCount, Writes, 0, NULL);
+	vkUpdateDescriptorSets(FVulkanDynamicRHI::GetDevice(), WriteCount, Writes, 0, NULL);
 
 	return DescSet;
 }

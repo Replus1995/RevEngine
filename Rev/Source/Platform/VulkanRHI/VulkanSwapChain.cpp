@@ -1,7 +1,6 @@
 #include "VulkanSwapChain.h"
+#include "VulkanDynamicRHI.h"
 #include "Core/VulkanDefines.h"
-#include "Core/VulkanInit.h"
-#include "VulkanCore.h"
 #include "Rev/Core/Assert.h"
 #include "Rev/Core/Application.h"
 #include "Rev/Core/Window.h"
@@ -14,7 +13,7 @@ namespace Rev
 
 void FVulkanSwapchain::CreateSwapchain(VkPresentModeKHR InPresentMode)
 {
-    const FVulkanSurfaceSupport& SurfaceSupport = FVulkanCore::GetSurfaceSupport();
+    const FVulkanSurfaceSupport& SurfaceSupport = FVulkanDynamicRHI::GetSurfaceSupport();
 
     VkSurfaceFormatKHR SurfaceFormat = ChooseSurfaceFormat(SurfaceSupport.Formats);
     VkPresentModeKHR PresentMode = ChoosePresentMode(SurfaceSupport.PresentModes, InPresentMode);
@@ -27,7 +26,7 @@ void FVulkanSwapchain::CreateSwapchain(VkPresentModeKHR InPresentMode)
 
     VkSwapchainCreateInfoKHR SwapChainCreateInfo{};
     SwapChainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-    SwapChainCreateInfo.surface = FVulkanCore::GetSurface();
+    SwapChainCreateInfo.surface = FVulkanDynamicRHI::GetSurface();
     SwapChainCreateInfo.minImageCount = ImageCount;
     SwapChainCreateInfo.imageFormat = SurfaceFormat.format;
     SwapChainCreateInfo.imageColorSpace = SurfaceFormat.colorSpace;
@@ -38,8 +37,8 @@ void FVulkanSwapchain::CreateSwapchain(VkPresentModeKHR InPresentMode)
     {
         //queue families
         std::set<uint32> UniqueIndexSet;
-        UniqueIndexSet.insert(FVulkanCore::GetQueueFamily(VQK_Present));
-        UniqueIndexSet.insert(FVulkanCore::GetQueueFamily(VQK_Graphics));
+        UniqueIndexSet.insert(FVulkanDynamicRHI::GetQueueFamily(VQK_Present));
+        UniqueIndexSet.insert(FVulkanDynamicRHI::GetQueueFamily(VQK_Graphics));
 
         std::vector<uint32> UniqueIndices;
         for (uint32 Index : UniqueIndexSet)
@@ -59,24 +58,24 @@ void FVulkanSwapchain::CreateSwapchain(VkPresentModeKHR InPresentMode)
     SwapChainCreateInfo.clipped = VK_TRUE;
     SwapChainCreateInfo.oldSwapchain = VK_NULL_HANDLE;
 
-    REV_VK_CHECK_THROW(vkCreateSwapchainKHR(FVulkanCore::GetDevice(), &SwapChainCreateInfo, nullptr, &mSwapchain), "[FVkSwapChain] Failed to create swap chain!");
+    REV_VK_CHECK_THROW(vkCreateSwapchainKHR(FVulkanDynamicRHI::GetDevice(), &SwapChainCreateInfo, nullptr, &mSwapchain), "[FVkSwapChain] Failed to create swap chain!");
 
     mExtent = Extent;
     mFormat = SurfaceFormat.format;
-    vkGetSwapchainImagesKHR(FVulkanCore::GetDevice(), mSwapchain, &ImageCount, nullptr);
+    vkGetSwapchainImagesKHR(FVulkanDynamicRHI::GetDevice(), mSwapchain, &ImageCount, nullptr);
     mImages.resize(ImageCount);
-    vkGetSwapchainImagesKHR(FVulkanCore::GetDevice(), mSwapchain, &ImageCount, mImages.data());
+    vkGetSwapchainImagesKHR(FVulkanDynamicRHI::GetDevice(), mSwapchain, &ImageCount, mImages.data());
     CreateImageViews();
 }
 
 void FVulkanSwapchain::Cleanup()
 {
     for (auto ImageView : mImageViews) {
-        vkDestroyImageView(FVulkanCore::GetDevice(), ImageView, nullptr);
+        vkDestroyImageView(FVulkanDynamicRHI::GetDevice(), ImageView, nullptr);
     }
     mImageViews.clear();
     mImages.clear();
-    vkDestroySwapchainKHR(FVulkanCore::GetDevice(), mSwapchain, nullptr);
+    vkDestroySwapchainKHR(FVulkanDynamicRHI::GetDevice(), mSwapchain, nullptr);
 }
 
 VkSurfaceFormatKHR FVulkanSwapchain::ChooseSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& InAvailableFormats)
@@ -143,7 +142,7 @@ void FVulkanSwapchain::CreateImageViews()
         ImageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
         ImageViewCreateInfo.subresourceRange.layerCount = 1;
 
-        REV_VK_CHECK_THROW(vkCreateImageView(FVulkanCore::GetDevice(), &ImageViewCreateInfo, nullptr, &mImageViews[i]), "[FVkSwapChain] Failed to create image views!");
+        REV_VK_CHECK_THROW(vkCreateImageView(FVulkanDynamicRHI::GetDevice(), &ImageViewCreateInfo, nullptr, &mImageViews[i]), "[FVkSwapChain] Failed to create image views!");
     }
 }
 

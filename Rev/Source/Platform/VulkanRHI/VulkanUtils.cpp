@@ -1,5 +1,5 @@
 #include "VulkanUtils.h"
-#include "VulkanCore.h"
+#include "VulkanContext.h"
 #include "VulkanBuffer.h"
 #include "Core/VulkanInit.h" 
 
@@ -72,12 +72,12 @@ void FVulkanUtils::BlitImage(VkCommandBuffer CmdBuffer, VkImage SrcImage, VkImag
 	vkCmdBlitImage2(CmdBuffer, &BlitInfo);
 }
 
-void FVulkanUtils::ImmediateUploadImage(VkImage Image, VkImageAspectFlags AspectMask, VkExtent3D Extent, const void* InData, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex, uint16 InArrayCount)
+void FVulkanUtils::ImmediateUploadImage(FVulkanContext* Context, VkImage Image, VkImageAspectFlags AspectMask, VkExtent3D Extent, const void* InData, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex, uint16 InArrayCount)
 {
 	FVulkanStageBuffer UploadBuffer(InSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
 	memcpy(UploadBuffer.GetMappedData(), InData, InSize);
 
-	FVulkanCore::ImmediateSubmit([&](VkCommandBuffer ImmCmdBuffer) {
+	Context->ImmediateSubmit([&](VkCommandBuffer ImmCmdBuffer) {
 		TransitionImage(ImmCmdBuffer, Image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
 		VkBufferImageCopy CopyRegion = {};
@@ -98,10 +98,10 @@ void FVulkanUtils::ImmediateUploadImage(VkImage Image, VkImageAspectFlags Aspect
 	});
 }
 
-void FVulkanUtils::ImmediateClearImage(VkImage Image, VkImageAspectFlags AspectMask, VkClearValue InClearValue, uint8 InMipLevel, uint8 InMipCount, uint16 InArrayIndex, uint16 InArrayCount)
+void FVulkanUtils::ImmediateClearImage(FVulkanContext* Context, VkImage Image, VkImageAspectFlags AspectMask, VkClearValue InClearValue, uint8 InMipLevel, uint8 InMipCount, uint16 InArrayIndex, uint16 InArrayCount)
 {
 	bool bColorImage = AspectMask & VK_IMAGE_ASPECT_COLOR_BIT;
-	FVulkanCore::ImmediateSubmit([&](VkCommandBuffer ImmCmdBuffer) {
+	Context->ImmediateSubmit([&](VkCommandBuffer ImmCmdBuffer) {
 		TransitionImage(ImmCmdBuffer, Image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL);
 
 		VkImageSubresourceRange Range{};
@@ -124,12 +124,12 @@ void FVulkanUtils::ImmediateClearImage(VkImage Image, VkImageAspectFlags AspectM
 	});
 }
 
-void FVulkanUtils::ImmediateUploadBuffer(VkBuffer DstBuffer, const void* InData, uint32 InSize, uint32 InOffset)
+void FVulkanUtils::ImmediateUploadBuffer(FVulkanContext* Context, VkBuffer DstBuffer, const void* InData, uint32 InSize, uint32 InOffset)
 {
 	FVulkanStageBuffer UploadBuffer(InSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
 	memcpy(UploadBuffer.GetMappedData(), InData, InSize);
 
-	FVulkanCore::ImmediateSubmit([&](VkCommandBuffer ImmCmdBuffer) {
+	Context->ImmediateSubmit([&](VkCommandBuffer ImmCmdBuffer) {
 		VkBufferCopy CopyInfo{};
 		CopyInfo.dstOffset = InOffset;
 		CopyInfo.srcOffset = 0;

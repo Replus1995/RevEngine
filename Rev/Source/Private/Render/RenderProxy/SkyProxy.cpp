@@ -1,6 +1,5 @@
 #include "Rev/Render/RenderProxy/SkyProxy.h"
 #include "Rev/Render/UniformLayout.h"
-#include "Rev/Render/RenderCmd.h"
 #include "Rev/Render/RenderUtils.h"
 #include "Rev/Render/Texture/Texture.h"
 #include "Rev/Render/Material/Material.h"
@@ -30,16 +29,16 @@ public:
 		);
 	}
 
-	virtual void PreDraw() override
+	virtual void PreDraw(FRHICommandList& RHICmdList) override
 	{
 		//RenderCmd::EnableDepthWrite(false);
 		//RenderCmd::SetDepthTestMode(DTM_LessEqual);
-		Material::PreDraw();
+		Material::PreDraw(RHICmdList);
 	}
 
-	virtual void PostDraw() override
+	virtual void PostDraw(FRHICommandList& RHICmdList) override
 	{
-		Material::PostDraw();
+		Material::PostDraw(RHICmdList);
 	}
 };
 
@@ -81,13 +80,13 @@ void FSkyProxy::SyncResource() const
 	}
 }
 
-void FSkyProxy::DrawSkybox() const
+void FSkyProxy::DrawSkybox(FRHICommandList& RHICmdList) const
 {
 	if (auto& EnvTex = mSkybox.GetEnvironmentTexture(); EnvTex)
 	{
-		mSkyboxMat->PreDraw();
+		mSkyboxMat->PreDraw(RHICmdList);
 		RenderUtils::DrawScreenQuad();
-		mSkyboxMat->PostDraw();
+		mSkyboxMat->PostDraw(RHICmdList);
 	}
 }
 

@@ -1,6 +1,5 @@
 #include "Rev/Render/Material/SurfaceMaterial.h"
 #include "Rev/Render/RHI/RHIShaderLibrary.h"
-#include "Rev/Render/RenderCmd.h"
 
 namespace Rev
 {
@@ -21,16 +20,16 @@ void SurfaceMaterial::Compile()
 		{ "/Engine/Shaders/BasicFS" });
 }
 
-void SurfaceMaterial::PreDraw()
+void SurfaceMaterial::PreDraw(FRHICommandList& RHICmdList)
 {
 	//RenderCmd::SetBlendMode(BlendMode);
 	//RenderCmd::SetCullFaceMode(TwoSided ? CFM_Disabled : CFM_Back);
-	Material::PreDraw();
+	Material::PreDraw(RHICmdList);
 }
 
-void SurfaceMaterial::PostDraw()
+void SurfaceMaterial::PostDraw(FRHICommandList& RHICmdList)
 {
-	Material::PostDraw();
+	Material::PostDraw(RHICmdList);
 }
 
 }

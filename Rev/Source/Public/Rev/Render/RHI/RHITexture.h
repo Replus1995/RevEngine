@@ -139,13 +139,6 @@ public:
 
 	virtual const FRHISampler* GetSampler() const = 0;
 
-	//Depth < 0 means updaing all 2d mips in this layer
-	//Depth = FaceIndex for CubeMap
-	virtual void UpdateLayerData(const void* InData, uint32 InSize, uint8 InMipLevel = 0, uint16 InArrayIndex = 0, int32 InDepth = -1) = 0;
-	virtual void ClearLayerData(uint8 InMipLevel = 0, uint16 InArrayIndex = 0, int32 InDepth = -1) = 0;
-	virtual void ClearMipData(uint8 InMipLevel = 0) = 0;
-	void ClearAllData(); //Clear all mips and all layers of texture
-
 protected:
 	FTextureDesc mDesc;
 };

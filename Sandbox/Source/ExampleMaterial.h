@@ -19,9 +19,9 @@ public:
         mProgram = Rev::FRHIShaderLibrary::GetInstance().CreateGraphicsProgram("ExampleProgram", "/Game/Shaders/ExampleVS", "/Game/Shaders/ExamplePS");
     }
 
-    virtual void PreDraw() override
+    virtual void PreDraw(Rev::FRHICommandList& RHICmdList) override
     {
-        Rev::Material::PreDraw();
+        Rev::Material::PreDraw(RHICmdList);
         //uColor.Upload(mProgram);
     }
 

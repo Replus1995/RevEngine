@@ -12,7 +12,7 @@ struct FVulkanFrameData
 {
 public:
 	VkCommandPool CmdPool;
-	VkCommandBuffer MainCmdBuffer;
+	VkCommandBuffer CmdBuffer;
 	VkSemaphore SwapchainSemaphore;
 	VkSemaphore RenderSemaphore;
 	VkFence Fence;

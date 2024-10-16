@@ -1,5 +1,6 @@
 #include "Rev/Render/Material/Material.h"
-#include "Rev/Render/RenderCmd.h"
+#include "Rev/Render/RHI/RHIContext.h"
+#include "Rev/Render/RHI/RHICommandList.h"
 
 namespace Rev
 {
@@ -12,14 +13,14 @@ Material::~Material()
 {
 }
 
-void Material::PreDraw()
+void Material::PreDraw(FRHICommandList& RHICmdList)
 {
-	RenderCmd::BindProgram(mProgram);
+	RHICmdList.GetContext()->BindProgram(mProgram);
 }
 
-void Material::PostDraw()
+void Material::PostDraw(FRHICommandList& RHICmdList)
 {
-	RenderCmd::BindProgram(nullptr);
+	RHICmdList.GetContext()->BindProgram(nullptr);
 }
 
 }

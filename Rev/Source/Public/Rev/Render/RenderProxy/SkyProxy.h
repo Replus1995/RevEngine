@@ -16,7 +16,7 @@ public:
 	void Cleanup();
 	void SyncResource() const;
 
-	void DrawSkybox() const;
+	void DrawSkybox(FRHICommandList& RHICmdList) const;
 
 private:
 	Skybox mSkybox;

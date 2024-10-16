@@ -1,7 +1,9 @@
 #include "Rev/Asset/AssetLibrary.h"
 #include <Rev/Core/FileSystem.h>
 #include "Rev/Render/RHI/RHIShaderLibrary.h"
-#include "Rev/Render/RHI/RHICore.h"
+#include "Rev/Render/RHI/DynamicRHI.h"
+#include "Rev/Render/RHI/RHIContext.h"
+#include "Rev/Render/RenderCore.h"
 #include "Rev/Render/Material/Material.h"
 #include "Rev/Render/Material/SurfaceMaterial.h"
 #include "Rev/Render/Mesh/StaticMesh.h"
@@ -37,8 +39,8 @@ const Ref<Texture>& FAssetLibrary::GetDefaultWhiteTexture2D()
 	{
 		FTextureDesc TextureDesc = FTextureDesc::Make2D(2, 2, PF_R8G8B8A8, false, Math::FLinearColor(1,1,1,1));
 		FSamplerDesc SamplerDesc;
-		sDefaultWhiteTexture = CreateRef<Texture>(FRHICore::CreateTexture(TextureDesc, SamplerDesc));
-		sDefaultWhiteTexture->GetResource()->ClearAllData();
+		sDefaultWhiteTexture = CreateRef<Texture>(GDynamicRHI->CreateTexture(TextureDesc, SamplerDesc));
+		FRenderCore::GetMainContext()->ClearTexture(sDefaultWhiteTexture->GetResource());
 	}
 	return sDefaultWhiteTexture;
 }
@@ -49,8 +51,8 @@ const Ref<Texture>& FAssetLibrary::GetDefaultBlackTexture2D()
 	{
 		FTextureDesc TextureDesc = FTextureDesc::Make2D(2, 2, PF_R8G8B8A8, false, Math::FLinearColor(0, 0, 0, 1));
 		FSamplerDesc SamplerDesc;
-		sDefaultWhiteTexture = CreateRef<Texture>(FRHICore::CreateTexture(TextureDesc, SamplerDesc));
-		sDefaultWhiteTexture->GetResource()->ClearAllData();
+		sDefaultWhiteTexture = CreateRef<Texture>(GDynamicRHI->CreateTexture(TextureDesc, SamplerDesc));
+		FRenderCore::GetMainContext()->ClearTexture(sDefaultWhiteTexture->GetResource());
 	}
 	return sDefaultWhiteTexture;
 }
@@ -61,8 +63,8 @@ const Ref<Texture>& FAssetLibrary::GetDefaultNormalTexture2D()
 	{
 		FTextureDesc TextureDesc = FTextureDesc::Make2D(2, 2, PF_R8G8B8, false, Math::FLinearColor(0.5f, 0.5f, 1.0f));
 		FSamplerDesc SamplerDesc;
-		sDefaultNormalTexture = CreateRef<Texture>(FRHICore::CreateTexture(TextureDesc, SamplerDesc));
-		sDefaultNormalTexture->GetResource()->ClearAllData();
+		sDefaultNormalTexture = CreateRef<Texture>(GDynamicRHI->CreateTexture(TextureDesc, SamplerDesc));
+		FRenderCore::GetMainContext()->ClearTexture(sDefaultWhiteTexture->GetResource());
 	}
 	return sDefaultNormalTexture;
 }

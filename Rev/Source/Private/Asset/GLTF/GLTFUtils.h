@@ -14,7 +14,6 @@ class FGLTFUtils
 {
 public:
 	static uint32 GetIndexStride(int InComponentType);
-	static EIndexElementType GetIndexType(uint32 InStride);
 
 	static EPrimitiveTopology TranslatePrimitiveTopology(int InPrimitiveTopology);
 	static EPixelFormat TranslateImageFormat(const tinygltf::Image& InImage);

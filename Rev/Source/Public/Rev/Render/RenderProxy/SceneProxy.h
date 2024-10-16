@@ -19,11 +19,11 @@ public:
 
 
 	void Prepare(const Ref<FScene>& Scene);
-	void SyncResource();
+	void SyncResource(FRHICommandList& RHICmdList);
 	void FreeResource();
 	void Cleanup();
 
-	void DrawScene();
+	void DrawScene(FRHICommandList& RHICmdList);
 
 	uint32 GetFrameWidth() const;
 	uint32 GetFrameHeight() const;

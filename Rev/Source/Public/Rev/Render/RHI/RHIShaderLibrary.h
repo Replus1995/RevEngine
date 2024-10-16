@@ -30,6 +30,7 @@ private:
     FRHIShaderLibrary() = default;
     ~FRHIShaderLibrary() = default;
     friend class RenderCmd;
+    friend class FRenderCore;
     static void CreateInstance();
     static void ReleaseInstance();
 

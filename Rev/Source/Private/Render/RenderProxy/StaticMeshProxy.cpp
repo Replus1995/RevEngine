@@ -1,8 +1,9 @@
 #include "Rev/Render/RenderProxy/StaticMeshProxy.h"
 #include "Rev/Render/Mesh/StaticMesh.h"
 #include "Rev/Render/Material/SurfaceMaterial.h"
-#include "Rev/Render/RenderCmd.h"
-#include "Rev/Render/Renderer/Renderer.h"
+#include "Rev/Render/RHI/DynamicRHI.h"
+#include "Rev/Render/RHI/RHIContext.h"
+#include "Rev/Render/RHI/RHICommandList.h"
 #include "Rev/Render/UniformLayout.h"
 
 #include "Rev/World/Entity.h"
@@ -41,7 +42,7 @@ void FStaticMeshProxy::Prepare(const Ref<FScene>& Scene)
 			FStaticMeshRenderData RenderData;
 			RenderData.MeshData = MeshComp.StaticMesh;
 			RenderData.MeshParams.ModelMat = TransComp.Transform.ToMatrix();
-			RenderData.MeshUB = FRHICore::CreateUniformBuffer(sizeof(FStaticMeshUniform));
+			RenderData.MeshUB = GDynamicRHI->CreateUniformBuffer(sizeof(FStaticMeshUniform));
 			RenderData.MeshUB->UpdateSubData(&RenderData.MeshParams, sizeof(FStaticMeshUniform));
 			mRenderDataArr.emplace_back(std::move(RenderData));
 		}
@@ -62,17 +63,17 @@ void FStaticMeshProxy::FreeResource()
 {
 }
 
-void FStaticMeshProxy::DrawMeshes(EMaterialBlendMode InBlend, bool bUseMeshMaterial)
+void FStaticMeshProxy::DrawMeshes(FRHICommandList& RHICmdList, EMaterialBlendMode InBlend, bool bUseMeshMaterial)
 {
 	for (auto& RenderData : mRenderDataArr)
 	{
-		DrawPrimitives(RenderData, InBlend, bUseMeshMaterial);
+		DrawPrimitives(RHICmdList, RenderData, InBlend, bUseMeshMaterial);
 	}
 }
 
-void FStaticMeshProxy::DrawPrimitives(const FStaticMeshRenderData& InData, EMaterialBlendMode InBlend, bool bUseMeshMaterial) const
+void FStaticMeshProxy::DrawPrimitives(FRHICommandList& RHICmdList, const FStaticMeshRenderData& InData, EMaterialBlendMode InBlend, bool bUseMeshMaterial) const
 {
-	RenderCmd::BindUniformBuffer(InData.MeshUB, UL::BStaticMesh);
+	RHICmdList.GetContext()->BindUniformBuffer(InData.MeshUB, UL::BStaticMesh);
 	for (uint32 i = 0; i < InData.MeshData->GetMaterialCount(); i++)
 	{
 		auto& pMat = InData.MeshData->GetMaterial(i);
@@ -84,17 +85,17 @@ void FStaticMeshProxy::DrawPrimitives(const FStaticMeshRenderData& InData, EMate
 		{
 			if (bUseMeshMaterial)
 			{
-				pMat->PreDraw();
+				pMat->PreDraw(RHICmdList);
 			}
 
 			for (auto& pPrimitive : vPrimitives)
 			{
-				RenderCmd::DrawPrimitive(pPrimitive->PrimitiveData);
+				RHICmdList.GetContext()->DrawPrimitive(pPrimitive->PrimitiveData);
 			}
 
 			if (bUseMeshMaterial)
 			{
-				pMat->PostDraw();
+				pMat->PostDraw(RHICmdList);
 			}
 		}
 	}

@@ -17,7 +17,7 @@ namespace Rev
 		void OnDetach() override;
 		void OnUpdate(float dt) override;
 		void OnEvent(Event& event) override;
-		void OnDraw() override;
+		void OnDraw(FRHICommandList& RHICmdList) override;
 
 	private:
 		bool OnKeyPressed(KeyPressedEvent& e);

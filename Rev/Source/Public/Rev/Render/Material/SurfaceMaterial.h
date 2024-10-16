@@ -1,6 +1,5 @@
 #pragma once
 #include "Rev/Render/Material/Material.h"
-#include "Rev/Render/RenderCore.h"
 
 namespace Rev
 {
@@ -12,8 +11,8 @@ public:
 	virtual ~SurfaceMaterial();
 
 	virtual void Compile() override;
-	virtual void PreDraw() override;
-	virtual void PostDraw() override;
+	virtual void PreDraw(FRHICommandList& RHICmdList) override;
+	virtual void PostDraw(FRHICommandList& RHICmdList) override;
 
 public:
 	EMaterialBlendMode BlendMode = MBM_Opaque;

@@ -1,6 +1,6 @@
 #include "VulkanRenderPass.h"
 #include "VulkanPixelFormat.h"
-#include "VulkanCore.h"
+#include "VulkanDynamicRHI.h"
 #include "VulkanRenderTarget.h"
 #include "Core/VulkanEnum.h"
 #include "Core/VulkanDefines.h"
@@ -157,12 +157,12 @@ void FVulkanRenderPass::CreateResource()
 	RenderPassInfo.subpassCount = (uint32_t)SubpassDescs.size();
 	RenderPassInfo.pSubpasses = SubpassDescs.data();
 
-	REV_VK_CHECK_THROW(vkCreateRenderPass2(FVulkanCore::GetDevice(), &RenderPassInfo, nullptr, &mRenderPass), "failed to create render pass!");
+	REV_VK_CHECK_THROW(vkCreateRenderPass2(FVulkanDynamicRHI::GetDevice(), &RenderPassInfo, nullptr, &mRenderPass), "failed to create render pass!");
 }
 
 void FVulkanRenderPass::ReleaseResource()
 {
-	vkDestroyRenderPass(FVulkanCore::GetDevice(), mRenderPass, nullptr);
+	vkDestroyRenderPass(FVulkanDynamicRHI::GetDevice(), mRenderPass, nullptr);
 }
 
 

@@ -4,9 +4,11 @@
 #include "Rev/Core/Clock.h"
 #include "Rev/Core/Input.h"
 #include "Rev/Render/RenderCore.h"
-#include "Rev/Render/RenderCmd.h"
 #include "Rev/Render/RenderUtils.h"
+#include "Rev/Render/RHI/RHIContext.h"
+#include "Rev/Render/RHI/RHICommandList.h"
 #include "Rev/Asset/AssetLibrary.h"
+
 
 namespace Rev
 {
@@ -29,19 +31,19 @@ namespace Rev
 		mWindow = std::unique_ptr<Window>(Window::Create());
 		mWindow->SetEventCallback(RE_BIND_EVENT_FN(Application::OnEvent, this));
 
-		RenderCmd::Init();
+		FRenderCore::Init(ERenderAPI::Vulkan);
 		RenderUtils::Init();
 		FAssetLibrary::Init();
 	}
 
 	Application::~Application()
 	{
-		RenderCmd::Flush();
+		FRenderCore::GetMainContext()->Flush();
 
 		mLayerStack.PopAll();
 		FAssetLibrary::Shutdown();
 		RenderUtils::Shutdown();
-		RenderCmd::Shutdown();
+		FRenderCore::Cleanup();
 	}
 
 	void Application::Run()
@@ -79,11 +81,12 @@ namespace Rev
 
 				if (!mMinimized)
 				{
-					RenderCmd::BeginFrame(true);
+					FRenderCore::GetMainContext()->BeginFrame(true);
+					FRHICommandList RHICmdList(FRenderCore::GetMainContext());
 					for (Layer* layer : mLayerStack)
-						layer->OnDraw();
-					RenderCmd::EndFrame();
-					RenderCmd::PresentFrame();
+						layer->OnDraw(RHICmdList);
+					FRenderCore::GetMainContext()->EndFrame();
+					FRenderCore::GetMainContext()->PresentFrame();
 				}
 			}
 

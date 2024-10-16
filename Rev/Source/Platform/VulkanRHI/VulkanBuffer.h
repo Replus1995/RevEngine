@@ -40,10 +40,10 @@ public:
 class FVulkanVertexBuffer : public FRHIVertexBuffer, FVulkanBuffer
 {
 public:
-	FVulkanVertexBuffer(uint32 InSize, const float* InData = nullptr);
+	FVulkanVertexBuffer(uint32 InSize, bool bDynamic);
 	virtual ~FVulkanVertexBuffer();
 	virtual const void* GetNativeHandle() const override { return mBuffer; }
-	virtual void UpdateSubData(const void* Data, uint32 Size, uint32 Offset) override;
+
 private:
 	VkDeviceAddress mDeviceAddress = 0;
 };
@@ -51,11 +51,14 @@ private:
 class FVulkanIndexBuffer : public FRHIIndexBuffer, FVulkanBuffer
 {
 public:
-	FVulkanIndexBuffer(EIndexElementType InType, uint32 InCount, const void* InData = nullptr);
+	FVulkanIndexBuffer(uint32 InStride, uint32 InCount, bool bDynamic);
 	virtual ~FVulkanIndexBuffer();
 	virtual const void* GetNativeHandle() const override { return mBuffer; }
-	virtual void UpdateSubData(const void* Data, uint32 Count, uint32 Offset) override;
 
+	VkIndexType GetIndexType() const { return mIndexType; }
+
+private:
+	VkIndexType mIndexType = VK_INDEX_TYPE_NONE_KHR;
 };
 
 }

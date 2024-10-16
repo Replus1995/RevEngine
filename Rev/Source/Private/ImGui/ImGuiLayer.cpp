@@ -2,7 +2,10 @@
 #include "Rev/Core/Application.h"
 #include "Rev/Core/Window.h"
 #include "Rev/Core/Assert.h"
-#include "Rev/Render/RenderCmd.h"
+#include "Rev/Render/RHI/DynamicRHI.h"
+#include "Rev/Render/RHI/RHIContext.h"
+#include "Rev/Render/RHI/RHICommandList.h"
+#include "Rev/Render/RenderCore.h"
 
 #include <imgui.h>
 #include <backends/imgui_impl_opengl3.h>
@@ -11,7 +14,8 @@
 //temp
 #include <GLFW/glfw3.h>
 #include <glad/gl.h>
-#include <VulkanRHI/VulkanCore.h>
+#include <VulkanRHI/VulkanDynamicRHI.h>
+#include <VulkanRHI/VulkanContext.h>
 
 
 static ImGuiKey GlfwKeyToImGuiKey(int key)
@@ -150,7 +154,7 @@ static VkDescriptorPool ImGuiLayer_Vulkan_Init()
 {
     REV_CORE_ASSERT(GetRenderAPI() == ERenderAPI::Vulkan);
 
-    FVulkanContext* pVkContext = static_cast<FVulkanContext*>(RenderCmd::GetContext());
+    FVulkanContext* pVkContext = static_cast<FVulkanContext*>(FRenderCore::GetMainContext()); //temp
 
     // 1: create descriptor pool for IMGUI
     //  the size of the pool is very oversize, but it's copied from imgui demo itself.
@@ -174,14 +178,14 @@ static VkDescriptorPool ImGuiLayer_Vulkan_Init()
     PoolCreateInfo.pPoolSizes = PoolSizes;
 
     VkDescriptorPool ImguiPool;
-    REV_VK_CHECK(vkCreateDescriptorPool(FVulkanCore::GetDevice(), &PoolCreateInfo, nullptr, &ImguiPool));
+    REV_VK_CHECK(vkCreateDescriptorPool(FVulkanDynamicRHI::GetDevice(), &PoolCreateInfo, nullptr, &ImguiPool));
 
     // this initializes imgui for Vulkan
     ImGui_ImplVulkan_InitInfo ImguiInitInfo{};
-    ImguiInitInfo.Instance = FVulkanCore::GetInstance();
-    ImguiInitInfo.PhysicalDevice = FVulkanCore::GetPhysicalDevice();
-    ImguiInitInfo.Device = FVulkanCore::GetDevice();
-    ImguiInitInfo.Queue = FVulkanCore::GetQueue(VQK_Graphics);
+    ImguiInitInfo.Instance = FVulkanDynamicRHI::GetInstance();
+    ImguiInitInfo.PhysicalDevice = FVulkanDynamicRHI::GetPhysicalDevice();
+    ImguiInitInfo.Device = FVulkanDynamicRHI::GetDevice();
+    ImguiInitInfo.Queue = FVulkanDynamicRHI::GetQueue(VQK_Graphics);
     ImguiInitInfo.DescriptorPool = ImguiPool;
     ImguiInitInfo.MinImageCount = 3;
     ImguiInitInfo.ImageCount = 3;
@@ -206,15 +210,15 @@ static void ImGuiLayer_Vulkan_Shutdown(VkDescriptorPool ImguiPool)
     REV_CORE_ASSERT(GetRenderAPI() == ERenderAPI::Vulkan);
 
     ImGui_ImplVulkan_Shutdown();
-    vkDestroyDescriptorPool(FVulkanCore::GetDevice(), ImguiPool, nullptr);
+    vkDestroyDescriptorPool(FVulkanDynamicRHI::GetDevice(), ImguiPool, nullptr);
 }
 
-static void ImGuiLayer_Vulkan_Draw()
+static void ImGuiLayer_Vulkan_Draw(FRHICommandList& RHICmdList)
 {
     REV_CORE_ASSERT(GetRenderAPI() == ERenderAPI::Vulkan);
 
-    FVulkanContext* pVkContext = static_cast<FVulkanContext*>(RenderCmd::GetContext());
-    VkCommandBuffer CmdBuffer = pVkContext->GetMainCmdBuffer();
+    FVulkanContext* pVkContext = static_cast<FVulkanContext*>(RHICmdList.GetContext());
+    VkCommandBuffer CmdBuffer = pVkContext->GetActiveCmdBuffer();
     VkImageView ImageView = pVkContext->GetSwapchainImageView();
     VkExtent2D Extent = pVkContext->GetSwapchain().GetExtent();
 
@@ -325,12 +329,12 @@ void ImGuiLayer::OnEvent(Event& event)
 	dispatcher.Dispatch<WindowResizeEvent>(RE_BIND_EVENT_FN(ImGuiLayer::OnWindowResize, this));
 }
 
-void ImGuiLayer::OnDraw()
+void ImGuiLayer::OnDraw(FRHICommandList& RHICmdList)
 {
     switch (GetRenderAPI())
     {
     case ERenderAPI::Vulkan:
-        ImGuiLayer_Vulkan_Draw();
+        ImGuiLayer_Vulkan_Draw(RHICmdList);
         break;
     default:
         REV_CORE_ASSERT(false, "[ImGuiLayer] Unknown render api")

@@ -1,7 +1,7 @@
 #include "VulkanFrameData.h"
+#include "VulkanDynamicRHI.h"
 #include "Core/VulkanInit.h"
 #include "Core/VulkanDefines.h"
-#include "VulkanCore.h"
 
 #include "Rev/Core/Assert.h"
 
@@ -10,8 +10,8 @@ namespace Rev
 
 void InitFrameData(FVulkanFrameData* Frames, uint32 Count)
 {
-	VkDevice Device = FVulkanCore::GetDevice();
-	uint32 GraphicsFamily = FVulkanCore::GetQueueFamily(VQK_Graphics);
+	VkDevice Device = FVulkanDynamicRHI::GetDevice();
+	uint32 GraphicsFamily = FVulkanDynamicRHI::GetQueueFamily(VQK_Graphics);
 
 	VkCommandPoolCreateInfo CmdPoolCreateInfo = FVulkanInit::CmdPoolCreateInfo(GraphicsFamily, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
 	for (uint32 i = 0; i < Count; i++) {
@@ -20,7 +20,7 @@ void InitFrameData(FVulkanFrameData* Frames, uint32 Count)
 
 		// allocate the default command buffer that we will use for rendering
 		VkCommandBufferAllocateInfo CmdBufferAllocInfo = FVulkanInit::CmdBufferAllocateInfo(Frames[i].CmdPool, 1);
-		REV_VK_CHECK_THROW(vkAllocateCommandBuffers(Device, &CmdBufferAllocInfo, &Frames[i].MainCmdBuffer), "[FVkFrameData] Failed to allocate main command buffer!");
+		REV_VK_CHECK_THROW(vkAllocateCommandBuffers(Device, &CmdBufferAllocInfo, &Frames[i].CmdBuffer), "[FVkFrameData] Failed to allocate main command buffer!");
 	}
 
 	VkFenceCreateInfo FenceCreateInfo = FVulkanInit::FenceCreateInfo(VK_FENCE_CREATE_SIGNALED_BIT);
@@ -46,14 +46,14 @@ void InitFrameData(FVulkanFrameData* Frames, uint32 Count)
 		{ VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000 }
 		};
 
-		Frames[i].DescriptorPool.CreatePool(FVulkanCore::GetDevice(), PoolSizes, 1000);
+		Frames[i].DescriptorPool.CreatePool(FVulkanDynamicRHI::GetDevice(), PoolSizes, 1000);
 	}
 
 }
 
 void CleanupFrameData(FVulkanFrameData* Frames, uint32 Count)
 {
-	VkDevice Device = FVulkanCore::GetDevice();
+	VkDevice Device = FVulkanDynamicRHI::GetDevice();
 	for (uint32 i = 0; i < Count; i++) {
 		//destroy cmd pool
 		vkDestroyCommandPool(Device, Frames[i].CmdPool, nullptr);

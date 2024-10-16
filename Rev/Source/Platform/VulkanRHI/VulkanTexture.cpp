@@ -1,5 +1,4 @@
 ﻿#include "VulkanTexture.h"
-#include "VulkanCore.h"
 #include "VulkanUtils.h"
 #include "Rev/Core/Assert.h"
 
@@ -14,25 +13,17 @@ const FRHISampler* FVulkanTexture::GetSampler() const
 	return mSampler.get();
 }
 
-void FVulkanTexture::ClearMipData(uint8 InMipLevel)
-{
-	REV_CORE_ASSERT(InMipLevel < mDesc.NumMips, "MipLevel out of range");
-	FVulkanUtils::ImmediateClearImage(mImage, mImageAspectFlags, GetClearValue(), InMipLevel, 1, 0, 0);
-}
-
 void FVulkanTexture::Transition(VkImageLayout DstLayout, VkCommandBuffer InCmdBuffer)
 {
-	VkCommandBuffer CmdBuffer = InCmdBuffer ? InCmdBuffer : FVulkanCore::GetMainCmdBuffer();
-	REV_CORE_ASSERT(CmdBuffer);
-	FVulkanUtils::TransitionImage(CmdBuffer, mImage, mImageLayout, DstLayout);
+	REV_CORE_ASSERT(InCmdBuffer);
+	FVulkanUtils::TransitionImage(InCmdBuffer, mImage, mImageLayout, DstLayout);
 	mImageLayout = DstLayout;
 }
 
 void FVulkanTexture::Transition(VkImageLayout SrcLayout, VkImageLayout DstLayout, VkCommandBuffer InCmdBuffer)
 {
-	VkCommandBuffer CmdBuffer = InCmdBuffer ? InCmdBuffer : FVulkanCore::GetMainCmdBuffer();
-    REV_CORE_ASSERT(CmdBuffer);
-    FVulkanUtils::TransitionImage(CmdBuffer, mImage, SrcLayout, DstLayout);
+    REV_CORE_ASSERT(InCmdBuffer);
+    FVulkanUtils::TransitionImage(InCmdBuffer, mImage, SrcLayout, DstLayout);
     mImageLayout = DstLayout;
 }
 
@@ -99,6 +90,13 @@ VkClearValue FVulkanTexture::GetClearValue()
 
 	return ClearValue;
 }
+
+void FVulkanTexture::ClearContent(FVulkanContext* Context, uint8 InMipLevel, uint8 InMipCount, uint16 InArrayIndex, uint16 InArrayCount)
+{
+	REV_CORE_ASSERT(InMipLevel < mDesc.NumMips, "MipLevel out of range");
+	FVulkanUtils::ImmediateClearImage(Context, mImage, mImageAspectFlags, GetClearValue(), InMipLevel, InMipCount, InArrayIndex, InArrayCount);
+}
+
 
 Ref<FVulkanTexture> CreateVulkanTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc)
 {

@@ -1,7 +1,5 @@
 #include "Rev/Render/RenderPass/GammaPass.h"
-#include "Rev/Render/RHI/RHICore.h"
 #include "Rev/Render/RHI/RHIShaderLibrary.h"
-#include "Rev/Render/RenderCmd.h"
 #include "Rev/Render/RenderUtils.h"
 #include "Rev/Render/Material/Material.h"
 
@@ -49,9 +47,9 @@ void FGammaCorrectPass::BeginPass()
 
 void FGammaCorrectPass::RunPass()
 {
-	mMaterial->PreDraw();
+	/*mMaterial->PreDraw();
 	RenderUtils::DrawScreenQuad();
-	mMaterial->PostDraw();
+	mMaterial->PostDraw();*/
 }
 
 

@@ -1,7 +1,7 @@
 #include "Rev/Render/Renderer/ForwardRenderer.h"
-#include "Rev/Render/RHI/RHICore.h"
-#include "Rev/Render/UniformLayout.h"
-#include "Rev/Render/RenderCmd.h"
+#include "Rev/Render/RHI/DynamicRHI.h"
+#include "Rev/Render/RHI/RHIContext.h"
+#include "Rev/Render/RHI/RHICommandList.h"
 #include "Rev/Render/RenderProxy/SceneProxy.h"
 
 namespace Rev
@@ -36,7 +36,7 @@ void FForwardRenderer::BeginFrame()
 		BasePassDesc.DepthStencilAttchment  = {PF_DepthStencil, ALO_Clear, ASO_Store, ALO_DontCare, ASO_DontCare};
 		BasePassDesc.SubpassDescs.push_back(SubpassDesc);
 
-		mBasePass = FRHICore::CreateRenderPass(BasePassDesc);
+		mBasePass = GDynamicRHI->CreateRenderPass(BasePassDesc);
 	}
 
 	if (!mBasePassTarget)
@@ -44,7 +44,7 @@ void FForwardRenderer::BeginFrame()
 		std::vector<FColorTargetDesc> vColorDesc;
 		vColorDesc.push_back({ PF_R8G8B8A8, Math::FLinearColor(0, 0, 0, 1) });
 		FRenderTargetDesc Desc = FRenderTargetDesc::Make2D(mSceneProxy->GetFrameWidth(), mSceneProxy->GetFrameHeight(), vColorDesc.data(), vColorDesc.size(), {PF_DepthStencil});
-		mBasePassTarget = FRHICore::CreateRenderTarget(Desc);
+		mBasePassTarget = GDynamicRHI->CreateRenderTarget(Desc);
 
 
 		mBasePass->SetRenderTarget(mBasePassTarget);
@@ -60,7 +60,7 @@ void FForwardRenderer::BeginFrame()
 	
 }
 
-void FForwardRenderer::DrawFrame()
+void FForwardRenderer::DrawFrame(FRHICommandList& RHICmdList)
 {
 	// (vulkan)
 	// begin cmd buffer 
@@ -70,11 +70,12 @@ void FForwardRenderer::DrawFrame()
 		// end render pass
 	// end cmd buffer
 
-	RenderCmd::BeginRenderPass(mBasePass);
-	mSceneProxy->SyncResource();
-	mSceneProxy->DrawScene();
+	RHICmdList.GetContext()->BeginRenderPass(mBasePass);
 
-	RenderCmd::EndRenderPass(true);
+	mSceneProxy->SyncResource(RHICmdList);
+	mSceneProxy->DrawScene(RHICmdList);
+
+	RHICmdList.GetContext()->EndRenderPass(true);
 
 	/*
 	RenderCmd::SetCullFaceMode(CFM_Back);

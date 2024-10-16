@@ -24,7 +24,7 @@ enum EMaterialShadingModel : uint8
 	MSM_Unlit
 };
 
-
+class FRHICommandList;
 class FRHIShaderProgram;
 class REV_API Material
 {
@@ -36,8 +36,8 @@ public:
 	* @brief Create shader program based on ShadingModel
 	*/
 	virtual void Compile() = 0;
-	virtual void PreDraw(); //Bind Program
-	virtual void PostDraw(); //Unbind Program
+	virtual void PreDraw(FRHICommandList& RHICmdList); //Bind Program
+	virtual void PostDraw(FRHICommandList& RHICmdList); //Unbind Program
 	//const Ref<FRHIShaderProgram>& GetProgram() const { return mProgram; }
 
 	EMaterialDomain GetDomain() const { return mDomain; }

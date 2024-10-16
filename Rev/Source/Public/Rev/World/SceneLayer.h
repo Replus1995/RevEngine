@@ -17,7 +17,7 @@ public:
 	virtual void OnDetach() override;
 	virtual void OnUpdate(float dt) override;
 	virtual void OnEvent(Event& event) override;
-	virtual void OnDraw() override;
+	virtual void OnDraw(FRHICommandList& RHICmdList) override;
 
 protected:
 	Ref<FScene> mScene;

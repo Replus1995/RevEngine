@@ -23,7 +23,7 @@ public:
 	//FBuffer WeightIndexData; //size = VertexCount * 4 * sizeof(int)
 
 	uint32 IndexCount = 0;
-	EIndexElementType IndexType = EIndexElementType::UInt16;
+	uint32 IndexStride = 0;
 	FBuffer IndexData; //size = IndexCount * IndexStride
 
 	FMeshPrimitiveStorage();

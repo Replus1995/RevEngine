@@ -4,20 +4,23 @@
 
 namespace Rev
 {
-	class REV_API Layer
-	{
-	public:
-		Layer(const std::string& name = "Layer");
-		virtual ~Layer();
+class FRHICommandList;
 
-		virtual void OnAttach() {}
-		virtual void OnDetach() {}
-		virtual void OnUpdate(float deltaTime) {}
-		virtual void OnEvent(Event& event) {}
-		virtual void OnDraw() {}
+class REV_API Layer
+{
+public:
+	Layer(const std::string& name = "Layer");
+	virtual ~Layer();
 
-		inline const std::string& GetName() const { return mDebugName; }
-	protected:
-		std::string mDebugName;
-	};
+	virtual void OnAttach() {}
+	virtual void OnDetach() {}
+	virtual void OnUpdate(float deltaTime) {}
+	virtual void OnEvent(Event& event) {}
+	virtual void OnDraw(FRHICommandList& RHICmdList) {}
+
+	inline const std::string& GetName() const { return mDebugName; }
+protected:
+	std::string mDebugName;
+};
+
 }

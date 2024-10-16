@@ -6,6 +6,7 @@
 
 namespace Rev
 {
+class FVulkanContext;
 class FVulkanSampler;
 class FVulkanTexture : public FRHITexture
 {
@@ -13,7 +14,6 @@ public:
 	virtual ~FVulkanTexture() = default;
 	virtual const void* GetNativeHandle() const override { return mImage; }
 	virtual const FRHISampler* GetSampler() const override;
-	virtual void ClearMipData(uint8 InMipLevel) override;
 
 	void Transition(VkImageLayout DstLayout, VkCommandBuffer InCmdBuffer = VK_NULL_HANDLE);
 	void Transition(VkImageLayout SrcLayout, VkImageLayout DstLayout, VkCommandBuffer InCmdBuffer = VK_NULL_HANDLE);
@@ -21,6 +21,11 @@ public:
 	VkImage GetImage() const { return mImage; } //For easy to understand
 	VkImageView GetImageView() const { return mImageView; }
 	VkClearValue GetClearValue();
+
+	virtual void UpdateContent(FVulkanContext* Context, const void* InContent, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex) = 0;
+	void ClearContent(FVulkanContext* Context, uint8 InMipLevel, uint8 InMipCount, uint16 InArrayIndex, uint16 InArrayCount);
+
+	static FVulkanTexture* Cast(FRHITexture* InTexture) { return static_cast<FVulkanTexture*>(InTexture); }
 
 protected:
 	FVulkanTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc);

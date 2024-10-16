@@ -1,9 +1,6 @@
 #include "Rev/Render/Material/PBRMaterial.h"
 #include "Rev/Render/RHI/RHIShaderLibrary.h"
-#include "Rev/Render/RHI/RHITexture.h"
 #include "Rev/Render/UniformLayout.h"
-#include "Rev/Render/RenderCmd.h"
-#include "Rev/Asset/AssetLibrary.h"
 
 
 
@@ -29,9 +26,9 @@ void PBRMaterial::Compile()
 	);
 }
 
-void PBRMaterial::PreDraw()
+void PBRMaterial::PreDraw(FRHICommandList& RHICmdList)
 {
-	SurfaceMaterial::PreDraw(); //BindProgram
+	SurfaceMaterial::PreDraw(RHICmdList); //BindProgram
 	if(!mProgram)
 		return;
 

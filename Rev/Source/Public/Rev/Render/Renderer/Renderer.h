@@ -6,6 +6,7 @@
 namespace Rev
 {
 class FSceneProxy;
+class FRHICommandList;
 class FRenderer
 {
 public:
@@ -13,7 +14,7 @@ public:
 	virtual ~FRenderer();
 
 	virtual void BeginFrame() = 0;
-	virtual void DrawFrame() = 0;
+	virtual void DrawFrame(FRHICommandList& RHICmdList) = 0;
 	virtual void EndFrame() = 0;
 
 protected:

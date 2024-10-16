@@ -1,5 +1,7 @@
 #include "Rev/Asset/TextureStorage.h"
-#include "Rev/Render/RHI/RHICore.h"
+#include "Rev/Core/Assert.h"
+#include "Rev/Render/RHI/DynamicRHI.h"
+#include "Rev/Render/RenderCore.h"
 
 namespace Rev
 {
@@ -53,13 +55,13 @@ Ref<Texture> FTextureStorage::CreateTexture(bool bForceSRGB)
 	if (TextureDesc.Dimension == ETextureDimension::TextureCube && ImageData.NumLayers() == 6)
 	{
 		REV_CORE_ASSERT(TextureDesc.NumMips == ImageData.NumMips());
-		mCache = CreateRef<Texture>(FRHICore::CreateTexture(TextureDesc, SamplerDesc));
+		mCache = CreateRef<Texture>(GDynamicRHI->CreateTexture(TextureDesc, SamplerDesc));
 		for (uint8 iCubeFace = 0; iCubeFace < 6; iCubeFace++)
 		{
 			for (uint8 iMip = 0; iMip < TextureDesc.NumMips; iMip++)
 			{
 				FBuffer& ImageBuffer = ImageData.At(iMip, iCubeFace);
-				mCache->GetResource()->UpdateLayerData(ImageBuffer.Data(), ImageBuffer.Size(), iMip, 0, iCubeFace);
+				FRenderCore::GetMainContext()->UpdateTexture(mCache->GetResource(), ImageBuffer.Data(), ImageBuffer.Size(), iMip, iCubeFace);
 			}
 		}
 		return mCache;
@@ -67,7 +69,7 @@ Ref<Texture> FTextureStorage::CreateTexture(bool bForceSRGB)
 	else if (TextureDesc.Dimension == ETextureDimension::TextureCubeArray && ImageData.NumLayers() == 6 * TextureDesc.ArraySize)
 	{
 		REV_CORE_ASSERT(TextureDesc.NumMips == ImageData.NumMips());
-		mCache = CreateRef<Texture>(FRHICore::CreateTexture(TextureDesc, SamplerDesc));
+		mCache = CreateRef<Texture>(GDynamicRHI->CreateTexture(TextureDesc, SamplerDesc));
 		for (uint8 iLayer = 0; iLayer < TextureDesc.ArraySize; iLayer++)
 		{
 			for (uint8 iCubeFace = 0; iCubeFace < 6; iCubeFace++)
@@ -75,7 +77,7 @@ Ref<Texture> FTextureStorage::CreateTexture(bool bForceSRGB)
 				for (uint8 iMip = 0; iMip < TextureDesc.NumMips; iMip++)
 				{
 					FBuffer& ImageBuffer = ImageData.At(iMip, iLayer * 6 + iCubeFace);
-					mCache->GetResource()->UpdateLayerData(ImageBuffer.Data(), ImageBuffer.Size(), iMip, iLayer, iCubeFace);
+					FRenderCore::GetMainContext()->UpdateTexture(mCache->GetResource(), ImageBuffer.Data(), ImageBuffer.Size(), iLayer * 6 + iCubeFace);
 				}
 			}
 		}
@@ -86,13 +88,13 @@ Ref<Texture> FTextureStorage::CreateTexture(bool bForceSRGB)
 	REV_CORE_ASSERT(TextureDesc.ArraySize == ImageData.NumLayers());
 
 	
-	mCache = CreateRef<Texture>(FRHICore::CreateTexture(TextureDesc, SamplerDesc));
+	mCache = CreateRef<Texture>(GDynamicRHI->CreateTexture(TextureDesc, SamplerDesc));
 	for (uint8 iLayer = 0; iLayer < TextureDesc.ArraySize; iLayer++)
 	{
 		for (uint8 iMip = 0; iMip < TextureDesc.NumMips; iMip++)
 		{
 			FBuffer& ImageBuffer = ImageData.At(iMip, iLayer);
-			mCache->GetResource()->UpdateLayerData(ImageBuffer.Data(), ImageBuffer.Size(), iMip, iLayer);
+			FRenderCore::GetMainContext()->UpdateTexture(mCache->GetResource(), ImageBuffer.Data(), ImageBuffer.Size(), iMip, iLayer);
 		}
 	}
 	return mCache;

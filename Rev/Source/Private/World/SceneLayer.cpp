@@ -1,6 +1,7 @@
 #include "Rev/World/SceneLayer.h"
 #include "Rev/World/Scene.h"
-#include "Rev/Render/RenderCmd.h"
+#include "Rev/Render/RHI/RHIContext.h"
+#include "Rev/Render/RHI/RHICommandList.h"
 #include "Rev/Core/Application.h"
 #include "Rev/Core/Window.h"
 
@@ -34,8 +35,6 @@ void SceneLayer::OnAttach()
 		mScene->OnRuntimeStart();
 	}
 	mRenderer = CreateRef<FForwardRenderer>(mSceneProxy.get());
-
-	RenderCmd::SetClearColor(Math::FLinearColor(0, 0, 0));
 }
 
 void SceneLayer::OnDetach()
@@ -65,17 +64,19 @@ void SceneLayer::OnEvent(Event& event)
 	EventDispatcher dispatcher(event);
 }
 
-void SceneLayer::OnDraw()
+void SceneLayer::OnDraw(FRHICommandList& RHICmdList)
 {
 	mSceneProxy->Prepare(mScene);
 
 	//uint32 WinWidth = Application::GetApp().GetWindow()->GetWidth();
 	//uint32 WinHeight = Application::GetApp().GetWindow()->GetHeight();
-	RenderCmd::SetViewport(0, 0, mSceneProxy->GetFrameWidth(), mSceneProxy->GetFrameHeight());
+
+	RHICmdList.GetContext()->SetClearColor(Math::FLinearColor(0, 0, 0));
+	RHICmdList.GetContext()->SetViewport(0, 0, mSceneProxy->GetFrameWidth(), mSceneProxy->GetFrameHeight());
 
 
 	mRenderer->BeginFrame();
-	mRenderer->DrawFrame();
+	mRenderer->DrawFrame(RHICmdList);
 	mRenderer->EndFrame();
 
 

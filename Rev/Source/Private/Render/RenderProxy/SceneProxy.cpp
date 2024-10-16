@@ -1,6 +1,6 @@
 #include "Rev/Render/RenderProxy/SceneProxy.h" 
-#include "Rev/Render/RenderCmd.h"
-#include "Rev/Render/RHI/RHICore.h"
+#include "Rev/Render/RHI/DynamicRHI.h"
+#include "Rev/Render/RHI/RHICommandList.h"
 #include "Rev/Render/UniformLayout.h"
 #include "Rev/Render/Texture/Texture.h"
 
@@ -23,10 +23,10 @@ void FSceneProxy::Prepare(const Ref<FScene>& Scene)
 	mSceneParams.ViewExtent = { 0, 0, pWindow->GetWidth(), pWindow->GetHeight() };
 }
 
-void FSceneProxy::SyncResource()
+void FSceneProxy::SyncResource(FRHICommandList& RHICmdList)
 {
 	if(!mSceneUB)
-		mSceneUB = FRHICore::CreateUniformBuffer(sizeof(FSceneUniform));
+		mSceneUB = GDynamicRHI->CreateUniformBuffer(sizeof(FSceneUniform));
 
 	//Should run on render thread
 	//Update uniform buffer
@@ -44,7 +44,7 @@ void FSceneProxy::SyncResource()
 
 		mSceneUB->UpdateSubData(&mSceneParams, sizeof(FSceneUniform));
 
-		RenderCmd::BindUniformBuffer(mSceneUB, UL::BScene);
+		RHICmdList.GetContext()->BindUniformBuffer(mSceneUB, UL::BScene);
 	}
 
 }
@@ -62,9 +62,9 @@ void FSceneProxy::Cleanup()
 	//mSkyProxy.Cleanup();
 }
 
-void FSceneProxy::DrawScene()
+void FSceneProxy::DrawScene(FRHICommandList& RHICmdList)
 {
-	mStaticMeshProxy.DrawMeshes(MBM_Opaque);
+	mStaticMeshProxy.DrawMeshes(RHICmdList, MBM_Opaque);
 	//mSkyProxy.DrawSkybox();
 }
 

@@ -1,12 +1,12 @@
 #pragma once
 #include "Rev/Render/RHI/RHIShader.h"
-#include "Rev/Render/RHI/RHIRenderPass.h"
 #include "VulkanPipeline.h"
 #include "../Shaderc/ShadercFactory.h"
 
 
 namespace Rev
 {
+class FVulkanContext;
 class FVulkanRenderPass;
 class FVulkanPrimitive;
 class FVulkanShader : public FRHIShader
@@ -47,13 +47,13 @@ public:
 
 	virtual void SetUniformArray(uint16 location, const int* values, uint32_t count) override {};
 
-	void PrepareDraw(const FVulkanRenderPass* RenderPass, const FVulkanPrimitive* Primitive);
+	void PrepareDraw(FVulkanContext* Context, const FVulkanRenderPass* RenderPass, const FVulkanPrimitive* Primitive);
 
 private:
 	static std::vector<VkPipelineShaderStageCreateInfo> MakeShaderStageInfo(const FRHIGraphicsShaders& InShaders);
 	std::vector<VkDescriptorSetLayoutBinding> MakeLayoutBindings(const FRHIGraphicsShaders& InShaders);
 
-	VkDescriptorSet GetDescriptorSet();
+	VkDescriptorSet GetDescriptorSet(FVulkanContext* Context);
 
 private:
 	FVulkanPipelineLayout mPipelineLayout;

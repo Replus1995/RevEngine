@@ -66,7 +66,7 @@ public:
 	uint32 NumColorAttachments = 0;
 	FDepthStencilAttachmentDesc DepthStencilAttchment;
 	std::vector<FSubpassDesc> SubpassDescs;  //TODO: define MAX_SUB_PASS to make this member as an array
-	std::vector<FSubpassDependDesc> SubpassDependDescs;
+	//std::vector<FSubpassDependDesc> SubpassDependDescs;
 };
 
 class FRHIRenderPass : public FRHIResource

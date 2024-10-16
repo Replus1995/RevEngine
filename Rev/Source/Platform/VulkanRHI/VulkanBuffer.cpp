@@ -1,6 +1,5 @@
 #include "VulkanBuffer.h"
-#include "VulkanCore.h"
-#include "VulkanUtils.h"
+#include "VulkanDynamicRHI.h"
 
 namespace Rev
 {
@@ -59,12 +58,12 @@ void FVulkanBuffer::Allocate(uint64 Size, VkBufferUsageFlags BufferUsage, VmaMem
 	AllocInfo.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT;
 
 	// allocate the buffer
-	REV_VK_CHECK(vmaCreateBuffer(FVulkanCore::GetAllocator(), &BufferCreateInfo, &AllocInfo, &mBuffer, &mAllocation, &mAllocationInfo));
+	REV_VK_CHECK(vmaCreateBuffer(FVulkanDynamicRHI::GetAllocator(), &BufferCreateInfo, &AllocInfo, &mBuffer, &mAllocation, &mAllocationInfo));
 }
 
 void FVulkanBuffer::Release()
 {
-	vmaDestroyBuffer(FVulkanCore::GetAllocator(), mBuffer, mAllocation);
+	vmaDestroyBuffer(FVulkanDynamicRHI::GetAllocator(), mBuffer, mAllocation);
 	mBuffer = VK_NULL_HANDLE;
 	mAllocation = nullptr;
 	mAllocationInfo = {};
@@ -79,7 +78,7 @@ FVulkanStageBuffer::~FVulkanStageBuffer()
 {
 }
 
-FVulkanVertexBuffer::FVulkanVertexBuffer(uint32 InSize, const float* InData)
+FVulkanVertexBuffer::FVulkanVertexBuffer(uint32 InSize, bool bDynamic)
 	: FRHIVertexBuffer(InSize)
 {
 	VkBufferUsageFlags BufferUsage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT;
@@ -88,44 +87,38 @@ FVulkanVertexBuffer::FVulkanVertexBuffer(uint32 InSize, const float* InData)
 	VkBufferDeviceAddressInfo DeviceAddressInfo{};
 	DeviceAddressInfo.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
 	DeviceAddressInfo.buffer = mBuffer;
-	mDeviceAddress = vkGetBufferDeviceAddress(FVulkanCore::GetDevice(), &DeviceAddressInfo);
-
-	if (InData)
-	{
-		FVulkanUtils::ImmediateUploadBuffer(mBuffer, InData, InSize, 0);
-	}
+	mDeviceAddress = vkGetBufferDeviceAddress(FVulkanDynamicRHI::GetDevice(), &DeviceAddressInfo);
 }
 
 FVulkanVertexBuffer::~FVulkanVertexBuffer()
 {
 }
 
-void FVulkanVertexBuffer::UpdateSubData(const void* Data, uint32 Size, uint32 Offset)
-{
-	REV_CORE_ASSERT(Size + Offset <= mSize);
-	FVulkanUtils::ImmediateUploadBuffer(mBuffer, Data, Size, Offset);
-}
-
-FVulkanIndexBuffer::FVulkanIndexBuffer(EIndexElementType InType, uint32 InCount, const void* InData)
-	: FRHIIndexBuffer(InType, InCount)
+FVulkanIndexBuffer::FVulkanIndexBuffer(uint32 InStride, uint32 InCount, bool bDynamic)
+	: FRHIIndexBuffer(InStride, InCount)
 {
 	VkBufferUsageFlags BufferUsage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
 	Allocate(GetCapacity(), BufferUsage, VMA_MEMORY_USAGE_GPU_ONLY);
 
-	if (InData)
+	switch (InStride)
 	{
-		FVulkanUtils::ImmediateUploadBuffer(mBuffer, InData, mCount * GetStride(), 0);
+	case 1:
+		mIndexType = VK_INDEX_TYPE_UINT8_KHR;
+		break;
+	case 2:
+		mIndexType = VK_INDEX_TYPE_UINT16;
+		break;
+	case 4:
+		mIndexType = VK_INDEX_TYPE_UINT32;
+		break;
+	default:
+		REV_CORE_ASSERT(false, "[FVulkanIndexBuffer] Unknown index buffer type");
+		break;
 	}
 }
 
 FVulkanIndexBuffer::~FVulkanIndexBuffer()
 {
-}
-
-void FVulkanIndexBuffer::UpdateSubData(const void* Data, uint32 Count, uint32 Offset)
-{
-	REV_CORE_ASSERT(Count + Offset <= mCount);
-	FVulkanUtils::ImmediateUploadBuffer(mBuffer, Data, Count * GetStride(), Offset * GetStride());
 }
 
 }

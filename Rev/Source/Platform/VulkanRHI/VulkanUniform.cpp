@@ -1,6 +1,5 @@
 #include "VulkanUniform.h"
-#include "VulkanCore.h"
-#include "VulkanUtils.h"
+#include "Rev/Core/Assert.h"
 
 namespace Rev
 {
@@ -22,33 +21,6 @@ void FVulkanUniformBuffer::UpdateSubData(const void* Data, uint32 Size, uint32 O
 	REV_CORE_ASSERT(Size + Offset <= mSize);
 	uint8* DstMem = (uint8*)GetMappedData() + Offset;
 	memcpy(DstMem, Data, Size);
-}
-
-FVulkanUniformBufferDynamic::FVulkanUniformBufferDynamic(uint32 InSize)
-	: FRHIUniformBufferDynamic(InSize)
-{
-	VkBufferUsageFlags BufferUsage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
-	Allocate(InSize, BufferUsage, VMA_MEMORY_USAGE_CPU_TO_GPU);
-}
-
-FVulkanUniformBufferDynamic::~FVulkanUniformBufferDynamic()
-{
-}
-
-uint32 FVulkanUniformBufferDynamic::UpdateSubData(const void* Data, uint32 Size)
-{
-	REV_CORE_ASSERT(mDynamicOffset + Size <= mSize);
-	uint8* DstMem = (uint8*)GetMappedData() + mDynamicOffset;
-	memcpy(DstMem, Data, Size);
-
-
-	mDynamicOffset += Size;
-	return mDynamicOffset;
-}
-
-void FVulkanUniformBufferDynamic::Clear()
-{
-	mDynamicOffset = 0;
 }
 
 }

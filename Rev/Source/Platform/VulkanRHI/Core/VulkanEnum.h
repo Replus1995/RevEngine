@@ -34,7 +34,6 @@ public:
 
     //Buffer
     static VkFormat Translate(EVertexElementType InType);
-    static VkIndexType Translate(EIndexElementType InType);
 };
 
 }

@@ -83,13 +83,6 @@ class REV_API FRHIVertexBuffer : public FRHIResource
 public:
 	FRHIVertexBuffer(uint32 InSize) : mSize(InSize) {}
 	virtual ~FRHIVertexBuffer() = default;
-	/**
-	* @brief Update vertex buffer data
-	* @param Data : memory pointer
-	* @param Size : memory size in bytes
-	* @param Offset : memory offset in bytes
-	*/
-	virtual void UpdateSubData(const void* Data, uint32 Size, uint32 Offset = 0) = 0;
 
 	const FRHIVertexLayout& GetLayout() const { return mLayout; }
 	void SetLayout(const FRHIVertexLayout& InLayout) { mLayout = InLayout; }
@@ -99,31 +92,17 @@ protected:
 	FRHIVertexLayout mLayout;
 };
 
-enum class EIndexElementType : uint8
-{
-	UInt16 = 0,
-	UInt32 = 1
-};
-
 class REV_API FRHIIndexBuffer : public FRHIResource
 {
 public:
-	FRHIIndexBuffer(EIndexElementType InType, uint32 InCount) : mType(InType), mCount(InCount) {}
+	FRHIIndexBuffer(uint32 InStride, uint32 InCount) : mStride(InStride), mCount(InCount) {}
 	virtual ~FRHIIndexBuffer() = default;
-	/**
-	* @brief Update index buffer data
-	* @param Data : memory pointer
-	* @param Count : element count (size = count * stride)
-	* @param Offset : element offset (byteoffset = offset * stride)
-	*/
-	virtual void UpdateSubData(const void* Data, uint32 Count, uint32 Offset = 0) = 0;
 
-	EIndexElementType GetType() const { return mType; }
-	uint32 GetStride() const { return (uint32(mType) + 1) * 2; }
+	uint32 GetStride() const { return mStride; }
 	uint32 GetCount() const { return mCount; }
-	uint32 GetCapacity() const { return GetStride() * mCount; }
+	uint32 GetCapacity() const { return mStride * mCount; }
 protected:
-	EIndexElementType mType = EIndexElementType::UInt16;
+	uint32 mStride = 0;
 	uint32 mCount = 0;
 };
 
@@ -136,17 +115,6 @@ public:
 
 	uint32 GetSize() const { return mSize; }
 
-protected:
-	uint32 mSize;
-};
-
-class REV_API FRHIUniformBufferDynamic : public FRHIResource
-{
-public:
-	FRHIUniformBufferDynamic(uint32 InSize) : mSize(InSize) {}
-	virtual ~FRHIUniformBufferDynamic() = default;
-	virtual uint32 UpdateSubData(const void* Data, uint32 Size) = 0;
-	virtual void Clear() = 0;
 protected:
 	uint32 mSize;
 };

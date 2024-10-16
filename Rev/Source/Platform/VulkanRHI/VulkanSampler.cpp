@@ -1,5 +1,5 @@
 #include "VulkanSampler.h"
-#include "VulkanCore.h"
+#include "VulkanDynamicRHI.h"
 #include "Core/VulkanEnum.h"
 #include "Rev/Core/Assert.h"
 
@@ -14,7 +14,7 @@ FVulkanSampler::FVulkanSampler(const FSamplerDesc& InDesc)
 
 FVulkanSampler::~FVulkanSampler()
 {
-	vkDestroySampler(FVulkanCore::GetDevice(), mSampler, nullptr);
+	vkDestroySampler(FVulkanDynamicRHI::GetDevice(), mSampler, nullptr);
 }
 
 bool FVulkanSampler::UseAnisotropicFilter(const FSamplerDesc& InDesc)
@@ -49,7 +49,7 @@ void FVulkanSampler::CreateResource()
 	//CreateInfo.borderColor
 	//CreateInfo.unnormalizedCoordinates
 
-	REV_VK_CHECK(vkCreateSampler(FVulkanCore::GetDevice(), &CreateInfo, nullptr, &mSampler));
+	REV_VK_CHECK(vkCreateSampler(FVulkanDynamicRHI::GetDevice(), &CreateInfo, nullptr, &mSampler));
 }
 
 Ref<FVulkanSampler> CreateVkSampler(const FSamplerDesc& InSamplerDesc)

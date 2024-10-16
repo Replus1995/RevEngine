@@ -41,6 +41,18 @@ public:
 	virtual void NextSubpass() = 0;
 
 
+	virtual void UpdateTexture(const Ref<FRHITexture>& InTexture, const void* InContent, uint32 InSize, uint8 InMipLevel = 0, uint16 InArrayIndex = 0) = 0;
+	virtual void ClearTexture(const Ref<FRHITexture>& InTexture, uint8 InMipLevel = 0, uint8 InMipCount = 1, uint16 InArrayIndex = 0, uint16 InArrayCount = 1) = 0;
+	/**
+	* @brief Update index buffer data
+	* @param Content : memory pointer
+	* @param Size : content size
+	* @param Offset : content offset
+	*/
+	virtual void UpdateBufferData(const Ref<FRHIVertexBuffer>& Buffer, const void* Content, uint32 Size, uint32 Offset = 0) = 0;
+	virtual void UpdateBufferData(const Ref<FRHIIndexBuffer>& Buffer, const void* Content, uint32 Size, uint32 Offset = 0) = 0;
+
+
 	virtual void BindUniformBuffer(const Ref<FRHIUniformBuffer>& InBuffer, uint16 InBinding) = 0;
 	virtual void BindTexture(const Ref<FRHITexture>& InTexture, uint16 InBinding) = 0;
 	virtual void BindProgram(const Ref<FRHIShaderProgram>& InProgram) = 0;
