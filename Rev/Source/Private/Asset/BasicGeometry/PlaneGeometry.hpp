@@ -47,8 +47,8 @@ public:
         Ref<FRHIVertexBuffer> planeVertices = GDynamicRHI->CreateVertexBuffer(planeVerticesSize);
         FRenderCore::GetMainContext()->UpdateBufferData(planeVertices, sPlaneVertices, planeVerticesSize);
         planeVertices->SetLayout({
-            {"Position", EVertexElementType::Float3, 0},
-            {"TexCoord", EVertexElementType::Float2, 1}
+            {"Position", VT_Float3, 0},
+            {"TexCoord", VT_Float2, 1}
             });
 
         constexpr uint32 planeIndicesCount = sizeof(sPlaneIndices) / sizeof(uint32);

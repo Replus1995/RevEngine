@@ -7,42 +7,45 @@
 namespace Rev
 {
 
-enum class EVertexElementType : uint8
+enum EVertexType : uint8
 {
-	None = 0,
-	Float,
-	Float2,
-	Float3,
-	Float4,
-	Mat3,
-	Mat4,
-	Int,
-	Int2,
-	Int3,
-	Int4,
-	Bool
+	VT_None		= 0,
+	VT_Float	= 1,
+	VT_Float2	= 2,
+	VT_Float3	= 3,
+	VT_Float4	= 4,
+	VT_Mat3		= 5,
+	VT_Mat4		= 6,
+	VT_Int		= 7,
+	VT_Int2		= 8,
+	VT_Int3		= 9,
+	VT_Int4		= 10,
+	VT_Bool		= 11
 };
-uint32 VertexElementSize(EVertexElementType type);
-uint32 VertexComponentCount(EVertexElementType type);
 
 struct FRHIVertexElement
 {
 	std::string Name;
-	EVertexElementType Type;
-	uint16 Location;
-	uint32 Size;
+	EVertexType Type;
+	uint8 Location;
+	uint8 Size;
+	uint8 Num;
 	uint32 Offset;
 	bool Normalized;
 
 	FRHIVertexElement() = default;
 
-	FRHIVertexElement(const std::string& InName, EVertexElementType InType, uint32 InLocation, bool InNormalized = false)
-		: Name(InName), Type(InType), Location(InLocation), Size(VertexElementSize(InType)), Offset(0), Normalized(InNormalized)
+	FRHIVertexElement(const std::string& InName, EVertexType InType, uint8 InLocation, uint32 InOffset = 0, bool InNormalized = false)
+		: Name(InName), Type(InType), Location(InLocation), Offset(InOffset), Normalized(InNormalized)
 	{
+		Size = ElementSize(InType);
+		Num = ComponentCount(InType);
 	}
+ 
 
-	uint32 GetElementSize() const;
-	uint32 GetComponentCount() const;
+private:
+	static uint8 ElementSize(EVertexType InType);
+	static uint8 ComponentCount(EVertexType InType);
 };
 
 class FRHIVertexLayout

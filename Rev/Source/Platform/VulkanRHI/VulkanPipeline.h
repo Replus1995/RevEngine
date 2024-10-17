@@ -19,15 +19,15 @@ public:
     VkPipeline Build(VkDevice InDevice, VkPipelineLayout InLayout, const std::vector<VkPipelineShaderStageCreateInfo>& InShaderStageInfo, const FVulkanRenderPass* RenderPass, const FVulkanPrimitive* InPrimitive);
 
 private:
-    VkPipelineInputAssemblyStateCreateInfo MakeInputAssemblyStateInfo() const;
+    VkPipelineInputAssemblyStateCreateInfo MakeInputAssemblyStateInfo(VkPrimitiveTopology InTopology) const;
     VkPipelineTessellationStateCreateInfo MakeTessellationStateInfo() const;
     VkPipelineViewportStateCreateInfo MakeViewportStateInfo() const;
     VkPipelineRasterizationStateCreateInfo MakeRasterizationStateInfo() const;
     VkPipelineMultisampleStateCreateInfo MakeMultisampleStateInfo() const;
     VkPipelineDepthStencilStateCreateInfo MakeDepthStencilStateInfo() const;
-    VkPipelineColorBlendStateCreateInfo MakeColorBlendStateInfo(const std::vector<VkPipelineColorBlendAttachmentState>& InAttachmentStates) const;
-    VkPipelineDynamicStateCreateInfo MakeDynamicStateInfo(const std::vector<VkDynamicState>& InDynaimcStates) const;
-    VkPipelineRenderingCreateInfo MakeRenderingInfo(const std::vector<VkFormat>& InColorFomats, VkFormat InDepthFormat) const;
+    VkPipelineColorBlendStateCreateInfo MakeColorBlendStateInfo(const VkPipelineColorBlendAttachmentState* InColorBlendStates, uint32 InNumColorBlendStates) const;
+    VkPipelineDynamicStateCreateInfo MakeDynamicStateInfo(const VkDynamicState* InDynaimcStates, uint32 InNumDynaimcStates) const;
+    VkPipelineRenderingCreateInfo MakeRenderingInfo(const VkFormat* InColorFomats, uint32 InNumColorFormats, VkFormat InDepthFormat) const;
 
 private:
     FRHIGraphicsState mState;

@@ -50,7 +50,7 @@ FMeshPrimitive FMeshPrimitiveStorage::CreateVertexData()
 		Ref<FRHIVertexBuffer> PositionBuffer = GDynamicRHI->CreateVertexBuffer(PositonData.Size());
 		FRenderCore::GetMainContext()->UpdateBufferData(PositionBuffer, PositonData.DataAs<float>(), PositonData.Size());
 		PositionBuffer->SetLayout({
-			{"Position", EVertexElementType::Float3,  0}
+			{"Position", VT_Float3,  0}
 			});
 		Primitive->AddVertexBuffer(PositionBuffer);
 	}
@@ -59,7 +59,7 @@ FMeshPrimitive FMeshPrimitiveStorage::CreateVertexData()
 		Ref<FRHIVertexBuffer> NormalBuffer = GDynamicRHI->CreateVertexBuffer(NormalData.Size());
 		FRenderCore::GetMainContext()->UpdateBufferData(NormalBuffer, NormalData.DataAs<float>(), NormalData.Size());
 		NormalBuffer->SetLayout({
-			{"Normal", EVertexElementType::Float3,  1}
+			{"Normal", VT_Float3,  1}
 			});
 		Primitive->AddVertexBuffer(NormalBuffer);
 	}
@@ -68,7 +68,7 @@ FMeshPrimitive FMeshPrimitiveStorage::CreateVertexData()
 		Ref<FRHIVertexBuffer> TangentBuffer = GDynamicRHI->CreateVertexBuffer(TangentData.Size());
 		FRenderCore::GetMainContext()->UpdateBufferData(TangentBuffer, TangentData.DataAs<float>(), TangentData.Size());
 		TangentBuffer->SetLayout({
-			{"Tangent", EVertexElementType::Float4,  2}
+			{"Tangent", VT_Float4,  2}
 			});
 		Primitive->AddVertexBuffer(TangentBuffer);
 	}
@@ -77,7 +77,7 @@ FMeshPrimitive FMeshPrimitiveStorage::CreateVertexData()
 		Ref<FRHIVertexBuffer> TexCoordBuffer = GDynamicRHI->CreateVertexBuffer(TexCoordData.Size());
 		FRenderCore::GetMainContext()->UpdateBufferData(TexCoordBuffer, TexCoordData.DataAs<float>(), TexCoordData.Size());
 		TexCoordBuffer->SetLayout({
-			{"TexCoord0", EVertexElementType::Float2,  3}
+			{"TexCoord0", VT_Float2,  3}
 			});
 		Primitive->AddVertexBuffer(TexCoordBuffer);
 	}

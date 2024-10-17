@@ -2,6 +2,7 @@
 #include "Rev/Core/Base.h"
 #include "Rev/Core/Assert.h"
 #include "Rev/Render/PixelFormat.h"
+#include "Rev/Render/RHI/RHIDefinitions.h"
 #include "Rev/Render/RHI/RHIResource.h"
 #include "Rev/Render/RHI/RHITexture.h"
 #include "Rev/Math/Maths.h"
@@ -11,27 +12,11 @@ namespace Rev
 
 enum class ERenderTargetDimension : uint8
 {
-	RenderTargetEmpty		= 0,
-	RenderTarget2D			= 1,
-	RenderTarget2DArray		= 2,
-	RenderTargetCube		= 3,
-	RenderTargetCubeArray	= 4
-};
-
-enum ERenderTargetAttachment : uint8
-{
-	RTA_ColorAttachment0 = 0,
-	RTA_ColorAttachment1 = 1,
-	RTA_ColorAttachment2 = 2,
-	RTA_ColorAttachment3 = 3,
-	RTA_ColorAttachment4 = 4,
-	RTA_ColorAttachment5 = 5,
-	RTA_ColorAttachment6 = 6,
-	RTA_ColorAttachment7 = 7,
-	RTA_MaxColorAttachments = 8,
-	RTA_DepthAttachment = 9,
-	RTA_DepthStencilAttachment = 10,
-	RTA_EmptyAttachment = 16
+	RenderTargetEmpty = 0,
+	RenderTarget2D = 1,
+	RenderTarget2DArray = 2,
+	RenderTargetCube = 3,
+	RenderTargetCubeArray = 4
 };
 
 struct FColorTargetDesc

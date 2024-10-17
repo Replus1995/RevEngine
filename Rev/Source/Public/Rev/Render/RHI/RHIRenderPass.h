@@ -1,7 +1,7 @@
 #pragma once
 #include "Rev/Core/Base.h"
+#include "Rev/Render/RHI/RHIDefinitions.h"
 #include "Rev/Render/RHI/RHIRenderTarget.h"
-#include "Rev/Render/RHI/RHIPipeline.h"
 
 namespace Rev
 {
@@ -56,7 +56,6 @@ public:
 	EAttachmentLoadOp StencilLoadOp;
 	EAttachmentStoreOp StencilStoreOp;
 };
-
 
 
 struct FRenderPassDesc

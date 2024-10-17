@@ -1,4 +1,4 @@
-#include "Engine/Shaders/Include/Global.rsh"
+#include "Engine/Shaders/Include/Base.rsh"
 
 cbuffer SceneUB : register(b0, space0)
 {
@@ -12,7 +12,7 @@ cbuffer StaticMeshUB : register(b1, space0)
 
 struct VSInput
 {
-    float3 aPosition : POSITION0;
+    float4 aPosition : POSITION0;
 };
 
 struct VSOutput
@@ -23,8 +23,6 @@ struct VSOutput
 VSOutput main(VSInput Input)
 {
     VSOutput Result;
-    //Result.vPosition = float4(Input.aPosition, 1.0) * uStaticMesh.ModelMat * uScene.ViewProjMat;
-    Result.vPosition = mul(uScene.ViewProjMat, mul(uStaticMesh.ModelMat, float4(Input.aPosition, 1.0)));
-    //Result.vPosition = Input.aPosition;
+    Result.vPosition = mul(uScene.ViewProjMat, mul(uStaticMesh.ModelMat, Input.aPosition));
     return Result;
 }

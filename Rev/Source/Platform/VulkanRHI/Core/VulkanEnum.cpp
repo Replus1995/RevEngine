@@ -89,7 +89,7 @@ VkPrimitiveTopology FVulkanEnum::Translate(EPrimitiveTopology InTopology)
     }
 }
 
-VkCompareOp FVulkanEnum::Translate(ECompareOp InOp)
+VkCompareOp FVulkanEnum::Translate(ECompareOperation InOp)
 {
     return VkCompareOp(InOp);
 }
@@ -99,12 +99,12 @@ VkBlendFactor FVulkanEnum::Translate(EBlendFactor InFactor)
     return VkBlendFactor(InFactor);
 }
 
-VkBlendOp FVulkanEnum::Translate(EBlendOp InOp)
+VkBlendOp FVulkanEnum::Translate(EBlendOperation InOp)
 {
     return VkBlendOp(InOp);
 }
 
-VkColorComponentFlags FVulkanEnum::Translate(EColorComponentMask InMask)
+VkColorComponentFlags FVulkanEnum::Translate(EColorWriteMask InMask)
 {
     return VkColorComponentFlags(InMask);
 }
@@ -154,34 +154,34 @@ VkPipelineBindPoint FVulkanEnum::Translate(EPipelineBindPoint InBindPoint)
     }
 }
 
-VkFormat FVulkanEnum::Translate(EVertexElementType InType)
+VkFormat FVulkanEnum::Translate(EVertexType InType)
 {
     switch (InType)
     {
     default:
-    case Rev::EVertexElementType::None:
+    case VT_None:
         break;
-    case Rev::EVertexElementType::Float:
+    case VT_Float:
         return VK_FORMAT_R32_SFLOAT;
-    case Rev::EVertexElementType::Float2:
+    case VT_Float2:
         return VK_FORMAT_R32G32_SFLOAT;
-    case Rev::EVertexElementType::Float3:
+    case VT_Float3:
         return VK_FORMAT_R32G32B32_SFLOAT;
-    case Rev::EVertexElementType::Float4:
+    case VT_Float4:
         return VK_FORMAT_R32G32B32A32_SFLOAT;
-    case Rev::EVertexElementType::Mat3:
+    case VT_Mat3:
         return VK_FORMAT_R32G32B32_SFLOAT;
-    case Rev::EVertexElementType::Mat4:
+    case VT_Mat4:
         return VK_FORMAT_R32G32B32A32_SFLOAT;
-    case Rev::EVertexElementType::Int:
+    case VT_Int:
         return VK_FORMAT_R32_SINT;
-    case Rev::EVertexElementType::Int2:
+    case VT_Int2:
         return VK_FORMAT_R32G32_SINT;
-    case Rev::EVertexElementType::Int3:
+    case VT_Int3:
         return VK_FORMAT_R32G32B32_SINT;
-    case Rev::EVertexElementType::Int4:
+    case VT_Int4:
         return VK_FORMAT_R32G32B32A32_SINT;
-    case Rev::EVertexElementType::Bool:
+    case VT_Bool:
         return VK_FORMAT_R8_SINT;
     }
 

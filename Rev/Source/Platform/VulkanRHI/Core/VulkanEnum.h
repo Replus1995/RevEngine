@@ -1,11 +1,7 @@
 #pragma once
 #include "Rev/Core/Base.h"
-#include "Rev/Render/RHI/RHITexture.h"
-#include "Rev/Render/RHI/RHIRenderTarget.h"
-#include "Rev/Render/RHI/RHISampler.h"
-#include "Rev/Render/RHI/RHIPrimitive.h"
-#include "Rev/Render/RHI/RHIShader.h"
-#include "Rev/Render/RHI/RHIPipeline.h"
+#include "Rev/Render/RHI/RHIDefinitions.h"
+#include "Rev/Render/RHI/RHIBuffer.h"
 #include "Rev/Render/RHI/RHIRenderPass.h"
 #include <vulkan/vulkan.h>
 
@@ -22,10 +18,10 @@ public:
 
     //Pipeline
     static VkPrimitiveTopology Translate(EPrimitiveTopology InTopology);
-    static VkCompareOp Translate(ECompareOp InOp);
+    static VkCompareOp Translate(ECompareOperation InOp);
     static VkBlendFactor Translate(EBlendFactor InFactor);
-    static VkBlendOp Translate(EBlendOp InOp);
-    static VkColorComponentFlags Translate(EColorComponentMask InMask);
+    static VkBlendOp Translate(EBlendOperation InOp);
+    static VkColorComponentFlags Translate(EColorWriteMask InMask);
     static VkPolygonMode Translate(EPolygonMode InMode);
     static VkCullModeFlags Translate(ECullMode InMode);
     static VkAttachmentLoadOp Translate(EAttachmentLoadOp InOp);
@@ -33,7 +29,7 @@ public:
     static VkPipelineBindPoint Translate(EPipelineBindPoint InBindPoint);
 
     //Buffer
-    static VkFormat Translate(EVertexElementType InType);
+    static VkFormat Translate(EVertexType InType);
 };
 
 }

@@ -1,7 +1,7 @@
 #pragma once
-#include "Rev/Core/Base.h"
 #include "Rev/Math/Maths.h"
 #include "Rev/Render/PixelFormat.h"
+#include "Rev/Render/RHI/RHIDefinitions.h"
 #include "Rev/Render/RHI/RHIResource.h"
 #include "Rev/Render/RHI/RHISampler.h"
 
@@ -10,22 +10,11 @@ namespace Rev
 
 enum class ETextureDimension : uint8
 {
-	Texture2D			= 1,
-	Texture2DArray		= 2,
-	TextureCube			= 3,
-	TextureCubeArray	= 4,
-	Texture3D			= 5,
-};
- 
-enum ETextureCubeFace : uint8
-{
-	TCF_PositiveX = 0,
-	TCF_NegativeX = 1,
-	TCF_PositiveY = 2,
-	TCF_NegativeY = 3,
-	TCF_PositiveZ = 4,
-	TCF_NegativeZ = 5,
-	TCF_Count = 6
+	Texture2D = 1,
+	Texture2DArray = 2,
+	TextureCube = 3,
+	TextureCubeArray = 4,
+	Texture3D = 5,
 };
 
 struct FTextureClearColor

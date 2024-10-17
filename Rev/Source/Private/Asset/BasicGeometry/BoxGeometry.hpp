@@ -48,7 +48,7 @@ public:
             Ref<FRHIVertexBuffer> boxVertices = GDynamicRHI->CreateVertexBuffer(boxVerticesSize);
             FRenderCore::GetMainContext()->UpdateBufferData(boxVertices, sBoxVertices, boxVerticesSize);
             boxVertices->SetLayout({
-                {"Position", EVertexElementType::Float3,  0}
+                {"Position", VT_Float3,  0}
                 //{EShaderDataType::Float3, "a_Normal"},
                 //{EShaderDataType::Float2, "a_TexCoord"}
                 });

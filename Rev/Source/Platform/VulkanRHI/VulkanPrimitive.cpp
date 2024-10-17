@@ -46,7 +46,7 @@ void FVulkanPrimitive::PrepareDraw()
 		uint32_t VertexStride = 0;
 		for (const auto& Elem : VertexLayout)
 		{
-			VertexStride += Elem.GetElementSize();
+			VertexStride += Elem.Size;
 			VkVertexInputAttributeDescription AttributeDesc{};
 			AttributeDesc.binding = (uint32_t)i;
 			AttributeDesc.location = Elem.Location;

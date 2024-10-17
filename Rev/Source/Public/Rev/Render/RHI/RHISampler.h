@@ -1,37 +1,10 @@
 #pragma once
-#include "Rev/Core/Base.h"
+#include "Rev/Render/RHI/RHIDefinitions.h"
 #include "Rev/Render/RHI/RHIResource.h"
 #include "Rev/Math/Maths.h"
 
 namespace Rev
 {
-
-enum ESamplerFilterMode : uint8
-{
-	SF_Nearest = 0,
-	SF_Bilinear,
-	SF_Trilinear,
-	SF_AnisotropicNearest,
-	SF_AnisotropicLinear,
-};
-
-enum ESamplerWarpMode : uint8
-{
-	SW_Repeat = 0,
-	SW_Clamp,
-	SW_Mirror,
-	SW_Border
-};
-
-enum ESamplerAnisotropicMode
-{
-	SA_None = 1,
-	SA_2X = 2,
-	SA_4X = 4,
-	SA_8X = 8,
-	SA_16X = 16
-};
-
 
 struct FSamplerDesc
 {
