@@ -93,14 +93,14 @@ enum EDepthClipMode : uint8
 
 enum EStencilOperation
 {
-	SO_KEEP = 0,
-	SO_ZERO = 1,
-	SO_REPLACE = 2,
-	SO_INCREMENT_AND_CLAMP = 3,
-	SO_DECREMENT_AND_CLAMP = 4,
-	SO_INVERT = 5,
-	SO_INCREMENT_AND_WRAP = 6,
-	SO_DECREMENT_AND_WRAP = 7,
+	SO_Keep = 0,
+	SO_Zero = 1,
+	SO_Replace = 2,
+	SO_IncrementAndClamp = 3,
+	SO_DecrementAndClamp = 4,
+	SO_Invert = 5,
+	SO_IncrementAndWrap = 6,
+	SO_DecrementAndWrap = 7,
 };
 
 enum ECompareFunction : uint8

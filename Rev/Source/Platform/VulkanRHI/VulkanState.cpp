@@ -77,37 +77,41 @@ FVulkanDepthStencilState::FVulkanDepthStencilState(const FDepthStencilStateDesc&
 
 	{
 		//DepthStencilState.depthBoundsTestEnable = GfxPSOInit.bDepthBounds;
-		DepthStencilState.depthBoundsTestEnable = false;
+		/*DepthStencilState.depthBoundsTestEnable = false;
 		DepthStencilState.minDepthBounds = 0.0f;
-		DepthStencilState.maxDepthBounds = 1.0f;
+		DepthStencilState.maxDepthBounds = 1.0f;*/
 	}
 
 	DepthStencilState.stencilTestEnable = (Desc.bEnableFrontFaceStencil || Desc.bEnableBackFaceStencil) ? VK_TRUE : VK_FALSE;
 
-	// Front
-	DepthStencilState.back.failOp = FVulkanEnum::Translate(Desc.FrontFaceStencilFailOp);
-	DepthStencilState.back.passOp = FVulkanEnum::Translate(Desc.FrontFaceStencilPassOp);
-	DepthStencilState.back.depthFailOp = FVulkanEnum::Translate(Desc.FrontFaceStencilDepthFailOp);
-	DepthStencilState.back.compareOp = FVulkanEnum::Translate(Desc.FrontFaceStencilFunc);
-	DepthStencilState.back.compareMask = Desc.StencilReadMask;
-	DepthStencilState.back.writeMask = Desc.StencilWriteMask;
-	DepthStencilState.back.reference = 0;
+	if (DepthStencilState.stencilTestEnable)
+	{
+		// Front
+		DepthStencilState.back.failOp = FVulkanEnum::Translate(Desc.FrontFaceStencilFailOp);
+		DepthStencilState.back.passOp = FVulkanEnum::Translate(Desc.FrontFaceStencilPassOp);
+		DepthStencilState.back.depthFailOp = FVulkanEnum::Translate(Desc.FrontFaceStencilDepthFailOp);
+		DepthStencilState.back.compareOp = FVulkanEnum::Translate(Desc.FrontFaceStencilFunc);
+		DepthStencilState.back.compareMask = Desc.StencilReadMask;
+		DepthStencilState.back.writeMask = Desc.StencilWriteMask;
+		DepthStencilState.back.reference = 0;
 
-	if (Desc.bEnableBackFaceStencil)
-	{
-		// Back
-		DepthStencilState.front.failOp = FVulkanEnum::Translate(Desc.BackFaceStencilFailOp);
-		DepthStencilState.front.passOp = FVulkanEnum::Translate(Desc.BackFaceStencilPassOp);
-		DepthStencilState.front.depthFailOp = FVulkanEnum::Translate(Desc.BackFaceStencilDepthFailOp);
-		DepthStencilState.front.compareOp = FVulkanEnum::Translate(Desc.BackFaceStencilFunc);
-		DepthStencilState.front.compareMask = Desc.StencilReadMask;
-		DepthStencilState.front.writeMask = Desc.StencilWriteMask;
-		DepthStencilState.front.reference = 0;
+		if (Desc.bEnableBackFaceStencil)
+		{
+			// Back
+			DepthStencilState.front.failOp = FVulkanEnum::Translate(Desc.BackFaceStencilFailOp);
+			DepthStencilState.front.passOp = FVulkanEnum::Translate(Desc.BackFaceStencilPassOp);
+			DepthStencilState.front.depthFailOp = FVulkanEnum::Translate(Desc.BackFaceStencilDepthFailOp);
+			DepthStencilState.front.compareOp = FVulkanEnum::Translate(Desc.BackFaceStencilFunc);
+			DepthStencilState.front.compareMask = Desc.StencilReadMask;
+			DepthStencilState.front.writeMask = Desc.StencilWriteMask;
+			DepthStencilState.front.reference = 0;
+		}
+		else
+		{
+			DepthStencilState.front = DepthStencilState.back;
+		}
 	}
-	else
-	{
-		DepthStencilState.front = DepthStencilState.back;
-	}
+	
 }
 
 FVulkanColorBlendState::FVulkanColorBlendState(const FColorBlendStateDesc& InDesc)

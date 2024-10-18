@@ -89,21 +89,21 @@ struct FDepthStencilStateDesc
 	bool bEnableDepthWrite = false;
 	ECompareFunction DepthTestFunc = CF_Never;
 
-	bool bEnableFrontFaceStencil;
-	bool bEnableBackFaceStencil;
+	bool bEnableFrontFaceStencil = false;
+	bool bEnableBackFaceStencil = false;
 
-	EStencilOperation FrontFaceStencilFailOp;
-	EStencilOperation FrontFaceStencilPassOp;
-	EStencilOperation FrontFaceStencilDepthFailOp;
-	ECompareFunction FrontFaceStencilFunc;
+	EStencilOperation FrontFaceStencilFailOp = SO_Keep;
+	EStencilOperation FrontFaceStencilPassOp = SO_Keep;
+	EStencilOperation FrontFaceStencilDepthFailOp = SO_Keep;
+	ECompareFunction FrontFaceStencilFunc = CF_Never;
 
-	EStencilOperation BackFaceStencilFailOp;
-	EStencilOperation BackFaceStencilPassOp;
-	EStencilOperation BackFaceStencilDepthFailOp;
-	ECompareFunction BackFaceStencilFunc;
+	EStencilOperation BackFaceStencilFailOp = SO_Keep;
+	EStencilOperation BackFaceStencilPassOp = SO_Keep;
+	EStencilOperation BackFaceStencilDepthFailOp = SO_Keep;
+	ECompareFunction BackFaceStencilFunc = CF_Never;
 
-	uint8 StencilReadMask;
-	uint8 StencilWriteMask;
+	uint8 StencilReadMask = 0;
+	uint8 StencilWriteMask = 0;
 
 };
 

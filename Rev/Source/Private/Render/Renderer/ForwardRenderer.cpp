@@ -74,6 +74,9 @@ void FForwardRenderer::DrawFrame(FRHICommandList& RHICmdList)
 	RHICmdList.GetContext()->BeginRenderPass(mBasePass);
 
 	FRHIGraphicsPipelineStateDesc Desc;
+	Desc.DepthStencilStateDesc.bEnableDepthWrite = true;
+	Desc.DepthStencilStateDesc.DepthTestFunc = CF_Less;
+	Desc.ColorBlendStateDesc.ColorTargets[0].bEnableBlend = true;
 	RHICmdList.GetContext()->SetGraphicsPipelineState(Desc);
 
 	mSceneProxy->SyncResource(RHICmdList);
