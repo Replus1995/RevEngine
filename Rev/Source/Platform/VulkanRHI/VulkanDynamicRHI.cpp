@@ -7,6 +7,7 @@
 #include "VulkanRenderTarget.h"
 #include "VulkanPrimitive.h"
 #include "VulkanRenderPass.h"
+#include "VulkanContext.h"
 #include "Rev/Core/Hash.h"
 
 namespace Rev
@@ -39,6 +40,7 @@ void FVulkanDynamicRHI::Init()
 
 void FVulkanDynamicRHI::Cleanup()
 {
+	mSamplerMap.clear();
 	vmaDestroyAllocator(mAllocator);
 	mInstance.Cleanup();
 }

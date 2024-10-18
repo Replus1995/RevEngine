@@ -18,9 +18,9 @@ public:
 	virtual void OnEvent(Event& event) {}
 	virtual void OnDraw(FRHICommandList& RHICmdList) {}
 
-	inline const std::string& GetName() const { return mDebugName; }
+	inline const std::string& GetName() const { return mName; }
 protected:
-	std::string mDebugName;
+	std::string mName;
 };
 
 }

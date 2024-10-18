@@ -9,6 +9,7 @@
 #include "Core/VulkanInit.h"
 #include "VulkanSwapchain.h"
 #include "VulkanFrameData.h"
+#include "VulkanPipeline.h"
 
 namespace Rev
 {
@@ -18,6 +19,7 @@ class FVulkanShaderProgram;
 class FVulkanUniformBuffer;
 class FVulkanTexture;
 class FVulkanPipelineLayout;
+class FVulkanPipeline;
 
 class FVulkanContext : public FRHIContext
 {
@@ -43,8 +45,8 @@ public:
 	virtual void ClearBackBuffer() override;
 
 //Data transfer
-	virtual void UpdateTexture(const Ref<FRHITexture>& InTexture, const void* InContent, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex) override;
-	virtual void ClearTexture(const Ref<FRHITexture>& InTexture, uint8 InMipLevel, uint8 InMipCount, uint16 InArrayIndex, uint16 InArrayCount) override;
+	virtual void UpdateTexture(FRHITexture* InTexture, const void* InContent, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex) override;
+	virtual void ClearTexture(FRHITexture* InTexture, uint8 InMipLevel, uint8 InMipCount, uint16 InArrayIndex, uint16 InArrayCount) override;
 	virtual void UpdateBufferData(const Ref<FRHIVertexBuffer>& Buffer, const void* Content, uint32 Size, uint32 Offset) override;
 	virtual void UpdateBufferData(const Ref<FRHIIndexBuffer>& Buffer, const void* Content, uint32 Size, uint32 Offset) override;
 
@@ -60,7 +62,6 @@ public:
 	virtual void SetGraphicsPipelineState(const FRHIGraphicsPipelineStateDesc& InState) override;
 
 	virtual void DrawPrimitive(const Ref<FRHIPrimitive>& InPrimitive) override;
-
 
 	const FVulkanSwapchain& GetSwapchain() const { return mSwapchain; }
 	VkImage GetSwapchainImage() { return mSwapchain.GetImages()[mCurSwapchainImageIndex]; }
@@ -102,6 +103,8 @@ private:
 	VkFence mImmFence;
 	VkCommandBuffer mImmCmdBuffer;
 	VkCommandPool mImmCmdPool;
+
+	FVulkanGraphicsPipelineCache mGraphicsPipelineCache;
 
 	//per frame data
 	Ref<FRHIRenderPass> mCurRenderPass = nullptr;

@@ -5,15 +5,19 @@
 #include "VulkanUniform.h"
 #include "VulkanDynamicRHI.h"
 #include "Rev/Core/Assert.h"
+#include "Rev/Core/Hash.h"
 
 namespace Rev
 {
 
 FVulkanShader::FVulkanShader(const FShadercCompiledData& InCompiledData)
 	: FRHIShader(InCompiledData.Stage)
-	, mDebugName(InCompiledData.Name)
+	, mName(InCompiledData.Name)
 	, mStageFlag(TranslateShaderStage(InCompiledData.Stage))
 {
+	REV_CORE_ASSERT(!mName.empty());
+	mHash = FCityHash::Gen(mName);
+
 	VkShaderModuleCreateInfo ShaderModuleCreateInfo{};
 	ShaderModuleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
 	ShaderModuleCreateInfo.codeSize = InCompiledData.Binary.Size();
@@ -63,40 +67,7 @@ FVulkanShaderProgram::~FVulkanShaderProgram()
 {
 }
 
-void FVulkanShaderProgram::PrepareDraw(FVulkanContext* Context, const FVulkanRenderPass* RenderPass, const FVulkanPrimitive* Primitive)
-{
-	if (mGraphicsStateDirty)
-	{
-		mGraphicsStateDirty = false;
-		mPipelineCache.Clear();
-		mPipeline.reset();
-	}
-
-	FVulkanPipelineKey NewKey = { (VkRenderPass)RenderPass->GetNativeHandle(), Primitive->GetDescHash() };
-
-	if (!mPipeline || mPipelineKey != NewKey)
-	{
-		mPipelineKey = NewKey;
-		if (Ref<FVulkanPipeline> CachedPipeline = mPipelineCache.Find(NewKey); CachedPipeline != nullptr)
-		{
-			mPipeline = CachedPipeline;
-		}
-		else
-		{
-			mPipeline = CreateRef<FVulkanPipeline>();
-			std::vector<VkPipelineShaderStageCreateInfo> ShaderStages = MakeShaderStageInfo(mShaders);
-			mPipeline->Build(mPipelineLayout, GraphicsState, ShaderStages, RenderPass, Primitive);
-			mPipelineCache.Add(NewKey, mPipeline);
-		}
-
-	}
-
-	VkDescriptorSet DescSet = GetDescriptorSet(Context);
-	vkCmdBindDescriptorSets(Context->GetActiveCmdBuffer(), mPipeline->GetPipelineBindPoint(), mPipelineLayout.GetPipelineLayout(), 0, 1, &DescSet, 0, nullptr);
-	vkCmdBindPipeline(Context->GetActiveCmdBuffer(), mPipeline->GetPipelineBindPoint(), mPipeline->GetPipeline());
-}
-
-std::vector<VkPipelineShaderStageCreateInfo> FVulkanShaderProgram::GenShaderStageInfo()
+std::vector<VkPipelineShaderStageCreateInfo> FVulkanShaderProgram::GenShaderStageInfo() const
 {
     std::vector<VkPipelineShaderStageCreateInfo> StageInfoVec;
     for (uint8 i = (uint8)ERHIShaderStage::Vertex; i < (uint8)ERHIShaderStage::Compute; i++)
@@ -116,7 +87,7 @@ std::vector<VkPipelineShaderStageCreateInfo> FVulkanShaderProgram::GenShaderStag
     return StageInfoVec;
 }
 
-std::vector<VkDescriptorSetLayoutBinding> FVulkanShaderProgram::GenLayoutBindings()
+std::vector<VkDescriptorSetLayoutBinding> FVulkanShaderProgram::GenLayoutBindings() const
 {
 	std::vector<VkDescriptorSetLayoutBinding> AllBindings;
 	for (const FVulkanUniformInfo& Uniform : mProgramUniforms)

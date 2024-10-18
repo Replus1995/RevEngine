@@ -1,7 +1,7 @@
 #pragma once
 #include "Rev/Core/Base.h"
 #include "Rev/Core/Buffer.h"
-#include "Rev/Render/RHI/RHISampler.h"
+#include "Rev/Render/RHI/RHIState.h"
 #include "Rev/Render/RHI/RHITexture.h"
 #include "Rev/Render/Texture/Texture.h"
 #include <vector>
@@ -37,7 +37,7 @@ public:
 	FTextureStorage(FTextureStorage&& Other) noexcept;
 
 	std::string Name;
-	FSamplerDesc SamplerDesc;
+	FSamplerStateDesc SamplerDesc;
 	FTextureDesc TextureDesc;
 	FImageStorage ImageData;
 

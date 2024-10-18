@@ -121,7 +121,7 @@ struct FColorBlendStateDesc
 	};
 
 	FColorTarget ColorTargets[RTA_MaxColorAttachments];
-	Math::FLinearColor BlendConstants;
+	//Math::FLinearColor BlendConstants;
 };
 
 

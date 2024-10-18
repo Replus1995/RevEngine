@@ -55,13 +55,13 @@ Ref<Texture> FTextureStorage::CreateTexture(bool bForceSRGB)
 	if (TextureDesc.Dimension == ETextureDimension::TextureCube && ImageData.NumLayers() == 6)
 	{
 		REV_CORE_ASSERT(TextureDesc.NumMips == ImageData.NumMips());
-		mCache = CreateRef<Texture>(GDynamicRHI->CreateTexture(TextureDesc, SamplerDesc));
+		mCache = CreateRef<Texture>(GDynamicRHI->CreateTexture(TextureDesc));
 		for (uint8 iCubeFace = 0; iCubeFace < 6; iCubeFace++)
 		{
 			for (uint8 iMip = 0; iMip < TextureDesc.NumMips; iMip++)
 			{
 				FBuffer& ImageBuffer = ImageData.At(iMip, iCubeFace);
-				FRenderCore::GetMainContext()->UpdateTexture(mCache->GetResource(), ImageBuffer.Data(), ImageBuffer.Size(), iMip, iCubeFace);
+				FRenderCore::GetMainContext()->UpdateTexture(mCache->GetTextureRHI(), ImageBuffer.Data(), ImageBuffer.Size(), iMip, iCubeFace);
 			}
 		}
 		return mCache;
@@ -69,7 +69,7 @@ Ref<Texture> FTextureStorage::CreateTexture(bool bForceSRGB)
 	else if (TextureDesc.Dimension == ETextureDimension::TextureCubeArray && ImageData.NumLayers() == 6 * TextureDesc.ArraySize)
 	{
 		REV_CORE_ASSERT(TextureDesc.NumMips == ImageData.NumMips());
-		mCache = CreateRef<Texture>(GDynamicRHI->CreateTexture(TextureDesc, SamplerDesc));
+		mCache = CreateRef<Texture>(GDynamicRHI->CreateTexture(TextureDesc));
 		for (uint8 iLayer = 0; iLayer < TextureDesc.ArraySize; iLayer++)
 		{
 			for (uint8 iCubeFace = 0; iCubeFace < 6; iCubeFace++)
@@ -77,7 +77,7 @@ Ref<Texture> FTextureStorage::CreateTexture(bool bForceSRGB)
 				for (uint8 iMip = 0; iMip < TextureDesc.NumMips; iMip++)
 				{
 					FBuffer& ImageBuffer = ImageData.At(iMip, iLayer * 6 + iCubeFace);
-					FRenderCore::GetMainContext()->UpdateTexture(mCache->GetResource(), ImageBuffer.Data(), ImageBuffer.Size(), iLayer * 6 + iCubeFace);
+					FRenderCore::GetMainContext()->UpdateTexture(mCache->GetTextureRHI(), ImageBuffer.Data(), ImageBuffer.Size(), iLayer * 6 + iCubeFace);
 				}
 			}
 		}
@@ -88,13 +88,13 @@ Ref<Texture> FTextureStorage::CreateTexture(bool bForceSRGB)
 	REV_CORE_ASSERT(TextureDesc.ArraySize == ImageData.NumLayers());
 
 	
-	mCache = CreateRef<Texture>(GDynamicRHI->CreateTexture(TextureDesc, SamplerDesc));
+	mCache = CreateRef<Texture>(GDynamicRHI->CreateTexture(TextureDesc));
 	for (uint8 iLayer = 0; iLayer < TextureDesc.ArraySize; iLayer++)
 	{
 		for (uint8 iMip = 0; iMip < TextureDesc.NumMips; iMip++)
 		{
 			FBuffer& ImageBuffer = ImageData.At(iMip, iLayer);
-			FRenderCore::GetMainContext()->UpdateTexture(mCache->GetResource(), ImageBuffer.Data(), ImageBuffer.Size(), iMip, iLayer);
+			FRenderCore::GetMainContext()->UpdateTexture(mCache->GetTextureRHI(), ImageBuffer.Data(), ImageBuffer.Size(), iMip, iLayer);
 		}
 	}
 	return mCache;

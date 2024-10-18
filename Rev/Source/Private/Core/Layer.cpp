@@ -3,7 +3,7 @@
 namespace Rev
 {
 	Layer::Layer(const std::string& name)
-		: mDebugName(name)
+		: mName(name)
 	{
 	}
 

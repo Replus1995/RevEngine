@@ -6,16 +6,16 @@
 namespace Rev
 {
 
-FVulkanTexture2D::FVulkanTexture2D(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc)
-	: FVulkanTexture(InDesc, InSamplerDesc)
+FVulkanTexture2D::FVulkanTexture2D(const FTextureDesc& InDesc)
+	: FVulkanTexture(InDesc)
 {
 	REV_CORE_ASSERT(InDesc.Dimension == ETextureDimension::Texture2D);
     VkImageUsageFlags UsageFlags = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
 	CreateResource(UsageFlags);
 }
 
-FVulkanTexture2D::FVulkanTexture2D(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc, VkImageUsageFlags InUsageFlags)
-    : FVulkanTexture(InDesc, InSamplerDesc)
+FVulkanTexture2D::FVulkanTexture2D(const FTextureDesc& InDesc, VkImageUsageFlags InUsageFlags)
+    : FVulkanTexture(InDesc)
 {
     REV_CORE_ASSERT(InDesc.Dimension == ETextureDimension::Texture2D);
     CreateResource(InUsageFlags);

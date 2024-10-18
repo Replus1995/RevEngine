@@ -27,13 +27,15 @@ public:
 
 	static VkShaderStageFlagBits TranslateShaderStage(ERHIShaderStage InStage);
 
+	uint32 GetHash() const { return mHash; }
 	VkShaderStageFlagBits GetStageFlag() const { return mStageFlag; }
 	const std::vector<FRHIUniformInfo>& GetStageUniforms() const { return mStageUniforms; }
 
 private:
-	VkShaderModule mModule = VK_NULL_HANDLE;
-	std::string mDebugName;
+	std::string mName;
+	uint32 mHash;
 	VkShaderStageFlagBits mStageFlag = VK_SHADER_STAGE_ALL;
+	VkShaderModule mModule = VK_NULL_HANDLE;
 	std::vector<FRHIUniformInfo> mStageUniforms;
 };
 
@@ -56,11 +58,10 @@ public:
 
 	virtual void SetUniformArray(uint16 location, const int* values, uint32_t count) override {};
 
-	void PrepareDraw(FVulkanContext* Context, const FVulkanRenderPass* RenderPass, const FVulkanPrimitive* Primitive);
-
+	const FRHIGraphicsShaders& GetShaders() const { return mShaders; }
 	const std::vector<FVulkanUniformInfo>& GetProgramUniforms() const { return mProgramUniforms; };
-	std::vector<VkPipelineShaderStageCreateInfo> GenShaderStageInfo();
-	std::vector<VkDescriptorSetLayoutBinding> GenLayoutBindings();
+	std::vector<VkPipelineShaderStageCreateInfo> GenShaderStageInfo() const;
+	std::vector<VkDescriptorSetLayoutBinding> GenLayoutBindings() const;
 
 private:
 	void UpdateProgramUniforms();

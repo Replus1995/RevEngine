@@ -49,6 +49,8 @@ void FVulkanContext::Init()
 
 void FVulkanContext::Cleanup()
 {
+	mGraphicsPipelineCache.ClearAll();
+
 	vkDestroyCommandPool(FVulkanDynamicRHI::GetDevice(), mImmCmdPool, nullptr);
 	vkDestroyFence(FVulkanDynamicRHI::GetDevice(), mImmFence, nullptr);
 
@@ -221,16 +223,16 @@ void FVulkanContext::ClearBackBuffer()
 	vkCmdClearDepthStencilImage(CmdBuffer, mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_GENERAL, &mClearDepthStencil, 1, &DepthImageRange);*/
 }
 
-void FVulkanContext::UpdateTexture(const Ref<FRHITexture>& InTexture, const void* InContent, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex)
+void FVulkanContext::UpdateTexture(FRHITexture* InTexture, const void* InContent, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex)
 {
 	if(!InTexture) return;
-	FVulkanTexture::Cast(InTexture.get())->UpdateContent(this, InContent, InSize, InMipLevel, InArrayIndex);
+	FVulkanTexture::Cast(InTexture)->UpdateContent(this, InContent, InSize, InMipLevel, InArrayIndex);
 }
 
-void FVulkanContext::ClearTexture(const Ref<FRHITexture>& InTexture, uint8 InMipLevel, uint8 InMipCount, uint16 InArrayIndex, uint16 InArrayCount)
+void FVulkanContext::ClearTexture(FRHITexture* InTexture, uint8 InMipLevel, uint8 InMipCount, uint16 InArrayIndex, uint16 InArrayCount)
 {
 	if (!InTexture) return;
-	FVulkanTexture::Cast(InTexture.get())->ClearContent(this, InMipLevel, InMipCount, InArrayIndex, InArrayCount);
+	FVulkanTexture::Cast(InTexture)->ClearContent(this, InMipLevel, InMipCount, InArrayIndex, InArrayCount);
 }
 
 void FVulkanContext::UpdateBufferData(const Ref<FRHIVertexBuffer>& Buffer, const void* Content, uint32 Size, uint32 Offset)
@@ -337,6 +339,7 @@ void FVulkanContext::BindProgram(const Ref<FRHIShaderProgram>& InProgram)
 
 void FVulkanContext::SetGraphicsPipelineState(const FRHIGraphicsPipelineStateDesc& InState)
 {
+	mCurState = InState;
 }
 
 void FVulkanContext::DrawPrimitive(const Ref<FRHIPrimitive>& InPrimitive)
@@ -347,10 +350,20 @@ void FVulkanContext::DrawPrimitive(const Ref<FRHIPrimitive>& InPrimitive)
 	}
 
 	FVulkanRenderPass* RenderPass = static_cast<FVulkanRenderPass*>(mCurRenderPass.get());
+	FVulkanShaderProgram* ShaderProgram = static_cast<FVulkanShaderProgram*>(mCurProgram.get());
 	FVulkanPrimitive* Primitive = static_cast<FVulkanPrimitive*>(InPrimitive.get());
-
 	Primitive->PrepareDraw();
-	mCurProgram->PrepareDraw(this, RenderPass, Primitive);
+
+	FVulkanPipeline* GraphicsPipeline = mGraphicsPipelineCache.GetOrCreatePipeline(mCurState, RenderPass, ShaderProgram, Primitive);
+
+	if (!GraphicsPipeline || !GraphicsPipeline->PipelineLayout)
+		return;
+
+	FVulkanPipelineLayout* GraphicsPipelineLayout = GraphicsPipeline->PipelineLayout;
+
+	VkDescriptorSet DescSet = GetDescriptorSet(ShaderProgram, GraphicsPipelineLayout);
+	vkCmdBindDescriptorSets(GetActiveCmdBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, GraphicsPipelineLayout->PipelineLayout, 0, 1, &DescSet, 0, nullptr);
+	vkCmdBindPipeline(GetActiveCmdBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, GraphicsPipeline->Pipeline);
 
 	VkBuffer VertexBuffers[REV_VK_MAX_VERTEX_STREAMS];
 	VkDeviceSize VertexOffsets[REV_VK_MAX_VERTEX_STREAMS];
@@ -402,7 +415,7 @@ void FVulkanContext::CreateImmediateData()
 
 VkDescriptorSet FVulkanContext::GetDescriptorSet(const FVulkanShaderProgram* InProgram, const FVulkanPipelineLayout* InLayout)
 {
-	VkDescriptorSetLayout DescLayout = InLayout->GetDescriptorSetLayout();
+	VkDescriptorSetLayout DescLayout = InLayout->DescriptorSetLayout;
 
 	VkDescriptorSet DescSet;
 	VkDescriptorSetAllocateInfo DescAllocateInfo{};

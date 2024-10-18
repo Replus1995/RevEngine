@@ -2,6 +2,7 @@
 #include "Rev/Render/RHI/DynamicRHI.h"
 #include "Rev/Render/RHI/RHIContext.h"
 #include "Rev/Render/RHI/RHICommandList.h"
+#include "Rev/Render/RHI/RHIPipeline.h"
 #include "Rev/Render/RenderProxy/SceneProxy.h"
 
 namespace Rev
@@ -71,6 +72,9 @@ void FForwardRenderer::DrawFrame(FRHICommandList& RHICmdList)
 	// end cmd buffer
 
 	RHICmdList.GetContext()->BeginRenderPass(mBasePass);
+
+	FRHIGraphicsPipelineStateDesc Desc;
+	RHICmdList.GetContext()->SetGraphicsPipelineState(Desc);
 
 	mSceneProxy->SyncResource(RHICmdList);
 	mSceneProxy->DrawScene(RHICmdList);

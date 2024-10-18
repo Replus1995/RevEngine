@@ -22,5 +22,5 @@ template< class T >
 static inline void ZeroVulkanStruct(T& VkStruct, int32 VkStructureType)
 {
 	(int32&)VkStruct.sType = VkStructureType;
-	memset(((uint8*)&Struct) + sizeof(VkStructureType), 0, sizeof(T) - sizeof(VkStructureType));
+	memset(((uint8*)&VkStruct) + sizeof(VkStructureType), 0, sizeof(T) - sizeof(VkStructureType));
 }

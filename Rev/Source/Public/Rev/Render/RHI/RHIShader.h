@@ -83,14 +83,9 @@ public:
 
     const std::string& GetName() const { return mProgramName; };
 
-    FRHIGraphicsState GraphicsState;
-    void MarkGraphicsStateDirty() { mGraphicsStateDirty = true; }
-
 protected:
     FRHIShaderProgram(const std::string& InName) : mProgramName(InName) {}
-protected:
     std::string mProgramName;
-    bool mGraphicsStateDirty = false;
 };
 
 

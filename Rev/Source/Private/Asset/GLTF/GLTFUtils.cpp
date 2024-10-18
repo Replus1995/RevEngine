@@ -157,9 +157,9 @@ EPixelFormat FGLTFUtils::TranslateImageFormat(const tinygltf::Image& InImage)
 	return PF_Unknown;
 }
 
-FSamplerDesc FGLTFUtils::TranslateSampler(const tinygltf::Sampler& InSampler)
+FSamplerStateDesc FGLTFUtils::TranslateSampler(const tinygltf::Sampler& InSampler)
 {
-	FSamplerDesc Result;
+	FSamplerStateDesc Result;
 
 	switch (InSampler.minFilter)
 	{

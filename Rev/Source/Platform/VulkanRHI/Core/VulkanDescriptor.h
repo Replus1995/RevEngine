@@ -13,7 +13,7 @@ public:
 
     void Add(uint32 InBinding, VkDescriptorType InType);
     void Clear();
-    VkDescriptorSetLayout Build(VkDevice InDevice, VkShaderStageFlags InShaderStages, VkDescriptorSetLayoutCreateFlags InFlags = 0, void* pNext = nullptr);
+    VkDescriptorSetLayout BuildGraphics(VkDevice InDevice, VkShaderStageFlags InShaderStages, VkDescriptorSetLayoutCreateFlags InFlags = 0, void* pNext = nullptr);
 
 };
 

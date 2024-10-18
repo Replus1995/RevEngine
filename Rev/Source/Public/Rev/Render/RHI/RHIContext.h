@@ -42,8 +42,8 @@ public:
 	virtual void NextSubpass() = 0;
 
 
-	virtual void UpdateTexture(const Ref<FRHITexture>& InTexture, const void* InContent, uint32 InSize, uint8 InMipLevel = 0, uint16 InArrayIndex = 0) = 0;
-	virtual void ClearTexture(const Ref<FRHITexture>& InTexture, uint8 InMipLevel = 0, uint8 InMipCount = 1, uint16 InArrayIndex = 0, uint16 InArrayCount = 1) = 0;
+	virtual void UpdateTexture(FRHITexture* InTexture, const void* InContent, uint32 InSize, uint8 InMipLevel = 0, uint16 InArrayIndex = 0) = 0;
+	virtual void ClearTexture(FRHITexture* InTexture, uint8 InMipLevel = 0, uint8 InMipCount = 1, uint16 InArrayIndex = 0, uint16 InArrayCount = 1) = 0;
 	/**
 	* @brief Update index buffer data
 	* @param Content : memory pointer

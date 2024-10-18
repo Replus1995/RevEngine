@@ -19,7 +19,7 @@ void FVulkanDescriptorLayoutBuilder::Clear()
     Bindings.clear();
 }
 
-VkDescriptorSetLayout FVulkanDescriptorLayoutBuilder::Build(VkDevice InDevice, VkShaderStageFlags InShaderStages, VkDescriptorSetLayoutCreateFlags InFlags, void* pNext)
+VkDescriptorSetLayout FVulkanDescriptorLayoutBuilder::BuildGraphics(VkDevice InDevice, VkShaderStageFlags InShaderStages, VkDescriptorSetLayoutCreateFlags InFlags, void* pNext)
 {
     for (auto& Binding : Bindings) {
         Binding.stageFlags |= InShaderStages;

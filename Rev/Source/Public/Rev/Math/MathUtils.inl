@@ -51,7 +51,7 @@ T Clamp(T InVal, T InMin, T InMax)
 template<typename T>
 T PowI(T InX, T InY)
 {
-	static_assert(std::is_integral_v<T>, "T must be integral");
+	//static_assert(std::is_integral_v<T>, "T must be integral");
 	T Result = 1;
 	for (T i = 0; i < InY; i++)
 	{
