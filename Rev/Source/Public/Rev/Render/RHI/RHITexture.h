@@ -3,7 +3,6 @@
 #include "Rev/Render/PixelFormat.h"
 #include "Rev/Render/RHI/RHIDefinitions.h"
 #include "Rev/Render/RHI/RHIResource.h"
-#include "Rev/Render/RHI/RHISampler.h"
 
 namespace Rev
 {
@@ -125,8 +124,6 @@ public:
 	uint16 GetArraySize() const { return mDesc.ArraySize; }
 	EPixelFormat GetFormat() const { return mDesc.Format; }
 	FPixelFormatInfo GetFormatInfo() const { return GPixelFormats[mDesc.Format]; }
-
-	virtual const FRHISampler* GetSampler() const = 0;
 
 protected:
 	FTextureDesc mDesc;

@@ -1,14 +1,4 @@
-#include "Engine/Shaders/Include/Base.rsh"
-
-cbuffer SceneUB : register(b0, space0)
-{
-	FSceneUniform uScene;
-};
-
-cbuffer StaticMeshUB : register(b1, space0)
-{
-	FStaticMeshUniform uStaticMesh;
-};
+#include "Engine/Shaders/Core/Base.rsh"
 
 struct VSInput
 {
@@ -18,6 +8,15 @@ struct VSInput
 struct VSOutput
 {
     float4 vPosition : SV_POSITION;
+};
+cbuffer SceneUB : register(b0, space0)
+{
+	FSceneUniform uScene;
+};
+
+cbuffer StaticMeshUB : register(b1, space0)
+{
+	FStaticMeshUniform uStaticMesh;
 };
 
 VSOutput main(VSInput Input)

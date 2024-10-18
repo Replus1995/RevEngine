@@ -5,7 +5,9 @@
 #include "VulkanTexture.h"
 #include "VulkanRenderTarget.h"
 #include "VulkanPrimitive.h"
+#include "VulkanShader.h"
 #include "VulkanRenderPass.h"
+#include "VulkanPipeline.h"
 #include "VulkanDynamicRHI.h"
 #include "Core/VulkanEnum.h"
 
@@ -333,6 +335,10 @@ void FVulkanContext::BindProgram(const Ref<FRHIShaderProgram>& InProgram)
 	mCurProgram = std::static_pointer_cast<FVulkanShaderProgram>(InProgram);
 }
 
+void FVulkanContext::SetGraphicsPipelineState(const FRHIGraphicsPipelineStateDesc& InState)
+{
+}
+
 void FVulkanContext::DrawPrimitive(const Ref<FRHIPrimitive>& InPrimitive)
 {
 	if (!mCurRenderPass || !mCurProgram || !InPrimitive)
@@ -392,6 +398,57 @@ void FVulkanContext::CreateImmediateData()
 
 	VkFenceCreateInfo FenceCreateInfo = FVulkanInit::FenceCreateInfo(VK_FENCE_CREATE_SIGNALED_BIT);
 	REV_VK_CHECK(vkCreateFence(FVulkanDynamicRHI::GetDevice(), &FenceCreateInfo, nullptr, &mImmFence));
+}
+
+VkDescriptorSet FVulkanContext::GetDescriptorSet(const FVulkanShaderProgram* InProgram, const FVulkanPipelineLayout* InLayout)
+{
+	VkDescriptorSetLayout DescLayout = InLayout->GetDescriptorSetLayout();
+
+	VkDescriptorSet DescSet;
+	VkDescriptorSetAllocateInfo DescAllocateInfo{};
+	DescAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+	DescAllocateInfo.pNext = NULL;
+	DescAllocateInfo.descriptorPool = GetActiveDescriptorPool().Pool;
+	DescAllocateInfo.descriptorSetCount = 1;
+	DescAllocateInfo.pSetLayouts = &DescLayout;
+
+	REV_VK_CHECK(vkAllocateDescriptorSets(FVulkanDynamicRHI::GetDevice(), &DescAllocateInfo, &DescSet));
+
+
+	VkDescriptorBufferInfo BufferInfos[REV_VK_MAX_SHADER_UNIFORM_BUFFERS] = {};
+	VkWriteDescriptorSet Writes[REV_VK_MAX_DESCRIPTORSETS] = {};
+	uint32 WriteCount = 0;
+	uint32_t BufferCount = 0;
+
+	for (const FRHIUniformInfo& Uniform : InProgram->GetProgramUniforms())
+	{
+		uint32 BindingIdx = Uniform.Binding;
+		FVulkanUniformBuffer* UniformBuffer = FindUniformBuffer(BindingIdx);
+		if (!UniformBuffer)
+			continue;
+
+		BufferInfos[BufferCount].buffer = (VkBuffer)UniformBuffer->GetNativeHandle();
+		BufferInfos[BufferCount].offset = 0;
+		BufferInfos[BufferCount].range = UniformBuffer->GetSize();
+
+		Writes[WriteCount].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		Writes[WriteCount].pNext = NULL;
+		Writes[WriteCount].dstSet = DescSet;
+		Writes[WriteCount].dstBinding = BindingIdx;
+		Writes[WriteCount].dstArrayElement = 0;
+		Writes[WriteCount].descriptorCount = 1;
+		Writes[WriteCount].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		Writes[WriteCount].pImageInfo = NULL;
+		Writes[WriteCount].pBufferInfo = &BufferInfos[BufferCount];
+		Writes[WriteCount].pTexelBufferView = NULL;
+
+		++WriteCount;
+		++BufferCount;
+	}
+
+	vkUpdateDescriptorSets(FVulkanDynamicRHI::GetDevice(), WriteCount, Writes, 0, NULL);
+
+	return DescSet;
 }
 
 }

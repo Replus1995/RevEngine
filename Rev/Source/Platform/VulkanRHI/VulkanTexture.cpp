@@ -2,16 +2,10 @@
 #include "VulkanUtils.h"
 #include "Rev/Core/Assert.h"
 
-#include "VulkanSampler.h"
 #include "VulkanTexture2D.h"
 
 namespace Rev
 {
-
-const FRHISampler* FVulkanTexture::GetSampler() const
-{
-	return mSampler.get();
-}
 
 void FVulkanTexture::Transition(VkImageLayout DstLayout, VkCommandBuffer InCmdBuffer)
 {
@@ -27,7 +21,7 @@ void FVulkanTexture::Transition(VkImageLayout SrcLayout, VkImageLayout DstLayout
     mImageLayout = DstLayout;
 }
 
-FVulkanTexture::FVulkanTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc)
+FVulkanTexture::FVulkanTexture(const FTextureDesc& InDesc)
     : FRHITexture(InDesc)
 {
 	if (FPixelFormatInfo::HasDepth(InDesc.Format))
@@ -36,7 +30,6 @@ FVulkanTexture::FVulkanTexture(const FTextureDesc& InDesc, const FSamplerDesc& I
 		mImageAspectFlags |= VK_IMAGE_ASPECT_STENCIL_BIT;
 	if (mImageAspectFlags == VK_IMAGE_ASPECT_NONE)
 		mImageAspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
-	mSampler = CreateVkSampler(InSamplerDesc);
 }
 
 VkExtent3D FVulkanTexture::GetExtent()
@@ -98,12 +91,12 @@ void FVulkanTexture::ClearContent(FVulkanContext* Context, uint8 InMipLevel, uin
 }
 
 
-Ref<FVulkanTexture> CreateVulkanTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc)
+Ref<FVulkanTexture> CreateVulkanTexture(const FTextureDesc& InDesc)
 {
 	switch (InDesc.Dimension)
 	{
 	case ETextureDimension::Texture2D:
-		return CreateRef<FVulkanTexture2D>(InDesc, InSamplerDesc);
+		return CreateRef<FVulkanTexture2D>(InDesc);
 	case ETextureDimension::Texture2DArray:
 		//return CreateRef<FOpenGLTexture2DArray>(InDesc, InSamplerDesc);
 	case ETextureDimension::TextureCube:

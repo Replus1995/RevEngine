@@ -18,11 +18,12 @@ public:
 
     //Pipeline
     static VkPrimitiveTopology Translate(EPrimitiveTopology InTopology);
-    static VkCompareOp Translate(ECompareOperation InOp);
+    static VkStencilOp Translate(EStencilOperation InOp);
+    static VkCompareOp Translate(ECompareFunction InFunc);
     static VkBlendFactor Translate(EBlendFactor InFactor);
     static VkBlendOp Translate(EBlendOperation InOp);
     static VkColorComponentFlags Translate(EColorWriteMask InMask);
-    static VkPolygonMode Translate(EPolygonMode InMode);
+    static VkPolygonMode Translate(EFillMode InMode);
     static VkCullModeFlags Translate(ECullMode InMode);
     static VkAttachmentLoadOp Translate(EAttachmentLoadOp InOp);
     static VkAttachmentStoreOp Translate(EAttachmentStoreOp InOp);

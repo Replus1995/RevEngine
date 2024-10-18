@@ -2,11 +2,12 @@
 #include "VulkanPixelFormat.h"
 #include "VulkanBuffer.h"
 #include "VulkanUniform.h"
-#include "VulkanSampler.h"
+#include "VulkanState.h"
 #include "VulkanTexture.h"
 #include "VulkanRenderTarget.h"
 #include "VulkanPrimitive.h"
 #include "VulkanRenderPass.h"
+#include "Rev/Core/Hash.h"
 
 namespace Rev
 {
@@ -67,14 +68,48 @@ Ref<FRHIPrimitive> FVulkanDynamicRHI::CreatePrimitive(EPrimitiveTopology InTopol
 	return CreateRef<FVulkanPrimitive>(InTopology);
 }
 
-Ref<FRHITexture> FVulkanDynamicRHI::CreateTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc)
+Ref<FRHITexture> FVulkanDynamicRHI::CreateTexture(const FTextureDesc& InDesc)
 {
-	return CreateVulkanTexture(InDesc, InSamplerDesc);
+	return CreateVulkanTexture(InDesc);
 }
 
 Ref<FRHIRenderTarget> FVulkanDynamicRHI::CreateRenderTarget(const FRenderTargetDesc& InDesc)
 {
 	return CreateRef<FVulkanRenderTarget>(InDesc);
+}
+
+Ref<FRHISamplerState> FVulkanDynamicRHI::CreateSamplerState(const FSamplerStateDesc& InDesc)
+{
+	VkSamplerCreateInfo SamplerCreateInfo;
+	FVulkanSamplerState::FillCreateInfo(InDesc, SamplerCreateInfo);
+
+	uint32 hash = FCityHash::Gen(&SamplerCreateInfo, sizeof(SamplerCreateInfo));
+
+	//Add lock for multithread create
+	{
+		if (auto iter = mSamplerMap.find(hash); iter != mSamplerMap.end())
+		{
+			return iter->second;
+		}
+		Ref<FVulkanSamplerState> NewSampler = CreateRef<FVulkanSamplerState>(SamplerCreateInfo);
+		mSamplerMap.emplace(hash, NewSampler);
+		return NewSampler;
+	}
+}
+
+Ref<FRHIRasterizerState> FVulkanDynamicRHI::CreateRasterizerState(const FRasterizerStateDesc& InDesc)
+{
+	return CreateRef<FVulkanRasterizerState>(InDesc);
+}
+
+Ref<FRHIDepthStencilState> FVulkanDynamicRHI::CreateDepthStencilStateState(const FDepthStencilStateDesc& InDesc)
+{
+	return CreateRef<FVulkanDepthStencilState>(InDesc);
+}
+
+Ref<FRHIColorBlendState> FVulkanDynamicRHI::CreateColorBlendState(const FColorBlendStateDesc& InDesc)
+{
+	return CreateRef<FVulkanColorBlendState>(InDesc);
 }
 
 Ref<FRHIRenderPass> FVulkanDynamicRHI::CreateRenderPass(const FRenderPassDesc& InDesc)

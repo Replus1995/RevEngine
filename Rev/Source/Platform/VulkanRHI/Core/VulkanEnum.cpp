@@ -89,9 +89,14 @@ VkPrimitiveTopology FVulkanEnum::Translate(EPrimitiveTopology InTopology)
     }
 }
 
-VkCompareOp FVulkanEnum::Translate(ECompareOperation InOp)
+VkStencilOp FVulkanEnum::Translate(EStencilOperation InOp)
 {
-    return VkCompareOp(InOp);
+    return VkStencilOp(InOp);
+}
+
+VkCompareOp FVulkanEnum::Translate(ECompareFunction InFunc)
+{
+    return VkCompareOp(InFunc);
 }
 
 VkBlendFactor FVulkanEnum::Translate(EBlendFactor InFactor)
@@ -109,7 +114,7 @@ VkColorComponentFlags FVulkanEnum::Translate(EColorWriteMask InMask)
     return VkColorComponentFlags(InMask);
 }
 
-VkPolygonMode FVulkanEnum::Translate(EPolygonMode InMode)
+VkPolygonMode FVulkanEnum::Translate(EFillMode InMode)
 {
     return VkPolygonMode(InMode);
 }

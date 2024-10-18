@@ -22,13 +22,10 @@ enum ESamplerWarpMode : uint8
 	SW_Border
 };
 
-enum ESamplerAnisotropicMode
+enum ESamplerCompareFunction : uint8
 {
-	SA_None = 1,
-	SA_2X = 2,
-	SA_4X = 4,
-	SA_8X = 8,
-	SA_16X = 16
+	SCF_Never,
+	SCF_Less
 };
 
 //Texture
@@ -73,7 +70,7 @@ enum EPrimitiveTopology : uint8
 };
 
 //Pipeline
-enum EPolygonMode : uint8
+enum EFillMode : uint8
 {
 	PM_Fill = 0,
 	PM_Line = 1,
@@ -88,16 +85,34 @@ enum ECullMode : uint8
 	CM_BackAndFront = 3
 };
 
-enum ECompareOperation : uint8
+enum EDepthClipMode : uint8
 {
-	CO_Never = 0,
-	CO_Less = 1,
-	CO_Equal = 2,
-	CO_Greater = 3,
-	CO_NotEqual = 4,
-	CO_LessEqual = 5,
-	CO_GreaterEqual = 6,
-	CO_Always = 7
+	DCM_Clip,
+	DCM_Clamp
+};
+
+enum EStencilOperation
+{
+	SO_KEEP = 0,
+	SO_ZERO = 1,
+	SO_REPLACE = 2,
+	SO_INCREMENT_AND_CLAMP = 3,
+	SO_DECREMENT_AND_CLAMP = 4,
+	SO_INVERT = 5,
+	SO_INCREMENT_AND_WRAP = 6,
+	SO_DECREMENT_AND_WRAP = 7,
+};
+
+enum ECompareFunction : uint8
+{
+	CF_Never = 0,
+	CF_Less = 1,
+	CF_Equal = 2,
+	CF_Greater = 3,
+	CF_NotEqual = 4,
+	CF_LessEqual = 5,
+	CF_GreaterEqual = 6,
+	CF_Always = 7
 };
 
 enum EBlendFactor : uint8

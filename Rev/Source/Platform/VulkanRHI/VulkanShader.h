@@ -9,6 +9,15 @@ namespace Rev
 class FVulkanContext;
 class FVulkanRenderPass;
 class FVulkanPrimitive;
+
+struct FVulkanUniformInfo : public FRHIUniformInfo
+{
+	VkShaderStageFlags StageFlags = 0;
+
+	FVulkanUniformInfo(const FRHIUniformInfo& InInfo, VkShaderStageFlags InStageFlags) : FRHIUniformInfo(InInfo) , StageFlags(InStageFlags) {}
+};
+
+
 class FVulkanShader : public FRHIShader
 {
 public:
@@ -18,13 +27,13 @@ public:
 
 	static VkShaderStageFlagBits TranslateShaderStage(ERHIShaderStage InStage);
 
-	VkShaderStageFlagBits GetStageFlags() const { return mStageFlags; }
+	VkShaderStageFlagBits GetStageFlag() const { return mStageFlag; }
 	const std::vector<FRHIUniformInfo>& GetStageUniforms() const { return mStageUniforms; }
 
 private:
 	VkShaderModule mModule = VK_NULL_HANDLE;
 	std::string mDebugName;
-	VkShaderStageFlagBits mStageFlags = VK_SHADER_STAGE_ALL;
+	VkShaderStageFlagBits mStageFlag = VK_SHADER_STAGE_ALL;
 	std::vector<FRHIUniformInfo> mStageUniforms;
 };
 
@@ -33,7 +42,7 @@ class FVulkanShaderProgram : public FRHIShaderProgram
 public:
 	FVulkanShaderProgram(const std::string& InName, const FRHIGraphicsShaders& InShaders);
 	virtual ~FVulkanShaderProgram();
-	virtual const void* GetNativeHandle() const override { return mPipeline->GetPipeline(); }
+	virtual const void* GetNativeHandle() const override { return nullptr; }
 
 	virtual uint16 GetUniformLocation(std::string_view name) override { return 0; };
 
@@ -49,19 +58,16 @@ public:
 
 	void PrepareDraw(FVulkanContext* Context, const FVulkanRenderPass* RenderPass, const FVulkanPrimitive* Primitive);
 
-private:
-	static std::vector<VkPipelineShaderStageCreateInfo> MakeShaderStageInfo(const FRHIGraphicsShaders& InShaders);
-	std::vector<VkDescriptorSetLayoutBinding> MakeLayoutBindings(const FRHIGraphicsShaders& InShaders);
-
-	VkDescriptorSet GetDescriptorSet(FVulkanContext* Context);
+	const std::vector<FVulkanUniformInfo>& GetProgramUniforms() const { return mProgramUniforms; };
+	std::vector<VkPipelineShaderStageCreateInfo> GenShaderStageInfo();
+	std::vector<VkDescriptorSetLayoutBinding> GenLayoutBindings();
 
 private:
-	FVulkanPipelineLayout mPipelineLayout;
-	Ref<FVulkanPipeline> mPipeline;
-	FVulkanPipelineKey mPipelineKey;
-	FVulkanPipelineCache mPipelineCache;
+	void UpdateProgramUniforms();
+
+private:
 	FRHIGraphicsShaders mShaders;
-	std::vector<FRHIUniformInfo> mProgramUniforms;
+	std::vector<FVulkanUniformInfo> mProgramUniforms;
 };
 
 }

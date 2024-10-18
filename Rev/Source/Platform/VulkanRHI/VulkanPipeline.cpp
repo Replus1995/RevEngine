@@ -2,6 +2,7 @@
 #include "VulkanDynamicRHI.h"
 #include "VulkanRenderPass.h"
 #include "VulkanPrimitive.h"
+#include "VulkanState.h"
 #include "Core/VulkanDefines.h"
 #include "Core/VulkanEnum.h"
 #include "Rev/Core/Assert.h"
@@ -9,35 +10,21 @@
 namespace Rev
 {
 
-FVulkanGraphicsPipelineBuilder::FVulkanGraphicsPipelineBuilder(const FRHIGraphicsState& InState)
-    : mState(InState)
-{
-}
-
-FVulkanGraphicsPipelineBuilder::~FVulkanGraphicsPipelineBuilder()
-{
-}
-
-VkPipeline FVulkanGraphicsPipelineBuilder::Build(VkDevice InDevice, VkPipelineLayout InLayout, const std::vector<VkPipelineShaderStageCreateInfo>& InShaderStageInfo, const FVulkanRenderPass* RenderPass, const FVulkanPrimitive* InPrimitive)
+VkPipeline FVulkanGraphicsPipelineBuilder::Build(VkDevice InDevice, VkPipelineLayout InLayout, 
+    const FRHIGraphicsPipelineStateDesc& InStateDesc,
+    const FVulkanRenderPass* RenderPass, 
+    const FVulkanShaderProgram* InProgram, 
+    const FVulkanPrimitive* InPrimitive)
 {
     const FRenderPassDesc& RenderPassDesc = RenderPass->GetDesc();
     uint32 ColorAttachmentCount = RenderPassDesc.NumColorAttachments;
     REV_CORE_ASSERT(ColorAttachmentCount <= RTA_MaxColorAttachments);
 
-    VkPipelineColorBlendAttachmentState ColorBlendStateArr[RTA_MaxColorAttachments];
-    for (uint32 i = 0; i < ColorAttachmentCount; i++)
-    {
-        ColorBlendStateArr[i].blendEnable = mState.ColorBlendStates[i].bEnable;
-        ColorBlendStateArr[i].srcColorBlendFactor = FVulkanEnum::Translate(mState.ColorBlendStates[i].SrcColorFactor);
-        ColorBlendStateArr[i].dstColorBlendFactor = FVulkanEnum::Translate(mState.ColorBlendStates[i].DstColorFactor);
-        ColorBlendStateArr[i].colorBlendOp = FVulkanEnum::Translate(mState.ColorBlendStates[i].ColorOp);
-        ColorBlendStateArr[i].srcAlphaBlendFactor = FVulkanEnum::Translate(mState.ColorBlendStates[i].SrcAlphaBlendFactor);
-        ColorBlendStateArr[i].dstAlphaBlendFactor = FVulkanEnum::Translate(mState.ColorBlendStates[i].DstAlphaBlendFactor);
-        ColorBlendStateArr[i].alphaBlendOp = FVulkanEnum::Translate(mState.ColorBlendStates[i].AlphaBlendOp);
-        ColorBlendStateArr[i].colorWriteMask = FVulkanEnum::Translate(mState.ColorBlendStates[i].ColorWriteMask);
-    }
+    FVulkanRasterizerState RasterizerState(InStateDesc.RasterizerStateDesc);
+    FVulkanDepthStencilState DepthStencilState(InStateDesc.DepthStencilStateDesc);
+    FVulkanColorBlendState ColorBlendState(InStateDesc.ColorBlendStateDesc);
 
-   VkDynamicState DynamicStates[] = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
+    VkDynamicState DynamicStates[] = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
     //std::vector<VkDynamicState> DynamicStates = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR, VK_DYNAMIC_STATE_PRIMITIVE_TOPOLOGY };
 
     VkFormat ColorFormats[RTA_MaxColorAttachments];
@@ -55,13 +42,13 @@ VkPipeline FVulkanGraphicsPipelineBuilder::Build(VkDevice InDevice, VkPipelineLa
     VertexInputState.pVertexAttributeDescriptions = InPrimitive->GetAttributeDescs().data();
 
 
-    VkPipelineInputAssemblyStateCreateInfo InputAssemblyState = MakeInputAssemblyStateInfo(FVulkanEnum::Translate(InPrimitive->GetTopology()));
+    VkPipelineInputAssemblyStateCreateInfo InputAssemblyState = MakeInputAssemblyStateInfo(FVulkanEnum::Translate(mState.PrimitiveTopology));
     VkPipelineTessellationStateCreateInfo TessellationState = MakeTessellationStateInfo();
     VkPipelineViewportStateCreateInfo ViewportState = MakeViewportStateInfo();
-    VkPipelineRasterizationStateCreateInfo RasterizationState = MakeRasterizationStateInfo();
+    VkPipelineRasterizationStateCreateInfo RasterizationState = RasterizerState.RasterizerState;
     VkPipelineMultisampleStateCreateInfo MultisampleState = MakeMultisampleStateInfo();
-    VkPipelineDepthStencilStateCreateInfo DepthStencilState = MakeDepthStencilStateInfo();
-    VkPipelineColorBlendStateCreateInfo ColorBlendState = MakeColorBlendStateInfo(ColorBlendStateArr, ColorAttachmentCount);
+    VkPipelineDepthStencilStateCreateInfo DepthStencilState = DepthStencilState.DepthStencilState;
+    VkPipelineColorBlendStateCreateInfo ColorBlendState = MakeColorBlendStateInfo(ColorBlendState.ColorBlendStates, ColorAttachmentCount);
     VkPipelineDynamicStateCreateInfo DynamicState = MakeDynamicStateInfo(DynamicStates, sizeof(DynamicStates) / sizeof(VkDynamicState));
     VkPipelineRenderingCreateInfo Rendering = MakeRenderingInfo(ColorFormats, ColorAttachmentCount, DepthFormat);
 
@@ -95,7 +82,7 @@ VkPipeline FVulkanGraphicsPipelineBuilder::Build(VkDevice InDevice, VkPipelineLa
     return NewPipeline;
 }
 
-VkPipelineInputAssemblyStateCreateInfo FVulkanGraphicsPipelineBuilder::MakeInputAssemblyStateInfo(VkPrimitiveTopology InTopology) const
+VkPipelineInputAssemblyStateCreateInfo FVulkanGraphicsPipelineBuilder::MakeInputAssemblyStateInfo(VkPrimitiveTopology InTopology)
 {
     VkPipelineInputAssemblyStateCreateInfo StateInfo{};
     StateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -104,7 +91,7 @@ VkPipelineInputAssemblyStateCreateInfo FVulkanGraphicsPipelineBuilder::MakeInput
     return StateInfo;
 }
 
-VkPipelineTessellationStateCreateInfo FVulkanGraphicsPipelineBuilder::MakeTessellationStateInfo() const
+VkPipelineTessellationStateCreateInfo FVulkanGraphicsPipelineBuilder::MakeTessellationStateInfo()
 {
    VkPipelineTessellationStateCreateInfo StateInfo{};
    StateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_TESSELLATION_STATE_CREATE_INFO;
@@ -112,7 +99,7 @@ VkPipelineTessellationStateCreateInfo FVulkanGraphicsPipelineBuilder::MakeTessel
    return StateInfo;
 }
 
-VkPipelineViewportStateCreateInfo FVulkanGraphicsPipelineBuilder::MakeViewportStateInfo() const
+VkPipelineViewportStateCreateInfo FVulkanGraphicsPipelineBuilder::MakeViewportStateInfo()
 {
     // make viewport state from our stored viewport and scissor.
     // at the moment we wont support multiple viewports or scissors
@@ -123,25 +110,7 @@ VkPipelineViewportStateCreateInfo FVulkanGraphicsPipelineBuilder::MakeViewportSt
     return StateInfo;
 }
 
-VkPipelineRasterizationStateCreateInfo FVulkanGraphicsPipelineBuilder::MakeRasterizationStateInfo() const
-{
-    VkPipelineRasterizationStateCreateInfo StateInfo{};
-    StateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
-    StateInfo.depthClampEnable = mState.DepthClampEnable;
-    StateInfo.rasterizerDiscardEnable = VK_FALSE;
-    StateInfo.polygonMode = FVulkanEnum::Translate(mState.PolygonMode);
-    StateInfo.cullMode = FVulkanEnum::Translate(mState.CullMode);
-    StateInfo.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
-    StateInfo.depthBiasEnable = mState.DepthBiasEnable;
-    StateInfo.depthBiasConstantFactor = mState.DepthBiasConstantFactor;
-    StateInfo.depthBiasClamp = mState.DepthBiasEnable ? mState.DepthBiasClamp : 0.0f;
-    StateInfo.depthBiasSlopeFactor = mState.DepthBiasSlopeFactor;
-    //StateInfo.lineWidth = mState.LineWidth;
-    StateInfo.lineWidth = 1.0;
-    return StateInfo;
-}
-
-VkPipelineMultisampleStateCreateInfo FVulkanGraphicsPipelineBuilder::MakeMultisampleStateInfo() const
+VkPipelineMultisampleStateCreateInfo FVulkanGraphicsPipelineBuilder::MakeMultisampleStateInfo()
 {
     VkPipelineMultisampleStateCreateInfo StateInfo{};
     StateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
@@ -154,7 +123,7 @@ VkPipelineMultisampleStateCreateInfo FVulkanGraphicsPipelineBuilder::MakeMultisa
     return StateInfo;
 }
 
-VkPipelineDepthStencilStateCreateInfo FVulkanGraphicsPipelineBuilder::MakeDepthStencilStateInfo() const
+VkPipelineDepthStencilStateCreateInfo FVulkanGraphicsPipelineBuilder::MakeDepthStencilStateInfo()
 {
     VkPipelineDepthStencilStateCreateInfo StateInfo{};
     StateInfo.depthTestEnable = mState.DepthTestEnable;
@@ -263,6 +232,10 @@ FVulkanPipeline::FVulkanPipeline()
 FVulkanPipeline::~FVulkanPipeline()
 {
     Release();
+}
+
+void FVulkanPipeline::Build(const FVulkanPipelineLayout& InLayout, const FRHIGraphicsPipelineStateDesc& InStateDesc, const FVulkanRenderPass* RenderPass, const FVulkanShaderProgram* InProgram, const FVulkanPrimitive* InPrimitive)
+{
 }
 
 void FVulkanPipeline::Release()

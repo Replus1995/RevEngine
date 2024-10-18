@@ -2,8 +2,8 @@
 #include "Rev/Core/Base.h"
 #include "Rev/Render/RenderCore.h"
 #include "Rev/Render/RHI/RHIContext.h"
+#include "Rev/Render/RHI/RHIState.h"
 #include "Rev/Render/RHI/RHIBuffer.h"
-#include "Rev/Render/RHI/RHISampler.h"
 #include "Rev/Render/RHI/RHITexture.h"
 #include "Rev/Render/RHI/RHIRenderTarget.h"
 #include "Rev/Render/RHI/RHIPrimitive.h"
@@ -32,8 +32,14 @@ public:
 	virtual Ref<FRHIPrimitive> CreatePrimitive(EPrimitiveTopology InTopology) = 0;
 
 	//Texture
-	virtual Ref<FRHITexture> CreateTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc) = 0;
+	virtual Ref<FRHITexture> CreateTexture(const FTextureDesc& InDesc) = 0;
 	virtual Ref<FRHIRenderTarget> CreateRenderTarget(const FRenderTargetDesc& InDesc) = 0;
+
+	//State
+	virtual Ref<FRHISamplerState> CreateSamplerState(const FSamplerStateDesc& InDesc) = 0;
+	virtual Ref<FRHIRasterizerState> CreateRasterizerState(const FRasterizerStateDesc& InDesc) = 0;
+	virtual Ref<FRHIDepthStencilState> CreateDepthStencilStateState(const FDepthStencilStateDesc& InDesc) = 0;
+	virtual Ref<FRHIColorBlendState> CreateColorBlendState(const FColorBlendStateDesc& InDesc) = 0;
 
 	//Pipeline
 	virtual Ref<FRHIRenderPass> CreateRenderPass(const FRenderPassDesc& InDesc) = 0;

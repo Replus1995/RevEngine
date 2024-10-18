@@ -5,6 +5,7 @@
 namespace Rev
 {
 class FRHITexture;
+class FRHISamplerState;
 class Texture
 {
 public:
@@ -23,10 +24,11 @@ public:
 	bool IsTextureCubeArray() const;
 	bool IsTexture3D() const;
 
-	const Ref<FRHITexture> GetResource() const { return mResource; }
+	FRHITexture* GetTextureRHI() const { return mTextureRHI.get(); }
 
 private:
-	Ref<FRHITexture> mResource;
+	Ref<FRHITexture> mTextureRHI = nullptr;
+	Ref<FRHISamplerState> mSamplerStateRHI = nullptr;
 };
 
 using Texture2D = Texture;

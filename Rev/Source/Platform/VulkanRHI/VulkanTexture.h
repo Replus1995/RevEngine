@@ -7,13 +7,12 @@
 namespace Rev
 {
 class FVulkanContext;
-class FVulkanSampler;
+class FVulkanSamplerState;
 class FVulkanTexture : public FRHITexture
 {
 public:
 	virtual ~FVulkanTexture() = default;
 	virtual const void* GetNativeHandle() const override { return mImage; }
-	virtual const FRHISampler* GetSampler() const override;
 
 	void Transition(VkImageLayout DstLayout, VkCommandBuffer InCmdBuffer = VK_NULL_HANDLE);
 	void Transition(VkImageLayout SrcLayout, VkImageLayout DstLayout, VkCommandBuffer InCmdBuffer = VK_NULL_HANDLE);
@@ -28,7 +27,7 @@ public:
 	static FVulkanTexture* Cast(FRHITexture* InTexture) { return static_cast<FVulkanTexture*>(InTexture); }
 
 protected:
-	FVulkanTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc);
+	FVulkanTexture(const FTextureDesc& InDesc);
 	VkExtent3D GetExtent();
 	VkExtent2D CalculateMipSize2D(uint32 InMipLevel);
 	VkExtent3D CalculateMipSize3D(uint32 InMipLevel);
@@ -38,9 +37,9 @@ protected:
 	VkImageLayout mImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 	VkImageAspectFlags mImageAspectFlags = VK_IMAGE_ASPECT_NONE;
 	VmaAllocation mAllocation = VK_NULL_HANDLE;
-	Ref<FVulkanSampler> mSampler = nullptr;
+	Ref<FVulkanSamplerState> mSampler = nullptr;
 };
 
-Ref<FVulkanTexture> CreateVulkanTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc);
+Ref<FVulkanTexture> CreateVulkanTexture(const FTextureDesc& InDesc);
 
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include "Rev/Core/Base.h"
 #include "Rev/Render/RHI/RHIShader.h"
+#include "Rev/Render/RHI/RHIPipeline.h"
 #include <vulkan/vulkan.h>
 #include <vector>
 #include <map>
@@ -8,29 +9,27 @@
 namespace Rev
 {
 class FVulkanRenderPass;
+class FVulkanShaderProgram;
 class FVulkanPrimitive;
 
 class FVulkanGraphicsPipelineBuilder
 {
 public:
-    FVulkanGraphicsPipelineBuilder(const FRHIGraphicsState& InState);
-    ~FVulkanGraphicsPipelineBuilder();
-
-    VkPipeline Build(VkDevice InDevice, VkPipelineLayout InLayout, const std::vector<VkPipelineShaderStageCreateInfo>& InShaderStageInfo, const FVulkanRenderPass* RenderPass, const FVulkanPrimitive* InPrimitive);
-
-private:
-    VkPipelineInputAssemblyStateCreateInfo MakeInputAssemblyStateInfo(VkPrimitiveTopology InTopology) const;
-    VkPipelineTessellationStateCreateInfo MakeTessellationStateInfo() const;
-    VkPipelineViewportStateCreateInfo MakeViewportStateInfo() const;
-    VkPipelineRasterizationStateCreateInfo MakeRasterizationStateInfo() const;
-    VkPipelineMultisampleStateCreateInfo MakeMultisampleStateInfo() const;
-    VkPipelineDepthStencilStateCreateInfo MakeDepthStencilStateInfo() const;
-    VkPipelineColorBlendStateCreateInfo MakeColorBlendStateInfo(const VkPipelineColorBlendAttachmentState* InColorBlendStates, uint32 InNumColorBlendStates) const;
-    VkPipelineDynamicStateCreateInfo MakeDynamicStateInfo(const VkDynamicState* InDynaimcStates, uint32 InNumDynaimcStates) const;
-    VkPipelineRenderingCreateInfo MakeRenderingInfo(const VkFormat* InColorFomats, uint32 InNumColorFormats, VkFormat InDepthFormat) const;
+    static VkPipeline Build(VkDevice InDevice, VkPipelineLayout InLayout,
+        const FRHIGraphicsPipelineStateDesc& InStateDesc,
+        const FVulkanRenderPass* RenderPass,
+        const FVulkanShaderProgram* InProgram,
+        const FVulkanPrimitive* InPrimitive);
 
 private:
-    FRHIGraphicsState mState;
+    static VkPipelineInputAssemblyStateCreateInfo MakeInputAssemblyStateInfo(VkPrimitiveTopology InTopology);
+    static VkPipelineTessellationStateCreateInfo MakeTessellationStateInfo();
+    static VkPipelineViewportStateCreateInfo MakeViewportStateInfo();
+    static VkPipelineMultisampleStateCreateInfo MakeMultisampleStateInfo();
+    static VkPipelineDepthStencilStateCreateInfo MakeDepthStencilStateInfo();
+    static VkPipelineColorBlendStateCreateInfo MakeColorBlendStateInfo(const VkPipelineColorBlendAttachmentState* InColorBlendStates, uint32 InNumColorBlendStates);
+    static VkPipelineDynamicStateCreateInfo MakeDynamicStateInfo(const VkDynamicState* InDynaimcStates, uint32 InNumDynaimcStates);
+    static VkPipelineRenderingCreateInfo MakeRenderingInfo(const VkFormat* InColorFomats, uint32 InNumColorFormats, VkFormat InDepthFormat);
     
 };
 
@@ -57,7 +56,12 @@ public:
     FVulkanPipeline();
     ~FVulkanPipeline();
 
-    void Build(const FVulkanPipelineLayout& InLayout, const FRHIGraphicsState& InState, const std::vector<VkPipelineShaderStageCreateInfo>& InShaderStageInfo, const FVulkanRenderPass* RenderPass, const FVulkanPrimitive* InPrimitive);
+    void Build(const FVulkanPipelineLayout& InLayout, 
+        const FRHIGraphicsPipelineStateDesc& InStateDesc,
+        const FVulkanRenderPass* RenderPass,
+        const FVulkanShaderProgram* InProgram, 
+        const FVulkanPrimitive* InPrimitive);
+
     void Release();
 
     VkPipeline GetPipeline() const { return mPipeline; }
@@ -88,18 +92,23 @@ struct FVulkanPipelineKey
     }
 };
 
-class FVulkanPipelineCache
+class FVulkanGraphicsPipelineCache
 {
 public:
-    FVulkanPipelineCache() = default;
-    ~FVulkanPipelineCache();
+    FVulkanGraphicsPipelineCache() = default;
+    ~FVulkanGraphicsPipelineCache();
 
-    void Add(const FVulkanPipelineKey& InKey, const Ref<FVulkanPipeline>& InPipeline);
-    Ref<FVulkanPipeline> Find(const FVulkanPipelineKey& InKey);
-    void Clear();
+    VkPipeline GetOrCreatePipeline(
+        const FRHIGraphicsPipelineStateDesc& InStateDesc, 
+        const FVulkanRenderPass* InRenderPass,
+        const FVulkanShaderProgram* InProgram,
+        const FVulkanPrimitive* InPrimitive);
+
+    void ClearAll();
 
 
 private:
+    std::map<uint32, FVulkanPipelineLayout> mLayoutCache;
     std::map<FVulkanPipelineKey, Ref<FVulkanPipeline>> mPipelineMap;
 };
 

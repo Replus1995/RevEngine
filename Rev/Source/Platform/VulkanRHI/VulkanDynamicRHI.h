@@ -2,10 +2,13 @@
 #include "Rev/Render/RHI/DynamicRHI.h"
 #include "Core/VulkanInstance.h"
 
+#include <map>
 #include <vk_mem_alloc.h>
 
 namespace Rev
 {
+
+class FVulkanSamplerState;
 
 class FVulkanDynamicRHI : public IDyanmicRHI
 {
@@ -27,8 +30,14 @@ public:
 	virtual Ref<FRHIPrimitive> CreatePrimitive(EPrimitiveTopology InTopology) override;
 
 	//Texture
-	virtual Ref<FRHITexture> CreateTexture(const FTextureDesc& InDesc, const FSamplerDesc& InSamplerDesc) override;
+	virtual Ref<FRHITexture> CreateTexture(const FTextureDesc& InDesc ) override;
 	virtual Ref<FRHIRenderTarget> CreateRenderTarget(const FRenderTargetDesc& InDesc) override;
+
+	//State
+	virtual Ref<FRHISamplerState> CreateSamplerState(const FSamplerStateDesc& InDesc) override;
+	virtual Ref<FRHIRasterizerState> CreateRasterizerState(const FRasterizerStateDesc& InDesc) override;
+	virtual Ref<FRHIDepthStencilState> CreateDepthStencilStateState(const FDepthStencilStateDesc& InDesc) override;
+	virtual Ref<FRHIColorBlendState> CreateColorBlendState(const FColorBlendStateDesc& InDesc) override;
 
 	//Pipeline
 	virtual Ref<FRHIRenderPass> CreateRenderPass(const FRenderPassDesc& InDesc) override;
@@ -48,6 +57,8 @@ public:
 private:
 	FVulkanInstance mInstance;
 	VmaAllocator mAllocator = nullptr;
+
+	std::map<uint32, Ref<FVulkanSamplerState>> mSamplerMap;
 };
 
 

@@ -17,6 +17,7 @@ class FVulkanRenderPass;
 class FVulkanShaderProgram;
 class FVulkanUniformBuffer;
 class FVulkanTexture;
+class FVulkanPipelineLayout;
 
 class FVulkanContext : public FRHIContext
 {
@@ -56,6 +57,8 @@ public:
 	virtual void BindTexture(const Ref<FRHITexture>& InTexture, uint16 InBinding) override;
 	virtual void BindProgram(const Ref<FRHIShaderProgram>& InProgram) override;
 
+	virtual void SetGraphicsPipelineState(const FRHIGraphicsPipelineStateDesc& InState) override;
+
 	virtual void DrawPrimitive(const Ref<FRHIPrimitive>& InPrimitive) override;
 
 
@@ -75,6 +78,7 @@ public:
 
 private:
 	void CreateImmediateData();
+	VkDescriptorSet GetDescriptorSet(const FVulkanShaderProgram* InProgram, const FVulkanPipelineLayout* InLayout);
 
 private:
 	FVulkanSwapchain mSwapchain;
@@ -102,6 +106,7 @@ private:
 	//per frame data
 	Ref<FRHIRenderPass> mCurRenderPass = nullptr;
 	Ref<FVulkanShaderProgram> mCurProgram = nullptr;
+	FRHIGraphicsPipelineStateDesc mCurState = {};
 	std::map<uint16, FVulkanUniformBuffer*> mUniformBuffers;
 	std::map<uint16, FVulkanTexture*> mTextures;
 
