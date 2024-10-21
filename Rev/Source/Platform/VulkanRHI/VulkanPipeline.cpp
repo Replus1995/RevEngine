@@ -38,7 +38,7 @@ VkPipeline FVulkanPipelineBuilder::BuildGraphics(VkDevice InDevice, VkPipelineLa
     const FVulkanShaderProgram* InProgram, 
     const FVulkanPrimitive* InPrimitive)
 {
-    const FRenderPassDesc& RenderPassDesc = RenderPass->GetDesc();
+    const FRHIRenderPassDesc& RenderPassDesc = RenderPass->GetDesc();
     uint32 ColorAttachmentCount = RenderPassDesc.NumColorAttachments;
     REV_CORE_ASSERT(ColorAttachmentCount <= RTA_MaxColorAttachments);
 

@@ -9,7 +9,7 @@ class FVulkanSamplerState : public FRHISamplerState
 public:
 	FVulkanSamplerState(const VkSamplerCreateInfo& InCreateInfo);
 	virtual ~FVulkanSamplerState();
-	static void FillCreateInfo(const FSamplerStateDesc& InDesc, VkSamplerCreateInfo& OutCreateInfo);
+	static void FillCreateInfo(const FRHISamplerStateDesc& InDesc, VkSamplerCreateInfo& OutCreateInfo);
 
 	VkSampler Sampler = VK_NULL_HANDLE;
 };
@@ -18,37 +18,37 @@ public:
 class FVulkanRasterizerState : public FRHIRasterizerState
 {
 public:
-	FVulkanRasterizerState(const FRasterizerStateDesc& InDesc);
-	virtual bool GetDesc(FRasterizerStateDesc& OutDesc) const override final
+	FVulkanRasterizerState(const FRHIRasterizerStateDesc& InDesc);
+	virtual bool GetDesc(FRHIRasterizerStateDesc& OutDesc) const override final
 	{
 		OutDesc = Desc;
 		return true;
 	}
 
 	VkPipelineRasterizationStateCreateInfo	RasterizerState;
-	FRasterizerStateDesc Desc;
+	FRHIRasterizerStateDesc Desc;
 };
 
 class FVulkanDepthStencilState : public FRHIDepthStencilState
 {
 public:
-	FVulkanDepthStencilState(const FDepthStencilStateDesc& InDesc);
-	virtual bool GetDesc(FDepthStencilStateDesc& OutDesc) const override final
+	FVulkanDepthStencilState(const FRHIDepthStencilStateDesc& InDesc);
+	virtual bool GetDesc(FRHIDepthStencilStateDesc& OutDesc) const override final
 	{
 		OutDesc = Desc;
 		return true;
 	}
 
 	VkPipelineDepthStencilStateCreateInfo DepthStencilState;
-	FDepthStencilStateDesc Desc;
+	FRHIDepthStencilStateDesc Desc;
 };
 
 class FVulkanColorBlendState : public FRHIColorBlendState
 {
 public:
-	FVulkanColorBlendState(const FColorBlendStateDesc& InDesc);
+	FVulkanColorBlendState(const FRHIColorBlendStateDesc& InDesc);
 
-	virtual bool GetDesc(FColorBlendStateDesc& OutDesc) const override final
+	virtual bool GetDesc(FRHIColorBlendStateDesc& OutDesc) const override final
 	{
 		OutDesc = Desc;
 		return true;
@@ -56,7 +56,7 @@ public:
 
 	// array the pipeline state can point right to
 	VkPipelineColorBlendAttachmentState ColorBlendStates[RTA_MaxColorAttachments];
-	FColorBlendStateDesc Desc;
+	FRHIColorBlendStateDesc Desc;
 };
 
 }

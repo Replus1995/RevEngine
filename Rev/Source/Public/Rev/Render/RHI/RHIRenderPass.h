@@ -6,7 +6,7 @@
 namespace Rev
 {
 
-struct FSubpassDesc
+struct FRHISubpassDesc
 {
 public:
 	EPipelineBindPoint PipelineBindPoint = PBP_Graphics;
@@ -18,7 +18,7 @@ public:
 	uint32 NumInputAttachments = 0;
 };
 
-struct FSubpassDependDesc
+struct FRHISubpassDependDesc
 {
 public:
 	uint32 SrcIndex;
@@ -29,20 +29,7 @@ public:
 	//DstAccessMask
 };
 
-enum EAttachmentLoadOp : uint8
-{
-	ALO_Load = 0,
-	ALO_Clear,
-	ALO_DontCare
-};
-
-enum EAttachmentStoreOp : uint8
-{
-	ASO_Store = 0,
-	ASO_DontCare
-};
-
-struct FColorAttachmentDesc
+struct FRHIColorAttachmentDesc
 {
 public:
 	EPixelFormat Format;
@@ -50,7 +37,7 @@ public:
 	EAttachmentStoreOp StoreOp;
 };
 
-struct FDepthStencilAttachmentDesc : public FColorAttachmentDesc
+struct FRHIDepthStencilAttachmentDesc : public FRHIColorAttachmentDesc
 {
 public:
 	EAttachmentLoadOp StencilLoadOp;
@@ -58,28 +45,28 @@ public:
 };
 
 
-struct FRenderPassDesc
+struct FRHIRenderPassDesc
 {
 public:
-	FColorAttachmentDesc ColorAttachments[RTA_MaxColorAttachments];
+	FRHIColorAttachmentDesc ColorAttachments[RTA_MaxColorAttachments];
 	uint32 NumColorAttachments = 0;
-	FDepthStencilAttachmentDesc DepthStencilAttchment;
-	std::vector<FSubpassDesc> SubpassDescs;  //TODO: define MAX_SUB_PASS to make this member as an array
+	FRHIDepthStencilAttachmentDesc DepthStencilAttchment;
+	std::vector<FRHISubpassDesc> SubpassDescs;  //TODO: define MAX_SUB_PASS to make this member as an array
 	//std::vector<FSubpassDependDesc> SubpassDependDescs;
 };
 
 class FRHIRenderPass : public FRHIResource
 {
 public:
-	FRHIRenderPass(const FRenderPassDesc& InDesc) : mDesc(InDesc) {}
+	FRHIRenderPass(const FRHIRenderPassDesc& InDesc) : mDesc(InDesc) {}
 	virtual ~FRHIRenderPass() = default;
 
-	const FRenderPassDesc& GetDesc() const { return mDesc; }
+	const FRHIRenderPassDesc& GetDesc() const { return mDesc; }
 	const Ref<FRHIRenderTarget>& GetRenderTarget() const { return mRenderTarget; } 
 	bool SetRenderTarget(const Ref<FRHIRenderTarget>& InRenderTarget);
 
 protected:
-	FRenderPassDesc mDesc;
+	FRHIRenderPassDesc mDesc;
 	Ref<FRHIRenderTarget> mRenderTarget;
 
 };

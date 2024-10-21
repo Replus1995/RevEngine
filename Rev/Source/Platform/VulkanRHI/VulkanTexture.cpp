@@ -21,7 +21,7 @@ void FVulkanTexture::Transition(VkImageLayout SrcLayout, VkImageLayout DstLayout
     mImageLayout = DstLayout;
 }
 
-FVulkanTexture::FVulkanTexture(const FTextureDesc& InDesc)
+FVulkanTexture::FVulkanTexture(const FRHITextureDesc& InDesc)
     : FRHITexture(InDesc)
 {
 	if (FPixelFormatInfo::HasDepth(InDesc.Format))
@@ -91,7 +91,7 @@ void FVulkanTexture::ClearContent(FVulkanContext* Context, uint8 InMipLevel, uin
 }
 
 
-Ref<FVulkanTexture> CreateVulkanTexture(const FTextureDesc& InDesc)
+Ref<FVulkanTexture> CreateVulkanTexture(const FRHITextureDesc& InDesc)
 {
 	switch (InDesc.Dimension)
 	{

@@ -16,7 +16,7 @@ FVulkanSamplerState::~FVulkanSamplerState()
 	vkDestroySampler(FVulkanDynamicRHI::GetDevice(), Sampler, nullptr);
 }
 
-void FVulkanSamplerState::FillCreateInfo(const FSamplerStateDesc& InDesc, VkSamplerCreateInfo& OutCreateInfo)
+void FVulkanSamplerState::FillCreateInfo(const FRHISamplerStateDesc& InDesc, VkSamplerCreateInfo& OutCreateInfo)
 {
 	ZeroVulkanStruct(OutCreateInfo, VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO);
 	auto FilterMode = FVulkanEnum::Translate(InDesc.Filter);
@@ -46,7 +46,7 @@ void FVulkanSamplerState::FillCreateInfo(const FSamplerStateDesc& InDesc, VkSamp
 	OutCreateInfo.borderColor = InDesc.BorderColor == 0 ? VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK : VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
 }
 
-FVulkanRasterizerState::FVulkanRasterizerState(const FRasterizerStateDesc& InDesc)
+FVulkanRasterizerState::FVulkanRasterizerState(const FRHIRasterizerStateDesc& InDesc)
 	: Desc(InDesc)
 {
 	ZeroVulkanStruct(RasterizerState, VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO);
@@ -66,7 +66,7 @@ FVulkanRasterizerState::FVulkanRasterizerState(const FRasterizerStateDesc& InDes
 	RasterizerState.depthBiasConstantFactor = Desc.DepthBias;
 }
 
-FVulkanDepthStencilState::FVulkanDepthStencilState(const FDepthStencilStateDesc& InDesc)
+FVulkanDepthStencilState::FVulkanDepthStencilState(const FRHIDepthStencilStateDesc& InDesc)
 	: Desc(InDesc)
 {
 	ZeroVulkanStruct(DepthStencilState, VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO);
@@ -114,12 +114,12 @@ FVulkanDepthStencilState::FVulkanDepthStencilState(const FDepthStencilStateDesc&
 	
 }
 
-FVulkanColorBlendState::FVulkanColorBlendState(const FColorBlendStateDesc& InDesc)
+FVulkanColorBlendState::FVulkanColorBlendState(const FRHIColorBlendStateDesc& InDesc)
 	: Desc(InDesc)
 {
 	for (uint32 Index = 0; Index < RTA_MaxColorAttachments; ++Index)
 	{
-		const FColorBlendStateDesc::FColorTarget& ColorTarget = Desc.ColorTargets[Index];
+		const FRHIColorBlendStateDesc::FColorTarget& ColorTarget = Desc.ColorTargets[Index];
 		VkPipelineColorBlendAttachmentState& ColorBlendState = ColorBlendStates[Index];
 		memset((uint8*)&ColorBlendState, 0, sizeof(ColorBlendState));
 

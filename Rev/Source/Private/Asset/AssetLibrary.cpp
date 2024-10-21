@@ -69,7 +69,7 @@ FTextureStorage FAssetLibrary::ImportTexture(const FPath& InPath)
 	if (FSTBImage2D image = FSTBImage::ImportImage2D(InPath); image.Valid())
 	{
 		Result.Name = InPath.Name();
-		Result.TextureDesc = FTextureDesc::Make2D(image.Width(), image.Height(), image.Format());
+		Result.TextureDesc = FRHITextureDesc::Make2D(image.Width(), image.Height(), image.Format());
 		Result.ImageData.Resize(1, 1);
 		FBuffer& ImageBuffer = Result.ImageData.At(0, 0);
 		ImageBuffer.Allocate(image.Width() * image.Height() * image.Channels() * image.PixelDepth());
@@ -97,7 +97,7 @@ FTextureStorage FAssetLibrary::ImportTextureCube(const FPath& InPathPX, const FP
 	REV_CORE_ASSERT(FSTBImage2D::SameSizeAndFormat(images[0], images[5]));
 
 	Result.Name = "CubeTexture";
-	Result.TextureDesc = FTextureDesc::MakeCube(images[0].Width(), images[0].Height(), images[0].Format());
+	Result.TextureDesc = FRHITextureDesc::MakeCube(images[0].Width(), images[0].Height(), images[0].Format());
 	Result.ImageData.Resize(1, 6);
 	uint32 ImageDataSize = images[0].Width() * images[0].Height() * images[0].Channels() * images[0].PixelDepth() / 8;
 	for (uint16 i = 0; i < 6; i++)

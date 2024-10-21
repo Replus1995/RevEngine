@@ -23,7 +23,7 @@ void FForwardRenderer::BeginFrame()
 
 	if (!mBasePass)
 	{
-		FSubpassDesc SubpassDesc;
+		FRHISubpassDesc SubpassDesc;
 		SubpassDesc.PipelineBindPoint = PBP_Graphics;
 		SubpassDesc.ColorAttachments[0] = RTA_ColorAttachment0;
 		SubpassDesc.DepthStencilAttachment = RTA_DepthStencilAttachment;
@@ -31,7 +31,7 @@ void FForwardRenderer::BeginFrame()
 		SubpassDesc.NumInputAttachments = 0;
 
 
-		FRenderPassDesc BasePassDesc;
+		FRHIRenderPassDesc BasePassDesc;
 		BasePassDesc.ColorAttachments[0] = {PF_R8G8B8A8, ALO_Clear, ASO_Store};
 		BasePassDesc.NumColorAttachments = 1;
 		BasePassDesc.DepthStencilAttchment  = {PF_DepthStencil, ALO_Clear, ASO_Store, ALO_DontCare, ASO_DontCare};

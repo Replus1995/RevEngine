@@ -32,17 +32,17 @@ public:
 	virtual Ref<FRHIPrimitive> CreatePrimitive(EPrimitiveTopology InTopology) = 0;
 
 	//Texture
-	virtual Ref<FRHITexture> CreateTexture(const FTextureDesc& InDesc) = 0;
+	virtual Ref<FRHITexture> CreateTexture(const FRHITextureDesc& InDesc) = 0;
 	virtual Ref<FRHIRenderTarget> CreateRenderTarget(const FRenderTargetDesc& InDesc) = 0;
 
 	//State
-	virtual Ref<FRHISamplerState> CreateSamplerState(const FSamplerStateDesc& InDesc) = 0;
-	virtual Ref<FRHIRasterizerState> CreateRasterizerState(const FRasterizerStateDesc& InDesc) = 0;
-	virtual Ref<FRHIDepthStencilState> CreateDepthStencilStateState(const FDepthStencilStateDesc& InDesc) = 0;
-	virtual Ref<FRHIColorBlendState> CreateColorBlendState(const FColorBlendStateDesc& InDesc) = 0;
+	virtual Ref<FRHISamplerState> CreateSamplerState(const FRHISamplerStateDesc& InDesc) = 0;
+	virtual Ref<FRHIRasterizerState> CreateRasterizerState(const FRHIRasterizerStateDesc& InDesc) = 0;
+	virtual Ref<FRHIDepthStencilState> CreateDepthStencilStateState(const FRHIDepthStencilStateDesc& InDesc) = 0;
+	virtual Ref<FRHIColorBlendState> CreateColorBlendState(const FRHIColorBlendStateDesc& InDesc) = 0;
 
 	//Pipeline
-	virtual Ref<FRHIRenderPass> CreateRenderPass(const FRenderPassDesc& InDesc) = 0;
+	virtual Ref<FRHIRenderPass> CreateRenderPass(const FRHIRenderPassDesc& InDesc) = 0;
 
 };
 

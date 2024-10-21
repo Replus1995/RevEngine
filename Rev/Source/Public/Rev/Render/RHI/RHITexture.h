@@ -30,7 +30,7 @@ struct FRHITextureClearColor
 	}
 };
 
-struct FTextureDesc
+struct FRHITextureDesc
 {
 	uint16 Width = 1;
 	uint16 Height = 1;
@@ -43,9 +43,9 @@ struct FTextureDesc
 	ETextureCreateFlags Flags = ETextureCreateFlags::None;
 	FRHITextureClearColor ClearColor;
 
-	FTextureDesc() {}
+	FRHITextureDesc() {}
 
-	FTextureDesc(ETextureDimension InDimension, EPixelFormat InFormat)
+	FRHITextureDesc(ETextureDimension InDimension, EPixelFormat InFormat)
 		: Dimension(InDimension)
 		, Format(InFormat)
 	{
@@ -76,7 +76,7 @@ struct FTextureDesc
 	{
 	}*/
 
-	FTextureDesc& operator=(const FTextureDesc& Other)
+	FRHITextureDesc& operator=(const FRHITextureDesc& Other)
 	{
 		Width = Other.Width;
 		Height = Other.Height;
@@ -91,42 +91,42 @@ struct FTextureDesc
 		return *this;
 	}
 
-	FTextureDesc& SetFlags(ETextureCreateFlags InFlags) { Flags = InFlags; return *this; }
-	FTextureDesc& AddFlags(ETextureCreateFlags InFlags) { Flags |= InFlags; return *this; }
-	FTextureDesc& SetExtent(uint16 InWidth, uint16 InHeight, uint16 InDepth = 1) { Width = InWidth; Height = InHeight; Depth = InDepth; return *this; }
-	FTextureDesc& SetArraySize(uint16 InArraySize) { ArraySize = InArraySize; return *this; }
-	FTextureDesc& SetClearColor(const FRHITextureClearColor& InClearColor) { ClearColor = InClearColor; return *this; }
-	FTextureDesc& SetNumMips(uint8 InNumMips) { NumMips = InNumMips; return *this; }
-	FTextureDesc& SetNumSamples(uint8 InNumSamples) { NumSamples = InNumSamples; return *this; }
+	FRHITextureDesc& SetFlags(ETextureCreateFlags InFlags) { Flags = InFlags; return *this; }
+	FRHITextureDesc& AddFlags(ETextureCreateFlags InFlags) { Flags |= InFlags; return *this; }
+	FRHITextureDesc& SetExtent(uint16 InWidth, uint16 InHeight, uint16 InDepth = 1) { Width = InWidth; Height = InHeight; Depth = InDepth; return *this; }
+	FRHITextureDesc& SetArraySize(uint16 InArraySize) { ArraySize = InArraySize; return *this; }
+	FRHITextureDesc& SetClearColor(const FRHITextureClearColor& InClearColor) { ClearColor = InClearColor; return *this; }
+	FRHITextureDesc& SetNumMips(uint8 InNumMips) { NumMips = InNumMips; return *this; }
+	FRHITextureDesc& SetNumSamples(uint8 InNumSamples) { NumSamples = InNumSamples; return *this; }
 
 
-	static FTextureDesc Make2D(uint16 InWidth, uint16 InHeight, EPixelFormat InFormat)
+	static FRHITextureDesc Make2D(uint16 InWidth, uint16 InHeight, EPixelFormat InFormat)
 	{
-		FTextureDesc Desc(ETextureDimension::Texture2D, InFormat);
+		FRHITextureDesc Desc(ETextureDimension::Texture2D, InFormat);
 		return Desc.SetExtent(InWidth, InHeight);
 	}
 	
-	static FTextureDesc Make2DArray(uint16 InWidth, uint16 InHeight, uint16 InArraySize, EPixelFormat InFormat)
+	static FRHITextureDesc Make2DArray(uint16 InWidth, uint16 InHeight, uint16 InArraySize, EPixelFormat InFormat)
 	{
-		FTextureDesc Desc(ETextureDimension::Texture2DArray, InFormat);
+		FRHITextureDesc Desc(ETextureDimension::Texture2DArray, InFormat);
 		return Desc.SetExtent(InWidth, InHeight).SetArraySize(InArraySize);
 	}
 
-	static FTextureDesc MakeCube(uint16 InWidth, uint16 InHeight, EPixelFormat InFormat)
+	static FRHITextureDesc MakeCube(uint16 InWidth, uint16 InHeight, EPixelFormat InFormat)
 	{
-		FTextureDesc Desc(ETextureDimension::TextureCube, InFormat);
+		FRHITextureDesc Desc(ETextureDimension::TextureCube, InFormat);
 		return Desc.SetExtent(InWidth, InHeight);
 	}
 
-	static FTextureDesc MakeCubeArray(uint16 InWidth, uint16 InHeight, uint16 InArraySize, EPixelFormat InFormat)
+	static FRHITextureDesc MakeCubeArray(uint16 InWidth, uint16 InHeight, uint16 InArraySize, EPixelFormat InFormat)
 	{
-		FTextureDesc Desc(ETextureDimension::TextureCubeArray, InFormat);
+		FRHITextureDesc Desc(ETextureDimension::TextureCubeArray, InFormat);
 		return Desc.SetExtent(InWidth, InHeight).SetArraySize(InArraySize);
 	}
 
-	static FTextureDesc Make3D(uint16 InWidth, uint16 InHeight, uint16 InDepth, EPixelFormat InFormat)
+	static FRHITextureDesc Make3D(uint16 InWidth, uint16 InHeight, uint16 InDepth, EPixelFormat InFormat)
 	{
-		FTextureDesc Desc(ETextureDimension::Texture3D, InFormat);
+		FRHITextureDesc Desc(ETextureDimension::Texture3D, InFormat);
 		return Desc.SetExtent(InWidth, InHeight, InDepth);
 	}
 
@@ -135,10 +135,10 @@ struct FTextureDesc
 class REV_API FRHITexture : public FRHIResource
 {
 public:
-	FRHITexture(const FTextureDesc& InDesc) : mDesc(InDesc) {}
+	FRHITexture(const FRHITextureDesc& InDesc) : mDesc(InDesc) {}
 	virtual ~FRHITexture() = default;
 
-	const FTextureDesc& GetDesc() const { return mDesc; }
+	const FRHITextureDesc& GetDesc() const { return mDesc; }
 	uint16 GetWidth() const { return mDesc.Width; }
 	uint16 GetHeight() const { return mDesc.Height; }
 	uint16 GetDepth() const { return mDesc.Depth; }
@@ -147,7 +147,7 @@ public:
 	FPixelFormatInfo GetFormatInfo() const { return GPixelFormats[mDesc.Format]; }
 
 protected:
-	FTextureDesc mDesc;
+	FRHITextureDesc mDesc;
 };
 
 }

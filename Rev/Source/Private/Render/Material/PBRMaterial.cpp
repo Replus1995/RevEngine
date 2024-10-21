@@ -1,5 +1,7 @@
 #include "Rev/Render/Material/PBRMaterial.h"
 #include "Rev/Render/RHI/RHIShaderLibrary.h"
+#include "Rev/Render/RHI/RHICommandList.h"
+#include "Rev/Render/RHI/RHIContext.h"
 #include "Rev/Render/UniformLayout.h"
 
 
@@ -32,12 +34,12 @@ void PBRMaterial::PreDraw(FRHICommandList& RHICmdList)
 	if(!mProgram)
 		return;
 
-	mProgram->SetUniform(UL::LBaseColorFactor, BaseColorFactor);
+	/*mProgram->SetUniform(UL::LBaseColorFactor, BaseColorFactor);
 	mProgram->SetUniform(UL::LMetallic, Metallic);
 	mProgram->SetUniform(UL::LRoughness, Roughness);
 	mProgram->SetUniform(UL::LNormalScale, NormalScale);
 	mProgram->SetUniform(UL::LOcclusionStrength, OcclusionStrength);
-	mProgram->SetUniform(UL::LEmissiveFactor, EmissiveFactor);
+	mProgram->SetUniform(UL::LEmissiveFactor, EmissiveFactor);*/
 
 	//FAssetLibrary::GetDefaultWhiteTexture()->GetResource()->Bind(0);
 	//FAssetLibrary::GetDefaultNormalTexture()->GetResource()->Bind(1);

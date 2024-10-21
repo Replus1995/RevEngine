@@ -158,7 +158,7 @@ Ref<FVulkanTexture> FVulkanRenderTarget::CreateColorTexture(const FColorTargetDe
     REV_CORE_ASSERT(!IsEmptyTarget());
     if (InDesc.Format == PF_Unknown)
         return nullptr;
-    FTextureDesc TexDesc((ETextureDimension)mDesc.Dimension, InDesc.Format);
+    FRHITextureDesc TexDesc((ETextureDimension)mDesc.Dimension, InDesc.Format);
     TexDesc.SetExtent(mDesc.Width, mDesc.Height, 1)
         .SetArraySize(mDesc.ArraySize)
         .SetClearColor(InDesc.ClearColor)
@@ -173,7 +173,7 @@ Ref<FVulkanTexture> FVulkanRenderTarget::CreateDepthStencilTexture(const FDepthS
     REV_CORE_ASSERT(!IsEmptyTarget());
     if (InDesc.Format != PF_ShadowDepth && InDesc.Format != PF_DepthStencil)
         return nullptr;
-    FTextureDesc TexDesc((ETextureDimension)mDesc.Dimension, InDesc.Format);
+    FRHITextureDesc TexDesc((ETextureDimension)mDesc.Dimension, InDesc.Format);
     TexDesc.SetExtent(mDesc.Width, mDesc.Height, 1)
         .SetArraySize(mDesc.ArraySize)
         .SetClearColor({ InDesc.ClearDepth, InDesc.ClearStencil })

@@ -70,7 +70,7 @@ Ref<FRHIPrimitive> FVulkanDynamicRHI::CreatePrimitive(EPrimitiveTopology InTopol
 	return CreateRef<FVulkanPrimitive>(InTopology);
 }
 
-Ref<FRHITexture> FVulkanDynamicRHI::CreateTexture(const FTextureDesc& InDesc)
+Ref<FRHITexture> FVulkanDynamicRHI::CreateTexture(const FRHITextureDesc& InDesc)
 {
 	return CreateVulkanTexture(InDesc);
 }
@@ -80,7 +80,7 @@ Ref<FRHIRenderTarget> FVulkanDynamicRHI::CreateRenderTarget(const FRenderTargetD
 	return CreateRef<FVulkanRenderTarget>(InDesc);
 }
 
-Ref<FRHISamplerState> FVulkanDynamicRHI::CreateSamplerState(const FSamplerStateDesc& InDesc)
+Ref<FRHISamplerState> FVulkanDynamicRHI::CreateSamplerState(const FRHISamplerStateDesc& InDesc)
 {
 	VkSamplerCreateInfo SamplerCreateInfo;
 	FVulkanSamplerState::FillCreateInfo(InDesc, SamplerCreateInfo);
@@ -99,22 +99,22 @@ Ref<FRHISamplerState> FVulkanDynamicRHI::CreateSamplerState(const FSamplerStateD
 	}
 }
 
-Ref<FRHIRasterizerState> FVulkanDynamicRHI::CreateRasterizerState(const FRasterizerStateDesc& InDesc)
+Ref<FRHIRasterizerState> FVulkanDynamicRHI::CreateRasterizerState(const FRHIRasterizerStateDesc& InDesc)
 {
 	return CreateRef<FVulkanRasterizerState>(InDesc);
 }
 
-Ref<FRHIDepthStencilState> FVulkanDynamicRHI::CreateDepthStencilStateState(const FDepthStencilStateDesc& InDesc)
+Ref<FRHIDepthStencilState> FVulkanDynamicRHI::CreateDepthStencilStateState(const FRHIDepthStencilStateDesc& InDesc)
 {
 	return CreateRef<FVulkanDepthStencilState>(InDesc);
 }
 
-Ref<FRHIColorBlendState> FVulkanDynamicRHI::CreateColorBlendState(const FColorBlendStateDesc& InDesc)
+Ref<FRHIColorBlendState> FVulkanDynamicRHI::CreateColorBlendState(const FRHIColorBlendStateDesc& InDesc)
 {
 	return CreateRef<FVulkanColorBlendState>(InDesc);
 }
 
-Ref<FRHIRenderPass> FVulkanDynamicRHI::CreateRenderPass(const FRenderPassDesc& InDesc)
+Ref<FRHIRenderPass> FVulkanDynamicRHI::CreateRenderPass(const FRHIRenderPassDesc& InDesc)
 {
 	return CreateRef<FVulkanRenderPass>(InDesc);
 }

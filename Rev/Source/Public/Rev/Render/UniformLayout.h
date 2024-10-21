@@ -40,6 +40,7 @@ constexpr IndexType SEnviornmentTex = 11;
 //Uniform Buffer Binding
 constexpr IndexType BScene = 0;
 constexpr IndexType BStaticMesh = 1;
+constexpr IndexType BMaterial = 2;
 
 constexpr IndexType BShadow = 4;
 constexpr IndexType BLight = 5;

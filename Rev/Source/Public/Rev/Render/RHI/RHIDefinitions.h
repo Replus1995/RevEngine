@@ -77,6 +77,28 @@ enum ERenderTargetAttachment : uint8
 	RTA_EmptyAttachment = 16
 };
 
+//Shader
+enum class ERHIUniformType : uint8
+{
+	Sampler,
+	Image,
+	Buffer,
+};
+
+enum class ERHIShaderStage : uint8
+{
+	Unknown = 0,
+	Vertex = 1,
+	Pixel = 2,
+	Hull = 3, //unsupported
+	Domain = 4, //unsupported
+	Geometry = 5, //unsupported
+	Compute = 6, //unsupported
+	Count = 7
+};
+
+
+
 //Primitive
 enum EPrimitiveTopology : uint8
 {
@@ -181,5 +203,17 @@ enum EPipelineBindPoint : uint8
 
 //RenderPass
 
+enum EAttachmentLoadOp : uint8
+{
+	ALO_Load = 0,
+	ALO_Clear,
+	ALO_DontCare
+};
+
+enum EAttachmentStoreOp : uint8
+{
+	ASO_Store = 0,
+	ASO_DontCare
+};
 
 }

@@ -17,7 +17,7 @@ public:
 
 	static EPrimitiveTopology TranslatePrimitiveTopology(int InPrimitiveTopology);
 	static EPixelFormat TranslateImageFormat(const tinygltf::Image& InImage);
-	static FSamplerStateDesc TranslateSampler(const tinygltf::Sampler& InSampler);
+	static FRHISamplerStateDesc TranslateSampler(const tinygltf::Sampler& InSampler);
 	static Math::FLinearColor TranslateColor(const std::vector<double>& InColor);
 	static Math::FVector3 TranslateVector3(const std::vector<double>& InVector3);
 

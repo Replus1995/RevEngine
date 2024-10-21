@@ -3,7 +3,7 @@
 namespace Rev
 {
 
-bool operator==(const FSamplerStateDesc& A, const FSamplerStateDesc& B)
+bool operator==(const FRHISamplerStateDesc& A, const FRHISamplerStateDesc& B)
 {
 	bool bSame = A.Filter == B.Filter &&
 		A.WarpU == B.WarpU &&

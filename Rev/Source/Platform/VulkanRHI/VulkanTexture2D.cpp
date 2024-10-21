@@ -6,7 +6,7 @@
 namespace Rev
 {
 
-FVulkanTexture2D::FVulkanTexture2D(const FTextureDesc& InDesc)
+FVulkanTexture2D::FVulkanTexture2D(const FRHITextureDesc& InDesc)
 	: FVulkanTexture(InDesc)
 {
 	REV_CORE_ASSERT(InDesc.Dimension == ETextureDimension::Texture2D);
@@ -14,7 +14,7 @@ FVulkanTexture2D::FVulkanTexture2D(const FTextureDesc& InDesc)
 	CreateResource(UsageFlags);
 }
 
-FVulkanTexture2D::FVulkanTexture2D(const FTextureDesc& InDesc, VkImageUsageFlags InUsageFlags)
+FVulkanTexture2D::FVulkanTexture2D(const FRHITextureDesc& InDesc, VkImageUsageFlags InUsageFlags)
     : FVulkanTexture(InDesc)
 {
     REV_CORE_ASSERT(InDesc.Dimension == ETextureDimension::Texture2D);

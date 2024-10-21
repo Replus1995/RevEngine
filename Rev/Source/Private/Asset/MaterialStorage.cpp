@@ -16,12 +16,12 @@ Ref<SurfaceMaterial> FPBRMaterialStorage::CreateMaterial()
 	Result->MaskClip = MaskClip;
 	Result->TwoSided = TwoSided;
 
-	Result->BaseColorFactor = BaseColorFactor;
-	Result->Metallic = Metallic;
-	Result->Roughness = Roughness;
-	Result->NormalScale = NormalScale;
-	Result->OcclusionStrength = OcclusionStrength;
-	Result->EmissiveFactor = EmissiveFactor;
+	Result->Params.BaseColorFactor = BaseColorFactor;
+	Result->Params.Metallic = Metallic;
+	Result->Params.Roughness = Roughness;
+	Result->Params.NormalScale = NormalScale;
+	Result->Params.OcclusionStrength = OcclusionStrength;
+	Result->Params.EmissiveFactor = EmissiveFactor;
 
 	if(BaseColorTexture)
 		Result->BaseColorTexture = BaseColorTexture->CreateTexture(true);

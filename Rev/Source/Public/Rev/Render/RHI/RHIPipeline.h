@@ -14,9 +14,9 @@ struct FRHIGraphicsPipelineStateDesc
 public:
 	EPrimitiveTopology PrimitiveTopology;
 
-	FRasterizerStateDesc RasterizerStateDesc;
-	FDepthStencilStateDesc DepthStencilStateDesc;
-	FColorBlendStateDesc ColorBlendStateDesc;
+	FRHIRasterizerStateDesc RasterizerStateDesc;
+	FRHIDepthStencilStateDesc DepthStencilStateDesc;
+	FRHIColorBlendStateDesc ColorBlendStateDesc;
 };
 
 

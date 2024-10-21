@@ -20,21 +20,21 @@ class FRHIRasterizerState
 {
 public:
 	FRHIRasterizerState() {}
-	virtual bool GetDesc(struct FRasterizerStateDesc& OutDesc) const { return false; }
+	virtual bool GetDesc(struct FRHIRasterizerStateDesc& OutDesc) const { return false; }
 };
 
 class FRHIDepthStencilState
 {
 public:
 	FRHIDepthStencilState() {}
-	virtual bool GetDesc(struct FDepthStencilStateDesc& OutDesc) const { return false; }
+	virtual bool GetDesc(struct FRHIDepthStencilStateDesc& OutDesc) const { return false; }
 };
 
 class FRHIColorBlendState
 {
 public:
 	FRHIColorBlendState() {}
-	virtual bool GetDesc(class FColorBlendStateDesc& OutDesc) const { return false; }
+	virtual bool GetDesc(class FRHIColorBlendStateDesc& OutDesc) const { return false; }
 };
 
 template <typename TRHIState, typename TRHIStateDesc>
@@ -56,7 +56,7 @@ static bool MatchRHIState(TRHIState* LHSState, TRHIState* RHSState)
 
 //State Desc
 
-struct FSamplerStateDesc
+struct FRHISamplerStateDesc
 {
 	ESamplerFilterMode Filter = SF_Nearest;
 	ESamplerWarpMode WarpU = SW_Repeat;
@@ -69,8 +69,8 @@ struct FSamplerStateDesc
 	uint32 BorderColor = 0;
 	ESamplerCompareFunction CompareFunc = SCF_Never;
 
-	FSamplerStateDesc() {}
-	FSamplerStateDesc(
+	FRHISamplerStateDesc() {}
+	FRHISamplerStateDesc(
 		ESamplerFilterMode InFilter,
 		ESamplerWarpMode InWarpU = SW_Repeat,
 		ESamplerWarpMode InWarpV = SW_Repeat,
@@ -96,10 +96,10 @@ struct FSamplerStateDesc
 	{
 	}
 
-	REV_API friend bool operator==(const FSamplerStateDesc& A, const FSamplerStateDesc& B);
+	REV_API friend bool operator==(const FRHISamplerStateDesc& A, const FRHISamplerStateDesc& B);
 };
 
-struct FRasterizerStateDesc
+struct FRHIRasterizerStateDesc
 {
 	EFillMode FillMode = PM_Fill;
 	ECullMode CullMode = CM_None;
@@ -111,7 +111,7 @@ struct FRasterizerStateDesc
 	bool bEnableLineAA = false;
 };
 
-struct FDepthStencilStateDesc
+struct FRHIDepthStencilStateDesc
 {
 	bool bEnableDepthWrite = false;
 	ECompareFunction DepthTestFunc = CF_Never;
@@ -134,7 +134,7 @@ struct FDepthStencilStateDesc
 
 };
 
-struct FColorBlendStateDesc
+struct FRHIColorBlendStateDesc
 {
 	struct FColorTarget {
 		bool bEnableBlend = false;

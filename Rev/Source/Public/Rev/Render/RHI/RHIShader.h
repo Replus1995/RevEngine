@@ -1,20 +1,15 @@
 #pragma once
 #include "Rev/Core/Base.h"
 #include "Rev/Math/Maths.h"
+#include "Rev/Render/PixelFormat.h"
 #include "Rev/Render/RHI/RHIResource.h"
-#include "Rev/Render/RHI/RHIPipeline.h"
-#include "Rev/Render/RHI/RHITexture.h"
+#include "Rev/Render/RHI/RHIDefinitions.h"
 #include <unordered_map>
 
 namespace Rev
 {
 
-enum class ERHIUniformType : uint8
-{
-    Sampler,
-    Image,
-    Buffer,
-};
+class FRHITexture;
 
 struct FRHIUniformInfo
 {
@@ -25,18 +20,6 @@ struct FRHIUniformInfo
 
     EPixelFormat TexFormat;
     ETextureDimension TexDimension;
-};
-
-enum class ERHIShaderStage : uint8
-{
-    Unknown = 0,
-    Vertex = 1,
-    Pixel = 2,
-    Hull = 3, //unsupported
-    Domain = 4, //unsupported
-    Geometry = 5, //unsupported
-    Compute = 6, //unsupported
-    Count = 7
 };
 
 class REV_API FRHIShader : public FRHIResource
@@ -51,13 +34,12 @@ protected:
     ERHIShaderStage mStage;
 };
 
-class FRHITexture;
 class REV_API FRHIShaderProgram : public FRHIResource
 {
 public:
     virtual ~FRHIShaderProgram() = default;
 
-    virtual uint16 GetUniformLocation(std::string_view name) = 0;
+   /* virtual uint16 GetUniformLocation(std::string_view name) = 0;
 
     virtual void SetUniform(uint16 location, int value) = 0;
     virtual void SetUniform(uint16 location, float value) = 0;
@@ -79,7 +61,7 @@ public:
     void SetUniformArray(const std::string& name, const T& value)
     {
         this->SetUniformArray(GetUniformLocation(name), value);
-    }
+    }*/
 
     const std::string& GetName() const { return mProgramName; };
 

@@ -9,7 +9,7 @@
 namespace Rev
 {
 
-FVulkanRenderPass::FVulkanRenderPass(const FRenderPassDesc& InDesc)
+FVulkanRenderPass::FVulkanRenderPass(const FRHIRenderPassDesc& InDesc)
 	: FRHIRenderPass(InDesc)
 {
 	REV_CORE_ASSERT(mDesc.NumColorAttachments <= (uint32)RTA_MaxColorAttachments);
@@ -27,7 +27,7 @@ void FVulkanRenderPass::CreateResource()
 	std::vector<VkAttachmentDescription2> AttachmentDescs;
 	for (uint32 i = 0; i < mDesc.NumColorAttachments; i++)
 	{
-		const FColorAttachmentDesc& InAttachmentDesc = mDesc.ColorAttachments[i];
+		const FRHIColorAttachmentDesc& InAttachmentDesc = mDesc.ColorAttachments[i];
 		EPixelFormat ColorFormat = InAttachmentDesc.Format;
 
 		VkAttachmentDescription2 AttachmentDesc{};
@@ -83,7 +83,7 @@ void FVulkanRenderPass::CreateResource()
 	std::vector<FSubpassAttachmentRef> SubpassAttachmentRefs(mDesc.SubpassDescs.size());
 	for (size_t i = 0; i < mDesc.SubpassDescs.size(); i++)
 	{
-		const FSubpassDesc& InSubpassDesc = mDesc.SubpassDescs[i];
+		const FRHISubpassDesc& InSubpassDesc = mDesc.SubpassDescs[i];
 		FSubpassAttachmentRef& AttachmentRef = SubpassAttachmentRefs[i];
 		VkSubpassDescription2& SubpassDesc = SubpassDescs[i];
 

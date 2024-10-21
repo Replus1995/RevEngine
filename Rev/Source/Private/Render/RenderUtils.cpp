@@ -16,10 +16,10 @@ public:
 	virtual void InitRHI() override
 	{
 		const FRHITextureClearColor ClearColor(Math::FLinearColor::FromColor(Math::FColor(R, G, B, A)));
-		const FTextureDesc TextureDesc = FTextureDesc::Make2D(1, 1, PF_R8G8B8A8).SetClearColor(ClearColor);
+		const FRHITextureDesc TextureDesc = FRHITextureDesc::Make2D(1, 1, PF_R8G8B8A8).SetClearColor(ClearColor);
 		TextureRHI = GDynamicRHI->CreateTexture(TextureDesc);
 
-		const FSamplerStateDesc SamplerDesc(SF_Nearest, SW_Repeat, SW_Repeat, SW_Repeat);
+		const FRHISamplerStateDesc SamplerDesc(SF_Nearest, SW_Repeat, SW_Repeat, SW_Repeat);
 		SamplerStateRHI = GDynamicRHI->CreateSamplerState(SamplerDesc);
 	}
 };

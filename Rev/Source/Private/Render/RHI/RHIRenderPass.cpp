@@ -6,7 +6,7 @@ namespace Rev
 bool FRHIRenderPass::SetRenderTarget(const Ref<FRHIRenderTarget>& InRenderTarget)
 {
 	const FRenderTargetDesc& RenderTargetDesc = InRenderTarget->GetDesc();
-	const FRenderPassDesc& RenderPassDesc = GetDesc();
+	const FRHIRenderPassDesc& RenderPassDesc = GetDesc();
 
 	if (RenderPassDesc.NumColorAttachments > RenderTargetDesc.NumColorTargets)
 		return false;

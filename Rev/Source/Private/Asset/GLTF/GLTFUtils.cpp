@@ -157,9 +157,9 @@ EPixelFormat FGLTFUtils::TranslateImageFormat(const tinygltf::Image& InImage)
 	return PF_Unknown;
 }
 
-FSamplerStateDesc FGLTFUtils::TranslateSampler(const tinygltf::Sampler& InSampler)
+FRHISamplerStateDesc FGLTFUtils::TranslateSampler(const tinygltf::Sampler& InSampler)
 {
-	FSamplerStateDesc Result;
+	FRHISamplerStateDesc Result;
 
 	switch (InSampler.minFilter)
 	{
@@ -343,7 +343,7 @@ Ref<FTextureStorage> FGLTFUtils::ImportTexture(const tinygltf::Texture& InTextur
 	{
 		Result->Name = InTexture.name;
 	}
-	Result->TextureDesc = FTextureDesc::Make2D(InImage.width, InImage.height, TranslateImageFormat(InImage));
+	Result->TextureDesc = FRHITextureDesc::Make2D(InImage.width, InImage.height, TranslateImageFormat(InImage));
 	Result->SamplerDesc = TranslateSampler(InSampler);
 	{
 		Result->ImageData.Resize(1, 1);

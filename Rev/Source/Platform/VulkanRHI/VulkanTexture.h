@@ -27,7 +27,7 @@ public:
 	static FVulkanTexture* Cast(FRHITexture* InTexture) { return static_cast<FVulkanTexture*>(InTexture); }
 
 protected:
-	FVulkanTexture(const FTextureDesc& InDesc);
+	FVulkanTexture(const FRHITextureDesc& InDesc);
 	VkExtent3D GetExtent();
 	VkExtent2D CalculateMipSize2D(uint32 InMipLevel);
 	VkExtent3D CalculateMipSize3D(uint32 InMipLevel);
@@ -40,6 +40,6 @@ protected:
 	Ref<FVulkanSamplerState> mSampler = nullptr;
 };
 
-Ref<FVulkanTexture> CreateVulkanTexture(const FTextureDesc& InDesc);
+Ref<FVulkanTexture> CreateVulkanTexture(const FRHITextureDesc& InDesc);
 
 }

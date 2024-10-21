@@ -30,17 +30,17 @@ public:
 	virtual Ref<FRHIPrimitive> CreatePrimitive(EPrimitiveTopology InTopology) override;
 
 	//Texture
-	virtual Ref<FRHITexture> CreateTexture(const FTextureDesc& InDesc ) override;
+	virtual Ref<FRHITexture> CreateTexture(const FRHITextureDesc& InDesc ) override;
 	virtual Ref<FRHIRenderTarget> CreateRenderTarget(const FRenderTargetDesc& InDesc) override;
 
 	//State
-	virtual Ref<FRHISamplerState> CreateSamplerState(const FSamplerStateDesc& InDesc) override;
-	virtual Ref<FRHIRasterizerState> CreateRasterizerState(const FRasterizerStateDesc& InDesc) override;
-	virtual Ref<FRHIDepthStencilState> CreateDepthStencilStateState(const FDepthStencilStateDesc& InDesc) override;
-	virtual Ref<FRHIColorBlendState> CreateColorBlendState(const FColorBlendStateDesc& InDesc) override;
+	virtual Ref<FRHISamplerState> CreateSamplerState(const FRHISamplerStateDesc& InDesc) override;
+	virtual Ref<FRHIRasterizerState> CreateRasterizerState(const FRHIRasterizerStateDesc& InDesc) override;
+	virtual Ref<FRHIDepthStencilState> CreateDepthStencilStateState(const FRHIDepthStencilStateDesc& InDesc) override;
+	virtual Ref<FRHIColorBlendState> CreateColorBlendState(const FRHIColorBlendStateDesc& InDesc) override;
 
 	//Pipeline
-	virtual Ref<FRHIRenderPass> CreateRenderPass(const FRenderPassDesc& InDesc) override;
+	virtual Ref<FRHIRenderPass> CreateRenderPass(const FRHIRenderPassDesc& InDesc) override;
 
 public:
 	static FVulkanDynamicRHI* GetVulkanRHI();

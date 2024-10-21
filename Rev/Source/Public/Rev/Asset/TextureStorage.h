@@ -38,8 +38,8 @@ public:
 	FTextureStorage(FTextureStorage&& Other) noexcept;
 
 	std::string Name;
-	FSamplerStateDesc SamplerDesc;
-	FTextureDesc TextureDesc;
+	FRHISamplerStateDesc SamplerDesc;
+	FRHITextureDesc TextureDesc;
 	FImageStorage ImageData;
 
 	REV_API Ref<FTexture> CreateTexture(bool bForceSRGB = false);

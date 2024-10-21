@@ -8,7 +8,7 @@ namespace Rev
 class FVulkanRenderPass : public FRHIRenderPass
 {
 public:
-	FVulkanRenderPass(const FRenderPassDesc& InDesc);
+	FVulkanRenderPass(const FRHIRenderPassDesc& InDesc);
 	virtual ~FVulkanRenderPass();
 	virtual const void* GetNativeHandle() const override { return mRenderPass; }
 
