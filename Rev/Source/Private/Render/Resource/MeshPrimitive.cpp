@@ -1,4 +1,4 @@
-#include "Rev/Render/Mesh/MeshPrimitive.h"
+#include "Rev/Render/Resource/MeshPrimitive.h"
 #include "Rev/Render/RHI/RHIPrimitive.h"
 
 namespace Rev

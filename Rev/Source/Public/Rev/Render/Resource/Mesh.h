@@ -1,6 +1,6 @@
 #pragma once
 #include "Rev/Core/Base.h"
-#include "Rev/Render/Mesh/MeshPrimitive.h"
+#include "Rev/Render/Resource/MeshPrimitive.h"
 #include <vector>
 
 namespace Rev
@@ -18,7 +18,7 @@ public:
 	virtual uint32 GetPrimitiveCount() const = 0;
 
 protected:
-	Mesh();
+	Mesh() {};
 };
 
 }

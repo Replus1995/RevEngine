@@ -158,7 +158,12 @@ Ref<FVulkanTexture> FVulkanRenderTarget::CreateColorTexture(const FColorTargetDe
     REV_CORE_ASSERT(!IsEmptyTarget());
     if (InDesc.Format == PF_Unknown)
         return nullptr;
-    FTextureDesc TexDesc((ETextureDimension)mDesc.Dimension, InDesc.Format, false, mDesc.Width, mDesc.Height, 0, mDesc.ArraySize, InDesc.ClearColor, 1, mDesc.NumSamples);
+    FTextureDesc TexDesc((ETextureDimension)mDesc.Dimension, InDesc.Format);
+    TexDesc.SetExtent(mDesc.Width, mDesc.Height, 1)
+        .SetArraySize(mDesc.ArraySize)
+        .SetClearColor(InDesc.ClearColor)
+        .SetNumSamples(mDesc.NumSamples);
+
     VkImageUsageFlags UsageFlags = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
     return CreateRef<FVulkanTexture2D>(TexDesc, UsageFlags);
 }
@@ -168,7 +173,12 @@ Ref<FVulkanTexture> FVulkanRenderTarget::CreateDepthStencilTexture(const FDepthS
     REV_CORE_ASSERT(!IsEmptyTarget());
     if (InDesc.Format != PF_ShadowDepth && InDesc.Format != PF_DepthStencil)
         return nullptr;
-    FTextureDesc TexDesc((ETextureDimension)mDesc.Dimension, InDesc.Format, false, mDesc.Width, mDesc.Height, 0, mDesc.ArraySize, { InDesc.ClearDepth, InDesc.ClearStencil }, 1, mDesc.NumSamples);
+    FTextureDesc TexDesc((ETextureDimension)mDesc.Dimension, InDesc.Format);
+    TexDesc.SetExtent(mDesc.Width, mDesc.Height, 1)
+        .SetArraySize(mDesc.ArraySize)
+        .SetClearColor({ InDesc.ClearDepth, InDesc.ClearStencil })
+        .SetNumSamples(mDesc.NumSamples);
+
     VkImageUsageFlags UsageFlags = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
     return CreateRef<FVulkanTexture2D>(TexDesc, UsageFlags);
 }

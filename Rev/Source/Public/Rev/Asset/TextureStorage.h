@@ -3,11 +3,12 @@
 #include "Rev/Core/Buffer.h"
 #include "Rev/Render/RHI/RHIState.h"
 #include "Rev/Render/RHI/RHITexture.h"
-#include "Rev/Render/Texture/Texture.h"
 #include <vector>
 
 namespace Rev
 {
+
+class FTexture;
 
 struct FImageStorage
 {
@@ -41,9 +42,9 @@ public:
 	FTextureDesc TextureDesc;
 	FImageStorage ImageData;
 
-	REV_API Ref<Texture> CreateTexture(bool bForceSRGB = false);
+	REV_API Ref<FTexture> CreateTexture(bool bForceSRGB = false);
 private:
-	Ref<Texture> mCache = nullptr;
+	Ref<FTexture> mCache = nullptr;
 };
 
 }

@@ -16,6 +16,7 @@ enum class ERenderAPI : uint8
 };
 REV_API ERenderAPI GetRenderAPI();
 
+extern REV_API bool GIsRHIInitialized;
 
 class FRHIContext;
 class REV_API FRenderCore

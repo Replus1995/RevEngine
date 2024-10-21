@@ -29,6 +29,26 @@ enum ESamplerCompareFunction : uint8
 };
 
 //Texture
+enum class ETextureDimension : uint8
+{
+	Texture2D = 1,
+	Texture2DArray = 2,
+	TextureCube = 3,
+	TextureCubeArray = 4,
+	Texture3D = 5,
+};
+
+enum class ETextureCreateFlags : uint64
+{
+	None							= 0,
+	RenderTargetable				= 1ull << 0,
+	ResolveTargetable				= 1ull << 1,
+	DepthStencilTargetable			= 1ull << 2,
+	ShaderResource					= 1ull << 3,
+	SRGB							= 1ull << 4,
+};
+ENUM_CLASS_FLAGS(ETextureCreateFlags)
+
 enum ETextureCubeFace : uint8
 {
 	TCF_PositiveX = 0,

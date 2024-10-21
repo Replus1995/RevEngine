@@ -1,4 +1,4 @@
-#include "Rev/Render/Mesh/StaticMesh.h"
+#include "Rev/Render/Resource/StaticMesh.h"
 #include "Rev/Render/Material/Material.h"
 #include "Rev/Render/RHI/RHIBuffer.h"
 

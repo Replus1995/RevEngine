@@ -8,8 +8,8 @@
 #include "Rev/Render/RenderCore.h"
 #include "Rev/Render/Material/Material.h"
 #include "Rev/Render/Material/SurfaceMaterial.h"
-#include "Rev/Render/Mesh/StaticMesh.h"
-#include "Rev/Render/Texture/Texture.h"
+#include "Rev/Render/Resource/StaticMesh.h"
+#include "Rev/Render/Resource/RenderResource.h"
 
 #include "./BasicGeometry/PlaneGeometry.hpp"
 #include "./BasicGeometry/BoxGeometry.hpp"
@@ -20,8 +20,6 @@ namespace Rev
 {
 
 static Ref<SurfaceMaterial> sDefaultSurfaceMaterial = nullptr;
-static Ref<Texture> sDefaultWhiteTexture = nullptr;
-static Ref<Texture> sDefaultNormalTexture = nullptr;
 
 void FAssetLibrary::Init()
 {
@@ -30,45 +28,7 @@ void FAssetLibrary::Init()
 
 void FAssetLibrary::Shutdown()
 {
-	sDefaultWhiteTexture.reset();
-	sDefaultNormalTexture.reset();
 	sDefaultSurfaceMaterial.reset();
-}
-
-const Ref<Texture>& FAssetLibrary::GetDefaultWhiteTexture2D()
-{
-	if (!sDefaultWhiteTexture)
-	{
-		FTextureDesc TextureDesc = FTextureDesc::Make2D(2, 2, PF_R8G8B8A8, false, Math::FLinearColor(1,1,1,1));
-		FSamplerStateDesc SamplerDesc;
-		sDefaultWhiteTexture = CreateRef<Texture>(GDynamicRHI->CreateTexture(TextureDesc));
-		FRenderCore::GetMainContext()->ClearTexture(sDefaultWhiteTexture->GetTextureRHI());
-	}
-	return sDefaultWhiteTexture;
-}
-
-const Ref<Texture>& FAssetLibrary::GetDefaultBlackTexture2D()
-{
-	if (!sDefaultWhiteTexture)
-	{
-		FTextureDesc TextureDesc = FTextureDesc::Make2D(2, 2, PF_R8G8B8A8, false, Math::FLinearColor(0, 0, 0, 1));
-		FSamplerStateDesc SamplerDesc;
-		sDefaultWhiteTexture = CreateRef<Texture>(GDynamicRHI->CreateTexture(TextureDesc));
-		FRenderCore::GetMainContext()->ClearTexture(sDefaultWhiteTexture->GetTextureRHI());
-	}
-	return sDefaultWhiteTexture;
-}
-
-const Ref<Texture>& FAssetLibrary::GetDefaultNormalTexture2D()
-{
-	if (!sDefaultNormalTexture)
-	{
-		FTextureDesc TextureDesc = FTextureDesc::Make2D(2, 2, PF_R8G8B8, false, Math::FLinearColor(0.5f, 0.5f, 1.0f));
-		FSamplerStateDesc SamplerDesc;
-		sDefaultNormalTexture = CreateRef<Texture>(GDynamicRHI->CreateTexture(TextureDesc));
-		FRenderCore::GetMainContext()->ClearTexture(sDefaultWhiteTexture->GetTextureRHI());
-	}
-	return sDefaultNormalTexture;
 }
 
 const Ref<SurfaceMaterial>& FAssetLibrary::GetDefaultSurfaceMaterial()
@@ -109,7 +69,7 @@ FTextureStorage FAssetLibrary::ImportTexture(const FPath& InPath)
 	if (FSTBImage2D image = FSTBImage::ImportImage2D(InPath); image.Valid())
 	{
 		Result.Name = InPath.Name();
-		Result.TextureDesc = FTextureDesc::Make2D(image.Width(), image.Height(), image.Format(), false);
+		Result.TextureDesc = FTextureDesc::Make2D(image.Width(), image.Height(), image.Format());
 		Result.ImageData.Resize(1, 1);
 		FBuffer& ImageBuffer = Result.ImageData.At(0, 0);
 		ImageBuffer.Allocate(image.Width() * image.Height() * image.Channels() * image.PixelDepth());
@@ -137,7 +97,7 @@ FTextureStorage FAssetLibrary::ImportTextureCube(const FPath& InPathPX, const FP
 	REV_CORE_ASSERT(FSTBImage2D::SameSizeAndFormat(images[0], images[5]));
 
 	Result.Name = "CubeTexture";
-	Result.TextureDesc = FTextureDesc::MakeCube(images[0].Width(), images[0].Height(), images[0].Format(), false);
+	Result.TextureDesc = FTextureDesc::MakeCube(images[0].Width(), images[0].Height(), images[0].Format());
 	Result.ImageData.Resize(1, 6);
 	uint32 ImageDataSize = images[0].Width() * images[0].Height() * images[0].Channels() * images[0].PixelDepth() / 8;
 	for (uint16 i = 0; i < 6; i++)

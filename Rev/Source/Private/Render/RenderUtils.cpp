@@ -3,11 +3,51 @@
 #include "Rev/Render/RHI/DynamicRHI.h"
 #include "Rev/Render/RHI/RHIBuffer.h"
 #include "Rev/Render/RHI/RHIPrimitive.h"
+#include "Rev/Render/RHI/DynamicRHI.h"
 
 namespace Rev
 {
 
-static Ref<FRHIPrimitive> sScreenQuad = nullptr;
+template <int32 R, int32 G, int32 B, int32 A>
+class FColoredTexture : public FTexture
+{
+public:
+	// FResource interface.
+	virtual void InitRHI() override
+	{
+		const FRHITextureClearColor ClearColor(Math::FLinearColor::FromColor(Math::FColor(R, G, B, A)));
+		const FTextureDesc TextureDesc = FTextureDesc::Make2D(1, 1, PF_R8G8B8A8).SetClearColor(ClearColor);
+		TextureRHI = GDynamicRHI->CreateTexture(TextureDesc);
+
+		const FSamplerStateDesc SamplerDesc(SF_Nearest, SW_Repeat, SW_Repeat, SW_Repeat);
+		SamplerStateRHI = GDynamicRHI->CreateSamplerState(SamplerDesc);
+	}
+};
+
+//template <float X, float Y, float Z>
+//class FLinearTexture : public FTexture
+//{
+//public:
+//    // FResource interface.
+//    virtual void InitRHI() override
+//    {
+//        const FRHITextureClearColor ClearColor(Math::FLinearColor(X, Y, Z));
+//        const FTextureDesc TextureDesc = FTextureDesc::Make2D(1, 1, PF_R8G8B8).SetClearColor(ClearColor);
+//        TextureRHI = GDynamicRHI->CreateTexture(TextureDesc);
+//
+//        const FSamplerStateDesc SamplerDesc(SF_Nearest, SW_Repeat, SW_Repeat, SW_Repeat);
+//        SamplerStateRHI = GDynamicRHI->CreateSamplerState(SamplerDesc);
+//    }
+//};
+
+
+FTexture* GWhiteTexture = new TGlobalResource<FColoredTexture<255, 255, 255, 255>>;
+FTexture* GBlackTexture = new TGlobalResource<FColoredTexture<0, 0, 0, 255>>;
+FTexture* GNormalTexture = new TGlobalResource<FColoredTexture<127, 127, 255, 255>>;
+
+
+namespace
+{
 static Ref<FRHIPrimitive> CreateScreenQuad()
 {
     constexpr float ScreenQuadVertices[] = {
@@ -38,21 +78,27 @@ static Ref<FRHIPrimitive> CreateScreenQuad()
     Primitive->SetIndexBuffer(IndexBuffer);
     return Primitive;
 }
+}
+
+Ref<FRHIPrimitive> GScreenPlanePrimitive = nullptr;
 
 void RenderUtils::Init()
 {
-    //sScreenQuad = CreateScreenQuad();
+    InitGlobalResources();
+
+    GScreenPlanePrimitive = CreateScreenQuad();
 }
 
 void RenderUtils::Shutdown()
 {
-    sScreenQuad.reset();
+    ReleaseGlobalResources();
+
+    SAFE_DELETE(GWhiteTexture);
+    SAFE_DELETE(GBlackTexture);
+    SAFE_DELETE(GNormalTexture);
+
+    GScreenPlanePrimitive.reset();
 }
 
-
-void RenderUtils::DrawScreenQuad()
-{
-    //RenderCmd::DrawPrimitive(sScreenQuad,)
-}
 
 }

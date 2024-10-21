@@ -52,3 +52,6 @@
 #define REV_EXPAND_MACRO(x) x
 #define REV_STRINGIFY_MACRO(x) #x
 #define ARRAY_LENGTH(Array) sizeof(Array) / sizeof(Array[0])
+
+#define SAFE_DELETE(Pointer) { delete Pointer; Pointer = nullptr; }
+#define SAFE_DELETE_ARRAY(Array) { delete Array; Array = nullptr; }

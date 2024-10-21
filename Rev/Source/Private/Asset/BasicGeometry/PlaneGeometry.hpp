@@ -1,7 +1,7 @@
 #pragma once
 #include "Rev/Core/Base.h"
 #include "Rev/Render/Material/SurfaceMaterial.h"
-#include "Rev/Render/Mesh/StaticMesh.h"
+#include "Rev/Render/Resource/StaticMesh.h"
 #include "Rev/Render/RenderCore.h"
 #include "Rev/Render/RHI/RHIBuffer.h"
 #include "Rev/Render/RHI/DynamicRHI.h"

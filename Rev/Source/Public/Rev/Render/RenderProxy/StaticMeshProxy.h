@@ -3,7 +3,7 @@
 #include "Rev/Math/Maths.h"
 #include "Rev/Render/RenderCore.h"
 #include "Rev/Render/UniformDefine.h"
-#include "Rev/Render/Mesh/StaticMesh.h"
+#include "Rev/Render/Resource/StaticMesh.h"
 #include "Rev/Render/Material/Material.h"
 
 namespace Rev

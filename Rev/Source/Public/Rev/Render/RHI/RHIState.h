@@ -63,11 +63,38 @@ struct FSamplerStateDesc
 	ESamplerWarpMode WarpV = SW_Repeat;
 	ESamplerWarpMode WarpW = SW_Repeat;
 	float MipBias = 0.0f;
+	int32 MaxAnisotropy = 0;
 	float MinMipLevel = 0.0f;
 	float MaxMipLevel = FLT_MAX;
-	int32 MaxAnisotropy = 0;
 	uint32 BorderColor = 0;
-	ESamplerCompareFunction CompareFunction = SCF_Never;
+	ESamplerCompareFunction CompareFunc = SCF_Never;
+
+	FSamplerStateDesc() {}
+	FSamplerStateDesc(
+		ESamplerFilterMode InFilter,
+		ESamplerWarpMode InWarpU = SW_Repeat,
+		ESamplerWarpMode InWarpV = SW_Repeat,
+		ESamplerWarpMode InWarpW = SW_Repeat,
+		float InMipBias = 0.0f,
+		int32 InMaxAnisotropy = 0,
+		float InMinMipLevel = 0,
+		float InMaxMipLevel = FLT_MAX,
+		uint32 InBorderColor = 0,
+		/** Only supported in D3D11 */
+		ESamplerCompareFunction InCompareFunc = SCF_Never
+	)
+		: Filter(InFilter)
+		, WarpU(InWarpU)
+		, WarpV(InWarpV)
+		, WarpW(InWarpW)
+		, MipBias(InMipBias)
+		, MaxAnisotropy(InMaxAnisotropy)
+		, MinMipLevel(InMinMipLevel)
+		, MaxMipLevel(InMaxMipLevel)
+		, BorderColor(InBorderColor)
+		, CompareFunc(InCompareFunc)
+	{
+	}
 
 	REV_API friend bool operator==(const FSamplerStateDesc& A, const FSamplerStateDesc& B);
 };

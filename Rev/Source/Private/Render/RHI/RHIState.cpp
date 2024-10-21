@@ -14,7 +14,7 @@ bool operator==(const FSamplerStateDesc& A, const FSamplerStateDesc& B)
 		A.MaxMipLevel == B.MaxMipLevel &&
 		A.MaxAnisotropy == B.MaxAnisotropy && 
 		A.BorderColor == B.BorderColor &&
-		A.CompareFunction == B.CompareFunction;
+		A.CompareFunc == B.CompareFunc;
 	return bSame;
 }
 

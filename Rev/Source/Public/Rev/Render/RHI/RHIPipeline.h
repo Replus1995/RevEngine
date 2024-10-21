@@ -12,6 +12,8 @@ namespace Rev
 struct FRHIGraphicsPipelineStateDesc
 {
 public:
+	EPrimitiveTopology PrimitiveTopology;
+
 	FRasterizerStateDesc RasterizerStateDesc;
 	FDepthStencilStateDesc DepthStencilStateDesc;
 	FColorBlendStateDesc ColorBlendStateDesc;

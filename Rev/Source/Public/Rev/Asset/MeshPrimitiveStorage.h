@@ -2,7 +2,7 @@
 #include "Rev/Core/Base.h"
 #include "Rev/Core/Buffer.h"
 #include "Rev/Math/Maths.h"
-#include "Rev/Render/Mesh/MeshPrimitive.h"
+#include "Rev/Render/Resource/MeshPrimitive.h"
 
 namespace Rev
 {

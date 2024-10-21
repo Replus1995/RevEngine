@@ -2,6 +2,7 @@
 #include "Rev/Core/Assert.h"
 #include "Rev/Render/RHI/DynamicRHI.h"
 #include "Rev/Render/RenderCore.h"
+#include "Rev/Render/Resource/RenderResource.h"
 
 namespace Rev
 {
@@ -46,16 +47,19 @@ FTextureStorage::FTextureStorage(FTextureStorage&& Other) noexcept
 {
 }
 
-Ref<Texture> FTextureStorage::CreateTexture(bool bForceSRGB)
+Ref<FTexture> FTextureStorage::CreateTexture(bool bForceSRGB)
 {
 	if(mCache)
 		return mCache;
 
-	TextureDesc.bSRGB = bForceSRGB ? true : TextureDesc.bSRGB;
+	if(bForceSRGB)
+		TextureDesc.AddFlags(ETextureCreateFlags::SRGB);
+
 	if (TextureDesc.Dimension == ETextureDimension::TextureCube && ImageData.NumLayers() == 6)
 	{
 		REV_CORE_ASSERT(TextureDesc.NumMips == ImageData.NumMips());
-		mCache = CreateRef<Texture>(GDynamicRHI->CreateTexture(TextureDesc));
+		mCache = CreateRef<FTexture>();
+		mCache->TextureRHI = GDynamicRHI->CreateTexture(TextureDesc);
 		for (uint8 iCubeFace = 0; iCubeFace < 6; iCubeFace++)
 		{
 			for (uint8 iMip = 0; iMip < TextureDesc.NumMips; iMip++)
@@ -69,7 +73,8 @@ Ref<Texture> FTextureStorage::CreateTexture(bool bForceSRGB)
 	else if (TextureDesc.Dimension == ETextureDimension::TextureCubeArray && ImageData.NumLayers() == 6 * TextureDesc.ArraySize)
 	{
 		REV_CORE_ASSERT(TextureDesc.NumMips == ImageData.NumMips());
-		mCache = CreateRef<Texture>(GDynamicRHI->CreateTexture(TextureDesc));
+		mCache = CreateRef<FTexture>();
+		mCache->TextureRHI = GDynamicRHI->CreateTexture(TextureDesc);
 		for (uint8 iLayer = 0; iLayer < TextureDesc.ArraySize; iLayer++)
 		{
 			for (uint8 iCubeFace = 0; iCubeFace < 6; iCubeFace++)
@@ -88,7 +93,8 @@ Ref<Texture> FTextureStorage::CreateTexture(bool bForceSRGB)
 	REV_CORE_ASSERT(TextureDesc.ArraySize == ImageData.NumLayers());
 
 	
-	mCache = CreateRef<Texture>(GDynamicRHI->CreateTexture(TextureDesc));
+	mCache = CreateRef<FTexture>();
+	mCache->TextureRHI = GDynamicRHI->CreateTexture(TextureDesc);
 	for (uint8 iLayer = 0; iLayer < TextureDesc.ArraySize; iLayer++)
 	{
 		for (uint8 iMip = 0; iMip < TextureDesc.NumMips; iMip++)

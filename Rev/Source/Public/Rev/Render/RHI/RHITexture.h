@@ -7,16 +7,7 @@
 namespace Rev
 {
 
-enum class ETextureDimension : uint8
-{
-	Texture2D = 1,
-	Texture2DArray = 2,
-	TextureCube = 3,
-	TextureCubeArray = 4,
-	Texture3D = 5,
-};
-
-struct FTextureClearColor
+struct FRHITextureClearColor
 {
 	union 
 	{
@@ -27,12 +18,12 @@ struct FTextureClearColor
 			uint32 Stencil;
 		};
 	};
-	FTextureClearColor() {}
-	FTextureClearColor(const FTextureClearColor& Other) : RGBA(Other.RGBA) {}
-	FTextureClearColor(const Math::FLinearColor& InColor) : RGBA(InColor) {}
-	FTextureClearColor(float InDepth, uint32 InStencil) : Depth(InDepth), Stencil(InStencil) {}
+	FRHITextureClearColor() {}
+	FRHITextureClearColor(const FRHITextureClearColor& Other) : RGBA(Other.RGBA) {}
+	FRHITextureClearColor(const Math::FLinearColor& InColor) : RGBA(InColor) {}
+	FRHITextureClearColor(float InDepth, uint32 InStencil) : Depth(InDepth), Stencil(InStencil) {}
 
-	FTextureClearColor& operator=(const FTextureClearColor& Other)
+	FRHITextureClearColor& operator=(const FRHITextureClearColor& Other)
 	{
 		RGBA = Other.RGBA;
 		return *this;
@@ -47,15 +38,30 @@ struct FTextureDesc
 	uint16 ArraySize = 1; //For Texture Array
 	ETextureDimension Dimension = ETextureDimension::Texture2D;
 	EPixelFormat Format = PF_R8G8B8A8;
-	bool bSRGB = false;
 	uint8 NumMips = 1;
 	uint8 NumSamples = 1; //For MSAA
-	FTextureClearColor ClearColor;
+	ETextureCreateFlags Flags = ETextureCreateFlags::None;
+	FRHITextureClearColor ClearColor;
 
 	FTextureDesc() {}
-	FTextureDesc(ETextureDimension InDimension, EPixelFormat InFormat, bool InSRGB,
-		uint16 InWidth, uint16 InHeight, uint16 InDepth, uint16 InArraySize,
-		const FTextureClearColor& InClearColor, uint8 InNumMips, uint8 InNumSamples
+
+	FTextureDesc(ETextureDimension InDimension, EPixelFormat InFormat)
+		: Dimension(InDimension)
+		, Format(InFormat)
+	{
+	}
+
+	/*FTextureDesc(
+		ETextureDimension InDimension, 
+		ETextureCreateFlags InFlags,
+		EPixelFormat InFormat,
+		const FRHITextureClearColor& InClearColor,
+		uint16 InWidth, 
+		uint16 InHeight, 
+		uint16 InDepth, 
+		uint16 InArraySize,
+		uint8 InNumMips, 
+		uint8 InNumSamples
 	)
 		: Width(InWidth)
 		, Height(InHeight)
@@ -63,12 +69,12 @@ struct FTextureDesc
 		, ArraySize(InArraySize)
 		, Dimension(InDimension)
 		, Format(InFormat)
-		, bSRGB(InSRGB)
 		, NumMips(InNumMips)
 		, NumSamples(InNumSamples)
+		, Flags(InFlags)
 		, ClearColor(InClearColor)
 	{
-	}
+	}*/
 
 	FTextureDesc& operator=(const FTextureDesc& Other)
 	{
@@ -80,33 +86,48 @@ struct FTextureDesc
 		Format = Other.Format;
 		NumMips = Other.NumMips;
 		NumSamples = Other.NumSamples;
+		Flags = Other.Flags;
 		ClearColor = Other.ClearColor;
 		return *this;
 	}
 
-	static FTextureDesc Make2D(uint16 InWidth, uint16 InHeight, EPixelFormat InFormat, bool InSRGB, const FTextureClearColor& InClearColor = {}, uint8 InNumMips = 1, uint8 InNumSamples = 1)
+	FTextureDesc& SetFlags(ETextureCreateFlags InFlags) { Flags = InFlags; return *this; }
+	FTextureDesc& AddFlags(ETextureCreateFlags InFlags) { Flags |= InFlags; return *this; }
+	FTextureDesc& SetExtent(uint16 InWidth, uint16 InHeight, uint16 InDepth = 1) { Width = InWidth; Height = InHeight; Depth = InDepth; return *this; }
+	FTextureDesc& SetArraySize(uint16 InArraySize) { ArraySize = InArraySize; return *this; }
+	FTextureDesc& SetClearColor(const FRHITextureClearColor& InClearColor) { ClearColor = InClearColor; return *this; }
+	FTextureDesc& SetNumMips(uint8 InNumMips) { NumMips = InNumMips; return *this; }
+	FTextureDesc& SetNumSamples(uint8 InNumSamples) { NumSamples = InNumSamples; return *this; }
+
+
+	static FTextureDesc Make2D(uint16 InWidth, uint16 InHeight, EPixelFormat InFormat)
 	{
-		return FTextureDesc(ETextureDimension::Texture2D, InFormat, InSRGB, InWidth, InHeight, 1, 1, InClearColor, InNumMips, InNumSamples);
+		FTextureDesc Desc(ETextureDimension::Texture2D, InFormat);
+		return Desc.SetExtent(InWidth, InHeight);
 	}
 	
-	static FTextureDesc Make2DArray(uint16 InWidth, uint16 InHeight, EPixelFormat InFormat, bool InSRGB, uint16 InArraySize, const FTextureClearColor& InClearColor = {}, uint8 InNumMips = 1, uint8 InNumSamples = 1)
+	static FTextureDesc Make2DArray(uint16 InWidth, uint16 InHeight, uint16 InArraySize, EPixelFormat InFormat)
 	{
-		return FTextureDesc(ETextureDimension::Texture2DArray, InFormat, InSRGB, InWidth, InHeight, 1, InArraySize, InClearColor, InNumMips, InNumSamples);
+		FTextureDesc Desc(ETextureDimension::Texture2DArray, InFormat);
+		return Desc.SetExtent(InWidth, InHeight).SetArraySize(InArraySize);
 	}
 
-	static FTextureDesc MakeCube(uint16 InWidth, uint16 InHeight, EPixelFormat InFormat, bool InSRGB, const FTextureClearColor& InClearColor = {}, uint8 InNumMips = 1, uint8 InNumSamples = 1)
+	static FTextureDesc MakeCube(uint16 InWidth, uint16 InHeight, EPixelFormat InFormat)
 	{
-		return FTextureDesc(ETextureDimension::TextureCube, InFormat, InSRGB, InWidth, InHeight, 1, 1, InClearColor, InNumMips, InNumSamples);
+		FTextureDesc Desc(ETextureDimension::TextureCube, InFormat);
+		return Desc.SetExtent(InWidth, InHeight);
 	}
 
-	static FTextureDesc MakeCubeArray(uint16 InWidth, uint16 InHeight, EPixelFormat InFormat, bool InSRGB, uint16 InArraySize, const FTextureClearColor& InClearColor = {}, uint8 InNumMips = 1, uint8 InNumSamples = 1)
+	static FTextureDesc MakeCubeArray(uint16 InWidth, uint16 InHeight, uint16 InArraySize, EPixelFormat InFormat)
 	{
-		return FTextureDesc(ETextureDimension::TextureCubeArray, InFormat, InSRGB, InWidth, InHeight, 1, InArraySize, InClearColor, InNumMips, InNumSamples);
+		FTextureDesc Desc(ETextureDimension::TextureCubeArray, InFormat);
+		return Desc.SetExtent(InWidth, InHeight).SetArraySize(InArraySize);
 	}
 
-	static FTextureDesc Make3D(uint16 InWidth, uint16 InHeight, uint16 InDepth, EPixelFormat InFormat, bool InSRGB, const FTextureClearColor& InClearColor = {}, uint8 InNumMips = 1, uint8 InNumSamples = 1)
+	static FTextureDesc Make3D(uint16 InWidth, uint16 InHeight, uint16 InDepth, EPixelFormat InFormat)
 	{
-		return FTextureDesc(ETextureDimension::Texture3D, InFormat, InSRGB, InWidth, InHeight, InDepth, 1, InClearColor, InNumMips, InNumSamples);
+		FTextureDesc Desc(ETextureDimension::Texture3D, InFormat);
+		return Desc.SetExtent(InWidth, InHeight, InDepth);
 	}
 
 };

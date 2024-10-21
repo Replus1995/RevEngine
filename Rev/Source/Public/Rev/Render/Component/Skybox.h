@@ -3,18 +3,18 @@
 
 namespace Rev
 {
-class Texture;
+class FTexture;
 class REV_API Skybox
 {
 public:
 	Skybox();
 	virtual ~Skybox();
 
-	const Ref<Texture>& GetEnvironmentTexture() const;
-	void SetEnvironmentTexture(const Ref<Texture>& InTexture);
+	const Ref<FTexture>& GetEnvironmentTexture() const;
+	void SetEnvironmentTexture(const Ref<FTexture>& InTexture);
 
 private:
-	Ref<Texture> mEnvTex;
+	Ref<FTexture> mEnvTex;
 };
 
 }

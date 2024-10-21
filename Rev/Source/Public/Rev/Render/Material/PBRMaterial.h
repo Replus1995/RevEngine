@@ -1,11 +1,11 @@
 #pragma once
 #include "Rev/Render/Material/SurfaceMaterial.h"
-#include "Rev/Render/Texture/Texture.h"
 #include "Rev/Math/Maths.h"
 
 namespace Rev
 {
 
+class FTexture;
 class REV_API PBRMaterial : public SurfaceMaterial
 {
 public:
@@ -16,20 +16,20 @@ public:
 	virtual void PreDraw(FRHICommandList& RHICmdList) override;
 
 	Math::FLinearColor BaseColorFactor = Math::FLinearColor(1.0f, 1.0f, 1.0f, 1.0f);
-	Ref<Texture> BaseColorTexture = nullptr;
+	Ref<FTexture> BaseColorTexture = nullptr;
 
 	float Metallic = 1.0f;
 	float Roughness = 1.0f;
-	Ref<Texture> MetallicRoughnessTexture = nullptr;
+	Ref<FTexture> MetallicRoughnessTexture = nullptr;
 
 	float NormalScale = 1.0f;
-	Ref<Texture> NormalTexture = nullptr;
+	Ref<FTexture> NormalTexture = nullptr;
 
 	float OcclusionStrength = 1.0f;
-	Ref<Texture> OcclusionTexture = nullptr;
+	Ref<FTexture> OcclusionTexture = nullptr;
 
 	Math::FVector3 EmissiveFactor = Math::FVector3(0.0f, 0.0f, 0.0f);
-	Ref<Texture> EmissiveTexture = nullptr;
+	Ref<FTexture> EmissiveTexture = nullptr;
 
 };
 

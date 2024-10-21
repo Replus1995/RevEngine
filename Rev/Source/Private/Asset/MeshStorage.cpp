@@ -1,6 +1,6 @@
 #include "Rev/Asset/MeshStorage.h"
 #include "Rev/Asset/MaterialStorage.h"
-#include "Rev/Render/Mesh/StaticMesh.h"
+#include "Rev/Render/Resource/StaticMesh.h"
 
 namespace Rev
 {

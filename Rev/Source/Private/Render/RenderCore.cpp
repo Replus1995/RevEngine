@@ -6,6 +6,8 @@
 namespace Rev
 {
 
+bool GIsRHIInitialized = false;
+
 static ERenderAPI sRenderAPI = ERenderAPI::None;
 static Scope<FRHIContext> sMainContext;
 
@@ -18,6 +20,8 @@ void FRenderCore::Init(ERenderAPI InAPI)
 	sMainContext->Init();
 	FRHIShaderLibrary::CreateInstance();
 
+	GIsRHIInitialized = true;
+
 	sMainContext->SetClearColor(Math::FLinearColor(0, 0, 0, 1));
 	
 }
@@ -29,6 +33,8 @@ void FRenderCore::Cleanup()
 	sMainContext->Cleanup();
 	sMainContext.reset();
 	RHIExit();
+
+	GIsRHIInitialized = false;
 }
 
 ERenderAPI FRenderCore::GetRenderAPI()

@@ -1,5 +1,5 @@
 #include "Rev/Render/RenderProxy/StaticMeshProxy.h"
-#include "Rev/Render/Mesh/StaticMesh.h"
+#include "Rev/Render/Resource/StaticMesh.h"
 #include "Rev/Render/Material/SurfaceMaterial.h"
 #include "Rev/Render/RHI/DynamicRHI.h"
 #include "Rev/Render/RHI/RHIContext.h"
