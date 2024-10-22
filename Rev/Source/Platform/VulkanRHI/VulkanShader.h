@@ -10,11 +10,11 @@ class FVulkanContext;
 class FVulkanRenderPass;
 class FVulkanPrimitive;
 
-struct FVulkanUniformInfo : public FRHIUniformInfo
+struct FVulkanUniformInfo : public FRHIShaderUniform
 {
 	VkShaderStageFlags StageFlags = 0;
 
-	FVulkanUniformInfo(const FRHIUniformInfo& InInfo, VkShaderStageFlags InStageFlags) : FRHIUniformInfo(InInfo) , StageFlags(InStageFlags) {}
+	FVulkanUniformInfo(const FRHIShaderUniform& InInfo, VkShaderStageFlags InStageFlags) : FRHIShaderUniform(InInfo) , StageFlags(InStageFlags) {}
 };
 
 
@@ -29,14 +29,14 @@ public:
 
 	uint32 GetHash() const { return mHash; }
 	VkShaderStageFlagBits GetStageFlag() const { return mStageFlag; }
-	const std::vector<FRHIUniformInfo>& GetStageUniforms() const { return mStageUniforms; }
+	const std::vector<FRHIShaderUniform>& GetStageUniforms() const { return mStageUniforms; }
 
 private:
 	std::string mName;
 	uint32 mHash;
 	VkShaderStageFlagBits mStageFlag = VK_SHADER_STAGE_ALL;
 	VkShaderModule mModule = VK_NULL_HANDLE;
-	std::vector<FRHIUniformInfo> mStageUniforms;
+	std::vector<FRHIShaderUniform> mStageUniforms;
 };
 
 class FVulkanShaderProgram : public FRHIShaderProgram

@@ -19,6 +19,7 @@ public:
 
 	VkImage GetImage() const { return mImage; } //For easy to understand
 	VkImageView GetImageView() const { return mImageView; }
+	VkImageLayout GetImageLayout() const { return mImageLayout; }
 	VkClearValue GetClearValue();
 
 	virtual void UpdateContent(FVulkanContext* Context, const void* InContent, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex) = 0;

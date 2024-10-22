@@ -11,15 +11,24 @@ namespace Rev
 
 class FRHITexture;
 
-struct FRHIUniformInfo
+struct FRHIShaderAttribute
 {
     std::string Name;
-    ERHIUniformType Type;
-    uint8 Num;
-    uint16 Binding;
+    EVertexType Type = EVertexType::Unknown;
+    uint8 StreamIndex = 0;
+};
 
-    EPixelFormat TexFormat;
-    ETextureDimension TexDimension;
+struct FRHIShaderUniform
+{
+    std::string Name;
+    ERHIUniformType Type = ERHIUniformType::Buffer;
+    uint8 Num = 1;
+    uint16 Binding = 0;
+
+    EPixelFormat TexFormat = PF_Unknown;
+    ETextureDimension TexDimension = ETextureDimension::Texture2D;
+    int8 SamplerBinding = -1; //Sampler binding should not be larger than 15
+    bool bSamplerCompare = false;
 };
 
 class REV_API FRHIShader : public FRHIResource

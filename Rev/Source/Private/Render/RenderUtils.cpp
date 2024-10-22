@@ -66,7 +66,7 @@ static Ref<FRHIPrimitive> CreateScreenQuad()
     Ref<FRHIVertexBuffer> VertexBuffer = GDynamicRHI->CreateVertexBuffer(VertexSize);
     FRenderCore::GetMainContext()->UpdateBufferData(VertexBuffer, ScreenQuadVertices, VertexSize);
     VertexBuffer->SetLayout({
-        {"Position", VT_Float3, 0}
+        {"Position", EVertexType::Float3, 0}
         });
 
     constexpr uint32 IndexCount = sizeof(ScreenQuadIndices) / sizeof(uint16);

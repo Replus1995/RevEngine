@@ -2,26 +2,11 @@
 #include "Rev/Core/Base.h"
 #include "Rev/Render/RenderCore.h"
 #include "Rev/Render/RHI/RHIResource.h"
+#include "Rev/Render/RHI/RHIDefinitions.h"
 #include <vector>
 
 namespace Rev
 {
-
-enum EVertexType : uint8
-{
-	VT_None		= 0,
-	VT_Float	= 1,
-	VT_Float2	= 2,
-	VT_Float3	= 3,
-	VT_Float4	= 4,
-	VT_Mat3		= 5,
-	VT_Mat4		= 6,
-	VT_Int		= 7,
-	VT_Int2		= 8,
-	VT_Int3		= 9,
-	VT_Int4		= 10,
-	VT_Bool		= 11
-};
 
 struct FRHIVertexElement
 {

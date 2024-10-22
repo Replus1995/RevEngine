@@ -164,29 +164,29 @@ VkFormat FVulkanEnum::Translate(EVertexType InType)
     switch (InType)
     {
     default:
-    case VT_None:
+    case EVertexType::Unknown:
         break;
-    case VT_Float:
+    case EVertexType::Float:
         return VK_FORMAT_R32_SFLOAT;
-    case VT_Float2:
+    case EVertexType::Float2:
         return VK_FORMAT_R32G32_SFLOAT;
-    case VT_Float3:
+    case EVertexType::Float3:
         return VK_FORMAT_R32G32B32_SFLOAT;
-    case VT_Float4:
+    case EVertexType::Float4:
         return VK_FORMAT_R32G32B32A32_SFLOAT;
-    case VT_Mat3:
+    case EVertexType::Matrix3:
         return VK_FORMAT_R32G32B32_SFLOAT;
-    case VT_Mat4:
+    case EVertexType::Matrix4:
         return VK_FORMAT_R32G32B32A32_SFLOAT;
-    case VT_Int:
+    case EVertexType::Int:
         return VK_FORMAT_R32_SINT;
-    case VT_Int2:
+    case EVertexType::Int2:
         return VK_FORMAT_R32G32_SINT;
-    case VT_Int3:
+    case EVertexType::Int3:
         return VK_FORMAT_R32G32B32_SINT;
-    case VT_Int4:
+    case EVertexType::Int4:
         return VK_FORMAT_R32G32B32A32_SINT;
-    case VT_Bool:
+    case EVertexType::Bool:
         return VK_FORMAT_R8_SINT;
     }
 

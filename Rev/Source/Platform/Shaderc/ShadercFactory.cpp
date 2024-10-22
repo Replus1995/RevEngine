@@ -3,6 +3,7 @@
 #include "Rev/Core/Clock.h"
 #include "Rev/Core/Log.h"
 #include "Rev/Render/RHI/RHITexture.h"
+#include "Rev/Render/RHI/RHIBuffer.h"
 #include <filesystem>
 
 #include <shaderc/shaderc.hpp>
@@ -89,6 +90,72 @@ ETextureDimension TranslateTextureDimension(spv::Dim InDim, bool bArray)
 		REV_CORE_ASSERT(false, "Unknown texture dimension");
 		return ETextureDimension::Texture2D;
 	}
+}
+
+EVertexType TranslateVertexAttribute(const spirv_cross::SPIRType& InSpirvType)
+{
+	auto ElemType = InSpirvType.basetype;
+	uint32 NumRows = InSpirvType.vecsize;
+	uint32 NumColumns = InSpirvType.columns;
+
+	if (NumColumns > 1)
+	{
+		if (ElemType == spirv_cross::SPIRType::BaseType::Float)
+		{
+			if (NumRows == 3 && NumColumns == 3)
+			{
+				return EVertexType::Matrix3;
+			}
+			else if (NumRows == 4 && NumColumns == 4)
+			{
+				return EVertexType::Matrix4;
+			}
+		}
+		return EVertexType::Unknown;
+	}
+
+	switch (ElemType)
+	{
+	case spirv_cross::SPIRType::Boolean:
+		return EVertexType::Bool;
+	case spirv_cross::SPIRType::Int:
+	{
+		switch (NumRows)
+		{
+		case 1:
+			return EVertexType::Int;
+		case 2:
+			return EVertexType::Int2;
+		case 3:
+			return EVertexType::Int3;
+		case 4:
+			return EVertexType::Int4;
+		default:
+			break;
+		}
+	}
+		break;
+	case spirv_cross::SPIRType::Float:
+	{
+		switch (NumRows)
+		{
+		case 1:
+			return EVertexType::Float;
+		case 2:
+			return EVertexType::Float2;
+		case 3:
+			return EVertexType::Float3;
+		case 4:
+			return EVertexType::Float4;
+		default:
+			break;
+		}
+	}
+		break;
+	default:
+		break;
+	}
+	return EVertexType::Unknown;
 }
 
 
@@ -182,30 +249,64 @@ static void AddCompileMacros(shaderc::CompileOptions& Options, const std::string
 	//todo
 }
 
-void FShadercFactory::ReflectUniformInfo(FShadercCompiledData& Data)
+void FShadercFactory::ReflectShaderInfo(FShadercCompiledData& Data)
 {
 	spirv_cross::CompilerReflection Refl(Data.Binary.DataAs<uint32_t>(), Data.Binary.Size() / sizeof(uint32_t));
 	spirv_cross::ShaderResources ResourceRefl = Refl.get_shader_resources();
 
 #ifdef REV_DEBUG
 	REV_CORE_TRACE("Shaderc::Reflect - {0} {1}", Data.Name.c_str(), FShadercUtils::ShaderStageToString(Data.Stage));
-	REV_CORE_TRACE("Buffers:");
 #endif
 
-	for (auto& Res : ResourceRefl.uniform_buffers)
+	if (Data.Stage == ERHIShaderStage::Vertex)
 	{
-		const auto& BufferType = Refl.get_type(Res.base_type_id);
+#ifdef REV_DEBUG
+		REV_CORE_TRACE("Vertex Input:");
+#endif
+		uint8 AttributeIndex = 0;
+		for (auto& Input : ResourceRefl.stage_inputs)
+		{
+			EVertexType InputType = TranslateVertexAttribute(Refl.get_type(Input.base_type_id));
+			if (InputType != EVertexType::Unknown)
+			{
+				FRHIShaderAttribute Attribute;
+				Attribute.Name = Input.name;
+				Attribute.Type = InputType;
+				Attribute.StreamIndex = AttributeIndex;
+				Data.Attributes.push_back(Attribute);
+
+#ifdef REV_DEBUG
+				REV_CORE_TRACE("  {0}: Type = {1}, StreamIndex = {2}", Attribute.Name.c_str(), uint8(Attribute.Type), Attribute.StreamIndex);
+#endif
+			}
+			else
+			{
+#ifdef REV_DEBUG
+				REV_CORE_WARN("  {0}: Unsupported type", Input.name.c_str());
+#endif
+			}
+			AttributeIndex++;
+
+		}
+	}
+	
+#ifdef REV_DEBUG
+	if(!ResourceRefl.uniform_buffers.empty())
+		REV_CORE_TRACE("Buffers:");
+#endif
+	for (auto& Buffer : ResourceRefl.uniform_buffers)
+	{
+		const auto& BufferType = Refl.get_type(Buffer.base_type_id);
 		size_t BufferSize = Refl.get_declared_struct_size(BufferType);
 		size_t MemberCount = BufferType.member_types.size();
 
-		FRHIUniformInfo Uniform;
-		Uniform.Name = Res.name;
+		FRHIShaderUniform Uniform;
+		Uniform.Name = Buffer.name;
 		Uniform.Type = ERHIUniformType::Buffer;
 		Uniform.Num = 1;
-		Uniform.Binding = Refl.get_decoration(Res.id, spv::Decoration::DecorationBinding);
+		Uniform.Binding = Refl.get_decoration(Buffer.id, spv::Decoration::DecorationBinding);
 
 		Data.Uniforms.push_back(Uniform);
-
 
 #ifdef REV_DEBUG
 		REV_CORE_TRACE("  {0}: Binding = {1}, Size = {2}, Members = {3}", Uniform.Name.c_str(), Uniform.Binding, BufferSize, MemberCount);
@@ -213,43 +314,42 @@ void FShadercFactory::ReflectUniformInfo(FShadercCompiledData& Data)
 	}
 
 #ifdef REV_DEBUG
-	REV_CORE_TRACE("Images:");
+	if (!ResourceRefl.separate_images.empty())
+		REV_CORE_TRACE("Textures:");
 #endif
-
-	for (auto& Res : ResourceRefl.separate_images)
+	for (auto& Texture : ResourceRefl.separate_images)
 	{
-		uint32 binding_index = Refl.get_decoration(Res.id, spv::Decoration::DecorationBinding);
+		uint32 TextureBinding = Refl.get_decoration(Texture.id, spv::Decoration::DecorationBinding);
+		auto TextureType = Refl.get_type(Texture.base_type_id).image;
 
-		auto imageType = Refl.get_type(Res.base_type_id).image;
-		auto componentType = Refl.get_type(imageType.type).basetype;
+		FRHIShaderUniform Uniform;
+		Uniform.Name = Texture.name;
+		Uniform.Type = ERHIUniformType::Texture;
+		Uniform.Num = 1;
+		Uniform.Binding = uint16(TextureBinding);
+
+		Uniform.TexFormat = sSpirvFormatMapping[uint32(TextureType.format)];
+		Uniform.TexDimension = TranslateTextureDimension(TextureType.dim, TextureType.arrayed);
+
+		std::string SamplerName = Texture.name + "Sampler";
 
 		bool isCompareSampler = false;
-		for (auto& sampler : ResourceRefl.separate_samplers)
+		for (auto& Sampler : ResourceRefl.separate_samplers)
 		{
-			if (binding_index + kSpirvSamplerShift == Refl.get_decoration(sampler.id, spv::Decoration::DecorationBinding))
+			if (SamplerName == Sampler.name)
 			{
-				//std::string samplerName = Refl.get_name(sampler.id);
-				isCompareSampler = Refl.variable_is_depth_or_compare(sampler.id);
+				Uniform.SamplerBinding = Refl.get_decoration(Sampler.id, spv::Decoration::DecorationBinding);
+				Uniform.bSamplerCompare = Refl.variable_is_depth_or_compare(Sampler.id);
 				break;
 			}
 		}
 
-		FRHIUniformInfo Uniform;
-		Uniform.Name = Res.name;
-		Uniform.Type = ERHIUniformType::Image;
-		Uniform.Num = 1;
-		Uniform.Binding = uint16(binding_index);
-
-		Uniform.TexFormat = sSpirvFormatMapping[uint32(imageType.format)];
-		Uniform.TexDimension = TranslateTextureDimension(imageType.dim, imageType.arrayed);
+		Data.Uniforms.push_back(Uniform);
 
 #ifdef REV_DEBUG
-		REV_CORE_TRACE(" {0}: Binding = {1}", Uniform.Name.c_str(), Uniform.Binding);
+		REV_CORE_TRACE(" {0}: Binding = {1}, SamplerBinding = {2}", Uniform.Name.c_str(), Uniform.Binding, Uniform.SamplerBinding);
 #endif
-
-		Data.Uniforms.push_back(Uniform);
 	}
-
 }
 
 void FShadercFactory::CompileShaders(const FShadercSource& InSource, const FRHIShaderCompileOptions& InOptions, FShadercCompiledData& OutData)
@@ -311,7 +411,7 @@ FShadercCompiledData FShadercFactory::LoadOrCompileShader(const FPath& InPath, c
 		auto ShaderSource = FShadercUtils::LoadShaderSource(InPath);
 		ShaderSource.Stage = InStage != ERHIShaderStage::Unknown ? InStage : DetectShaderStage(ShaderSource);
 		CompileShaders(ShaderSource, InOptions, Result);
-		ReflectUniformInfo(Result);
+		ReflectShaderInfo(Result);
 		//FShadercUtils::SaveShaderCompiledData(ShaderCachePath, Result);
 	}
 

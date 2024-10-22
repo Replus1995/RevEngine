@@ -5,6 +5,7 @@
 #include "VulkanTexture.h"
 #include "VulkanRenderTarget.h"
 #include "VulkanPrimitive.h"
+#include "VulkanState.h"
 #include "VulkanShader.h"
 #include "VulkanRenderPass.h"
 #include "VulkanPipeline.h"
@@ -320,16 +321,19 @@ void FVulkanContext::NextSubpass()
 	vkCmdNextSubpass2(GetActiveCmdBuffer(), &SubpassBeginInfo, &SubpassEndInfo);
 }
 
-void FVulkanContext::BindUniformBuffer(const Ref<FRHIUniformBuffer>& InBuffer, uint16 InBinding)
+void FVulkanContext::BindUniformBuffer(uint16 InBinding, FRHIUniformBuffer* InBuffer)
 {
 	if(!InBuffer) return;
-	mUniformBuffers[InBinding] = static_cast<FVulkanUniformBuffer*>(InBuffer.get());
+	mUniformBuffers[InBinding] = static_cast<FVulkanUniformBuffer*>(InBuffer);
 }
 
-void FVulkanContext::BindTexture(const Ref<FRHITexture>& InTexture, uint16 InBinding)
+void FVulkanContext::BindTexture(uint16 InBinding, FRHITexture* InTexture, FRHISamplerState* InSamplerState)
 {
 	if (!InTexture) return;
-	mTextures[InBinding] = static_cast<FVulkanTexture*>(InTexture.get());
+
+	FVulkanTexture* pTexture = static_cast<FVulkanTexture*>(InTexture);
+	FVulkanSamplerState* pSamplerState = static_cast<FVulkanSamplerState*>(InSamplerState);
+	mTextures[InBinding] = { pTexture, pSamplerState };
 }
 
 void FVulkanContext::BindProgram(const Ref<FRHIShaderProgram>& InProgram)
@@ -394,6 +398,15 @@ FVulkanUniformBuffer* FVulkanContext::FindUniformBuffer(uint16 BindingIdx) const
 	return nullptr;
 }
 
+std::pair<FVulkanTexture*, FVulkanSamplerState*> FVulkanContext::FindTexture(uint16 BindingIdx) const
+{
+	if (auto iter = mTextures.find(BindingIdx); iter != mTextures.end())
+	{
+		return iter->second;
+	}
+	return { nullptr, nullptr };
+}
+
 FVulkanContext* FVulkanContext::Cast(FRHIContext* InContext)
 {
 	REV_CORE_ASSERT(GetRenderAPI() == ERenderAPI::Vulkan);
@@ -429,34 +442,86 @@ VkDescriptorSet FVulkanContext::GetDescriptorSet(const FVulkanShaderProgram* InP
 
 
 	VkDescriptorBufferInfo BufferInfos[REV_VK_MAX_SHADER_UNIFORM_BUFFERS] = {};
+	VkDescriptorImageInfo ImageInfos[REV_VK_MAX_SHADER_UNIFORM_SAMPLERS] = {};
 	VkWriteDescriptorSet Writes[REV_VK_MAX_DESCRIPTORSETS] = {};
 	uint32 WriteCount = 0;
-	uint32_t BufferCount = 0;
+	uint32 BufferCount = 0;
+	uint32 ImageCount = 0;
 
-	for (const FRHIUniformInfo& Uniform : InProgram->GetProgramUniforms())
+	for (const FRHIShaderUniform& Uniform : InProgram->GetProgramUniforms())
 	{
 		uint32 BindingIdx = Uniform.Binding;
-		FVulkanUniformBuffer* UniformBuffer = FindUniformBuffer(BindingIdx);
-		if (!UniformBuffer)
-			continue;
+		switch (Uniform.Type)
+		{
+		case ERHIUniformType::Buffer:
+		{
+			FVulkanUniformBuffer* UniformBuffer = FindUniformBuffer(BindingIdx);
+			if (UniformBuffer)
+			{
+				BufferInfos[BufferCount].buffer = (VkBuffer)UniformBuffer->GetNativeHandle();
+				BufferInfos[BufferCount].offset = 0;
+				BufferInfos[BufferCount].range = UniformBuffer->GetSize();
 
-		BufferInfos[BufferCount].buffer = (VkBuffer)UniformBuffer->GetNativeHandle();
-		BufferInfos[BufferCount].offset = 0;
-		BufferInfos[BufferCount].range = UniformBuffer->GetSize();
+				Writes[WriteCount].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+				Writes[WriteCount].pNext = NULL;
+				Writes[WriteCount].dstSet = DescSet;
+				Writes[WriteCount].dstBinding = BindingIdx;
+				Writes[WriteCount].dstArrayElement = 0;
+				Writes[WriteCount].descriptorCount = 1;
+				Writes[WriteCount].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+				Writes[WriteCount].pImageInfo = NULL;
+				Writes[WriteCount].pBufferInfo = &BufferInfos[BufferCount];
+				Writes[WriteCount].pTexelBufferView = NULL;
 
-		Writes[WriteCount].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		Writes[WriteCount].pNext = NULL;
-		Writes[WriteCount].dstSet = DescSet;
-		Writes[WriteCount].dstBinding = BindingIdx;
-		Writes[WriteCount].dstArrayElement = 0;
-		Writes[WriteCount].descriptorCount = 1;
-		Writes[WriteCount].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		Writes[WriteCount].pImageInfo = NULL;
-		Writes[WriteCount].pBufferInfo = &BufferInfos[BufferCount];
-		Writes[WriteCount].pTexelBufferView = NULL;
+				++WriteCount;
+				++BufferCount;
+			}
+		}
+		break;
+		case ERHIUniformType::Texture:
+		{
+			auto[Texture, SamplerState] = FindTexture(BindingIdx);
+			if (Texture)
+			{
+				ImageInfos[ImageCount].imageLayout = Texture->GetImageLayout();
+				ImageInfos[ImageCount].imageView = Texture->GetImageView();
+				ImageInfos[ImageCount].sampler = SamplerState ? SamplerState->Sampler : VK_NULL_HANDLE;
+				
+				Writes[WriteCount].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+				Writes[WriteCount].pNext = NULL;
+				Writes[WriteCount].dstSet = DescSet;
+				Writes[WriteCount].dstBinding = BindingIdx;
+				Writes[WriteCount].dstArrayElement = 0;
+				Writes[WriteCount].descriptorCount = 1;
+				Writes[WriteCount].descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+				Writes[WriteCount].pImageInfo = &ImageInfos[ImageCount];
+				Writes[WriteCount].pBufferInfo = NULL;
+				Writes[WriteCount].pTexelBufferView = NULL;
+				++WriteCount;
 
-		++WriteCount;
-		++BufferCount;
+				if (SamplerState)
+				{
+					Writes[WriteCount].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+					Writes[WriteCount].pNext = NULL;
+					Writes[WriteCount].dstSet = DescSet;
+					Writes[WriteCount].dstBinding = Uniform.SamplerBinding;
+					Writes[WriteCount].dstArrayElement = 0;
+					Writes[WriteCount].descriptorCount = 1;
+					Writes[WriteCount].descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
+					Writes[WriteCount].pImageInfo = &ImageInfos[ImageCount];
+					Writes[WriteCount].pBufferInfo = NULL;
+					Writes[WriteCount].pTexelBufferView = NULL;
+					++WriteCount;
+				}
+
+				++ImageCount;
+			}
+		}
+		default:
+			break;
+		}
+
+		
 	}
 
 	vkUpdateDescriptorSets(FVulkanDynamicRHI::GetDevice(), WriteCount, Writes, 0, NULL);

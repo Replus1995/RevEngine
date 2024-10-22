@@ -12,7 +12,7 @@ namespace Rev
 struct FRHIGraphicsPipelineStateDesc
 {
 public:
-	EPrimitiveTopology PrimitiveTopology;
+	EPrimitiveTopology PrimitiveTopology = PT_Triangles;
 
 	FRHIRasterizerStateDesc RasterizerStateDesc;
 	FRHIDepthStencilStateDesc DepthStencilStateDesc;

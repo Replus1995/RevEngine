@@ -73,7 +73,7 @@ void FStaticMeshProxy::DrawMeshes(FRHICommandList& RHICmdList, EMaterialBlendMod
 
 void FStaticMeshProxy::DrawPrimitives(FRHICommandList& RHICmdList, const FStaticMeshRenderData& InData, EMaterialBlendMode InBlend, bool bUseMeshMaterial) const
 {
-	RHICmdList.GetContext()->BindUniformBuffer(InData.MeshUB, UL::BStaticMesh);
+	RHICmdList.GetContext()->BindUniformBuffer(UL::BStaticMesh, InData.MeshUB.get());
 	for (uint32 i = 0; i < InData.MeshData->GetMaterialCount(); i++)
 	{
 		auto& pMat = InData.MeshData->GetMaterial(i);

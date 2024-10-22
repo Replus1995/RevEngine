@@ -18,6 +18,7 @@ class FVulkanRenderPass;
 class FVulkanShaderProgram;
 class FVulkanUniformBuffer;
 class FVulkanTexture;
+class FVulkanSamplerState;
 class FVulkanPipelineLayout;
 class FVulkanPipeline;
 
@@ -55,8 +56,8 @@ public:
 	virtual void EndRenderPass(bool bBlitToBack) override;
 	virtual void NextSubpass() override;
 
-	virtual void BindUniformBuffer(const Ref<FRHIUniformBuffer>& InBuffer, uint16 InBinding) override;
-	virtual void BindTexture(const Ref<FRHITexture>& InTexture, uint16 InBinding) override;
+	virtual void BindUniformBuffer(uint16 InBinding, FRHIUniformBuffer* InBuffer) override;
+	virtual void BindTexture(uint16 InBinding, FRHITexture* InTexture, FRHISamplerState* InSamplerState) override;
 	virtual void BindProgram(const Ref<FRHIShaderProgram>& InProgram) override;
 
 	virtual void SetGraphicsPipelineState(const FRHIGraphicsPipelineStateDesc& InState) override;
@@ -73,6 +74,8 @@ public:
 
 	const std::map<uint16, FVulkanUniformBuffer*>& GetUniformBufferMap() const { return mUniformBuffers; };
 	FVulkanUniformBuffer* FindUniformBuffer(uint16 BindingIdx) const;
+	const std::map<uint16, std::pair<FVulkanTexture*, FVulkanSamplerState*>>& GetTextureMap() const { return mTextures; }
+	std::pair<FVulkanTexture*, FVulkanSamplerState*> FindTexture(uint16 BindingIdx) const;
 
 public:
 	static FVulkanContext* Cast(FRHIContext* InContext);
@@ -111,7 +114,7 @@ private:
 	Ref<FVulkanShaderProgram> mCurProgram = nullptr;
 	FRHIGraphicsPipelineStateDesc mCurState = {};
 	std::map<uint16, FVulkanUniformBuffer*> mUniformBuffers;
-	std::map<uint16, FVulkanTexture*> mTextures;
+	std::map<uint16, std::pair<FVulkanTexture*, FVulkanSamplerState*>> mTextures;
 
 };
 

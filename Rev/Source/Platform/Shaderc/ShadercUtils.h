@@ -33,7 +33,8 @@ struct FShadercCompiledData
 	std::string Name;
 	ERHIShaderStage Stage = ERHIShaderStage::Unknown;
 	FBuffer Binary;
-	std::vector<FRHIUniformInfo> Uniforms;
+	std::vector<FRHIShaderUniform> Uniforms;
+	std::vector<FRHIShaderAttribute> Attributes; //only for vertex shader input
 
 	bool Empty() const
 	{

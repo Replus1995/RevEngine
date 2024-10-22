@@ -65,7 +65,7 @@ VkPipeline FVulkanPipelineBuilder::BuildGraphics(VkDevice InDevice, VkPipelineLa
     VertexInputState.pVertexAttributeDescriptions = InPrimitive->GetAttributeDescs().data();
 
 
-    VkPipelineInputAssemblyStateCreateInfo InputAssemblyState = MakeInputAssemblyStateInfo(FVulkanEnum::Translate(InPrimitive->GetTopology()));
+    VkPipelineInputAssemblyStateCreateInfo InputAssemblyState = MakeInputAssemblyStateInfo(FVulkanEnum::Translate(InStateDesc.PrimitiveTopology));
     VkPipelineTessellationStateCreateInfo TessellationState = MakeTessellationStateInfo();
     VkPipelineViewportStateCreateInfo ViewportState = MakeViewportStateInfo();
     VkPipelineMultisampleStateCreateInfo MultisampleState = MakeMultisampleStateInfo();

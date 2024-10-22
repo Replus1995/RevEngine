@@ -3,7 +3,6 @@
 
 namespace Rev
 {
-
 //Sampler
 enum ESamplerFilterMode : uint8
 {
@@ -80,9 +79,10 @@ enum ERenderTargetAttachment : uint8
 //Shader
 enum class ERHIUniformType : uint8
 {
-	Sampler,
-	Image,
+	Unknown,
 	Buffer,
+	Sampler,
+	Texture,
 };
 
 enum class ERHIShaderStage : uint8
@@ -97,7 +97,22 @@ enum class ERHIShaderStage : uint8
 	Count = 7
 };
 
-
+//Vertex
+enum class EVertexType : uint8
+{
+	Unknown	= 0,
+	Float	= 1,
+	Float2	= 2,
+	Float3	= 3,
+	Float4	= 4,
+	Matrix3	= 5,
+	Matrix4	= 6,
+	Int		= 7,
+	Int2	= 8,
+	Int3	= 9,
+	Int4	= 10,
+	Bool	= 11
+};
 
 //Primitive
 enum EPrimitiveTopology : uint8

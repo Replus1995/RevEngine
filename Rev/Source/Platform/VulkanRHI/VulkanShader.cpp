@@ -124,8 +124,8 @@ void FVulkanShaderProgram::UpdateProgramUniforms()
 		if (!pShader)
 			continue;
 		FVulkanShader* pVulkanShader = static_cast<FVulkanShader*>(pShader.get());
-		const std::vector<FRHIUniformInfo>& StageUniforms = pVulkanShader->GetStageUniforms();
-		for (const FRHIUniformInfo& StageUniform : StageUniforms)
+		const std::vector<FRHIShaderUniform>& StageUniforms = pVulkanShader->GetStageUniforms();
+		for (const FRHIShaderUniform& StageUniform : StageUniforms)
 		{
 
 			if (auto iter = std::find_if(mProgramUniforms.begin(), mProgramUniforms.end(), [&StageUniform](const FVulkanUniformInfo& Elem) { return Elem.Binding == StageUniform.Binding; });

@@ -12,6 +12,7 @@ class FRHIPrimitive;
 class FRHIShaderProgram;
 class FRHIUniformBuffer;
 class FRHITexture;
+class FRHISamplerState;
 class FRHIRenderTarget;
 class FRHIRenderPass;
 class FRHIGraphicsPipelineStateDesc;
@@ -54,8 +55,8 @@ public:
 	virtual void UpdateBufferData(const Ref<FRHIIndexBuffer>& Buffer, const void* Content, uint32 Size, uint32 Offset = 0) = 0;
 
 
-	virtual void BindUniformBuffer(const Ref<FRHIUniformBuffer>& InBuffer, uint16 InBinding) = 0;
-	virtual void BindTexture(const Ref<FRHITexture>& InTexture, uint16 InBinding) = 0;
+	virtual void BindUniformBuffer(uint16 InBinding, FRHIUniformBuffer* InBuffer) = 0;
+	virtual void BindTexture(uint16 InBinding, FRHITexture* InTexture, FRHISamplerState* InSamplerState = nullptr) = 0;
 	virtual void BindProgram(const Ref<FRHIShaderProgram>& InProgram) = 0;
 
 	virtual void SetGraphicsPipelineState(const FRHIGraphicsPipelineStateDesc& InState) = 0;
