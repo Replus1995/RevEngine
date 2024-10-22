@@ -8,6 +8,7 @@ class FVulkanPixelFormat
 {
 public:
 	static void InitPlatformFormats();
+	static VkFormat GetPlatformFormatSRGB(VkFormat InFormat);
 };
 
 }

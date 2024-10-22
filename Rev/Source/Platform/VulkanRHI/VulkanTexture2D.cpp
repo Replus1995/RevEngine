@@ -1,4 +1,5 @@
 #include "VulkanTexture2D.h"
+#include "VulkanPixelFormat.h"
 #include "VulkanUtils.h"
 #include "VulkanDynamicRHI.h"
 #include "Rev/Core/Assert.h"
@@ -53,6 +54,8 @@ void FVulkanTexture2D::CreateResource(VkImageUsageFlags InUsageFlags)
     REV_CORE_ASSERT(FVulkanDynamicRHI::GetAllocator());
 
     VkFormat ImageFormat = (VkFormat)GPixelFormats[mDesc.Format].PlatformFormat;
+    if((mDesc.Flags | ETextureCreateFlags::SRGB) != ETextureCreateFlags::None)
+        ImageFormat = FVulkanPixelFormat::GetPlatformFormatSRGB(ImageFormat);
 
     VkImageCreateInfo ImageCreateInfo{};
     ImageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;

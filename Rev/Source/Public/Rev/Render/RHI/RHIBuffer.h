@@ -107,4 +107,18 @@ protected:
 	uint32 mSize;
 };
 
+class FRHIBuffer : public FRHIResource
+{
+public:
+	FRHIBuffer(uint32 InSize, uint32 InStride, EBufferUsageFlags InUsage) : Size(InSize), Stride(InStride), Usage(InUsage) {}
+
+	uint32 GetSize() const { return Size; }
+	uint32 GetStride() const { return Stride; }
+	EBufferUsageFlags GetUsage() const { return Usage; }
+private:
+	uint32 Size = 0;
+	uint32 Stride = 0;
+	EBufferUsageFlags Usage = EBufferUsageFlags::None;
+};
+
 }

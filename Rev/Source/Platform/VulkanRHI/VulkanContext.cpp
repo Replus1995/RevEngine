@@ -295,8 +295,6 @@ void FVulkanContext::EndRenderPass(bool bBlitToBack)
 
 	vkCmdEndRenderPass2(GetActiveCmdBuffer(), &SubpassEndInfo);
 
-
-
 	if (bBlitToBack)
 	{
 		auto ColorTex = mCurRenderPass->GetRenderTarget()->GetTargetTexture(RTA_ColorAttachment0);

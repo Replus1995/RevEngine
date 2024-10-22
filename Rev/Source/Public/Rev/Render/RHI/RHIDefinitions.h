@@ -97,6 +97,21 @@ enum class ERHIShaderStage : uint8
 	Count = 7
 };
 
+//Buffer
+enum class EBufferUsageFlags : uint32
+{
+	None				= 0,
+	Static				= 1u << 0,
+	Dynamic				= 1u << 1,
+	Volatile			= 1u << 2,
+	ShaderResource		= 1u << 3,
+	KeepCPUAccess		= 1u << 4,
+	VertexBuffer		= 1u << 5,
+	IndexBuffer			= 1u << 6,
+};
+ENUM_CLASS_FLAGS(EBufferUsageFlags);
+
+
 //Vertex
 enum class EVertexType : uint8
 {
