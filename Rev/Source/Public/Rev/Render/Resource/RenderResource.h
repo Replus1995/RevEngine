@@ -55,10 +55,9 @@ extern REV_API void InitGlobalResources();
 extern REV_API void ReleaseGlobalResources();
 
 
-
 class FRHITexture;
 class FRHISamplerState;
-class FTexture : public FRenderResource
+class REV_API FTexture : public FRenderResource
 { 
 public:
 
@@ -85,6 +84,33 @@ public:
 	{
 		TextureRHI.reset();
 		SamplerStateRHI.reset();
+	}
+};
+
+class FRHIBuffer;
+class REV_API FVertexBuffer : public FRenderResource
+{
+public:
+	Ref<FRHIBuffer> VertexBufferRHI;
+
+	FVertexBuffer() {}
+	virtual ~FVertexBuffer() {}
+	virtual void ReleaseRHI() override
+	{
+		VertexBufferRHI.reset();
+	}
+};
+
+class REV_API FIndexBuffer : public FRenderResource
+{
+public:
+	Ref<FRHIBuffer> IndexBufferRHI;
+
+	FIndexBuffer() {}
+	virtual ~FIndexBuffer() {}
+	virtual void ReleaseRHI() override
+	{
+		IndexBufferRHI.reset();
 	}
 };
 

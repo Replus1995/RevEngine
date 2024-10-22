@@ -54,7 +54,7 @@ void FVulkanTexture2D::CreateResource(VkImageUsageFlags InUsageFlags)
     REV_CORE_ASSERT(FVulkanDynamicRHI::GetAllocator());
 
     VkFormat ImageFormat = (VkFormat)GPixelFormats[mDesc.Format].PlatformFormat;
-    if((mDesc.Flags | ETextureCreateFlags::SRGB) != ETextureCreateFlags::None)
+    if((mDesc.Flags & ETextureCreateFlags::SRGB) != ETextureCreateFlags::None)
         ImageFormat = FVulkanPixelFormat::GetPlatformFormatSRGB(ImageFormat);
 
     VkImageCreateInfo ImageCreateInfo{};

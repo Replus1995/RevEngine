@@ -3,6 +3,13 @@
 
 namespace Rev
 {
+//Resource
+enum EResourceLockMode
+{
+	RLM_ReadOnly,
+	RLM_WriteOnly,
+};
+
 //Sampler
 enum ESamplerFilterMode : uint8
 {
