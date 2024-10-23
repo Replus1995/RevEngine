@@ -62,7 +62,6 @@ public:
         uint32 StateHash = 0;
         VkRenderPass RenderPass = VK_NULL_HANDLE;
         uint32 ShaderHash[5];
-        EPrimitiveTopology PrimitiveTopology = PT_Unknown;
         uint64 VertexHash = 0;
         uint32 SecondaryHash = 0;
 

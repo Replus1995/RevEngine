@@ -1,6 +1,8 @@
 #pragma once
 #include "Rev/Core/Base.h"
 
+#define REV_MAX_VERTEX_ELEMENTS 16
+
 namespace Rev
 {
 //Resource
@@ -120,20 +122,18 @@ ENUM_CLASS_FLAGS(EBufferUsageFlags);
 
 
 //Vertex
-enum class EVertexType : uint8
+enum class EVertexElmentType : uint8
 {
 	Unknown	= 0,
-	Float	= 1,
+	Float1	= 1,
 	Float2	= 2,
 	Float3	= 3,
 	Float4	= 4,
-	Matrix3	= 5,
-	Matrix4	= 6,
-	Int		= 7,
-	Int2	= 8,
-	Int3	= 9,
-	Int4	= 10,
-	Bool	= 11
+	UByte4	= 5,
+	Matrix3	= 6,
+	Matrix4	= 7,
+	UInt	= 8,
+	Bool	= 9
 };
 
 //Primitive

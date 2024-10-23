@@ -119,8 +119,8 @@ FVulkanColorBlendState::FVulkanColorBlendState(const FRHIColorBlendStateDesc& In
 {
 	for (uint32 Index = 0; Index < RTA_MaxColorAttachments; ++Index)
 	{
-		const FRHIColorBlendStateDesc::FColorTarget& ColorTarget = Desc.ColorTargets[Index];
-		VkPipelineColorBlendAttachmentState& ColorBlendState = ColorBlendStates[Index];
+		const FRHIColorBlendStateDesc::FAttachment& ColorTarget = Desc.Attachments[Index];
+		VkPipelineColorBlendAttachmentState& ColorBlendState = Attachments[Index];
 		memset((uint8*)&ColorBlendState, 0, sizeof(ColorBlendState));
 
 		ColorBlendState.colorBlendOp = FVulkanEnum::Translate(ColorTarget.ColorOp);
@@ -134,6 +134,77 @@ FVulkanColorBlendState::FVulkanColorBlendState(const FRHIColorBlendStateDesc& In
 
 		ColorBlendState.blendEnable = ColorTarget.bEnableBlend;
 		ColorBlendState.colorWriteMask = FVulkanEnum::Translate(ColorTarget.ColorWriteMask);
+	}
+}
+
+FVulkanVertexInputState::FVulkanVertexInputState(const FRHIVertexInputStateDesc& InDesc)
+	: Desc(InDesc)
+{
+	REV_CORE_ASSERT(Desc.NumVertexElements < REV_MAX_VERTEX_ELEMENTS);
+
+	std::map<uint32, uint32> BindingsMap;//<StreamIndex,Stride>
+	for (uint8 i = 0; i < Desc.NumVertexElements; i++)
+	{
+		const FVertexElement& VertexElement = Desc.VertexElements[i];
+		REV_CORE_ASSERT(VertexElement.StreamIndex < REV_MAX_VERTEX_ELEMENTS);
+		REV_CORE_ASSERT(VertexElement.AttributeIndex < REV_MAX_VERTEX_ELEMENTS);
+
+		BindingsMap[VertexElement.StreamIndex] = VertexElement.Stride;
+
+
+		VkVertexInputAttributeDescription& AttributeDesc = Attributes[NumAttributes];
+		AttributeDesc.binding = (uint32_t)VertexElement.StreamIndex;
+		AttributeDesc.location = (uint32_t)VertexElement.AttributeIndex;
+		AttributeDesc.format = FVulkanEnum::Translate(VertexElement.Type);
+		AttributeDesc.offset = VertexElement.Offset;
+		NumAttributes++;
+	}
+
+	for (auto[StreamIndex, Stride] : BindingsMap)
+	{
+		VkVertexInputBindingDescription& BindingDesc = Bindings[NumBindings];
+		BindingDesc.binding = StreamIndex;
+		BindingDesc.stride = Stride;
+		BindingDesc.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+		NumBindings++;
+	}
+
+	VertexInputState.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+	VertexInputState.vertexBindingDescriptionCount = NumBindings;
+	VertexInputState.pVertexBindingDescriptions = Bindings;
+	VertexInputState.vertexAttributeDescriptionCount = NumAttributes;
+	VertexInputState.pVertexAttributeDescriptions = Attributes;
+}
+
+void FVulkanGraphicsFrameState::PrepareForDraw(VkCommandBuffer InCmdBuffer)
+{
+	if (bVertexStreamsDirty)
+	{
+		VkBuffer VertexBuffers[REV_MAX_VERTEX_ELEMENTS];
+		VkDeviceSize VertexOffsets[REV_MAX_VERTEX_ELEMENTS];
+		uint8 NumStreams = 0;
+
+		uint8 MaxStreamIndex = 0;
+		for (uint32 i = 0; i < CurrentState.VertexInputStateDesc.NumVertexElements; i++)
+		{
+			const FVertexElement& Element = CurrentState.VertexInputStateDesc.VertexElements[i];
+			MaxStreamIndex = Math::Max(MaxStreamIndex, Element.StreamIndex);
+		}
+		REV_CORE_ASSERT(MaxStreamIndex < REV_MAX_VERTEX_ELEMENTS);
+
+		for (uint8 i = 0; i < MaxStreamIndex + 1; i++)
+		{
+			const FVulkanVertexStream& Stream = VertexStreams[i];
+			if (Stream.Buffer == VK_NULL_HANDLE)
+				continue;
+			VertexBuffers[NumStreams] = Stream.Buffer;
+			VertexOffsets[NumStreams] = Stream.Offset;
+			++NumStreams;
+		}
+
+		vkCmdBindVertexBuffers2(InCmdBuffer, 0, NumStreams, VertexBuffers, VertexOffsets, NULL, NULL);
+
+		bVertexStreamsDirty = false;
 	}
 }
 

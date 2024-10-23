@@ -17,6 +17,7 @@ public:
 	FRHIRasterizerStateDesc RasterizerStateDesc;
 	FRHIDepthStencilStateDesc DepthStencilStateDesc;
 	FRHIColorBlendStateDesc ColorBlendStateDesc;
+	FRHIVertexInputStateDesc VertexInputStateDesc;
 };
 
 

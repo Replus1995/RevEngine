@@ -34,7 +34,14 @@ class FRHIColorBlendState
 {
 public:
 	FRHIColorBlendState() {}
-	virtual bool GetDesc(class FRHIColorBlendStateDesc& OutDesc) const { return false; }
+	virtual bool GetDesc(struct FRHIColorBlendStateDesc& OutDesc) const { return false; }
+};
+
+class FRHIVertexInputState
+{
+public:
+	FRHIVertexInputState() {}
+	virtual bool GetDesc(struct FRHIVertexInputStateDesc& OutDesc) const { return false; }
 };
 
 template <typename TRHIState, typename TRHIStateDesc>
@@ -136,7 +143,7 @@ struct FRHIDepthStencilStateDesc
 
 struct FRHIColorBlendStateDesc
 {
-	struct FColorTarget {
+	struct FAttachment {
 		bool bEnableBlend = false;
 		EBlendFactor SrcColorFactor = BF_One;
 		EBlendFactor DstColorFactor = BF_Zero;
@@ -147,11 +154,37 @@ struct FRHIColorBlendStateDesc
 		EColorWriteMask ColorWriteMask = CWM_RGBA;
 	};
 
-	FColorTarget ColorTargets[RTA_MaxColorAttachments];
+	FAttachment Attachments[RTA_MaxColorAttachments];
 	//Math::FLinearColor BlendConstants;
 };
 
+struct FVertexElement
+{
+	EVertexElmentType Type = EVertexElmentType::Unknown;
+	uint8 StreamIndex = 0;
+	uint8 AttributeIndex = 0;
+	uint8 Offset = 0;
+	uint16 Stride = 0;
 
+	FVertexElement(EVertexElmentType InType, uint8 InStreamIndex, uint8 InAttributeIndex, uint8 InOffset = 0, uint16 InStride = 0)
+		: Type(InType)
+		, StreamIndex(InStreamIndex)
+		, AttributeIndex(InAttributeIndex)
+		, Offset(InOffset)
+		, Stride(InStride)
+	{}
+
+
+	uint8 GetComponentSize();
+	uint8 GetComponentCount();
+	uint32 GetElementSize(); // GetComponentSize * ComponentCount
+};
+
+struct FRHIVertexInputStateDesc
+{
+	FVertexElement VertexElements[REV_MAX_VERTEX_ELEMENTS];
+	uint8 NumVertexElements = 0;
+};
 
 
 }

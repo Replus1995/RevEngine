@@ -21,12 +21,12 @@ public:
 	virtual void Init() = 0;
 	virtual void Cleanup() = 0;
 
-	virtual Scope<FRHIContext> CreateContext() = 0;
+	virtual Scope<FRHIContext> RHICreateContext() = 0;
 	//Buffer
 	virtual Ref<FRHIVertexBuffer> CreateVertexBuffer(uint32 InSize, bool bDynamic = false) = 0;
 	virtual Ref<FRHIIndexBuffer> CreateIndexBuffer(uint32 InStride, uint32 InCount, bool bDynamic = false) = 0;
-
 	virtual Ref<FRHIUniformBuffer> CreateUniformBuffer(uint32 InSize) = 0;
+	virtual Ref<FRHIBuffer> RHICreateBuffer(uint32 InSize, uint32 InStride, EBufferUsageFlags InFlags) = 0;
 
 	//Primitive
 	virtual Ref<FRHIPrimitive> CreatePrimitive(EPrimitiveTopology InTopology) = 0;

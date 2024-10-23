@@ -1,11 +1,11 @@
 #include "VulkanContext.h"
 #include "VulkanUtils.h"
-#include "VulkanUniform.h"
 #include "VulkanShader.h"
 #include "VulkanTexture.h"
 #include "VulkanRenderTarget.h"
 #include "VulkanPrimitive.h"
 #include "VulkanState.h"
+#include "VulkanBuffer.h"
 #include "VulkanShader.h"
 #include "VulkanRenderPass.h"
 #include "VulkanPipeline.h"
@@ -16,6 +16,7 @@
 #include "Rev/Core/Assert.h"
 #include "Rev/Core/Application.h"
 #include "Rev/Core/Window.h"
+#include "Rev/Render/RHI/RHIUtils.h"
 
 #define VMA_IMPLEMENTATION
 #include <vk_mem_alloc.h>
@@ -123,11 +124,7 @@ void FVulkanContext::EndFrame()
 	//Fence will now block until the graphic commands finish execution
 	REV_VK_CHECK(vkQueueSubmit2(FVulkanDynamicRHI::GetQueue(VQK_Graphics), 1, &SubmitInfo, FrameData.Fence));
 
-	//clear bindings
-	mTextures.clear();
-	mUniformBuffers.clear();
-	mCurProgram = nullptr;
-	mCurRenderPass = nullptr;
+	mFrameState.Reset();
 }
 
 void FVulkanContext::PresentFrame()
@@ -248,28 +245,24 @@ void FVulkanContext::UpdateBufferData(const Ref<FRHIIndexBuffer>& Buffer, const 
 	FVulkanUtils::ImmediateUploadBuffer(this, (VkBuffer)Buffer->GetNativeHandle(), Content, Size, Offset);
 }
 
-void FVulkanContext::BeginRenderPass(const Ref<FRHIRenderPass>& InRenderPass)
+void FVulkanContext::BeginRenderPass(FRHIRenderPass* InRenderPass)
 {
-	mCurRenderPass = std::static_pointer_cast<FVulkanRenderPass>(InRenderPass);
-	if(!mCurRenderPass)
+	FVulkanRenderPass* RenderPass = static_cast<FVulkanRenderPass*>(InRenderPass);
+	if(!RenderPass || !RenderPass->GetRenderTarget())
 		return;
-	if (!mCurRenderPass->GetRenderTarget())
-	{
-		mCurRenderPass = nullptr;
-		return;
-	}
-	FVulkanRenderTarget* pRenderTarget = static_cast<FVulkanRenderTarget*>(mCurRenderPass->GetRenderTarget().get());
-	pRenderTarget->FlushResource((VkRenderPass)mCurRenderPass->GetNativeHandle());
+	mFrameState.CurrentPass = RenderPass;
+	FVulkanRenderTarget* pRenderTarget = static_cast<FVulkanRenderTarget*>(RenderPass->GetRenderTarget().get());
+	pRenderTarget->FlushResource((VkRenderPass)RenderPass->GetNativeHandle());
 
 	VkRenderPassBeginInfo RenderPassInfo{};
 	RenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 	RenderPassInfo.pNext = NULL;
-	RenderPassInfo.renderPass = (VkRenderPass)mCurRenderPass->GetNativeHandle();
+	RenderPassInfo.renderPass = (VkRenderPass)RenderPass->GetNativeHandle();
 	RenderPassInfo.framebuffer = (VkFramebuffer)pRenderTarget->GetNativeHandle();
 	RenderPassInfo.renderArea.offset.x = 0;
 	RenderPassInfo.renderArea.offset.y = 0;
-	RenderPassInfo.renderArea.extent.width = mCurRenderPass->GetRenderTarget()->GetWidth();
-	RenderPassInfo.renderArea.extent.height = mCurRenderPass->GetRenderTarget()->GetHeight();
+	RenderPassInfo.renderArea.extent.width = RenderPass->GetRenderTarget()->GetWidth();
+	RenderPassInfo.renderArea.extent.height = RenderPass->GetRenderTarget()->GetHeight();
 	RenderPassInfo.clearValueCount = pRenderTarget->GetNumClearValues();
 	RenderPassInfo.pClearValues = pRenderTarget->GetClearValues();
 
@@ -278,15 +271,18 @@ void FVulkanContext::BeginRenderPass(const Ref<FRHIRenderPass>& InRenderPass)
 	SubpassBeginInfo.pNext = NULL;
 	SubpassBeginInfo.contents = VK_SUBPASS_CONTENTS_INLINE;
 
+
+
 	vkCmdBeginRenderPass2(GetActiveCmdBuffer(), &RenderPassInfo, &SubpassBeginInfo);
 
 	vkCmdSetViewport(GetActiveCmdBuffer(), 0, 1, &mViewport);
 	vkCmdSetScissor(GetActiveCmdBuffer(), 0, 1, &mScissor);
 }
 
+
 void FVulkanContext::EndRenderPass(bool bBlitToBack)
 {
-	if(!mCurRenderPass)
+	if(!mFrameState.CurrentPass)
 		return;
 
 	VkSubpassEndInfo SubpassEndInfo{};
@@ -297,7 +293,7 @@ void FVulkanContext::EndRenderPass(bool bBlitToBack)
 
 	if (bBlitToBack)
 	{
-		auto ColorTex = mCurRenderPass->GetRenderTarget()->GetTargetTexture(RTA_ColorAttachment0);
+		auto ColorTex = mFrameState.CurrentPass->GetRenderTarget()->GetTargetTexture(RTA_ColorAttachment0);
 		FVulkanUtils::TransitionImage(GetActiveCmdBuffer(), (VkImage)ColorTex->GetNativeHandle(), VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
 		FVulkanUtils::TransitionImage(GetActiveCmdBuffer(), mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 		FVulkanUtils::BlitImage(GetActiveCmdBuffer(), (VkImage)ColorTex->GetNativeHandle(), mSwapchain.GetImages()[mCurSwapchainImageIndex], mDrawExtent, mSwapchain.GetExtent());
@@ -322,7 +318,7 @@ void FVulkanContext::NextSubpass()
 void FVulkanContext::BindUniformBuffer(uint16 InBinding, FRHIUniformBuffer* InBuffer)
 {
 	if(!InBuffer) return;
-	mUniformBuffers[InBinding] = static_cast<FVulkanUniformBuffer*>(InBuffer);
+	mFrameState.UniformBuffers[InBinding] = static_cast<FVulkanUniformBuffer*>(InBuffer);
 }
 
 void FVulkanContext::BindTexture(uint16 InBinding, FRHITexture* InTexture, FRHISamplerState* InSamplerState)
@@ -331,47 +327,43 @@ void FVulkanContext::BindTexture(uint16 InBinding, FRHITexture* InTexture, FRHIS
 
 	FVulkanTexture* pTexture = static_cast<FVulkanTexture*>(InTexture);
 	FVulkanSamplerState* pSamplerState = static_cast<FVulkanSamplerState*>(InSamplerState);
-	mTextures[InBinding] = { pTexture, pSamplerState };
+	mFrameState.Textures[InBinding] = { pTexture, pSamplerState };
 }
 
-void FVulkanContext::BindProgram(const Ref<FRHIShaderProgram>& InProgram)
+void FVulkanContext::BindProgram(FRHIShaderProgram* InProgram)
 {
-	mCurProgram = std::static_pointer_cast<FVulkanShaderProgram>(InProgram);
+	mFrameState.CurrentProgram = static_cast<FVulkanShaderProgram*>(InProgram);
 }
 
 void FVulkanContext::SetGraphicsPipelineState(const FRHIGraphicsPipelineStateDesc& InState)
 {
-	mCurState = InState;
+	mFrameState.CurrentState = InState;
 }
 
 void FVulkanContext::DrawPrimitive(const Ref<FRHIPrimitive>& InPrimitive)
 {
-	if (!mCurRenderPass || !mCurProgram || !InPrimitive)
-	{
+	if (!mFrameState.ReadyForDraw())
 		return;
-	}
 
-	FVulkanRenderPass* RenderPass = static_cast<FVulkanRenderPass*>(mCurRenderPass.get());
-	FVulkanShaderProgram* ShaderProgram = static_cast<FVulkanShaderProgram*>(mCurProgram.get());
 	FVulkanPrimitive* Primitive = static_cast<FVulkanPrimitive*>(InPrimitive.get());
 	Primitive->PrepareDraw();
 
-	FVulkanPipeline* GraphicsPipeline = mGraphicsPipelineCache.GetOrCreatePipeline(mCurState, RenderPass, ShaderProgram, Primitive);
+	FVulkanPipeline* GraphicsPipeline = mGraphicsPipelineCache.GetOrCreatePipeline(mFrameState.CurrentState, mFrameState.CurrentPass, mFrameState.CurrentProgram, Primitive);
 
 	if (!GraphicsPipeline || !GraphicsPipeline->PipelineLayout)
 		return;
 
 	FVulkanPipelineLayout* GraphicsPipelineLayout = GraphicsPipeline->PipelineLayout;
 
-	VkDescriptorSet DescSet = GetDescriptorSet(ShaderProgram, GraphicsPipelineLayout);
+	VkDescriptorSet DescSet = GetDescriptorSet(mFrameState.CurrentProgram, GraphicsPipelineLayout);
 	vkCmdBindDescriptorSets(GetActiveCmdBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, GraphicsPipelineLayout->PipelineLayout, 0, 1, &DescSet, 0, nullptr);
 	vkCmdBindPipeline(GetActiveCmdBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, GraphicsPipeline->Pipeline);
 
-	VkBuffer VertexBuffers[REV_VK_MAX_VERTEX_STREAMS];
-	VkDeviceSize VertexOffsets[REV_VK_MAX_VERTEX_STREAMS];
+	VkBuffer VertexBuffers[REV_MAX_VERTEX_ELEMENTS];
+	VkDeviceSize VertexOffsets[REV_MAX_VERTEX_ELEMENTS];
 	uint32 VertexStreamCount = Primitive->GetVertexBuffers().size();
 
-	REV_CORE_ASSERT(VertexStreamCount < REV_VK_MAX_VERTEX_STREAMS);
+	REV_CORE_ASSERT(VertexStreamCount < REV_MAX_VERTEX_ELEMENTS);
 
 	for (uint32 i = 0; i < VertexStreamCount; i++)
 	{
@@ -387,22 +379,56 @@ void FVulkanContext::DrawPrimitive(const Ref<FRHIPrimitive>& InPrimitive)
 	vkCmdDrawIndexed(GetActiveCmdBuffer(), Primitive->GetIndexBuffer()->GetCount(), 1, 0, 0, 0);
 }
 
-FVulkanUniformBuffer* FVulkanContext::FindUniformBuffer(uint16 BindingIdx) const
+void FVulkanContext::RHISetVertexStream(uint32 StreamIndex, FRHIBuffer* VertexBuffer, uint32 Offset)
 {
-	if (auto iter = mUniformBuffers.find(BindingIdx); iter != mUniformBuffers.end())
-	{
-		return iter->second;
-	}
-	return nullptr;
+	if(!VertexBuffer)
+		return;
+
+	REV_CORE_ASSERT(StreamIndex < REV_MAX_VERTEX_ELEMENTS);
+	mFrameState.VertexStreams[StreamIndex].Buffer = (VkBuffer)VertexBuffer->GetNativeHandle();
+	mFrameState.VertexStreams[StreamIndex].Offset = Offset;
+	mFrameState.bVertexStreamsDirty = true;
 }
 
-std::pair<FVulkanTexture*, FVulkanSamplerState*> FVulkanContext::FindTexture(uint16 BindingIdx) const
+void FVulkanContext::RHIDrawPrimitive(uint32 NumPrimitives, uint32 StartVertex)
 {
-	if (auto iter = mTextures.find(BindingIdx); iter != mTextures.end())
-	{
-		return iter->second;
-	}
-	return { nullptr, nullptr };
+	if (!mFrameState.ReadyForDraw())
+		return;
+
+	FVulkanPipeline* GraphicsPipeline = mGraphicsPipelineCache.GetOrCreatePipeline(mFrameState.CurrentState, mFrameState.CurrentPass, mFrameState.CurrentProgram, nullptr);
+	if (!GraphicsPipeline || !GraphicsPipeline->PipelineLayout)
+		return;
+	FVulkanPipelineLayout* GraphicsPipelineLayout = GraphicsPipeline->PipelineLayout;
+	VkDescriptorSet DescSet = GetDescriptorSet(mFrameState.CurrentProgram, GraphicsPipelineLayout);
+	vkCmdBindDescriptorSets(GetActiveCmdBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, GraphicsPipelineLayout->PipelineLayout, 0, 1, &DescSet, 0, nullptr);
+	vkCmdBindPipeline(GetActiveCmdBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, GraphicsPipeline->Pipeline);
+
+	mFrameState.PrepareForDraw(GetActiveCmdBuffer());
+
+	uint32 NumVertices = ComputeVertexCount(NumPrimitives, mFrameState.CurrentState.PrimitiveTopology);
+	vkCmdDraw(GetActiveCmdBuffer(), NumVertices, 1, StartVertex, 0);
+}
+
+void FVulkanContext::RHIDrawPrimitiveIndexed(FRHIBuffer* IndexBuffer, uint32 NumPrimitives, uint32 StartIndex, int32 VertexOffset)
+{
+	if (!mFrameState.ReadyForDraw() || !IndexBuffer)
+		return;
+
+	FVulkanPipeline* GraphicsPipeline = mGraphicsPipelineCache.GetOrCreatePipeline(mFrameState.CurrentState, mFrameState.CurrentPass, mFrameState.CurrentProgram, nullptr);
+	if (!GraphicsPipeline || !GraphicsPipeline->PipelineLayout)
+		return;
+	FVulkanPipelineLayout* GraphicsPipelineLayout = GraphicsPipeline->PipelineLayout;
+	VkDescriptorSet DescSet = GetDescriptorSet(mFrameState.CurrentProgram, GraphicsPipelineLayout);
+	vkCmdBindDescriptorSets(GetActiveCmdBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, GraphicsPipelineLayout->PipelineLayout, 0, 1, &DescSet, 0, nullptr);
+	vkCmdBindPipeline(GetActiveCmdBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, GraphicsPipeline->Pipeline);
+
+	mFrameState.PrepareForDraw(GetActiveCmdBuffer());
+
+	FVulkanBuffer* IndexBufferVk = static_cast<FVulkanBuffer*>(IndexBuffer);
+	vkCmdBindIndexBuffer(GetActiveCmdBuffer(), (VkBuffer)IndexBufferVk->GetNativeHandle(), 0, IndexBufferVk->GetIndexType());
+
+	uint32 NumVertices = ComputeVertexCount(NumPrimitives, mFrameState.CurrentState.PrimitiveTopology);
+	vkCmdDrawIndexed(GetActiveCmdBuffer(), NumVertices, 1, StartIndex, 0, 0);
 }
 
 FVulkanContext* FVulkanContext::Cast(FRHIContext* InContext)
@@ -453,7 +479,7 @@ VkDescriptorSet FVulkanContext::GetDescriptorSet(const FVulkanShaderProgram* InP
 		{
 		case ERHIUniformType::Buffer:
 		{
-			FVulkanUniformBuffer* UniformBuffer = FindUniformBuffer(BindingIdx);
+			FVulkanUniformBuffer* UniformBuffer = mFrameState.FindUniformBuffer(BindingIdx);
 			if (UniformBuffer)
 			{
 				BufferInfos[BufferCount].buffer = (VkBuffer)UniformBuffer->GetNativeHandle();
@@ -478,7 +504,7 @@ VkDescriptorSet FVulkanContext::GetDescriptorSet(const FVulkanShaderProgram* InP
 		break;
 		case ERHIUniformType::Texture:
 		{
-			auto[Texture, SamplerState] = FindTexture(BindingIdx);
+			auto[Texture, SamplerState] = mFrameState.FindTexture(BindingIdx);
 			if (Texture)
 			{
 				ImageInfos[ImageCount].imageLayout = Texture->GetImageLayout();
@@ -518,7 +544,6 @@ VkDescriptorSet FVulkanContext::GetDescriptorSet(const FVulkanShaderProgram* InP
 		default:
 			break;
 		}
-
 		
 	}
 

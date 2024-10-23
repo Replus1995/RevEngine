@@ -159,34 +159,34 @@ VkPipelineBindPoint FVulkanEnum::Translate(EPipelineBindPoint InBindPoint)
     }
 }
 
-VkFormat FVulkanEnum::Translate(EVertexType InType)
+VkFormat FVulkanEnum::Translate(EVertexElmentType InType)
 {
     switch (InType)
     {
     default:
-    case EVertexType::Unknown:
+    case EVertexElmentType::Unknown:
         break;
-    case EVertexType::Float:
+    case EVertexElmentType::Float:
         return VK_FORMAT_R32_SFLOAT;
-    case EVertexType::Float2:
+    case EVertexElmentType::Float2:
         return VK_FORMAT_R32G32_SFLOAT;
-    case EVertexType::Float3:
+    case EVertexElmentType::Float3:
         return VK_FORMAT_R32G32B32_SFLOAT;
-    case EVertexType::Float4:
+    case EVertexElmentType::Float4:
         return VK_FORMAT_R32G32B32A32_SFLOAT;
-    case EVertexType::Matrix3:
+    case EVertexElmentType::Matrix3:
         return VK_FORMAT_R32G32B32_SFLOAT;
-    case EVertexType::Matrix4:
+    case EVertexElmentType::Matrix4:
         return VK_FORMAT_R32G32B32A32_SFLOAT;
-    case EVertexType::Int:
+    case EVertexElmentType::Int:
         return VK_FORMAT_R32_SINT;
-    case EVertexType::Int2:
+    case EVertexElmentType::Int2:
         return VK_FORMAT_R32G32_SINT;
-    case EVertexType::Int3:
+    case EVertexElmentType::Int3:
         return VK_FORMAT_R32G32B32_SINT;
-    case EVertexType::Int4:
+    case EVertexElmentType::Int4:
         return VK_FORMAT_R32G32B32A32_SINT;
-    case EVertexType::Bool:
+    case EVertexElmentType::Bool:
         return VK_FORMAT_R8_SINT;
     }
 

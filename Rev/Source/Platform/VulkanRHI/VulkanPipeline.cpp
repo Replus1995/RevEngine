@@ -45,6 +45,7 @@ VkPipeline FVulkanPipelineBuilder::BuildGraphics(VkDevice InDevice, VkPipelineLa
     FVulkanRasterizerState RasterizerStateRHI(InStateDesc.RasterizerStateDesc);
     FVulkanDepthStencilState DepthStencilStateRHI(InStateDesc.DepthStencilStateDesc);
     FVulkanColorBlendState ColorBlendStateRHI(InStateDesc.ColorBlendStateDesc);
+    FVulkanVertexInputState VertexInputStataRHI(InStateDesc.VertexInputStateDesc);
     auto ShaderStageInfo = InProgram->GenShaderStageInfo();
 
     VkDynamicState DynamicStates[] = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
@@ -57,19 +58,22 @@ VkPipeline FVulkanPipelineBuilder::BuildGraphics(VkDevice InDevice, VkPipelineLa
     }
     VkFormat DepthFormat = (VkFormat)GPixelFormats[RenderPassDesc.DepthStencilAttchment.Format].PlatformFormat;
     
-    VkPipelineVertexInputStateCreateInfo VertexInputState{};
-    VertexInputState.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    VertexInputState.vertexBindingDescriptionCount = (uint32_t)InPrimitive->GetBindingDescs().size();
-    VertexInputState.pVertexBindingDescriptions = InPrimitive->GetBindingDescs().data();
-    VertexInputState.vertexAttributeDescriptionCount = (uint32_t)InPrimitive->GetAttributeDescs().size();
-    VertexInputState.pVertexAttributeDescriptions = InPrimitive->GetAttributeDescs().data();
+    VkPipelineVertexInputStateCreateInfo PrimitiveVertexInputState{};
+    if (InPrimitive)
+    {
+        PrimitiveVertexInputState.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+        PrimitiveVertexInputState.vertexBindingDescriptionCount = (uint32_t)InPrimitive->GetBindingDescs().size();
+        PrimitiveVertexInputState.pVertexBindingDescriptions = InPrimitive->GetBindingDescs().data();
+        PrimitiveVertexInputState.vertexAttributeDescriptionCount = (uint32_t)InPrimitive->GetAttributeDescs().size();
+        PrimitiveVertexInputState.pVertexAttributeDescriptions = InPrimitive->GetAttributeDescs().data();
+    }
 
 
     VkPipelineInputAssemblyStateCreateInfo InputAssemblyState = MakeInputAssemblyStateInfo(FVulkanEnum::Translate(InStateDesc.PrimitiveTopology));
     VkPipelineTessellationStateCreateInfo TessellationState = MakeTessellationStateInfo();
     VkPipelineViewportStateCreateInfo ViewportState = MakeViewportStateInfo();
     VkPipelineMultisampleStateCreateInfo MultisampleState = MakeMultisampleStateInfo();
-    VkPipelineColorBlendStateCreateInfo ColorBlendState = MakeColorBlendStateInfo(ColorBlendStateRHI.ColorBlendStates, ColorAttachmentCount);
+    VkPipelineColorBlendStateCreateInfo ColorBlendState = MakeColorBlendStateInfo(ColorBlendStateRHI.Attachments, ColorAttachmentCount);
     VkPipelineDynamicStateCreateInfo DynamicState = MakeDynamicStateInfo(DynamicStates, sizeof(DynamicStates) / sizeof(VkDynamicState));
     VkPipelineRenderingCreateInfo Rendering = MakeRenderingInfo(ColorFormats, ColorAttachmentCount, DepthFormat);
 
@@ -83,7 +87,7 @@ VkPipeline FVulkanPipelineBuilder::BuildGraphics(VkDevice InDevice, VkPipelineLa
 
     PipelineInfo.stageCount = (uint32_t)ShaderStageInfo.size();
     PipelineInfo.pStages = ShaderStageInfo.data();
-    PipelineInfo.pVertexInputState = &VertexInputState;
+    PipelineInfo.pVertexInputState = InPrimitive ? &PrimitiveVertexInputState : &VertexInputStataRHI.VertexInputState;
     PipelineInfo.pInputAssemblyState = &InputAssemblyState;
     PipelineInfo.pViewportState = &ViewportState;
     PipelineInfo.pRasterizationState = &RasterizerStateRHI.RasterizerState;
@@ -320,8 +324,8 @@ FVulkanGraphicsPipelineCache::FCacheKey::FCacheKey(const FRHIGraphicsPipelineSta
             continue;
         ShaderHash[i - 1] = pShaderVk->GetHash();
     }
-    PrimitiveTopology = InPrimitive->GetTopology();
-    VertexHash = InPrimitive->GetDescHash(); //todo: get vertex data hash from shader
+    if(InPrimitive)
+        VertexHash = InPrimitive->GetDescHash(); //todo: get vertex data hash from shader
 
     SecondaryHash = FCityHash::Gen(this, sizeof(FCacheKey) - sizeof(uint32));
 }
@@ -332,7 +336,6 @@ bool operator==(const FVulkanGraphicsPipelineCache::FCacheKey& L, const FVulkanG
     {
         bool bSame = L.StateHash == R.StateHash &&
             L.RenderPass == R.RenderPass &&
-            L.PrimitiveTopology == R.PrimitiveTopology &&
             L.VertexHash == R.VertexHash;
 
         if (bSame)

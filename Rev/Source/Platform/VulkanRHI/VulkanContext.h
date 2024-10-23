@@ -52,17 +52,21 @@ public:
 	virtual void UpdateBufferData(const Ref<FRHIIndexBuffer>& Buffer, const void* Content, uint32 Size, uint32 Offset) override;
 
 //Draw
-	virtual void BeginRenderPass(const Ref<FRHIRenderPass>& InRenderPass) override;
+	virtual void BeginRenderPass(FRHIRenderPass* InRenderPass) override;
 	virtual void EndRenderPass(bool bBlitToBack) override;
 	virtual void NextSubpass() override;
 
 	virtual void BindUniformBuffer(uint16 InBinding, FRHIUniformBuffer* InBuffer) override;
 	virtual void BindTexture(uint16 InBinding, FRHITexture* InTexture, FRHISamplerState* InSamplerState) override;
-	virtual void BindProgram(const Ref<FRHIShaderProgram>& InProgram) override;
+	virtual void BindProgram(FRHIShaderProgram* InProgram) override;
 
 	virtual void SetGraphicsPipelineState(const FRHIGraphicsPipelineStateDesc& InState) override;
 
 	virtual void DrawPrimitive(const Ref<FRHIPrimitive>& InPrimitive) override;
+
+	virtual void RHISetVertexStream(uint32 StreamIndex, FRHIBuffer* VertexBuffer, uint32 Offset) override;
+	virtual void RHIDrawPrimitive(uint32 NumPrimitives, uint32 StartVertex) override;
+	virtual void RHIDrawPrimitiveIndexed(FRHIBuffer* IndexBuffer, uint32 NumPrimitives, uint32 StartIndex, int32 VertexOffset) override;
 
 	const FVulkanSwapchain& GetSwapchain() const { return mSwapchain; }
 	VkImage GetSwapchainImage() { return mSwapchain.GetImages()[mCurSwapchainImageIndex]; }
@@ -71,11 +75,6 @@ public:
 	FVulkanFrameData& GetActiveFrameData() { return mFrameData[mFrameDataIndex]; }
 	VkCommandBuffer GetActiveCmdBuffer() { return mFrameData[mFrameDataIndex].CmdBuffer; }
 	FVulkanDescriptorPool& GetActiveDescriptorPool() { return mFrameData[mFrameDataIndex].DescriptorPool; }
-
-	const std::map<uint16, FVulkanUniformBuffer*>& GetUniformBufferMap() const { return mUniformBuffers; };
-	FVulkanUniformBuffer* FindUniformBuffer(uint16 BindingIdx) const;
-	const std::map<uint16, std::pair<FVulkanTexture*, FVulkanSamplerState*>>& GetTextureMap() const { return mTextures; }
-	std::pair<FVulkanTexture*, FVulkanSamplerState*> FindTexture(uint16 BindingIdx) const;
 
 public:
 	static FVulkanContext* Cast(FRHIContext* InContext);
@@ -108,13 +107,7 @@ private:
 	VkCommandPool mImmCmdPool;
 
 	FVulkanGraphicsPipelineCache mGraphicsPipelineCache;
-
-	//per frame data
-	Ref<FRHIRenderPass> mCurRenderPass = nullptr;
-	Ref<FVulkanShaderProgram> mCurProgram = nullptr;
-	FRHIGraphicsPipelineStateDesc mCurState = {};
-	std::map<uint16, FVulkanUniformBuffer*> mUniformBuffers;
-	std::map<uint16, std::pair<FVulkanTexture*, FVulkanSamplerState*>> mTextures;
+	FVulkanGraphicsFrameState mFrameState;
 
 };
 

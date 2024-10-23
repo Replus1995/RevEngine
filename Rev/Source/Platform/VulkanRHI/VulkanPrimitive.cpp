@@ -49,7 +49,7 @@ void FVulkanPrimitive::PrepareDraw()
 			VertexStride += Elem.Size;
 			VkVertexInputAttributeDescription AttributeDesc{};
 			AttributeDesc.binding = (uint32_t)i;
-			AttributeDesc.location = Elem.Location;
+			AttributeDesc.location = Elem.AttributeIndex;
 			AttributeDesc.format = FVulkanEnum::Translate(Elem.Type);
 			AttributeDesc.offset = Elem.Offset;
 			mAttributeDescs.emplace_back(std::move(AttributeDesc));

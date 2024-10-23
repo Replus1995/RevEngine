@@ -30,7 +30,7 @@ public:
     static VkPipelineBindPoint Translate(EPipelineBindPoint InBindPoint);
 
     //Buffer
-    static VkFormat Translate(EVertexType InType);
+    static VkFormat Translate(EVertexElmentType InType);
 };
 
 }

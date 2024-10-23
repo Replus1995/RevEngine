@@ -14,7 +14,7 @@ class FRHITexture;
 struct FRHIShaderAttribute
 {
     std::string Name;
-    EVertexType Type = EVertexType::Unknown;
+    EVertexElmentType Type = EVertexElmentType::Unknown;
     uint8 StreamIndex = 0;
 };
 

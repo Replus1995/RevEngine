@@ -11,8 +11,8 @@ namespace Rev
 struct FRHIVertexElement
 {
 	std::string Name;
-	EVertexType Type;
-	uint8 Location;
+	EVertexElmentType Type;
+	uint8 AttributeIndex;
 	uint8 Size;
 	uint8 Num;
 	uint32 Offset;
@@ -20,8 +20,8 @@ struct FRHIVertexElement
 
 	FRHIVertexElement() = default;
 
-	FRHIVertexElement(const std::string& InName, EVertexType InType, uint8 InLocation, uint32 InOffset = 0, bool InNormalized = false)
-		: Name(InName), Type(InType), Location(InLocation), Offset(InOffset), Normalized(InNormalized)
+	FRHIVertexElement(const std::string& InName, EVertexElmentType InType, uint8 InAttributeIndex, uint32 InOffset = 0, bool InNormalized = false)
+		: Name(InName), Type(InType), AttributeIndex(InAttributeIndex), Offset(InOffset), Normalized(InNormalized)
 	{
 		Size = ElementSize(InType);
 		Num = ComponentCount(InType);
@@ -29,8 +29,8 @@ struct FRHIVertexElement
  
 
 private:
-	static uint8 ElementSize(EVertexType InType);
-	static uint8 ComponentCount(EVertexType InType);
+	static uint8 ElementSize(EVertexElmentType InType);
+	static uint8 ComponentCount(EVertexElmentType InType);
 };
 
 class FRHIVertexLayout

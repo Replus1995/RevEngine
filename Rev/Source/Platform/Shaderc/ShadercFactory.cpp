@@ -92,7 +92,7 @@ ETextureDimension TranslateTextureDimension(spv::Dim InDim, bool bArray)
 	}
 }
 
-EVertexType TranslateVertexAttribute(const spirv_cross::SPIRType& InSpirvType)
+EVertexElmentType TranslateVertexAttribute(const spirv_cross::SPIRType& InSpirvType)
 {
 	auto ElemType = InSpirvType.basetype;
 	uint32 NumRows = InSpirvType.vecsize;
@@ -104,32 +104,32 @@ EVertexType TranslateVertexAttribute(const spirv_cross::SPIRType& InSpirvType)
 		{
 			if (NumRows == 3 && NumColumns == 3)
 			{
-				return EVertexType::Matrix3;
+				return EVertexElmentType::Matrix3;
 			}
 			else if (NumRows == 4 && NumColumns == 4)
 			{
-				return EVertexType::Matrix4;
+				return EVertexElmentType::Matrix4;
 			}
 		}
-		return EVertexType::Unknown;
+		return EVertexElmentType::Unknown;
 	}
 
 	switch (ElemType)
 	{
 	case spirv_cross::SPIRType::Boolean:
-		return EVertexType::Bool;
+		return EVertexElmentType::Bool;
 	case spirv_cross::SPIRType::Int:
 	{
 		switch (NumRows)
 		{
 		case 1:
-			return EVertexType::Int;
+			return EVertexElmentType::Int;
 		case 2:
-			return EVertexType::Int2;
+			return EVertexElmentType::Int2;
 		case 3:
-			return EVertexType::Int3;
+			return EVertexElmentType::Int3;
 		case 4:
-			return EVertexType::Int4;
+			return EVertexElmentType::Int4;
 		default:
 			break;
 		}
@@ -140,13 +140,13 @@ EVertexType TranslateVertexAttribute(const spirv_cross::SPIRType& InSpirvType)
 		switch (NumRows)
 		{
 		case 1:
-			return EVertexType::Float;
+			return EVertexElmentType::Float;
 		case 2:
-			return EVertexType::Float2;
+			return EVertexElmentType::Float2;
 		case 3:
-			return EVertexType::Float3;
+			return EVertexElmentType::Float3;
 		case 4:
-			return EVertexType::Float4;
+			return EVertexElmentType::Float4;
 		default:
 			break;
 		}
@@ -155,7 +155,7 @@ EVertexType TranslateVertexAttribute(const spirv_cross::SPIRType& InSpirvType)
 	default:
 		break;
 	}
-	return EVertexType::Unknown;
+	return EVertexElmentType::Unknown;
 }
 
 
@@ -266,8 +266,8 @@ void FShadercFactory::ReflectShaderInfo(FShadercCompiledData& Data)
 		uint8 AttributeIndex = 0;
 		for (auto& Input : ResourceRefl.stage_inputs)
 		{
-			EVertexType InputType = TranslateVertexAttribute(Refl.get_type(Input.base_type_id));
-			if (InputType != EVertexType::Unknown)
+			EVertexElmentType InputType = TranslateVertexAttribute(Refl.get_type(Input.base_type_id));
+			if (InputType != EVertexElmentType::Unknown)
 			{
 				FRHIShaderAttribute Attribute;
 				Attribute.Name = Input.name;

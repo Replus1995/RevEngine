@@ -6,59 +6,78 @@
 namespace Rev
 {
 
-class FVulkanBuffer
+class FVulkanBufferBase
 {
 public:
-    FVulkanBuffer();
-	FVulkanBuffer(const FVulkanBuffer& Other) = delete;
-	FVulkanBuffer(FVulkanBuffer&& Other) noexcept;
-	virtual ~FVulkanBuffer();
+    FVulkanBufferBase();
+	FVulkanBufferBase(const FVulkanBufferBase& Other) = delete;
+	FVulkanBufferBase(FVulkanBufferBase&& Other) noexcept;
+	virtual ~FVulkanBufferBase();
 
-	FVulkanBuffer& operator=(const FVulkanBuffer& Other) = delete;
-	FVulkanBuffer& operator=(FVulkanBuffer&& Other) noexcept;
+	FVulkanBufferBase& operator=(const FVulkanBufferBase& Other) = delete;
+	FVulkanBufferBase& operator=(FVulkanBufferBase&& Other) noexcept;
 
-	VkBuffer GetBuffer() const { return mBuffer; }
-	void* GetMappedData() const { return mAllocationInfo.pMappedData; }
+	VkDeviceAddress GetDeviceAddress() const;
+	VkBuffer Buffer = VK_NULL_HANDLE;
 
 protected:
-    void Allocate(uint64 Size, VkBufferUsageFlags BufferUsage, VmaMemoryUsage MemoryUsage);
+    void Allocate(uint64 Size, VkBufferUsageFlags BufferUsage, VmaAllocationCreateFlags CreateFlags);
     void Release();
 
-protected:
-    VkBuffer mBuffer = VK_NULL_HANDLE;
     VmaAllocation mAllocation = nullptr;
     VmaAllocationInfo mAllocationInfo = {};
 };
 
-class FVulkanStageBuffer : public FVulkanBuffer
+class FVulkanStageBuffer : public FVulkanBufferBase
 {
 public:
-	FVulkanStageBuffer(uint64 Size, VkBufferUsageFlags BufferUsage, VmaMemoryUsage MemoryUsage);
+	FVulkanStageBuffer(uint64 Size);
 	virtual ~FVulkanStageBuffer();
+	void* GetMappedData() const { return mAllocationInfo.pMappedData; }
 };
 
-class FVulkanVertexBuffer : public FRHIVertexBuffer, FVulkanBuffer
+
+class FVulkanBuffer : public FRHIBuffer, FVulkanBufferBase
+{
+public:
+	FVulkanBuffer(uint32 InSize, uint32 InStride, EBufferUsageFlags InUsage);
+	virtual ~FVulkanBuffer();
+	virtual const void* GetNativeHandle() const override { return Buffer; }
+
+	VkIndexType GetIndexType() const;
+protected:
+	static VkBufferUsageFlags TranslateUsageFlags(EBufferUsageFlags InUsage);
+	static VmaAllocationCreateFlags GetAllocateFlags(EBufferUsageFlags InUsage);
+};
+
+class FVulkanVertexBuffer : public FRHIVertexBuffer, FVulkanBufferBase
 {
 public:
 	FVulkanVertexBuffer(uint32 InSize, bool bDynamic);
 	virtual ~FVulkanVertexBuffer();
-	virtual const void* GetNativeHandle() const override { return mBuffer; }
-
-private:
-	VkDeviceAddress mDeviceAddress = 0;
+	virtual const void* GetNativeHandle() const override { return Buffer; }
 };
 
-class FVulkanIndexBuffer : public FRHIIndexBuffer, FVulkanBuffer
+class FVulkanIndexBuffer : public FRHIIndexBuffer, FVulkanBufferBase
 {
 public:
 	FVulkanIndexBuffer(uint32 InStride, uint32 InCount, bool bDynamic);
 	virtual ~FVulkanIndexBuffer();
-	virtual const void* GetNativeHandle() const override { return mBuffer; }
+	virtual const void* GetNativeHandle() const override { return Buffer; }
 
 	VkIndexType GetIndexType() const { return mIndexType; }
 
 private:
 	VkIndexType mIndexType = VK_INDEX_TYPE_NONE_KHR;
+};
+
+class FVulkanUniformBuffer : public FRHIUniformBuffer, FVulkanBufferBase
+{
+public:
+	FVulkanUniformBuffer(uint32 InSize);
+	virtual ~FVulkanUniformBuffer();
+	virtual const void* GetNativeHandle() const override { return Buffer; }
+	virtual void UpdateSubData(const void* Data, uint32 Size, uint32 Offset) override;
 };
 
 }
