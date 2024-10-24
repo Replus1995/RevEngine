@@ -166,6 +166,7 @@ struct FVertexElement
 	uint8 Offset = 0;
 	uint16 Stride = 0;
 
+	FVertexElement() {}
 	FVertexElement(EVertexElmentType InType, uint8 InStreamIndex, uint8 InAttributeIndex, uint8 InOffset = 0, uint16 InStride = 0)
 		: Type(InType)
 		, StreamIndex(InStreamIndex)

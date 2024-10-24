@@ -6,18 +6,18 @@
 namespace Rev
 {
 
-class GammaCorrectMaterial : public Material
+class GammaCorrectMaterial : public FMaterial
 {
 public:
 	GammaCorrectMaterial()
 	{
-		mDomain = MD_PostProcess;
+		Domain = MD_PostProcess;
 	}
 	virtual ~GammaCorrectMaterial() = default;
 
 	virtual void Compile() override
 	{
-		mProgram = FRHIShaderLibrary::GetInstance().CreateGraphicsProgram(
+		ShaderProgram = FRHIShaderLibrary::GetInstance().CreateGraphicsProgram(
 			"GammaCorrectProgram",
 			{ "/Engine/Shaders/PostVS" },
 			{ "/Engine/Shaders/GammaCorrectFS" }

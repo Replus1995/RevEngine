@@ -130,10 +130,11 @@ enum class EVertexElmentType : uint8
 	Float3	= 3,
 	Float4	= 4,
 	UByte4	= 5,
-	Matrix3	= 6,
-	Matrix4	= 7,
-	UInt	= 8,
-	Bool	= 9
+	Color	= 6,
+	Matrix3	= 7,
+	Matrix4	= 8,
+	UInt	= 9,
+	Bool	= 10
 };
 
 //Primitive

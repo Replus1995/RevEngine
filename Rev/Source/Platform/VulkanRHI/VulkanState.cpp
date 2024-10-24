@@ -2,9 +2,54 @@
 #include "VulkanDynamicRHI.h"
 #include "Core/VulkanEnum.h"
 #include "Rev/Core/Assert.h"
+#include "Rev/Core/Hash.h"
 
 namespace Rev
 {
+
+//Dynamic RHI
+
+Ref<FRHISamplerState> FVulkanDynamicRHI::RHICreateSamplerState(const FRHISamplerStateDesc& InDesc)
+{
+	VkSamplerCreateInfo SamplerCreateInfo;
+	FVulkanSamplerState::FillCreateInfo(InDesc, SamplerCreateInfo);
+
+	uint32 hash = FCityHash::Gen(&SamplerCreateInfo, sizeof(SamplerCreateInfo));
+
+	//Add lock for multithread create
+	{
+		if (auto iter = mSamplerMap.find(hash); iter != mSamplerMap.end())
+		{
+			return iter->second;
+		}
+		Ref<FVulkanSamplerState> NewSampler = CreateRef<FVulkanSamplerState>(SamplerCreateInfo);
+		mSamplerMap.emplace(hash, NewSampler);
+		return NewSampler;
+	}
+}
+
+Ref<FRHIRasterizerState> FVulkanDynamicRHI::RHICreateRasterizerState(const FRHIRasterizerStateDesc& InDesc)
+{
+	return CreateRef<FVulkanRasterizerState>(InDesc);
+}
+
+Ref<FRHIDepthStencilState> FVulkanDynamicRHI::RHICreateDepthStencilStateState(const FRHIDepthStencilStateDesc& InDesc)
+{
+	return CreateRef<FVulkanDepthStencilState>(InDesc);
+}
+
+Ref<FRHIColorBlendState> FVulkanDynamicRHI::RHICreateColorBlendState(const FRHIColorBlendStateDesc& InDesc)
+{
+	return CreateRef<FVulkanColorBlendState>(InDesc);
+}
+
+Ref<FRHIVertexInputState> FVulkanDynamicRHI::RHICreateVertexInputState(const FRHIVertexInputStateDesc& InDesc)
+{
+	return CreateRef<FRHIVertexInputState>(InDesc);
+}
+//Dynamic RHI
+
+
 
 FVulkanSamplerState::FVulkanSamplerState(const VkSamplerCreateInfo& InCreateInfo)
 {

@@ -116,41 +116,34 @@ EVertexElmentType TranslateVertexAttribute(const spirv_cross::SPIRType& InSpirvT
 
 	switch (ElemType)
 	{
-	case spirv_cross::SPIRType::Boolean:
-		return EVertexElmentType::Bool;
-	case spirv_cross::SPIRType::Int:
-	{
-		switch (NumRows)
-		{
-		case 1:
-			return EVertexElmentType::Int;
-		case 2:
-			return EVertexElmentType::Int2;
-		case 3:
-			return EVertexElmentType::Int3;
-		case 4:
-			return EVertexElmentType::Int4;
-		default:
-			break;
-		}
-	}
-		break;
 	case spirv_cross::SPIRType::Float:
-	{
-		switch (NumRows)
 		{
-		case 1:
-			return EVertexElmentType::Float;
-		case 2:
-			return EVertexElmentType::Float2;
-		case 3:
-			return EVertexElmentType::Float3;
-		case 4:
-			return EVertexElmentType::Float4;
-		default:
-			break;
+			switch (NumRows)
+			{
+			case 1:
+				return EVertexElmentType::Float1;
+			case 2:
+				return EVertexElmentType::Float2;
+			case 3:
+				return EVertexElmentType::Float3;
+			case 4:
+				return EVertexElmentType::Float4;
+			default:
+				break;
+			}
 		}
-	}
+		break;
+	case spirv_cross::SPIRType::UByte:
+		if (NumRows == 4)
+			return EVertexElmentType::UByte4;
+		break;
+	case spirv_cross::SPIRType::UInt:
+		if (NumRows == 1)
+			return EVertexElmentType::UInt;
+		break;
+	case spirv_cross::SPIRType::Boolean:
+		if (NumRows == 1)
+			return EVertexElmentType::Bool;
 		break;
 	default:
 		break;

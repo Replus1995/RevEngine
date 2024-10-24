@@ -10,7 +10,7 @@ Ref<SurfaceMaterial> FPBRMaterialStorage::CreateMaterial()
 	if(mCache)
 		return mCache;
 
-	Ref<PBRMaterial> Result = CreateRef<PBRMaterial>();
+	Ref<FPBRMaterial> Result = CreateRef<FPBRMaterial>();
 	Result->BlendMode = BlendMode;
 	Result->ShadingModel = ShadingModel;
 	Result->MaskClip = MaskClip;

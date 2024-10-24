@@ -1,7 +1,8 @@
 #pragma once
 #include "Rev/Core/Base.h"
 #include "Rev/Core/FileSystem.h"
-#include "Rev/Asset/MeshStorage.h"
+#include "Rev/Asset/TextureStorage.h"
+#include "Rev/Asset/MaterialStorage.h"
 
 namespace Rev
 {
@@ -17,14 +18,25 @@ enum class EBasicGeometry : uint8
 };
 
 class FTexture;
-class Material;
-class SurfaceMaterial;
-class StaticMesh;
+class FMaterial;
+class FStaticMesh;
+
+
+
+struct FModelImportResult
+{
+	std::vector<Ref<FTextureStorage>> Textures;
+	std::vector<Ref<FSurfaceMaterialStorage>> Materials;
+	std::vector<Ref<FStaticMesh>> StaticMeshes;
+	//SkeletalMeshes
+};
+
+
 class REV_API FAssetLibrary
 {
 public:
-	static const Ref<SurfaceMaterial>& GetDefaultSurfaceMaterial();
-	static Ref<StaticMesh> CreateBasicGeometry(EBasicGeometry InKind, const Ref<SurfaceMaterial>& InMaterial = nullptr);
+	static const Ref<FMaterial>& GetDefaultSurfaceMaterial();
+	static Ref<FStaticMesh> CreateBasicGeometry(EBasicGeometry InKind, const Ref<FMaterial>& InMaterial = nullptr);
 
 
 	static FTextureStorage ImportTexture(const FPath& InPath);

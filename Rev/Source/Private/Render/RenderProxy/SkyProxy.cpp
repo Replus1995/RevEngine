@@ -11,18 +11,18 @@ namespace Rev
 {
 
 
-class SkyboxMaterial : public Material
+class SkyboxMaterial : public FMaterial
 {
 public:
 	SkyboxMaterial()
 	{
-		mDomain = MD_PostProcess;
+		Domain = MD_PostProcess;
 	}
 	virtual ~SkyboxMaterial() = default;
 
 	virtual void Compile() override
 	{
-		mProgram = FRHIShaderLibrary::GetInstance().CreateGraphicsProgram(
+		ShaderProgram = FRHIShaderLibrary::GetInstance().CreateGraphicsProgram(
 			"SkyboxProgram",
 			{ "/Engine/Shaders/Skybox/SkyboxVS" },
 			{ "/Engine/Shaders/Skybox/SkyboxFS" }
@@ -33,12 +33,12 @@ public:
 	{
 		//RenderCmd::EnableDepthWrite(false);
 		//RenderCmd::SetDepthTestMode(DTM_LessEqual);
-		Material::PreDraw(RHICmdList);
+		FMaterial::PreDraw(RHICmdList);
 	}
 
 	virtual void PostDraw(FRHICommandList& RHICmdList) override
 	{
-		Material::PostDraw(RHICmdList);
+		FMaterial::PostDraw(RHICmdList);
 	}
 };
 

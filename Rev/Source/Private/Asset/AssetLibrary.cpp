@@ -7,8 +7,6 @@
 #include "Rev/Render/RHI/RHITexture.h"
 #include "Rev/Render/RenderCore.h"
 #include "Rev/Render/Material/Material.h"
-#include "Rev/Render/Material/SurfaceMaterial.h"
-#include "Rev/Render/Resource/StaticMesh.h"
 #include "Rev/Render/Resource/RenderResource.h"
 
 #include "./BasicGeometry/PlaneGeometry.hpp"
@@ -19,7 +17,7 @@
 namespace Rev
 {
 
-static Ref<SurfaceMaterial> sDefaultSurfaceMaterial = nullptr;
+static Ref<FMaterial> sDefaultSurfaceMaterial = nullptr;
 
 void FAssetLibrary::Init()
 {
@@ -31,7 +29,7 @@ void FAssetLibrary::Shutdown()
 	sDefaultSurfaceMaterial.reset();
 }
 
-const Ref<SurfaceMaterial>& FAssetLibrary::GetDefaultSurfaceMaterial()
+const Ref<FMaterial>& FAssetLibrary::GetDefaultSurfaceMaterial()
 {
 	if (!sDefaultSurfaceMaterial)
 	{
@@ -41,9 +39,9 @@ const Ref<SurfaceMaterial>& FAssetLibrary::GetDefaultSurfaceMaterial()
 	return sDefaultSurfaceMaterial;
 }
 
-Ref<StaticMesh> FAssetLibrary::CreateBasicGeometry(EBasicGeometry InKind, const Ref<SurfaceMaterial>& InMaterial)
+Ref<FStaticMesh> FAssetLibrary::CreateBasicGeometry(EBasicGeometry InKind, const Ref<FMaterial>& InMaterial)
 {
-	const Ref<SurfaceMaterial>& GeoMat = InMaterial ? InMaterial : GetDefaultSurfaceMaterial();
+	const Ref<FMaterial>& GeoMat = InMaterial ? InMaterial : GetDefaultSurfaceMaterial();
 	switch (InKind)
 	{
 	case Rev::EBasicGeometry::Plane:

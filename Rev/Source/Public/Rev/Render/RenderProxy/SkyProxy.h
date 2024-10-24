@@ -4,7 +4,7 @@
 
 namespace Rev
 {
-class Material;
+class FMaterial;
 class FScene;
 class FSkyProxy
 {
@@ -20,7 +20,7 @@ public:
 
 private:
 	Skybox mSkybox;
-	Ref<Material> mSkyboxMat;
+	Ref<FMaterial> mSkyboxMat;
 };
 
 }

@@ -1,8 +1,6 @@
 #include "VulkanDynamicRHI.h"
 #include "VulkanPixelFormat.h"
 #include "VulkanBuffer.h"
-#include "VulkanUniform.h"
-#include "VulkanState.h"
 #include "VulkanTexture.h"
 #include "VulkanRenderTarget.h"
 #include "VulkanPrimitive.h"
@@ -45,7 +43,7 @@ void FVulkanDynamicRHI::Cleanup()
 	mInstance.Cleanup();
 }
 
-Scope<FRHIContext> FVulkanDynamicRHI::CreateContext()
+Scope<FRHIContext> FVulkanDynamicRHI::RHICreateContext()
 {
 	return CreateScope<FVulkanContext>();
 }
@@ -78,40 +76,6 @@ Ref<FRHITexture> FVulkanDynamicRHI::CreateTexture(const FRHITextureDesc& InDesc)
 Ref<FRHIRenderTarget> FVulkanDynamicRHI::CreateRenderTarget(const FRenderTargetDesc& InDesc)
 {
 	return CreateRef<FVulkanRenderTarget>(InDesc);
-}
-
-Ref<FRHISamplerState> FVulkanDynamicRHI::CreateSamplerState(const FRHISamplerStateDesc& InDesc)
-{
-	VkSamplerCreateInfo SamplerCreateInfo;
-	FVulkanSamplerState::FillCreateInfo(InDesc, SamplerCreateInfo);
-
-	uint32 hash = FCityHash::Gen(&SamplerCreateInfo, sizeof(SamplerCreateInfo));
-
-	//Add lock for multithread create
-	{
-		if (auto iter = mSamplerMap.find(hash); iter != mSamplerMap.end())
-		{
-			return iter->second;
-		}
-		Ref<FVulkanSamplerState> NewSampler = CreateRef<FVulkanSamplerState>(SamplerCreateInfo);
-		mSamplerMap.emplace(hash, NewSampler);
-		return NewSampler;
-	}
-}
-
-Ref<FRHIRasterizerState> FVulkanDynamicRHI::CreateRasterizerState(const FRHIRasterizerStateDesc& InDesc)
-{
-	return CreateRef<FVulkanRasterizerState>(InDesc);
-}
-
-Ref<FRHIDepthStencilState> FVulkanDynamicRHI::CreateDepthStencilStateState(const FRHIDepthStencilStateDesc& InDesc)
-{
-	return CreateRef<FVulkanDepthStencilState>(InDesc);
-}
-
-Ref<FRHIColorBlendState> FVulkanDynamicRHI::CreateColorBlendState(const FRHIColorBlendStateDesc& InDesc)
-{
-	return CreateRef<FVulkanColorBlendState>(InDesc);
 }
 
 Ref<FRHIRenderPass> FVulkanDynamicRHI::CreateRenderPass(const FRHIRenderPassDesc& InDesc)

@@ -16,7 +16,7 @@ void FRenderCore::Init(ERenderAPI InAPI)
 	REV_CORE_ASSERT(!GDynamicRHI, "RenderCmd already initialized!");
 	sRenderAPI = InAPI;
 	RHIInit(InAPI);
-	sMainContext = GDynamicRHI->CreateContext();
+	sMainContext = GDynamicRHI->RHICreateContext();
 	sMainContext->Init();
 	FRHIShaderLibrary::CreateInstance();
 

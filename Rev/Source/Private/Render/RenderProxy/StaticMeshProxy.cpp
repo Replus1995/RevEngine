@@ -1,6 +1,4 @@
 #include "Rev/Render/RenderProxy/StaticMeshProxy.h"
-#include "Rev/Render/Resource/StaticMesh.h"
-#include "Rev/Render/Material/SurfaceMaterial.h"
 #include "Rev/Render/RHI/DynamicRHI.h"
 #include "Rev/Render/RHI/RHIContext.h"
 #include "Rev/Render/RHI/RHICommandList.h"
@@ -30,17 +28,20 @@ void FStaticMeshProxy::Prepare(const Ref<FScene>& Scene)
 	auto EntityView = Scene->EntityView<StaticMeshComponent, TransformComponent>();
 	for (const auto& [Entiny, MeshComp, TransComp] : EntityView.each())
 	{
+		if(MeshComp.StaticMesh->IsEmpty())
+			continue;
+
 		if (MeshCount < mRenderDataArr.size())
 		{
 			FStaticMeshRenderData& RenderData = mRenderDataArr[MeshCount];
-			RenderData.MeshData = MeshComp.StaticMesh;
+			RenderData.StaticMesh = MeshComp.StaticMesh;
 			RenderData.MeshParams.ModelMat = TransComp.Transform.ToMatrix();
 			RenderData.MeshUB->UpdateSubData(&RenderData.MeshParams, sizeof(FStaticMeshUniform));
 		}
 		else
 		{
 			FStaticMeshRenderData RenderData;
-			RenderData.MeshData = MeshComp.StaticMesh;
+			RenderData.StaticMesh = MeshComp.StaticMesh;
 			RenderData.MeshParams.ModelMat = TransComp.Transform.ToMatrix();
 			RenderData.MeshUB = GDynamicRHI->CreateUniformBuffer(sizeof(FStaticMeshUniform));
 			RenderData.MeshUB->UpdateSubData(&RenderData.MeshParams, sizeof(FStaticMeshUniform));
@@ -55,7 +56,7 @@ void FStaticMeshProxy::Cleanup()
 {
 	for (size_t i = 0; i < mRenderDataArr.size(); i++)
 	{
-		mRenderDataArr[i].MeshData = nullptr;
+		mRenderDataArr[i].StaticMesh = nullptr;
 	}
 }
 
@@ -74,29 +75,42 @@ void FStaticMeshProxy::DrawMeshes(FRHICommandList& RHICmdList, EMaterialBlendMod
 void FStaticMeshProxy::DrawPrimitives(FRHICommandList& RHICmdList, const FStaticMeshRenderData& InData, EMaterialBlendMode InBlend, bool bUseMeshMaterial) const
 {
 	RHICmdList.GetContext()->BindUniformBuffer(UL::BStaticMesh, InData.MeshUB.get());
-	for (uint32 i = 0; i < InData.MeshData->GetMaterialCount(); i++)
-	{
-		auto& pMat = InData.MeshData->GetMaterial(i);
-		if (!pMat || pMat->BlendMode != InBlend)
-			continue;
 
-		auto vPrimitives = InData.MeshData->GetPrimitive(i);
-		if (!vPrimitives.empty())
+	RHICmdList.GetContext()->RHISetVertexStream(0, InData.StaticMesh->GetVertexBuffer().GetPositionBufferRHI());
+	RHICmdList.GetContext()->RHISetVertexStream(1, InData.StaticMesh->GetVertexBuffer().GetNormalBufferRHI());
+	RHICmdList.GetContext()->RHISetVertexStream(2, InData.StaticMesh->GetVertexBuffer().GetTangentBufferRHI());
+	RHICmdList.GetContext()->RHISetVertexStream(3, InData.StaticMesh->GetVertexBuffer().GetTexCoordBufferRHI());
+	RHICmdList.GetContext()->RHISetVertexStream(4, InData.StaticMesh->GetVertexBuffer().GetColorBufferRHI());
+
+	for (uint32 i = 0; i < InData.StaticMesh->GetNumMaterials(); i++)
+	{
+		auto pMat = InData.StaticMesh->GetMaterial(i);
+		if (bUseMeshMaterial)
+		{
+			if (!pMat || pMat->BlendMode != InBlend)
+				continue;
+		}
+
+		InData.StaticMesh->PrepareDraw();
+		auto Sections = InData.StaticMesh->GetSectionsForMaterial(i);
+		if (!Sections.empty())
 		{
 			if (bUseMeshMaterial)
 			{
 				pMat->PreDraw(RHICmdList);
 			}
 
-			for (auto& pPrimitive : vPrimitives)
+			for (auto Section : Sections)
 			{
-				RHICmdList.GetContext()->DrawPrimitive(pPrimitive->PrimitiveData);
+				FRHIBuffer* IndexBufferRHI = InData.StaticMesh->GetIndexBuffer().GetIndexBufferRHI();
+				RHICmdList.GetContext()->RHIDrawPrimitiveIndexed(IndexBufferRHI, Section->NumTriangles, Section->StartIndex);
 			}
 
 			if (bUseMeshMaterial)
 			{
 				pMat->PostDraw(RHICmdList);
 			}
+
 		}
 	}
 }

@@ -26,11 +26,11 @@ enum EMaterialShadingModel : uint8
 
 class FRHICommandList;
 class FRHIShaderProgram;
-class REV_API Material
+class REV_API FMaterial
 {
 public:
-	Material();
-	virtual ~Material();
+	FMaterial();
+	virtual ~FMaterial();
 	
 	/**
 	* @brief Create shader program based on ShadingModel
@@ -38,15 +38,16 @@ public:
 	virtual void Compile() = 0;
 	virtual void PreDraw(FRHICommandList& RHICmdList); //Bind Program
 	virtual void PostDraw(FRHICommandList& RHICmdList); //Unbind Program
-	//const Ref<FRHIShaderProgram>& GetProgram() const { return mProgram; }
+	const Ref<FRHIShaderProgram>& GetProgram() const { return ShaderProgram; }
 
-	EMaterialDomain GetDomain() const { return mDomain; }
-
-	const Ref<FRHIShaderProgram>& GetProgram() const { return mProgram; }
+	EMaterialDomain Domain = MD_Surface;
+	EMaterialBlendMode BlendMode = MBM_Opaque;
+	EMaterialShadingModel ShadingModel = MSM_Default;
+	bool TwoSided = false;
+	float MaskClip = 0.5f;
 
 protected:
-	Ref<FRHIShaderProgram> mProgram = nullptr;
-	EMaterialDomain mDomain = MD_Surface;
+	Ref<FRHIShaderProgram> ShaderProgram = nullptr;
 };
 
 }

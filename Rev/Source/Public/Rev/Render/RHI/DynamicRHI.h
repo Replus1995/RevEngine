@@ -36,10 +36,11 @@ public:
 	virtual Ref<FRHIRenderTarget> CreateRenderTarget(const FRenderTargetDesc& InDesc) = 0;
 
 	//State
-	virtual Ref<FRHISamplerState> CreateSamplerState(const FRHISamplerStateDesc& InDesc) = 0;
-	virtual Ref<FRHIRasterizerState> CreateRasterizerState(const FRHIRasterizerStateDesc& InDesc) = 0;
-	virtual Ref<FRHIDepthStencilState> CreateDepthStencilStateState(const FRHIDepthStencilStateDesc& InDesc) = 0;
-	virtual Ref<FRHIColorBlendState> CreateColorBlendState(const FRHIColorBlendStateDesc& InDesc) = 0;
+	virtual Ref<FRHISamplerState> RHICreateSamplerState(const FRHISamplerStateDesc& InDesc) = 0;
+	virtual Ref<FRHIRasterizerState> RHICreateRasterizerState(const FRHIRasterizerStateDesc& InDesc) = 0;
+	virtual Ref<FRHIDepthStencilState> RHICreateDepthStencilStateState(const FRHIDepthStencilStateDesc& InDesc) = 0;
+	virtual Ref<FRHIColorBlendState> RHICreateColorBlendState(const FRHIColorBlendStateDesc& InDesc) = 0;
+	virtual Ref<FRHIVertexInputState> RHICreateVertexInputState(const FRHIVertexInputStateDesc& InDesc) = 0;
 
 	//Pipeline
 	virtual Ref<FRHIRenderPass> CreateRenderPass(const FRHIRenderPassDesc& InDesc) = 0;

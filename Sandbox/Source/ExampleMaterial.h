@@ -21,7 +21,7 @@ public:
 
     virtual void PreDraw(Rev::FRHICommandList& RHICmdList) override
     {
-        Rev::Material::PreDraw(RHICmdList);
+        Rev::FMaterial::PreDraw(RHICmdList);
         //uColor.Upload(mProgram);
     }
 

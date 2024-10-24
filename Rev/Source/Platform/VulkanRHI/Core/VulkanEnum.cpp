@@ -166,7 +166,7 @@ VkFormat FVulkanEnum::Translate(EVertexElmentType InType)
     default:
     case EVertexElmentType::Unknown:
         break;
-    case EVertexElmentType::Float:
+    case EVertexElmentType::Float1:
         return VK_FORMAT_R32_SFLOAT;
     case EVertexElmentType::Float2:
         return VK_FORMAT_R32G32_SFLOAT;
@@ -174,18 +174,16 @@ VkFormat FVulkanEnum::Translate(EVertexElmentType InType)
         return VK_FORMAT_R32G32B32_SFLOAT;
     case EVertexElmentType::Float4:
         return VK_FORMAT_R32G32B32A32_SFLOAT;
+    case EVertexElmentType::UByte4:
+        return VK_FORMAT_R8G8B8A8_UNORM;
+    case EVertexElmentType::Color:
+        return VK_FORMAT_R8G8B8A8_UINT;
     case EVertexElmentType::Matrix3:
         return VK_FORMAT_R32G32B32_SFLOAT;
     case EVertexElmentType::Matrix4:
         return VK_FORMAT_R32G32B32A32_SFLOAT;
-    case EVertexElmentType::Int:
-        return VK_FORMAT_R32_SINT;
-    case EVertexElmentType::Int2:
-        return VK_FORMAT_R32G32_SINT;
-    case EVertexElmentType::Int3:
-        return VK_FORMAT_R32G32B32_SINT;
-    case EVertexElmentType::Int4:
-        return VK_FORMAT_R32G32B32A32_SINT;
+    case EVertexElmentType::UInt:
+        return VK_FORMAT_R32_UINT;
     case EVertexElmentType::Bool:
         return VK_FORMAT_R8_SINT;
     }

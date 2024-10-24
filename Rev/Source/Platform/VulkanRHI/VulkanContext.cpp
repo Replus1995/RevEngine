@@ -504,7 +504,9 @@ VkDescriptorSet FVulkanContext::GetDescriptorSet(const FVulkanShaderProgram* InP
 		break;
 		case ERHIUniformType::Texture:
 		{
-			auto[Texture, SamplerState] = mFrameState.FindTexture(BindingIdx);
+			auto TextureAndSamplerState = mFrameState.FindTexture(BindingIdx);
+			FVulkanTexture* Texture = TextureAndSamplerState.first;
+			FVulkanSamplerState* SamplerState = TextureAndSamplerState.second;
 			if (Texture)
 			{
 				ImageInfos[ImageCount].imageLayout = Texture->GetImageLayout();

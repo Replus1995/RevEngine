@@ -20,7 +20,7 @@ public:
 		TextureRHI = GDynamicRHI->CreateTexture(TextureDesc);
 
 		const FRHISamplerStateDesc SamplerDesc(SF_Nearest, SW_Repeat, SW_Repeat, SW_Repeat);
-		SamplerStateRHI = GDynamicRHI->CreateSamplerState(SamplerDesc);
+		SamplerStateRHI = GDynamicRHI->RHICreateSamplerState(SamplerDesc);
 	}
 };
 

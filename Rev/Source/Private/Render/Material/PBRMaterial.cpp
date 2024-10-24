@@ -9,29 +9,29 @@
 namespace Rev
 {
 
-PBRMaterial::PBRMaterial()
+FPBRMaterial::FPBRMaterial()
 {
 
 }
 
-PBRMaterial::~PBRMaterial()
+FPBRMaterial::~FPBRMaterial()
 {
 }
 
-void PBRMaterial::Compile()
+void FPBRMaterial::Compile()
 {
 	FRHIShaderCompileOptions FragCompileOps;
 
-	mProgram = FRHIShaderLibrary::GetInstance().CreateGraphicsProgram("PbrProgram",
+	ShaderProgram = FRHIShaderLibrary::GetInstance().CreateGraphicsProgram("PbrProgram",
 		{ "/Engine/Shaders/CommonVS" },
 		{ "/Engine/Shaders/PBR/ForwardFS", FragCompileOps }
 	);
 }
 
-void PBRMaterial::PreDraw(FRHICommandList& RHICmdList)
+void FPBRMaterial::PreDraw(FRHICommandList& RHICmdList)
 {
-	SurfaceMaterial::PreDraw(RHICmdList); //BindProgram
-	if(!mProgram)
+	FMaterial::PreDraw(RHICmdList); //BindProgram
+	if(!ShaderProgram)
 		return;
 
 	/*mProgram->SetUniform(UL::LBaseColorFactor, BaseColorFactor);

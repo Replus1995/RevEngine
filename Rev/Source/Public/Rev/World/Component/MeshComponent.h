@@ -4,10 +4,9 @@
 namespace Rev
 {
 
-class StaticMesh;
 struct StaticMeshComponent
 {
-	Ref<class StaticMesh> StaticMesh;
+	Ref<class FStaticMesh> StaticMesh;
 
 	StaticMeshComponent() = default;
 	StaticMeshComponent(const StaticMeshComponent& other){ this->StaticMesh = other.StaticMesh; }

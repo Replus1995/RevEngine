@@ -3,15 +3,14 @@
 #include "Rev/Math/Maths.h"
 #include "Rev/Render/RenderCore.h"
 #include "Rev/Render/UniformDefine.h"
-#include "Rev/Render/Resource/StaticMesh.h"
-#include "Rev/Render/Material/Material.h"
+#include "Rev/Render/Component/StaticMesh.h"
 
 namespace Rev
 {
 class FScene;
 struct FStaticMeshRenderData
 {
-	Ref<StaticMesh> MeshData;
+	Ref<FStaticMesh> StaticMesh;
 	FStaticMeshUniform MeshParams;
 	Ref<FRHIUniformBuffer> MeshUB;
 };

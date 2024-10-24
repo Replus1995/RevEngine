@@ -1,5 +1,5 @@
 #pragma once
-#include "Rev/Render/Material/SurfaceMaterial.h"
+#include "Rev/Render/Material/Material.h"
 #include "Rev/Math/Maths.h"
 
 namespace Rev
@@ -18,11 +18,11 @@ struct alignas(16) FPBRMaterialUniform
 };
 
 
-class REV_API PBRMaterial : public SurfaceMaterial
+class REV_API FPBRMaterial : public FMaterial
 {
 public:
-	PBRMaterial();
-	virtual ~PBRMaterial();
+	FPBRMaterial();
+	virtual ~FPBRMaterial();
 
 	virtual void Compile() override;
 	virtual void PreDraw(FRHICommandList& RHICmdList) override;

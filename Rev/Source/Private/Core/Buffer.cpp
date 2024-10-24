@@ -53,6 +53,7 @@ void FBuffer::Allocate(uint64 size)
 	Release();
 	mData = new uint8[size];
 	mSize = size;
+	memset(mData, 0, mSize);
 }
 
 void FBuffer::Release()

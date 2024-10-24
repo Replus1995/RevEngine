@@ -1,12 +1,12 @@
 #pragma once
 #include "Rev/Core/Base.h"
-#include "Rev/Render/Material/SurfaceMaterial.h"
+#include "Rev/Render/Material/Material.h"
 #include "Rev/Math/Maths.h"
 
 namespace Rev
 {
 struct FTextureStorage;
-struct FSurfaceMaterialStorage
+struct FMaterialStorage
 {
 public:
 	std::string Name;
@@ -15,12 +15,12 @@ public:
 	float MaskClip = 0.5f;
 	bool TwoSided = false;
 
-	virtual Ref<SurfaceMaterial> CreateMaterial() { return mCache; }
+	virtual Ref<FMaterial> CreateMaterial() { return mCache; }
 protected:
-	Ref<SurfaceMaterial> mCache = nullptr;
+	Ref<FMaterial> mCache = nullptr;
 };
 
-struct FPBRMaterialStorage : public FSurfaceMaterialStorage
+struct FPBRMaterialStorage : public FMaterialStorage
 {
 public:
 	Math::FLinearColor BaseColorFactor = Math::FLinearColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -39,7 +39,7 @@ public:
 	Math::FVector3 EmissiveFactor = Math::FVector3(0.0f, 0.0f, 0.0f);
 	Ref<FTextureStorage> EmissiveTexture = nullptr;
 
-	virtual Ref<SurfaceMaterial> CreateMaterial() override;
+	virtual Ref<FMaterial> CreateMaterial() override;
 };
 
 

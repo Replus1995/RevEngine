@@ -10,6 +10,7 @@
 #include "VulkanSwapchain.h"
 #include "VulkanFrameData.h"
 #include "VulkanPipeline.h"
+#include "VulkanState.h"
 
 namespace Rev
 {

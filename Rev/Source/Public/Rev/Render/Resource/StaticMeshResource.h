@@ -26,6 +26,7 @@ struct FStaticMeshVertex
 
 class REV_API FStaticMeshVertexBuffer : public FRenderResource
 {
+	friend class FStaticMeshBuilder;
 public:
 	FStaticMeshVertexBuffer();
 	virtual ~FStaticMeshVertexBuffer();
@@ -33,15 +34,32 @@ public:
 	void Init(uint32 InNumVertices, uint32 InNumTexCoords);
 	void Cleanup();
 
-	void SetPosition(uint32 VertexIndex, const Math::FVector3& InPosition);
-	void SetNormal(uint32 VertexIndex, const Math::FVector3& InNormal);
-	void SetTangent(uint32 VertexIndex, const Math::FVector4& InTangent);
-	void SetTexCoord(uint32 VertexIndex, uint32 UVIndex, const Math::FVector2& InTexCoord);
-	void SetColor(uint32 VertexIndex, const Math::FColor& InColor);
+	FORCEINLINE uint32 GetNumVertices() const { return NumVertices; }
+	FORCEINLINE uint32 GetNumTexCoords() const { return NumTexCoords; }
 
+	FRHIBuffer* GetPositionBufferRHI() const { return PositionBuffer.VertexBufferRHI.get(); }
+	FRHIBuffer* GetNormalBufferRHI() const { return NormalBuffer.VertexBufferRHI.get(); }
+	FRHIBuffer* GetTangentBufferRHI() const { return TangentBuffer.VertexBufferRHI.get(); }
+	FRHIBuffer* GetTexCoordBufferRHI() const { return TexCoordBuffer.VertexBufferRHI.get(); }
+	FRHIBuffer* GetColorBufferRHI() const { return ColorBuffer.VertexBufferRHI.get(); }
 
 	virtual void InitRHI() override;
 	virtual void ReleaseRHI() override;
+
+protected:
+	Math::FVector3& GetPosition(uint32 VertexIndex);
+	Math::FVector3& GetNormal(uint32 VertexIndex);
+	Math::FVector4& GetTangent(uint32 VertexIndex);
+	Math::FVector2& GetTexCoord(uint32 VertexIndex, uint32 UVIndex = 0);
+	Math::FColor& GetColor(uint32 VertexIndex);
+
+	void FillPositions(const float* Content, uint32 Size, uint32 Offset);
+	void FillNormals(const float* Content, uint32 Size, uint32 Offset);
+	void FillTangents(const float* Content, uint32 Size, uint32 Offset);
+	void FillTexCoords(uint32 UVIndex, const float* Content, uint32 Size, uint32 Offset);
+	void FillColors(const uint8* Content, uint32 Size, uint32 Offset);
+
+	Ref<FRHIBuffer> CreateBufferFromData(const FBuffer& InData, uint32 InStride);
 
 protected:
 	uint32 NumVertices = 0;
@@ -62,9 +80,38 @@ protected:
 	FVertexBuffer ColorBuffer;
 };
 
-struct FStaticMeshSection
+class REV_API FStaticMeshIndexBuffer : public FRenderResource
 {
+	friend class FStaticMeshBuilder;
+public:
+	FStaticMeshIndexBuffer();
+	virtual ~FStaticMeshIndexBuffer();
 
+	void Init(uint32 InNumIndices, bool bUse32Bit);
+	void Cleanup();
+
+	FORCEINLINE uint32 GetNumIndices() const { return NumIndices; }
+	FORCEINLINE uint32 GetNumTriangles() const { return NumIndices / 3; }
+	FORCEINLINE bool Is32Bit() const { return b32Bit; }
+	FRHIBuffer* GetIndexBufferRHI() const { return IndexBuffer.IndexBufferRHI.get(); }
+
+	virtual void InitRHI() override;
+	virtual void ReleaseRHI() override;
+
+protected:
+	uint32 GetIndex(uint32 At);
+	void SetIndex(uint32 At, uint32 Value);
+
+	void FillIndices(const uint16* Content, uint32 Size, uint32 Offset);
+	void FillIndices(const uint32* Content, uint32 Size, uint32 Offset);
+
+protected:
+	uint32 NumIndices = 0;
+	bool b32Bit = false;
+
+	FBuffer IndexData;
+	FIndexBuffer IndexBuffer;
 };
+
 
 }

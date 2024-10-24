@@ -5,20 +5,20 @@
 namespace Rev
 {
 
-Material::Material()
+FMaterial::FMaterial()
 {
 }
 
-Material::~Material()
+FMaterial::~FMaterial()
 {
 }
 
-void Material::PreDraw(FRHICommandList& RHICmdList)
+void FMaterial::PreDraw(FRHICommandList& RHICmdList)
 {
-	RHICmdList.GetContext()->BindProgram(mProgram);
+	RHICmdList.GetContext()->BindProgram(ShaderProgram.get());
 }
 
-void Material::PostDraw(FRHICommandList& RHICmdList)
+void FMaterial::PostDraw(FRHICommandList& RHICmdList)
 {
 	RHICmdList.GetContext()->BindProgram(nullptr);
 }
