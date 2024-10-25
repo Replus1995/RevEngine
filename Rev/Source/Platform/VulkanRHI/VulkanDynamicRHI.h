@@ -24,7 +24,7 @@ public:
 	virtual Ref<FRHIVertexBuffer> CreateVertexBuffer(uint32 InSize, bool bDynamic) override;
 	virtual Ref<FRHIIndexBuffer> CreateIndexBuffer(uint32 InStride, uint32 InCount, bool bDynamic) override;
 	virtual Ref<FRHIUniformBuffer> CreateUniformBuffer(uint32 InSize) override;
-	virtual Ref<FRHIBuffer> RHICreateBuffer(uint32 InSize, uint32 InStride, EBufferUsageFlags InFlags) override {};
+	virtual Ref<FRHIBuffer> RHICreateBuffer(uint32 InSize, uint32 InStride, EBufferUsageFlags InFlags) override;
 
 	//Primitive
 	virtual Ref<FRHIPrimitive> CreatePrimitive(EPrimitiveTopology InTopology) override;

@@ -37,7 +37,6 @@ public:
 	FTextureStorage(const FTextureStorage& Other) = delete;
 	FTextureStorage(FTextureStorage&& Other) noexcept;
 
-	std::string Name;
 	FRHISamplerStateDesc SamplerDesc;
 	FRHITextureDesc TextureDesc;
 	FImageStorage ImageData;

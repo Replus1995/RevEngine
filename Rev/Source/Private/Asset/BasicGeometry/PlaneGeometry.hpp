@@ -37,8 +37,8 @@ public:
         FStaticMeshBuilder PlaneBuilder;
         PlaneBuilder.Init(4, 1, 6, false);
         PlaneBuilder.FillPositions(sPlanePositions, ARRAY_LENGTH(sPlanePositions));
-        PlaneBuilder.FillTexCoords(0, sPlaneTexCoords, sizeof(sPlaneTexCoords) / sizeof(float));
-        PlaneBuilder.FillIndices(sPlaneIndices, sizeof(sPlaneIndices) / sizeof(uint16));
+        PlaneBuilder.FillTexCoords(0, sPlaneTexCoords, ARRAY_LENGTH(sPlaneTexCoords));
+        PlaneBuilder.FillIndices(sPlaneIndices, ARRAY_LENGTH(sPlaneIndices));
         PlaneBuilder.SetMaterials({ InMat });
 
         return PlaneBuilder.Build(true, true);

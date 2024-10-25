@@ -129,19 +129,4 @@ void ReleaseGlobalResources()
 		});
 }
 
-uint32 FTexture::GetSizeX() const
-{
-	return TextureRHI ? TextureRHI->GetWidth() : 0;
-}
-
-uint32 FTexture::GetSizeY() const
-{
-	return TextureRHI ? TextureRHI->GetHeight() : 0;
-}
-
-uint32 FTexture::GetSizeZ() const
-{
-	return TextureRHI ? TextureRHI->GetDepth() : 0;
-}
-
 }

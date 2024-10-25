@@ -24,7 +24,7 @@ public:
 	static Ref<FStaticMesh> ImportMeshPrimitive(const tinygltf::Primitive& InPrimitive, const tinygltf::Model& InModel, const std::vector<Ref<FMaterial>>& InMaterials);
 	static std::vector<Ref<FStaticMesh>> ImportStaticMesh(const tinygltf::Mesh& InMesh, const tinygltf::Model& InModel, const std::vector<Ref<FMaterial>>& InMaterials);
 	static Ref<FTextureStorage> ImportTexture(const tinygltf::Texture& InTexture, const tinygltf::Model& InModel);
-	static Ref<FMaterialStorage> ImportMaterial(const tinygltf::Material& InMaterial, const tinygltf::Model& InModel, const std::vector<Ref<FTextureStorage>>& InTextures);
+	static Ref<FMaterial> ImportMaterial(const tinygltf::Material& InMaterial, const tinygltf::Model& InModel, const std::vector<Ref<FTextureStorage>>& InTextures);
 	static FModelImportResult ImportModel(const FPath& InPath, bool DumpInfo = false);
 };
 

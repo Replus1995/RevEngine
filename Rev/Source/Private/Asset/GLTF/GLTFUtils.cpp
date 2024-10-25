@@ -488,74 +488,58 @@ Ref<FTextureStorage> FGLTFUtils::ImportTexture(const tinygltf::Texture& InTextur
 	const tinygltf::Image& InImage = InModel.images[InTexture.source];
 	const tinygltf::Sampler& InSampler = InModel.samplers[InTexture.sampler];
 
-	Ref<FTextureStorage> Result = CreateRef<FTextureStorage>();
-	if (InTexture.name.empty())
+	Ref<FTextureStorage> Storage = CreateRef<FTextureStorage>();
+	Storage->TextureDesc = FRHITextureDesc::Make2D(InImage.width, InImage.height, TranslateImageFormat(InImage));
+	Storage->SamplerDesc = TranslateSampler(InSampler);
 	{
-		if (InImage.name.empty())
-		{
-			std::filesystem::path uri(InImage.uri);
-			Result->Name = uri.filename().generic_string();
-		}
-		else
-		{
-			Result->Name = InImage.name;
-		}
-	}
-	else
-	{
-		Result->Name = InTexture.name;
-	}
-	Result->TextureDesc = FRHITextureDesc::Make2D(InImage.width, InImage.height, TranslateImageFormat(InImage));
-	Result->SamplerDesc = TranslateSampler(InSampler);
-	{
-		Result->ImageData.Resize(1, 1);
-		FBuffer& ImageBuffer = Result->ImageData.At(0, 0);
+		Storage->ImageData.Resize(1, 1);
+		FBuffer& ImageBuffer = Storage->ImageData.At(0, 0);
 		//Decoded data
 		ImageBuffer.Allocate(InImage.image.size());
 		memcpy(ImageBuffer.Data(), InImage.image.data(), InImage.image.size());
 	}
 	//TODO: Decode image data from buffer
 	
-	return Result;
+	return Storage;
 }
 
-Ref<FMaterialStorage> FGLTFUtils::ImportMaterial(const tinygltf::Material& InMaterial, const tinygltf::Model& InModel, const std::vector<Ref<FTextureStorage>>& InTextures)
+Ref<FMaterial> FGLTFUtils::ImportMaterial(const tinygltf::Material& InMaterial, const tinygltf::Model& InModel, const std::vector<Ref<FTextureStorage>>& InTextures)
 {
 	auto& pbrInfo = InMaterial.pbrMetallicRoughness;
-	Ref<FPBRMaterialStorage> Result = CreateRef<FPBRMaterialStorage>();
-	Result->Name = InMaterial.name;
+	FPBRMaterialStorage Storage;
+	//Storage.Name = InMaterial.name;
 	
 	{
 		//Alpha Mode
 		if (InMaterial.alphaMode == "OPAQUE")
 		{
-			Result->BlendMode = MBM_Opaque;
+			Storage.BlendMode = MBM_Opaque;
 		}
 		else if (InMaterial.alphaMode == "BLEND")
 		{
-			Result->BlendMode = MBM_Transparent;
+			Storage.BlendMode = MBM_Transparent;
 		}
 		else if (InMaterial.alphaMode == "MASK")
 		{
-			Result->BlendMode = MBM_Masked;
+			Storage.BlendMode = MBM_Masked;
 		}
 	}
 
-	Result->MaskClip = InMaterial.alphaCutoff;
-	Result->TwoSided = InMaterial.doubleSided;
-	Result->BaseColorFactor = TranslateColor(pbrInfo.baseColorFactor);
-	Result->BaseColorTexture = pbrInfo.baseColorTexture.index >= 0 ? InTextures[pbrInfo.baseColorTexture.index] : nullptr;
-	Result->Metallic = pbrInfo.metallicFactor;
-	Result->Roughness = pbrInfo.roughnessFactor;
-	Result->MetallicRoughnessTexture = pbrInfo.metallicRoughnessTexture.index >= 0 ? InTextures[pbrInfo.metallicRoughnessTexture.index] : nullptr;
-	Result->NormalScale = InMaterial.normalTexture.scale;
-	Result->NormalTexture = InMaterial.normalTexture.index >= 0 ? InTextures[InMaterial.normalTexture.index] : nullptr;
-	Result->OcclusionStrength = InMaterial.occlusionTexture.strength;
-	Result->OcclusionTexture = InMaterial.occlusionTexture.index >= 0 ? InTextures[InMaterial.occlusionTexture.index] : nullptr;
-	Result->EmissiveFactor = TranslateVector3(InMaterial.emissiveFactor);
-	Result->EmissiveTexture = InMaterial.emissiveTexture.index >= 0 ? InTextures[InMaterial.emissiveTexture.index] : nullptr;
+	Storage.MaskClip = InMaterial.alphaCutoff;
+	Storage.TwoSided = InMaterial.doubleSided;
+	Storage.BaseColorFactor = TranslateColor(pbrInfo.baseColorFactor);
+	Storage.BaseColorTexture = pbrInfo.baseColorTexture.index >= 0 ? InTextures[pbrInfo.baseColorTexture.index]->CreateTexture(true) : nullptr;
+	Storage.Metallic = pbrInfo.metallicFactor;
+	Storage.Roughness = pbrInfo.roughnessFactor;
+	Storage.MetallicRoughnessTexture = pbrInfo.metallicRoughnessTexture.index >= 0 ? InTextures[pbrInfo.metallicRoughnessTexture.index]->CreateTexture(false) : nullptr;
+	Storage.NormalScale = InMaterial.normalTexture.scale;
+	Storage.NormalTexture = InMaterial.normalTexture.index >= 0 ? InTextures[InMaterial.normalTexture.index]->CreateTexture(false) : nullptr;
+	Storage.OcclusionStrength = InMaterial.occlusionTexture.strength;
+	Storage.OcclusionTexture = InMaterial.occlusionTexture.index >= 0 ? InTextures[InMaterial.occlusionTexture.index]->CreateTexture(false) : nullptr;
+	Storage.EmissiveFactor = TranslateVector3(InMaterial.emissiveFactor);
+	Storage.EmissiveTexture = InMaterial.emissiveTexture.index >= 0 ? InTextures[InMaterial.emissiveTexture.index]->CreateTexture(true) : nullptr;
 
-	return Result;
+	return Storage.CreateMaterial();
 }
 
 FModelImportResult FGLTFUtils::ImportModel(const FPath& InPath, bool DumpInfo)
@@ -598,17 +582,18 @@ FModelImportResult FGLTFUtils::ImportModel(const FPath& InPath, bool DumpInfo)
 	}
 
 	FModelImportResult Result;
+	std::vector<Ref<FTextureStorage>> TextureStorageVec;
 
 	for (size_t i = 0; i < InModel.textures.size(); i++)
 	{
 		Ref<FTextureStorage> TextureStorage = ImportTexture(InModel.textures[i], InModel);
-		Result.Textures.emplace_back(std::move(TextureStorage));
+		TextureStorageVec.emplace_back(std::move(TextureStorage));
 	}
 
 	for (size_t i = 0; i < InModel.materials.size(); i++)
 	{
-		Ref<FMaterialStorage> MaterialStorage = ImportMaterial(InModel.materials[i], InModel, Result.Textures);
-		Result.Materials.emplace_back(std::move(MaterialStorage));
+		Ref<FMaterial> Material = ImportMaterial(InModel.materials[i], InModel, TextureStorageVec);
+		Result.Materials.emplace_back(std::move(Material));
 	}
 
 	for (size_t i = 0; i < InModel.meshes.size(); i++)

@@ -5,11 +5,11 @@
 
 namespace Rev
 {
-struct FTextureStorage;
+struct FTexture;
 struct FMaterialStorage
 {
 public:
-	std::string Name;
+	//std::string Name;
 	EMaterialBlendMode BlendMode = MBM_Opaque;
 	EMaterialShadingModel ShadingModel = MSM_Default;
 	float MaskClip = 0.5f;
@@ -24,20 +24,20 @@ struct FPBRMaterialStorage : public FMaterialStorage
 {
 public:
 	Math::FLinearColor BaseColorFactor = Math::FLinearColor(1.0f, 1.0f, 1.0f, 1.0f);
-	Ref<FTextureStorage> BaseColorTexture = nullptr;
+	Ref<FTexture> BaseColorTexture = nullptr;
 
 	float Metallic = 1.0f;
 	float Roughness = 1.0f;
-	Ref<FTextureStorage> MetallicRoughnessTexture = nullptr;
+	Ref<FTexture> MetallicRoughnessTexture = nullptr;
 
 	float NormalScale = 1.0f;
-	Ref<FTextureStorage> NormalTexture = nullptr;
+	Ref<FTexture> NormalTexture = nullptr;
 
 	float OcclusionStrength = 1.0f;
-	Ref<FTextureStorage> OcclusionTexture = nullptr;
+	Ref<FTexture> OcclusionTexture = nullptr;
 
 	Math::FVector3 EmissiveFactor = Math::FVector3(0.0f, 0.0f, 0.0f);
-	Ref<FTextureStorage> EmissiveTexture = nullptr;
+	Ref<FTexture> EmissiveTexture = nullptr;
 
 	virtual Ref<FMaterial> CreateMaterial() override;
 };

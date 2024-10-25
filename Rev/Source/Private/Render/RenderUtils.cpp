@@ -4,6 +4,7 @@
 #include "Rev/Render/RHI/RHIBuffer.h"
 #include "Rev/Render/RHI/RHIPrimitive.h"
 #include "Rev/Render/RHI/DynamicRHI.h"
+#include "Rev/Render/Resource/TextureResource.h"
 
 namespace Rev
 {

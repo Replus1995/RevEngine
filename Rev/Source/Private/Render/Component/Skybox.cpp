@@ -1,5 +1,5 @@
 #include "Rev/Render/Component/Skybox.h"
-#include "Rev/Render/Resource/RenderResource.h"
+#include "Rev/Render/Resource/TextureResource.h"
 #include "Rev/Render/RHI/RHITexture.h"
 #include "Rev/Core/Assert.h"
 

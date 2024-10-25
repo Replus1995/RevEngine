@@ -245,6 +245,12 @@ void FVulkanContext::UpdateBufferData(const Ref<FRHIIndexBuffer>& Buffer, const 
 	FVulkanUtils::ImmediateUploadBuffer(this, (VkBuffer)Buffer->GetNativeHandle(), Content, Size, Offset);
 }
 
+void FVulkanContext::UpdateBufferData(FRHIBuffer* Buffer, const void* Content, uint32 Size, uint32 Offset)
+{
+	REV_CORE_ASSERT(Size + Offset <= Buffer->GetSize());
+	FVulkanUtils::ImmediateUploadBuffer(this, (VkBuffer)Buffer->GetNativeHandle(), Content, Size, Offset);
+}
+
 void FVulkanContext::BeginRenderPass(FRHIRenderPass* InRenderPass)
 {
 	FVulkanRenderPass* RenderPass = static_cast<FVulkanRenderPass*>(InRenderPass);

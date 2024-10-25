@@ -113,5 +113,24 @@ protected:
 	FIndexBuffer IndexBuffer;
 };
 
+//struct FStaticMeshVertexSource
+//{
+//	uint32 NumVertices = 0;
+//	uint32 NumTexCoords = 0;
+//
+//	FBuffer PositionData;
+//	FBuffer NormalData;
+//	FBuffer TangentData;
+//	FBuffer TexCoordData;
+//	FBuffer ColorData;
+//};
+//
+//struct FStaticMeshIndexSource
+//{
+//	uint32 NumIndices = 0;
+//	bool b32Bit = false;
+//
+//	FBuffer IndexData;
+//};
 
 }

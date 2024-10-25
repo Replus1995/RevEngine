@@ -45,7 +45,7 @@ Ref<FRHIColorBlendState> FVulkanDynamicRHI::RHICreateColorBlendState(const FRHIC
 
 Ref<FRHIVertexInputState> FVulkanDynamicRHI::RHICreateVertexInputState(const FRHIVertexInputStateDesc& InDesc)
 {
-	return CreateRef<FRHIVertexInputState>(InDesc);
+	return CreateRef<FVulkanVertexInputState>(InDesc);
 }
 //Dynamic RHI
 

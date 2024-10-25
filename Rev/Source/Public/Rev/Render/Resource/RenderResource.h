@@ -56,42 +56,11 @@ extern REV_API void ReleaseGlobalResources();
 
 
 class FRHIBuffer;
-class FRHITexture;
-class FRHISamplerState;
 class FRHIRasterizerState;
 class FRHIDepthStencilState;
 class FRHIColorBlendState;
 class FRHIVertexInputState;
 
-class REV_API FTexture : public FRenderResource
-{ 
-public:
-
-	Ref<FRHITexture> TextureRHI;
-	Ref<FRHISamplerState> SamplerStateRHI;
-	bool bSRGB;
-
-	FTexture()
-		: TextureRHI(nullptr)
-		, SamplerStateRHI(nullptr)
-		, bSRGB(false)
-	{}
-
-	virtual ~FTexture() {};
-
-	virtual uint32 GetSizeX() const;
-	virtual uint32 GetSizeY() const;
-	virtual uint32 GetSizeZ() const;
-
-	FRHITexture* GetTextureRHI() const { return TextureRHI.get(); }
-	FRHISamplerState* GetSamplerStateRHI() const { return SamplerStateRHI.get(); }
-
-	virtual void ReleaseRHI() override
-	{
-		TextureRHI.reset();
-		SamplerStateRHI.reset();
-	}
-};
 
 class REV_API FVertexBuffer : public FRenderResource
 {

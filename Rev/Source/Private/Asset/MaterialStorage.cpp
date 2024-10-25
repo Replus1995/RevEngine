@@ -5,7 +5,7 @@
 namespace Rev
 {
 
-Ref<SurfaceMaterial> FPBRMaterialStorage::CreateMaterial()
+Ref<FMaterial> FPBRMaterialStorage::CreateMaterial()
 {
 	if(mCache)
 		return mCache;
@@ -24,15 +24,15 @@ Ref<SurfaceMaterial> FPBRMaterialStorage::CreateMaterial()
 	Result->Params.EmissiveFactor = EmissiveFactor;
 
 	if(BaseColorTexture)
-		Result->BaseColorTexture = BaseColorTexture->CreateTexture(true);
+		Result->BaseColorTexture = BaseColorTexture;
 	if (MetallicRoughnessTexture)
-		Result->MetallicRoughnessTexture = MetallicRoughnessTexture->CreateTexture();
+		Result->MetallicRoughnessTexture = MetallicRoughnessTexture;
 	if (NormalTexture)
-		Result->NormalTexture = NormalTexture->CreateTexture();
+		Result->NormalTexture = NormalTexture;
 	if (OcclusionTexture)
-		Result->OcclusionTexture = OcclusionTexture->CreateTexture();
+		Result->OcclusionTexture = OcclusionTexture;
 	if (EmissiveTexture)
-		Result->EmissiveTexture = EmissiveTexture->CreateTexture(true);
+		Result->EmissiveTexture = EmissiveTexture;
 
 	Result->Compile();
 

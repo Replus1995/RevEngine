@@ -2,7 +2,7 @@
 #include "Rev/Core/Assert.h"
 #include "Rev/Render/RHI/DynamicRHI.h"
 #include "Rev/Render/RenderCore.h"
-#include "Rev/Render/Resource/RenderResource.h"
+#include "Rev/Render/Resource/TextureResource.h"
 
 namespace Rev
 {
@@ -40,8 +40,7 @@ FBuffer& FImageStorage::At(uint8 MipIndex, uint16 LayerIndex)
 }
 
 FTextureStorage::FTextureStorage(FTextureStorage&& Other) noexcept
-	: Name(Other.Name)
-	, SamplerDesc(std::move(Other.SamplerDesc))
+	: SamplerDesc(std::move(Other.SamplerDesc))
 	, TextureDesc(std::move(Other.TextureDesc))
 	, ImageData(std::move(Other.ImageData))
 {

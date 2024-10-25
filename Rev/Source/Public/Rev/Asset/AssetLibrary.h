@@ -20,13 +20,9 @@ enum class EBasicGeometry : uint8
 class FTexture;
 class FMaterial;
 class FStaticMesh;
-
-
-
 struct FModelImportResult
 {
-	std::vector<Ref<FTextureStorage>> Textures;
-	std::vector<Ref<FSurfaceMaterialStorage>> Materials;
+	std::vector<Ref<FMaterial>> Materials;
 	std::vector<Ref<FStaticMesh>> StaticMeshes;
 	//SkeletalMeshes
 };

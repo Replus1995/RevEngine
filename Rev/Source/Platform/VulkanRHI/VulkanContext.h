@@ -51,6 +51,7 @@ public:
 	virtual void ClearTexture(FRHITexture* InTexture, uint8 InMipLevel, uint8 InMipCount, uint16 InArrayIndex, uint16 InArrayCount) override;
 	virtual void UpdateBufferData(const Ref<FRHIVertexBuffer>& Buffer, const void* Content, uint32 Size, uint32 Offset) override;
 	virtual void UpdateBufferData(const Ref<FRHIIndexBuffer>& Buffer, const void* Content, uint32 Size, uint32 Offset) override;
+	virtual void UpdateBufferData(FRHIBuffer* Buffer, const void* Content, uint32 Size, uint32 Offset = 0) override;
 
 //Draw
 	virtual void BeginRenderPass(FRHIRenderPass* InRenderPass) override;

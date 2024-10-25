@@ -178,6 +178,7 @@ void FStaticMeshIndexBuffer::ReleaseRHI()
 
 uint32 FStaticMeshIndexBuffer::GetIndex(uint32 At)
 {
+	REV_CORE_ASSERT(At < NumIndices);
 	if (b32Bit)
 	{
 		return IndexData.DataAs<uint32>()[At];
@@ -190,6 +191,7 @@ uint32 FStaticMeshIndexBuffer::GetIndex(uint32 At)
 
 void FStaticMeshIndexBuffer::SetIndex(uint32 At, uint32 Value)
 {
+	REV_CORE_ASSERT(At < NumIndices);
 	if (b32Bit)
 	{
 		IndexData.DataAs<uint32>()[At] = Value;

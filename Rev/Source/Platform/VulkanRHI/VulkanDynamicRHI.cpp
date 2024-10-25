@@ -63,6 +63,11 @@ Ref<FRHIUniformBuffer> FVulkanDynamicRHI::CreateUniformBuffer(uint32 InSize)
 	return CreateRef<FVulkanUniformBuffer>(InSize);
 }
 
+Ref<FRHIBuffer> FVulkanDynamicRHI::RHICreateBuffer(uint32 InSize, uint32 InStride, EBufferUsageFlags InFlags)
+{
+	return CreateRef<FVulkanBuffer>(InSize, InStride, InFlags);
+}
+
 Ref<FRHIPrimitive> FVulkanDynamicRHI::CreatePrimitive(EPrimitiveTopology InTopology)
 {
 	return CreateRef<FVulkanPrimitive>(InTopology);

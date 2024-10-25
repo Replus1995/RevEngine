@@ -1,7 +1,7 @@
 #pragma once
 #include "Rev/Core/Base.h"
 #include "Rev/Render/Material/Material.h"
-#include "Rev/Render/Resource/StaticMesh.h"
+#include "Rev/Render/Component/StaticMesh.h"
 #include "Rev/Render/RHI/RHIBuffer.h"
 #include "Rev/Render/RHI/DynamicRHI.h"
 #include "Rev/Render/RHI/RHIContext.h"
@@ -10,7 +10,7 @@ namespace Rev
 {
 
 
-static constexpr float sBoxVertices[] = {
+static constexpr float sBoxPositions[] = {
     -0.5, -0.5, -0.5,
     -0.5, +0.5, -0.5,
     +0.5, +0.5, -0.5,
@@ -21,7 +21,7 @@ static constexpr float sBoxVertices[] = {
     +0.5, -0.5, +0.5
 };
 
-static constexpr uint32 sBoxIndices[] = {
+static constexpr uint16 sBoxIndices[] = {
     4, 7, 5,
     6, 5, 7,
     7, 4, 3,
@@ -39,36 +39,15 @@ static constexpr uint32 sBoxIndices[] = {
 class FBoxGeometry
 {
 public:
-    static Ref<StaticMesh> Create(const Ref<SurfaceMaterial>& InMat)
+    static Ref<FStaticMesh> Create(const Ref<FMaterial>& InMat)
     {
-        std::vector<Ref<SurfaceMaterial>> boxMatArr = { InMat };
-        std::vector<FMeshPrimitive> boxPrimArr;
-        {
-            constexpr uint32 boxVerticesSize = sizeof(sBoxVertices);
-            Ref<FRHIVertexBuffer> boxVertices = GDynamicRHI->CreateVertexBuffer(boxVerticesSize);
-            FRenderCore::GetMainContext()->UpdateBufferData(boxVertices, sBoxVertices, boxVerticesSize);
-            boxVertices->SetLayout({
-                {"Position", EVertexElmentType::Float3,  0}
-                //{EShaderDataType::Float3, "a_Normal"},
-                //{EShaderDataType::Float2, "a_TexCoord"}
-                });
+        FStaticMeshBuilder BoxBuilder;
+        BoxBuilder.Init(4, 1, 6, false);
+        BoxBuilder.FillPositions(sBoxPositions, ARRAY_LENGTH(sBoxPositions));
+        BoxBuilder.FillIndices(sBoxIndices, ARRAY_LENGTH(sBoxIndices));
+        BoxBuilder.SetMaterials({ InMat });
 
-            constexpr uint32 boxIndicesCount = sizeof(sBoxIndices) / sizeof(uint32);
-            Ref<FRHIIndexBuffer> boxIndices = GDynamicRHI->CreateIndexBuffer(sizeof(uint32), boxIndicesCount);
-            FRenderCore::GetMainContext()->UpdateBufferData(boxIndices, sBoxIndices, sizeof(sBoxIndices));
-
-            FMeshPrimitive boxMeshPrim;
-            boxMeshPrim.PrimitiveData = GDynamicRHI->CreatePrimitive(PT_Triangles);
-            boxMeshPrim.PrimitiveData->AddVertexBuffer(boxVertices);
-            boxMeshPrim.PrimitiveData->SetIndexBuffer(boxIndices);
-
-            boxPrimArr.emplace_back(std::move(boxMeshPrim));
-        }
-
-        Ref<StaticMesh> OutMesh = CreateRef<StaticMesh>();
-        OutMesh->SetMaterials(std::move(boxMatArr));
-        OutMesh->SetPrimitives(std::move(boxPrimArr));
-        return OutMesh;
+        return BoxBuilder.Build(true, true);
     }
 };
 

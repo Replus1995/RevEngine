@@ -1,6 +1,5 @@
 #pragma once
 #include "Rev/Render/RenderCore.h"
-#include "Rev/Render/Resource/RenderResource.h"
 #include "Rev/Math/Maths.h"
 
 namespace Rev
