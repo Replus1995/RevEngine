@@ -81,8 +81,8 @@ public:
 
 struct FVulkanVertexStream
 {
-	VkBuffer Buffer;
-	uint32 Offset;
+	VkBuffer Buffer = VK_NULL_HANDLE;
+	uint32 Offset = 0;
 };
 
 class FVulkanRenderPass;

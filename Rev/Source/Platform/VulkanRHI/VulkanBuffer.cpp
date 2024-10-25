@@ -67,7 +67,7 @@ void FVulkanBufferBase::Allocate(uint64 Size, VkBufferUsageFlags BufferUsage, Vm
 
 	VmaAllocationCreateInfo AllocInfo = {};
 	AllocInfo.usage = VMA_MEMORY_USAGE_AUTO;
-	AllocInfo.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT;
+	AllocInfo.flags = CreateFlags;
 
 	// allocate the buffer
 	REV_VK_CHECK(vmaCreateBuffer(FVulkanDynamicRHI::GetAllocator(), &BufferCreateInfo, &AllocInfo, &Buffer, &mAllocation, &mAllocationInfo));

@@ -9,6 +9,19 @@ namespace Rev
 class FRenderResourceList
 {
 public:
+	static FRenderResourceList& GetInstance()
+	{
+		if(!Instance)
+			Instance = new FRenderResourceList;
+		return *Instance;
+	}
+	static void ReleaseInstance()
+	{
+		delete Instance;
+		Instance = nullptr;
+	}
+
+
 	FRenderResourceList()
 	{
 	}
@@ -59,11 +72,11 @@ public:
 private:
 	std::vector<FRenderResource*> ResourceList;
 	bool bIsIterating = false;
+
+	static FRenderResourceList* Instance;
 };
 
-FRenderResourceList GGlobalResourceList;
-
-
+FRenderResourceList* FRenderResourceList::Instance = nullptr;
 
 FRenderResource::FRenderResource()
 	: ListIndex(-1)
@@ -82,7 +95,7 @@ void FRenderResource::InitResource()
 
 	if (!GIsRHIInitialized)
 	{
-		ListIndex = GGlobalResourceList.Allocate(this);
+		ListIndex = FRenderResourceList::GetInstance().Allocate(this);
 	}
 	else
 	{
@@ -99,7 +112,7 @@ void FRenderResource::ReleaseResource()
 		{
 			ReleaseRHI();
 		}
-		GGlobalResourceList.Deallocate(ListIndex);
+		FRenderResourceList::GetInstance().Deallocate(ListIndex);
 		ListIndex = -1;
 	}
 }
@@ -115,7 +128,7 @@ void FRenderResource::ReinitRHI()
 
 void InitGlobalResources()
 {
-	GGlobalResourceList.ForEach([](FRenderResource* Resource)
+	FRenderResourceList::GetInstance().ForEach([](FRenderResource* Resource)
 		{
 			Resource->InitRHI();
 		});
@@ -123,10 +136,11 @@ void InitGlobalResources()
 
 void ReleaseGlobalResources()
 {
-	GGlobalResourceList.ForEach([](FRenderResource* Resource)
+	FRenderResourceList::GetInstance().ForEach([](FRenderResource* Resource)
 		{
 			Resource->ReleaseRHI();
 		});
+	FRenderResourceList::ReleaseInstance();
 }
 
 }

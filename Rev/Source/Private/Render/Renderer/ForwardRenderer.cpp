@@ -4,6 +4,7 @@
 #include "Rev/Render/RHI/RHICommandList.h"
 #include "Rev/Render/RHI/RHIPipeline.h"
 #include "Rev/Render/RenderProxy/SceneProxy.h"
+#include "Rev/Render/RenderUtils.h"
 
 namespace Rev
 {
@@ -74,6 +75,7 @@ void FForwardRenderer::DrawFrame(FRHICommandList& RHICmdList)
 	RHICmdList.GetContext()->BeginRenderPass(mBasePass.get());
 
 	FRHIGraphicsPipelineStateDesc Desc;
+	Desc.VertexInputState = GStaticMeshVertexInputState.VertexInputStateRHI.get();
 	Desc.DepthStencilStateDesc.bEnableDepthWrite = true;
 	Desc.DepthStencilStateDesc.DepthTestFunc = CF_Less;
 	Desc.ColorBlendStateDesc.Attachments[0].bEnableBlend = true;

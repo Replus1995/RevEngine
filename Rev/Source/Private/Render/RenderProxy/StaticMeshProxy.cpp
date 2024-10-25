@@ -76,6 +76,7 @@ void FStaticMeshProxy::DrawPrimitives(FRHICommandList& RHICmdList, const FStatic
 {
 	RHICmdList.GetContext()->BindUniformBuffer(UL::BStaticMesh, InData.MeshUB.get());
 
+	InData.StaticMesh->PrepareDraw();
 	RHICmdList.GetContext()->RHISetVertexStream(0, InData.StaticMesh->GetVertexBuffer().GetPositionBufferRHI());
 	RHICmdList.GetContext()->RHISetVertexStream(1, InData.StaticMesh->GetVertexBuffer().GetNormalBufferRHI());
 	RHICmdList.GetContext()->RHISetVertexStream(2, InData.StaticMesh->GetVertexBuffer().GetTangentBufferRHI());
@@ -91,7 +92,6 @@ void FStaticMeshProxy::DrawPrimitives(FRHICommandList& RHICmdList, const FStatic
 				continue;
 		}
 
-		InData.StaticMesh->PrepareDraw();
 		auto Sections = InData.StaticMesh->GetSectionsForMaterial(i);
 		if (!Sections.empty())
 		{

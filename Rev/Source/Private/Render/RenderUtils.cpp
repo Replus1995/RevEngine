@@ -46,6 +46,11 @@ FTexture* GWhiteTexture = new TGlobalResource<FColoredTexture<255, 255, 255, 255
 FTexture* GBlackTexture = new TGlobalResource<FColoredTexture<0, 0, 0, 255>>;
 FTexture* GNormalTexture = new TGlobalResource<FColoredTexture<127, 127, 255, 255>>;
 
+TGlobalResource<F2DQuadIndexBuffer> G2DQuadIndexBuffer;
+TGlobalResource<F2DQuadVertexBuffer> G2DQuadVertexBuffer;
+TGlobalResource<FTileVertexInputState> GTileVertexInputState;
+TGlobalResource<FStaticMeshVertexInputState> GStaticMeshVertexInputState;
+
 
 namespace
 {
@@ -87,7 +92,7 @@ void RenderUtils::Init()
 {
     InitGlobalResources();
 
-    GScreenPlanePrimitive = CreateScreenQuad();
+    //GScreenPlanePrimitive = CreateScreenQuad();
 }
 
 void RenderUtils::Shutdown()
@@ -98,7 +103,7 @@ void RenderUtils::Shutdown()
     SAFE_DELETE(GBlackTexture);
     SAFE_DELETE(GNormalTexture);
 
-    GScreenPlanePrimitive.reset();
+    //GScreenPlanePrimitive.reset();
 }
 
 

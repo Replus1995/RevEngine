@@ -45,7 +45,8 @@ VkPipeline FVulkanPipelineBuilder::BuildGraphics(VkDevice InDevice, VkPipelineLa
     FVulkanRasterizerState RasterizerStateRHI(InStateDesc.RasterizerStateDesc);
     FVulkanDepthStencilState DepthStencilStateRHI(InStateDesc.DepthStencilStateDesc);
     FVulkanColorBlendState ColorBlendStateRHI(InStateDesc.ColorBlendStateDesc);
-    FVulkanVertexInputState VertexInputStataRHI(InStateDesc.VertexInputStateDesc);
+    //FVulkanVertexInputState VertexInputStataRHI(InStateDesc.VertexInputStateDesc);
+    FVulkanVertexInputState* VertexInputStataRHI = static_cast<FVulkanVertexInputState*>(InStateDesc.VertexInputState);
     auto ShaderStageInfo = InProgram->GenShaderStageInfo();
 
     VkDynamicState DynamicStates[] = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
@@ -87,7 +88,7 @@ VkPipeline FVulkanPipelineBuilder::BuildGraphics(VkDevice InDevice, VkPipelineLa
 
     PipelineInfo.stageCount = (uint32_t)ShaderStageInfo.size();
     PipelineInfo.pStages = ShaderStageInfo.data();
-    PipelineInfo.pVertexInputState = InPrimitive ? &PrimitiveVertexInputState : &VertexInputStataRHI.VertexInputState;
+    PipelineInfo.pVertexInputState = InPrimitive ? &PrimitiveVertexInputState : &VertexInputStataRHI->VertexInputState;
     PipelineInfo.pInputAssemblyState = &InputAssemblyState;
     PipelineInfo.pViewportState = &ViewportState;
     PipelineInfo.pRasterizationState = &RasterizerStateRHI.RasterizerState;

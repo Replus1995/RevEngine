@@ -1,9 +1,9 @@
 #pragma once
-#include <Rev/Render/Material/SurfaceMaterial.h>
+#include <Rev/Render/Material/Material.h>
 #include <Rev/Math/Maths.h>
 #include <Rev/Render/RHI/RHIShaderLibrary.h>
 
-class ExampleMaterial : public Rev::SurfaceMaterial
+class ExampleMaterial : public Rev::FMaterial
 {
 public:
     ExampleMaterial() {}
@@ -16,7 +16,7 @@ public:
 
     virtual void Compile() override
     {
-        mProgram = Rev::FRHIShaderLibrary::GetInstance().CreateGraphicsProgram("ExampleProgram", "/Game/Shaders/ExampleVS", "/Game/Shaders/ExamplePS");
+        ShaderProgram = Rev::FRHIShaderLibrary::GetInstance().CreateGraphicsProgram("ExampleProgram", "/Game/Shaders/ExampleVS", "/Game/Shaders/ExamplePS");
     }
 
     virtual void PreDraw(Rev::FRHICommandList& RHICmdList) override

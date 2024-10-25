@@ -42,12 +42,12 @@ public:
     static Ref<FStaticMesh> Create(const Ref<FMaterial>& InMat)
     {
         FStaticMeshBuilder BoxBuilder;
-        BoxBuilder.Init(4, 1, 6, false);
+        BoxBuilder.Init(8, 1, 36, false);
         BoxBuilder.FillPositions(sBoxPositions, ARRAY_LENGTH(sBoxPositions));
         BoxBuilder.FillIndices(sBoxIndices, ARRAY_LENGTH(sBoxIndices));
         BoxBuilder.SetMaterials({ InMat });
 
-        return BoxBuilder.Build(true, true);
+        return BoxBuilder.Build(false, false);
     }
 };
 

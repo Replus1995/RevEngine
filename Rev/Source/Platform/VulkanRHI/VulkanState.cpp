@@ -225,27 +225,27 @@ void FVulkanGraphicsFrameState::PrepareForDraw(VkCommandBuffer InCmdBuffer)
 {
 	if (bVertexStreamsDirty)
 	{
+
+		FVulkanVertexInputState* VertexInputStataRHI = static_cast<FVulkanVertexInputState*>(CurrentState.VertexInputState);
+
 		VkBuffer VertexBuffers[REV_MAX_VERTEX_ELEMENTS];
 		VkDeviceSize VertexOffsets[REV_MAX_VERTEX_ELEMENTS];
 		uint8 NumStreams = 0;
 
-		uint8 MaxStreamIndex = 0;
-		for (uint32 i = 0; i < CurrentState.VertexInputStateDesc.NumVertexElements; i++)
+		//REV_CORE_ASSERT(MaxStreamIndex < REV_MAX_VERTEX_ELEMENTS);
+		for (uint32 i = 0; i < VertexInputStataRHI->NumBindings; i++)
 		{
-			const FVertexElement& Element = CurrentState.VertexInputStateDesc.VertexElements[i];
-			MaxStreamIndex = Math::Max(MaxStreamIndex, Element.StreamIndex);
-		}
-		REV_CORE_ASSERT(MaxStreamIndex < REV_MAX_VERTEX_ELEMENTS);
+			const VkVertexInputBindingDescription& CurBinding = VertexInputStataRHI->Bindings[i];
+			uint32 StreamIndex = CurBinding.binding;
 
-		for (uint8 i = 0; i < MaxStreamIndex + 1; i++)
-		{
-			const FVulkanVertexStream& Stream = VertexStreams[i];
+			const FVulkanVertexStream& Stream = VertexStreams[StreamIndex];
 			if (Stream.Buffer == VK_NULL_HANDLE)
 				continue;
 			VertexBuffers[NumStreams] = Stream.Buffer;
 			VertexOffsets[NumStreams] = Stream.Offset;
 			++NumStreams;
 		}
+
 
 		vkCmdBindVertexBuffers2(InCmdBuffer, 0, NumStreams, VertexBuffers, VertexOffsets, NULL, NULL);
 

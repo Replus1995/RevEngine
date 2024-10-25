@@ -91,13 +91,52 @@ public:
 class REV_API FRasterizerState : public FRenderResource
 {
 public:
-	Ref<FRHIRasterizerState> SamplerStateRHI;
+	Ref<FRHIRasterizerState> RasterizerStateRHI;
 
 	FRasterizerState() {}
 	virtual ~FRasterizerState() {}
 	virtual void ReleaseRHI() override
 	{
-		SamplerStateRHI.reset();
+		RasterizerStateRHI.reset();
+	}
+};
+
+class REV_API FDepthStencilState : public FRenderResource
+{
+public:
+	Ref<FRHIDepthStencilState> DepthStencilStateRHI;
+
+	FDepthStencilState() {}
+	virtual ~FDepthStencilState() {}
+	virtual void ReleaseRHI() override
+	{
+		DepthStencilStateRHI.reset();
+	}
+};
+
+class REV_API FColorBlendState : public FRenderResource
+{
+public:
+	Ref<FRHIColorBlendState> ColorBlendStateRHI;
+
+	FColorBlendState() {}
+	virtual ~FColorBlendState() {}
+	virtual void ReleaseRHI() override
+	{
+		ColorBlendStateRHI.reset();
+	}
+};
+
+class REV_API FVertexInputState : public FRenderResource
+{
+public:
+	Ref<FRHIVertexInputState> VertexInputStateRHI;
+
+	FVertexInputState() {}
+	virtual ~FVertexInputState() {}
+	virtual void ReleaseRHI() override
+	{
+		VertexInputStateRHI.reset();
 	}
 };
 

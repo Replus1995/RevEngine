@@ -88,26 +88,26 @@ Math::FColor& FStaticMeshVertexBuffer::GetColor(uint32 VertexIndex)
 
 void FStaticMeshVertexBuffer::FillPositions(const float* Content, uint32 Size, uint32 Offset)
 {
-	REV_CORE_ASSERT(Size + Offset < NumVertices * 3);
+	REV_CORE_ASSERT(Size + Offset <= NumVertices * 3);
 	memcpy(PositionData.DataAs<float>() + Offset, Content, Size * sizeof(float));
 }
 
 void FStaticMeshVertexBuffer::FillNormals(const float* Content, uint32 Size, uint32 Offset)
 {
-	REV_CORE_ASSERT(Size + Offset < NumVertices * 3);
+	REV_CORE_ASSERT(Size + Offset <= NumVertices * 3);
 	memcpy(NormalData.DataAs<float>() + Offset, Content, Size * sizeof(float));
 }
 
 void FStaticMeshVertexBuffer::FillTangents(const float* Content, uint32 Size, uint32 Offset)
 {
-	REV_CORE_ASSERT(Size + Offset < NumVertices * 4);
+	REV_CORE_ASSERT(Size + Offset <= NumVertices * 4);
 	memcpy(TangentData.DataAs<float>() + Offset, Content, Size * sizeof(float));
 }
 
 void FStaticMeshVertexBuffer::FillTexCoords(uint32 UVIndex, const float* Content, uint32 Size, uint32 Offset)
 {
 	REV_CORE_ASSERT(UVIndex < NumTexCoords);
-	REV_CORE_ASSERT(Size + Offset < NumVertices * 2);
+	REV_CORE_ASSERT(Size + Offset <= NumVertices * 2);
 	uint32 TexCoordStride = NumTexCoords * 2;
 	float* TexCoordPtr = TexCoordData.DataAs<float>();
 	for (uint32 i = 0; i < Size; i++)
@@ -119,7 +119,7 @@ void FStaticMeshVertexBuffer::FillTexCoords(uint32 UVIndex, const float* Content
 
 void FStaticMeshVertexBuffer::FillColors(const uint8* Content, uint32 Size, uint32 Offset)
 {
-	REV_CORE_ASSERT(Size + Offset < NumVertices * 4);
+	REV_CORE_ASSERT(Size + Offset <= NumVertices * 4);
 	memcpy(ColorData.DataAs<uint8>() + Offset, Content, Size * sizeof(uint8));
 }
 
@@ -204,7 +204,7 @@ void FStaticMeshIndexBuffer::SetIndex(uint32 At, uint32 Value)
 
 void FStaticMeshIndexBuffer::FillIndices(const uint16* Content, uint32 Size, uint32 Offset)
 {
-	REV_CORE_ASSERT(Size + Offset < NumIndices);
+	REV_CORE_ASSERT(Size + Offset <= NumIndices);
 	if (b32Bit)
 	{
 		for (uint32 i = 0; i < Size; i++)
@@ -220,7 +220,7 @@ void FStaticMeshIndexBuffer::FillIndices(const uint16* Content, uint32 Size, uin
 
 void FStaticMeshIndexBuffer::FillIndices(const uint32* Content, uint32 Size, uint32 Offset)
 {
-	REV_CORE_ASSERT(Size + Offset < NumIndices);
+	REV_CORE_ASSERT(Size + Offset <= NumIndices);
 	if (b32Bit)
 	{
 		memcpy(IndexData.DataAs<uint32>() + Offset, Content, Size * sizeof(uint32));

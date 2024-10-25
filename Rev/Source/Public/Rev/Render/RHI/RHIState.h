@@ -167,12 +167,12 @@ struct FVertexElement
 	uint16 Stride = 0;
 
 	FVertexElement() {}
-	FVertexElement(EVertexElmentType InType, uint8 InStreamIndex, uint8 InAttributeIndex, uint8 InOffset = 0, uint16 InStride = 0)
+	FVertexElement(EVertexElmentType InType, uint8 InStreamIndex, uint8 InAttributeIndex, uint16 InStride, uint8 InOffset = 0)
 		: Type(InType)
 		, StreamIndex(InStreamIndex)
 		, AttributeIndex(InAttributeIndex)
-		, Offset(InOffset)
 		, Stride(InStride)
+		, Offset(InOffset)
 	{}
 
 
@@ -185,6 +185,12 @@ struct FRHIVertexInputStateDesc
 {
 	FVertexElement VertexElements[REV_MAX_VERTEX_ELEMENTS];
 	uint8 NumVertexElements = 0;
+
+	void Add(const FVertexElement& InElement)
+	{
+		VertexElements[NumVertexElements] = InElement;
+		NumVertexElements++;
+	}
 };
 
 
