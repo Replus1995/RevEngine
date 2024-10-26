@@ -63,7 +63,7 @@ void FSceneProxy::Cleanup()
 
 void FSceneProxy::DrawScene(FRHICommandList& RHICmdList)
 {
-	mStaticMeshProxy.DrawMeshes(RHICmdList, MBM_Opaque);
+	mStaticMeshProxy.DrawMeshesOpaque(RHICmdList);
 	//mSkyProxy.DrawSkybox();
 }
 

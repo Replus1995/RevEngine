@@ -20,11 +20,11 @@ class REV_API FStaticMesh
 public:
 	FStaticMesh();
 	virtual ~FStaticMesh();
-	virtual void PrepareDraw();
 
 	bool IsEmpty() const;
 	const FStaticMeshVertexBuffer& GetVertexBuffer() const { return VertexBuffer; }
 	const FStaticMeshIndexBuffer& GetIndexBuffer() const { return IndexBuffer; }
+	bool IsReadyForDraw() const { return VertexBuffer.IsReadyForDraw() && IndexBuffer.IsReadyForDraw(); }
 
 	uint32 GetNumMaterials() const { return Materials.size(); }
 	FMaterial* GetMaterial(uint32 InMaterialIndex) const { return Materials[InMaterialIndex].get(); }

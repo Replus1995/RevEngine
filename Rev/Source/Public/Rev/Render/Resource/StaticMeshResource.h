@@ -24,6 +24,7 @@ struct FStaticMeshVertex
 	Math::FColor Color;
 };
 
+class FRHICommandList;
 class REV_API FStaticMeshVertexBuffer : public FRenderResource
 {
 	friend class FStaticMeshBuilder;
@@ -40,26 +41,36 @@ public:
 	FRHIBuffer* GetPositionBufferRHI() const { return PositionBuffer.VertexBufferRHI.get(); }
 	FRHIBuffer* GetNormalBufferRHI() const { return NormalBuffer.VertexBufferRHI.get(); }
 	FRHIBuffer* GetTangentBufferRHI() const { return TangentBuffer.VertexBufferRHI.get(); }
-	FRHIBuffer* GetTexCoordBufferRHI() const { return TexCoordBuffer.VertexBufferRHI.get(); }
+	FRHIBuffer* GetTexCoordBufferRHI(uint32 UVIndex) const;
 	FRHIBuffer* GetColorBufferRHI() const { return ColorBuffer.VertexBufferRHI.get(); }
+	bool IsReadyForDraw() const { return GetPositionBufferRHI() != nullptr; }
+	bool IsPositonDataValid() const { return PositionData.Size() >= NumVertices * sizeof(Math::FVector3); }
+	bool IsTexCoordDataValid(uint32 UVIndex) const { return TexCoordData[UVIndex].Size() >= NumVertices * sizeof(Math::FVector2); }
 
 	virtual void InitRHI() override;
 	virtual void ReleaseRHI() override;
+	virtual void UpdateVertexStreams(FRHICommandList& RHICmdList) const;
 
 protected:
-	Math::FVector3& GetPosition(uint32 VertexIndex);
-	Math::FVector3& GetNormal(uint32 VertexIndex);
-	Math::FVector4& GetTangent(uint32 VertexIndex);
-	Math::FVector2& GetTexCoord(uint32 VertexIndex, uint32 UVIndex = 0);
-	Math::FColor& GetColor(uint32 VertexIndex);
+	Math::FVector3 GetPosition(uint32 VertexIndex) const;
+	Math::FColor GetColor(uint32 VertexIndex) const;
+	Math::FVector3 GetNormal(uint32 VertexIndex) const;
+	Math::FVector4 GetTangent(uint32 VertexIndex) const;
+	Math::FVector2 GetTexCoord(uint32 VertexIndex, uint32 UVIndex = 0) const;
 
 	void FillPositions(const float* Content, uint32 Size, uint32 Offset);
+	void FillColors(const uint8* Content, uint32 Size, uint32 Offset);
 	void FillNormals(const float* Content, uint32 Size, uint32 Offset);
 	void FillTangents(const float* Content, uint32 Size, uint32 Offset);
 	void FillTexCoords(uint32 UVIndex, const float* Content, uint32 Size, uint32 Offset);
-	void FillColors(const uint8* Content, uint32 Size, uint32 Offset);
 
-	Ref<FRHIBuffer> CreateBufferFromData(const FBuffer& InData, uint32 InStride);
+	template<typename T>
+	void CheckAllocateData(FBuffer& Data)
+	{
+		if (Data.Size() < NumVertices * sizeof(T))
+			Data.Allocate<T>(NumVertices);
+	}
+	Ref<FRHIBuffer> CreateBufferFromData(const FBuffer& InData, uint32 InSize, uint32 InStride);
 
 protected:
 	uint32 NumVertices = 0;
@@ -67,17 +78,17 @@ protected:
 
 	//CPU Data
 	FBuffer PositionData;
+	FBuffer ColorData;
 	FBuffer NormalData;
 	FBuffer TangentData;
-	FBuffer TexCoordData;
-	FBuffer ColorData;
+	FBuffer TexCoordData[REV_MAX_TEXCOORDS];
 
 	//GPU Data
 	FVertexBuffer PositionBuffer;
+	FVertexBuffer ColorBuffer;
 	FVertexBuffer NormalBuffer; //can be optimized by geometry shader
 	FVertexBuffer TangentBuffer;
-	FVertexBuffer TexCoordBuffer;
-	FVertexBuffer ColorBuffer;
+	FVertexBuffer TexCoordBuffer[REV_MAX_TEXCOORDS];
 };
 
 class REV_API FStaticMeshIndexBuffer : public FRenderResource
@@ -93,7 +104,10 @@ public:
 	FORCEINLINE uint32 GetNumIndices() const { return NumIndices; }
 	FORCEINLINE uint32 GetNumTriangles() const { return NumIndices / 3; }
 	FORCEINLINE bool Is32Bit() const { return b32Bit; }
+
 	FRHIBuffer* GetIndexBufferRHI() const { return IndexBuffer.IndexBufferRHI.get(); }
+	bool IsReadyForDraw() const { return GetIndexBufferRHI() != nullptr; }
+	bool IsIndexDataValid() const;
 
 	virtual void InitRHI() override;
 	virtual void ReleaseRHI() override;
@@ -104,6 +118,9 @@ protected:
 
 	void FillIndices(const uint16* Content, uint32 Size, uint32 Offset);
 	void FillIndices(const uint32* Content, uint32 Size, uint32 Offset);
+
+
+	void CheckAllocateData();
 
 protected:
 	uint32 NumIndices = 0;

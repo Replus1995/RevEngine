@@ -50,9 +50,12 @@ FBuffer FBuffer::Copy(FBuffer other)
 
 void FBuffer::Allocate(uint64 size)
 {
-	Release();
-	mData = new uint8[size];
-	mSize = size;
+	if (mSize != size)
+	{
+		Release();
+		mData = new uint8[size];
+		mSize = size;
+	}
 	memset(mData, 0, mSize);
 }
 

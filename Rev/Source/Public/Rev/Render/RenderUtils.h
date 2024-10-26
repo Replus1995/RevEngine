@@ -37,7 +37,7 @@ public:
 	virtual void InitRHI() override
 	{
 		// create a static vertex buffer
-		VertexBufferRHI = GDynamicRHI->RHICreateBuffer(sizeof(Math::FVector2) * 4, 0, EBufferUsageFlags::Static | EBufferUsageFlags::VertexBuffer);
+		VertexBufferRHI = GDynamicRHI->RHICreateBuffer(sizeof(Math::FVector2) * 4, sizeof(Math::FVector2), EBufferUsageFlags::Static | EBufferUsageFlags::VertexBuffer);
 		static const Math::FVector2 Vertices[4] =
 		{
 			Math::FVector2(-1,-1),
@@ -71,6 +71,23 @@ public:
 };
 extern REV_API TGlobalResource<FTileVertexInputState> GTileVertexInputState;
 
+class FNullVertexBuffer: public FVertexBuffer
+{
+public:
+	/**
+	* Initialize the RHI for this rendering resource
+	*/
+	virtual void InitRHI() override
+	{
+		// create a static vertex buffer
+		VertexBufferRHI = GDynamicRHI->RHICreateBuffer(sizeof(float) * 4, 0, EBufferUsageFlags::Static | EBufferUsageFlags::VertexBuffer);
+		static const float Vertices[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+		FRenderCore::GetMainContext()->UpdateBufferData(VertexBufferRHI.get(), Vertices, sizeof(float) * 4);
+	}
+};
+extern REV_API TGlobalResource<FNullVertexBuffer> GNullVertexBuffer;
+
+
 class FStaticMeshVertexInputState : public FVertexInputState
 {
 public:
@@ -81,10 +98,11 @@ public:
 	{
 		FRHIVertexInputStateDesc StateDesc;
 		StateDesc.Add(FVertexElement(EVertexElmentType::Float3, 0, 0, sizeof(Math::FVector3))); //Position
-		StateDesc.Add(FVertexElement(EVertexElmentType::Float3, 1, 1, sizeof(Math::FVector3))); //Normal
+		StateDesc.Add(FVertexElement(EVertexElmentType::Color, 1, 1, sizeof(Math::FColor))); //Color
+		StateDesc.Add(FVertexElement(EVertexElmentType::Float3, 2, 2, sizeof(Math::FVector3))); //Normal
 		StateDesc.Add(FVertexElement(EVertexElmentType::Float4, 3, 3, sizeof(Math::FVector4))); //Tangent
 		StateDesc.Add(FVertexElement(EVertexElmentType::Float2, 4, 4, sizeof(Math::FVector2))); //TexCoord0
-		StateDesc.Add(FVertexElement(EVertexElmentType::Color, 5, 5, sizeof(Math::FColor))); //Color
+		StateDesc.Add(FVertexElement(EVertexElmentType::Float2, 5, 5, sizeof(Math::FVector2))); //TexCoord1
 		VertexInputStateRHI = GDynamicRHI->RHICreateVertexInputState(StateDesc);
 	}
 };

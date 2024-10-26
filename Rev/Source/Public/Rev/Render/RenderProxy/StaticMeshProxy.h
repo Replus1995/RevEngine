@@ -25,10 +25,11 @@ public:
 	void Cleanup();
 	void FreeResource();
 
-	void DrawMeshes(FRHICommandList& RHICmdList, EMaterialBlendMode InBlend, bool bUseMeshMaterial = true);
+	void DrawMeshesDepth(FRHICommandList& RHICmdList);
+	void DrawMeshesOpaque(FRHICommandList& RHICmdList);
 
 private:
-	void DrawPrimitives(FRHICommandList& RHICmdList, const FStaticMeshRenderData& InData, EMaterialBlendMode InBlend, bool bUseMeshMaterial = true) const;
+	void PrepareMeshDraw(FRHICommandList& RHICmdList, const FStaticMeshRenderData& InData);
 
 private:
 	std::vector<FStaticMeshRenderData> mRenderDataArr;

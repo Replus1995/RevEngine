@@ -10,12 +10,8 @@ FStaticMesh::FStaticMesh()
 
 FStaticMesh::~FStaticMesh()
 {
-}
-
-void FStaticMesh::PrepareDraw()
-{
-	VertexBuffer.InitResource();
-	IndexBuffer.InitResource();
+	VertexBuffer.ReleaseResource();
+	IndexBuffer.ReleaseResource();
 }
 
 bool FStaticMesh::IsEmpty() const
@@ -78,15 +74,9 @@ void FStaticMeshBuilder::InitVertices(uint32 InNumVertices, uint32 InNumTexCoord
 	}
 	if (InNumTexCoords > 0)
 	{
-		StaticMesh->VertexBuffer.TexCoordData.Allocate<Math::FVector2>(InNumVertices * InNumTexCoords);
-		Math::FVector2* TexCoords = StaticMesh->VertexBuffer.TexCoordData.DataAs<Math::FVector2>();
 		for (uint32 i = 0; i < InNumVertices; i++)
 		{
-			Math::FVector2* CurTexCoords = TexCoords + i * InNumTexCoords;
-			for (uint32 j = 0; j < InNumTexCoords; j++)
-			{
-				CurTexCoords[j] = InTexCoordData[j].DataAs<Math::FVector2>()[i];
-			}
+			StaticMesh->VertexBuffer.TexCoordData[i] = std::move(InTexCoordData[i]);
 		}
 	}
 	if (!InColorData.Empty())
@@ -162,6 +152,12 @@ Ref<FStaticMesh> FStaticMeshBuilder::Build(bool bComputeNormal, bool bComputeTan
 		StaticMesh->Sections.push_back({0, 0, StaticMesh->IndexBuffer.GetNumTriangles()});
 	}
 
+	StaticMesh->VertexBuffer.ReleaseResource();
+	StaticMesh->IndexBuffer.ReleaseResource();
+
+	StaticMesh->VertexBuffer.InitResource();
+	StaticMesh->IndexBuffer.InitResource();
+
 	return StaticMesh;
 }
 
@@ -207,12 +203,12 @@ Math::FVector4 FStaticMeshBuilder::ComputeTanget(uint32 A, uint32 B, uint32 C) c
 
 void FStaticMeshBuilder::ComputeTangents()
 {
-	if (StaticMesh->IsEmpty() || StaticMesh->VertexBuffer.GetNumTexCoords() == 0)
+	if (!StaticMesh->IndexBuffer.IsIndexDataValid() || !StaticMesh->VertexBuffer.IsPositonDataValid() || !StaticMesh->VertexBuffer.IsTexCoordDataValid(0))
 	{
 		return;
 	}
 
-	memset(StaticMesh->VertexBuffer.TangentData.Data(), 0, StaticMesh->VertexBuffer.TangentData.Size());
+	StaticMesh->VertexBuffer.TangentData.Allocate<Math::FVector4>(StaticMesh->VertexBuffer.NumVertices);
 	Math::FVector4* Tangents = StaticMesh->VertexBuffer.TangentData.DataAs<Math::FVector4>();
 
 	uint32 TriCount = StaticMesh->IndexBuffer.GetNumTriangles();
@@ -236,12 +232,11 @@ void FStaticMeshBuilder::ComputeTangents()
 
 void FStaticMeshBuilder::ComputeNormals()
 {
-	if (StaticMesh->IsEmpty())
+	if (!StaticMesh->IndexBuffer.IsIndexDataValid() || !StaticMesh->VertexBuffer.IsPositonDataValid())
 	{
 		return;
 	}
-	memset(StaticMesh->VertexBuffer.NormalData.Data(), 0, StaticMesh->VertexBuffer.NormalData.Size());
-
+	StaticMesh->VertexBuffer.NormalData.Allocate<Math::FVector3>(StaticMesh->VertexBuffer.NumVertices);
 	Math::FVector3* Normals = StaticMesh->VertexBuffer.NormalData.DataAs<Math::FVector3>();
 	const Math::FVector3* Positions = StaticMesh->VertexBuffer.PositionData.DataAs<Math::FVector3>();
 

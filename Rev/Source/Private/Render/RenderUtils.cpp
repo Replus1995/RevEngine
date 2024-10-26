@@ -49,6 +49,7 @@ FTexture* GNormalTexture = new TGlobalResource<FColoredTexture<127, 127, 255, 25
 TGlobalResource<F2DQuadIndexBuffer> G2DQuadIndexBuffer;
 TGlobalResource<F2DQuadVertexBuffer> G2DQuadVertexBuffer;
 TGlobalResource<FTileVertexInputState> GTileVertexInputState;
+TGlobalResource<FNullVertexBuffer> GNullVertexBuffer;
 TGlobalResource<FStaticMeshVertexInputState> GStaticMeshVertexInputState;
 
 
