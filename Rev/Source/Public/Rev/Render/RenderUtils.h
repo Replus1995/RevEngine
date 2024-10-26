@@ -80,9 +80,9 @@ public:
 	virtual void InitRHI() override
 	{
 		// create a static vertex buffer
-		VertexBufferRHI = GDynamicRHI->RHICreateBuffer(sizeof(float) * 4, 0, EBufferUsageFlags::Static | EBufferUsageFlags::VertexBuffer);
-		static const float Vertices[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-		FRenderCore::GetMainContext()->UpdateBufferData(VertexBufferRHI.get(), Vertices, sizeof(float) * 4);
+		VertexBufferRHI = GDynamicRHI->RHICreateBuffer(sizeof(uint32) * 4, 0, EBufferUsageFlags::Static | EBufferUsageFlags::VertexBuffer);
+		static const uint32 Vertices[4] = { 0, 0, 0, 0 };
+		FRenderCore::GetMainContext()->UpdateBufferData(VertexBufferRHI.get(), Vertices, sizeof(uint32) * 4);
 	}
 };
 extern REV_API TGlobalResource<FNullVertexBuffer> GNullVertexBuffer;
