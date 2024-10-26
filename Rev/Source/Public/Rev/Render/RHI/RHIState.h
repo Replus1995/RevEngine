@@ -42,6 +42,7 @@ class FRHIVertexInputState
 public:
 	FRHIVertexInputState() {}
 	virtual bool GetDesc(struct FRHIVertexInputStateDesc& OutDesc) const { return false; }
+	uint64 GetHash() const { return (uint64)this; }
 };
 
 template <typename TRHIState, typename TRHIStateDesc>

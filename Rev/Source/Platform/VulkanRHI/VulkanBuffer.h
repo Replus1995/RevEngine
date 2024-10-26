@@ -50,27 +50,6 @@ protected:
 	static VmaAllocationCreateFlags GetAllocateFlags(EBufferUsageFlags InUsage);
 };
 
-class FVulkanVertexBuffer : public FRHIVertexBuffer, FVulkanBufferBase
-{
-public:
-	FVulkanVertexBuffer(uint32 InSize, bool bDynamic);
-	virtual ~FVulkanVertexBuffer();
-	virtual const void* GetNativeHandle() const override { return Buffer; }
-};
-
-class FVulkanIndexBuffer : public FRHIIndexBuffer, FVulkanBufferBase
-{
-public:
-	FVulkanIndexBuffer(uint32 InStride, uint32 InCount, bool bDynamic);
-	virtual ~FVulkanIndexBuffer();
-	virtual const void* GetNativeHandle() const override { return Buffer; }
-
-	VkIndexType GetIndexType() const { return mIndexType; }
-
-private:
-	VkIndexType mIndexType = VK_INDEX_TYPE_NONE_KHR;
-};
-
 class FVulkanUniformBuffer : public FRHIUniformBuffer, FVulkanBufferBase
 {
 public:

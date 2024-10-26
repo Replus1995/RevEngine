@@ -6,7 +6,6 @@
 #include "Rev/Render/RHI/RHIBuffer.h"
 #include "Rev/Render/RHI/RHITexture.h"
 #include "Rev/Render/RHI/RHIRenderTarget.h"
-#include "Rev/Render/RHI/RHIPrimitive.h"
 #include "Rev/Render/RHI/RHIRenderPass.h"
 
 namespace Rev
@@ -23,13 +22,8 @@ public:
 
 	virtual Scope<FRHIContext> RHICreateContext() = 0;
 	//Buffer
-	virtual Ref<FRHIVertexBuffer> CreateVertexBuffer(uint32 InSize, bool bDynamic = false) = 0;
-	virtual Ref<FRHIIndexBuffer> CreateIndexBuffer(uint32 InStride, uint32 InCount, bool bDynamic = false) = 0;
 	virtual Ref<FRHIUniformBuffer> CreateUniformBuffer(uint32 InSize) = 0;
 	virtual Ref<FRHIBuffer> RHICreateBuffer(uint32 InSize, uint32 InStride, EBufferUsageFlags InFlags) = 0;
-
-	//Primitive
-	virtual Ref<FRHIPrimitive> CreatePrimitive(EPrimitiveTopology InTopology) = 0;
 
 	//Texture
 	virtual Ref<FRHITexture> CreateTexture(const FRHITextureDesc& InDesc) = 0;

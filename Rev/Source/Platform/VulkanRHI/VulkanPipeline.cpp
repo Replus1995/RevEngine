@@ -2,7 +2,6 @@
 #include "VulkanDynamicRHI.h"
 #include "VulkanRenderPass.h"
 #include "VulkanShader.h"
-#include "VulkanPrimitive.h"
 #include "VulkanState.h"
 #include "Core/VulkanDefines.h"
 #include "Core/VulkanEnum.h"
@@ -18,8 +17,7 @@ public:
     static VkPipeline BuildGraphics(VkDevice InDevice, VkPipelineLayout InLayout,
         const FRHIGraphicsPipelineStateDesc& InStateDesc,
         const FVulkanRenderPass* RenderPass,
-        const FVulkanShaderProgram* InProgram,
-        const FVulkanPrimitive* InPrimitive);
+        const FVulkanShaderProgram* InProgram);
 
 private:
     static VkPipelineInputAssemblyStateCreateInfo MakeInputAssemblyStateInfo(VkPrimitiveTopology InTopology);
@@ -35,12 +33,12 @@ private:
 VkPipeline FVulkanPipelineBuilder::BuildGraphics(VkDevice InDevice, VkPipelineLayout InLayout, 
     const FRHIGraphicsPipelineStateDesc& InStateDesc,
     const FVulkanRenderPass* RenderPass, 
-    const FVulkanShaderProgram* InProgram, 
-    const FVulkanPrimitive* InPrimitive)
+    const FVulkanShaderProgram* InProgram)
 {
     const FRHIRenderPassDesc& RenderPassDesc = RenderPass->GetDesc();
     uint32 ColorAttachmentCount = RenderPassDesc.NumColorAttachments;
     REV_CORE_ASSERT(ColorAttachmentCount <= RTA_MaxColorAttachments);
+    REV_CORE_ASSERT(InStateDesc.VertexInputState);
 
     FVulkanRasterizerState RasterizerStateRHI(InStateDesc.RasterizerStateDesc);
     FVulkanDepthStencilState DepthStencilStateRHI(InStateDesc.DepthStencilStateDesc);
@@ -58,17 +56,6 @@ VkPipeline FVulkanPipelineBuilder::BuildGraphics(VkDevice InDevice, VkPipelineLa
         ColorFormats[i] = (VkFormat)GPixelFormats[RenderPassDesc.ColorAttachments[i].Format].PlatformFormat;
     }
     VkFormat DepthFormat = (VkFormat)GPixelFormats[RenderPassDesc.DepthStencilAttchment.Format].PlatformFormat;
-    
-    VkPipelineVertexInputStateCreateInfo PrimitiveVertexInputState{};
-    if (InPrimitive)
-    {
-        PrimitiveVertexInputState.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-        PrimitiveVertexInputState.vertexBindingDescriptionCount = (uint32_t)InPrimitive->GetBindingDescs().size();
-        PrimitiveVertexInputState.pVertexBindingDescriptions = InPrimitive->GetBindingDescs().data();
-        PrimitiveVertexInputState.vertexAttributeDescriptionCount = (uint32_t)InPrimitive->GetAttributeDescs().size();
-        PrimitiveVertexInputState.pVertexAttributeDescriptions = InPrimitive->GetAttributeDescs().data();
-    }
-
 
     VkPipelineInputAssemblyStateCreateInfo InputAssemblyState = MakeInputAssemblyStateInfo(FVulkanEnum::Translate(InStateDesc.PrimitiveTopology));
     VkPipelineTessellationStateCreateInfo TessellationState = MakeTessellationStateInfo();
@@ -88,7 +75,7 @@ VkPipeline FVulkanPipelineBuilder::BuildGraphics(VkDevice InDevice, VkPipelineLa
 
     PipelineInfo.stageCount = (uint32_t)ShaderStageInfo.size();
     PipelineInfo.pStages = ShaderStageInfo.data();
-    PipelineInfo.pVertexInputState = InPrimitive ? &PrimitiveVertexInputState : &VertexInputStataRHI->VertexInputState;
+    PipelineInfo.pVertexInputState = &VertexInputStataRHI->VertexInputState;
     PipelineInfo.pInputAssemblyState = &InputAssemblyState;
     PipelineInfo.pViewportState = &ViewportState;
     PipelineInfo.pRasterizationState = &RasterizerStateRHI.RasterizerState;
@@ -238,13 +225,13 @@ FVulkanPipeline::~FVulkanPipeline()
     Release();
 }
 
-void FVulkanPipeline::BuildGraphics(FVulkanPipelineLayout* InLayout, const FRHIGraphicsPipelineStateDesc& InStateDesc, const FVulkanRenderPass* RenderPass, const FVulkanShaderProgram* InProgram, const FVulkanPrimitive* InPrimitive)
+void FVulkanPipeline::BuildGraphics(FVulkanPipelineLayout* InLayout, const FRHIGraphicsPipelineStateDesc& InStateDesc, const FVulkanRenderPass* RenderPass, const FVulkanShaderProgram* InProgram)
 {
     REV_CORE_ASSERT(InLayout != nullptr);
     REV_CORE_ASSERT(InLayout->PipelineLayout != VK_NULL_HANDLE);
 
     Release();
-    Pipeline = FVulkanPipelineBuilder::BuildGraphics(FVulkanDynamicRHI::GetDevice(), InLayout->PipelineLayout, InStateDesc, RenderPass, InProgram, InPrimitive);
+    Pipeline = FVulkanPipelineBuilder::BuildGraphics(FVulkanDynamicRHI::GetDevice(), InLayout->PipelineLayout, InStateDesc, RenderPass, InProgram);
     PipelineLayout = InLayout;
 }
 
@@ -264,11 +251,11 @@ FVulkanGraphicsPipelineCache::~FVulkanGraphicsPipelineCache()
 
 FVulkanPipeline* FVulkanGraphicsPipelineCache::GetOrCreatePipeline(const FRHIGraphicsPipelineStateDesc& InStateDesc,
     const FVulkanRenderPass* InRenderPass, 
-    const FVulkanShaderProgram* InProgram, 
-    const FVulkanPrimitive* InPrimitive)
+    const FVulkanShaderProgram* InProgram)
 {
-    
-    FCacheKey PipelineCacheKey(InStateDesc, InRenderPass, InProgram, InPrimitive);
+    REV_CORE_ASSERT(InStateDesc.VertexInputState);
+
+    FCacheKey PipelineCacheKey(InStateDesc, InRenderPass, InProgram, InStateDesc.VertexInputState->GetHash());//temp
     FVulkanPipeline* pPipeline = nullptr;
     if (auto PipelineIter = mPipelineCache.find(PipelineCacheKey); PipelineIter != mPipelineCache.end())
     {
@@ -295,7 +282,7 @@ FVulkanPipeline* FVulkanGraphicsPipelineCache::GetOrCreatePipeline(const FRHIGra
         }
 
         Scope<FVulkanPipeline> NewPipeline = CreateScope<FVulkanPipeline>();
-        NewPipeline->BuildGraphics(pLayout, InStateDesc, InRenderPass, InProgram, InPrimitive);
+        NewPipeline->BuildGraphics(pLayout, InStateDesc, InRenderPass, InProgram);
         auto PipelineIter = mPipelineCache.emplace(PipelineCacheKey, std::move(NewPipeline)).first;
         pPipeline = PipelineIter->second.get();
     }
@@ -311,8 +298,8 @@ void FVulkanGraphicsPipelineCache::ClearAll()
 
 FVulkanGraphicsPipelineCache::FCacheKey::FCacheKey(const FRHIGraphicsPipelineStateDesc& InStateDesc, 
     const FVulkanRenderPass* InRenderPass, 
-    const FVulkanShaderProgram* InProgram, 
-    const FVulkanPrimitive* InPrimitive)
+    const FVulkanShaderProgram* InProgram,
+    uint64 InVertexHash)
 {
     StateHash = FCityHash::Gen(&InStateDesc, sizeof(InStateDesc));
     RenderPass = (VkRenderPass)InRenderPass->GetNativeHandle();
@@ -325,8 +312,7 @@ FVulkanGraphicsPipelineCache::FCacheKey::FCacheKey(const FRHIGraphicsPipelineSta
             continue;
         ShaderHash[i - 1] = pShaderVk->GetHash();
     }
-    if(InPrimitive)
-        VertexHash = InPrimitive->GetDescHash(); //todo: get vertex data hash from shader
+    VertexHash = InVertexHash;
 
     SecondaryHash = FCityHash::Gen(this, sizeof(FCacheKey) - sizeof(uint32));
 }

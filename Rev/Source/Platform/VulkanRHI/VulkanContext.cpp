@@ -3,7 +3,6 @@
 #include "VulkanShader.h"
 #include "VulkanTexture.h"
 #include "VulkanRenderTarget.h"
-#include "VulkanPrimitive.h"
 #include "VulkanState.h"
 #include "VulkanBuffer.h"
 #include "VulkanShader.h"
@@ -233,18 +232,6 @@ void FVulkanContext::ClearTexture(FRHITexture* InTexture, uint8 InMipLevel, uint
 	FVulkanTexture::Cast(InTexture)->ClearContent(this, InMipLevel, InMipCount, InArrayIndex, InArrayCount);
 }
 
-void FVulkanContext::UpdateBufferData(const Ref<FRHIVertexBuffer>& Buffer, const void* Content, uint32 Size, uint32 Offset)
-{
-	REV_CORE_ASSERT(Size + Offset <= Buffer->GetCapacity());
-	FVulkanUtils::ImmediateUploadBuffer(this, (VkBuffer)Buffer->GetNativeHandle(), Content, Size, Offset);
-}
-
-void FVulkanContext::UpdateBufferData(const Ref<FRHIIndexBuffer>& Buffer, const void* Content, uint32 Size, uint32 Offset)
-{
-	REV_CORE_ASSERT(Size + Offset <= Buffer->GetCapacity());
-	FVulkanUtils::ImmediateUploadBuffer(this, (VkBuffer)Buffer->GetNativeHandle(), Content, Size, Offset);
-}
-
 void FVulkanContext::UpdateBufferData(FRHIBuffer* Buffer, const void* Content, uint32 Size, uint32 Offset)
 {
 	REV_CORE_ASSERT(Size + Offset <= Buffer->GetSize());
@@ -346,45 +333,6 @@ void FVulkanContext::SetGraphicsPipelineState(const FRHIGraphicsPipelineStateDes
 	mFrameState.CurrentState = InState;
 }
 
-void FVulkanContext::DrawPrimitive(const Ref<FRHIPrimitive>& InPrimitive)
-{
-	if (!mFrameState.ReadyForDraw())
-		return;
-
-	FVulkanPrimitive* Primitive = static_cast<FVulkanPrimitive*>(InPrimitive.get());
-	Primitive->PrepareDraw();
-
-	FVulkanPipeline* GraphicsPipeline = mGraphicsPipelineCache.GetOrCreatePipeline(mFrameState.CurrentState, mFrameState.CurrentPass, mFrameState.CurrentProgram, Primitive);
-
-	if (!GraphicsPipeline || !GraphicsPipeline->PipelineLayout)
-		return;
-
-	FVulkanPipelineLayout* GraphicsPipelineLayout = GraphicsPipeline->PipelineLayout;
-
-	VkDescriptorSet DescSet = GetDescriptorSet(mFrameState.CurrentProgram, GraphicsPipelineLayout);
-	vkCmdBindDescriptorSets(GetActiveCmdBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, GraphicsPipelineLayout->PipelineLayout, 0, 1, &DescSet, 0, nullptr);
-	vkCmdBindPipeline(GetActiveCmdBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, GraphicsPipeline->Pipeline);
-
-	VkBuffer VertexBuffers[REV_MAX_VERTEX_ELEMENTS];
-	VkDeviceSize VertexOffsets[REV_MAX_VERTEX_ELEMENTS];
-	uint32 VertexStreamCount = Primitive->GetVertexBuffers().size();
-
-	REV_CORE_ASSERT(VertexStreamCount < REV_MAX_VERTEX_ELEMENTS);
-
-	for (uint32 i = 0; i < VertexStreamCount; i++)
-	{
-		const Ref<FRHIVertexBuffer>& VertexBuffer = Primitive->GetVertexBuffers()[i];
-		VertexBuffers[i] = (VkBuffer)VertexBuffer->GetNativeHandle();
-		VertexOffsets[i] = 0; //temp, to be modifed
-	}
-
-	FVulkanIndexBuffer* IndexBuffer = static_cast<FVulkanIndexBuffer*>(Primitive->GetIndexBuffer().get());
-
-	vkCmdBindVertexBuffers2(GetActiveCmdBuffer(), 0, VertexStreamCount, VertexBuffers, VertexOffsets, NULL, NULL);
-	vkCmdBindIndexBuffer(GetActiveCmdBuffer(), (VkBuffer)Primitive->GetIndexBuffer()->GetNativeHandle(), 0, IndexBuffer->GetIndexType());
-	vkCmdDrawIndexed(GetActiveCmdBuffer(), Primitive->GetIndexBuffer()->GetCount(), 1, 0, 0, 0);
-}
-
 void FVulkanContext::RHISetVertexStream(uint32 StreamIndex, FRHIBuffer* VertexBuffer, uint32 Offset)
 {
 	if(!VertexBuffer)
@@ -401,7 +349,7 @@ void FVulkanContext::RHIDrawPrimitive(uint32 NumPrimitives, uint32 StartVertex)
 	if (!mFrameState.ReadyForDraw())
 		return;
 
-	FVulkanPipeline* GraphicsPipeline = mGraphicsPipelineCache.GetOrCreatePipeline(mFrameState.CurrentState, mFrameState.CurrentPass, mFrameState.CurrentProgram, nullptr);
+	FVulkanPipeline* GraphicsPipeline = mGraphicsPipelineCache.GetOrCreatePipeline(mFrameState.CurrentState, mFrameState.CurrentPass, mFrameState.CurrentProgram);
 	if (!GraphicsPipeline || !GraphicsPipeline->PipelineLayout)
 		return;
 	FVulkanPipelineLayout* GraphicsPipelineLayout = GraphicsPipeline->PipelineLayout;
@@ -420,7 +368,7 @@ void FVulkanContext::RHIDrawPrimitiveIndexed(FRHIBuffer* IndexBuffer, uint32 Num
 	if (!mFrameState.ReadyForDraw() || !IndexBuffer)
 		return;
 
-	FVulkanPipeline* GraphicsPipeline = mGraphicsPipelineCache.GetOrCreatePipeline(mFrameState.CurrentState, mFrameState.CurrentPass, mFrameState.CurrentProgram, nullptr);
+	FVulkanPipeline* GraphicsPipeline = mGraphicsPipelineCache.GetOrCreatePipeline(mFrameState.CurrentState, mFrameState.CurrentPass, mFrameState.CurrentProgram);
 	if (!GraphicsPipeline || !GraphicsPipeline->PipelineLayout)
 		return;
 	FVulkanPipelineLayout* GraphicsPipelineLayout = GraphicsPipeline->PipelineLayout;

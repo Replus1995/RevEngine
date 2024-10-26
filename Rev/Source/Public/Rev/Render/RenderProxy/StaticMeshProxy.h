@@ -12,7 +12,7 @@ struct FStaticMeshRenderData
 {
 	Ref<FStaticMesh> StaticMesh;
 	FStaticMeshUniform MeshParams;
-	Ref<FRHIUniformBuffer> MeshUB;
+	Ref<class FRHIUniformBuffer> MeshUB;
 };
 
 class FStaticMeshProxy

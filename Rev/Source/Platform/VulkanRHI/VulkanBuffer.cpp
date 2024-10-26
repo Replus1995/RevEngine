@@ -141,44 +141,6 @@ VmaAllocationCreateFlags FVulkanBuffer::GetAllocateFlags(EBufferUsageFlags InUsa
 	return OutFlags;
 }
 
-FVulkanVertexBuffer::FVulkanVertexBuffer(uint32 InSize, bool bDynamic)
-	: FRHIVertexBuffer(InSize)
-{
-	VkBufferUsageFlags BufferUsage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
-	Allocate(InSize, BufferUsage, 0);
-}
-
-FVulkanVertexBuffer::~FVulkanVertexBuffer()
-{
-}
-
-FVulkanIndexBuffer::FVulkanIndexBuffer(uint32 InStride, uint32 InCount, bool bDynamic)
-	: FRHIIndexBuffer(InStride, InCount)
-{
-	VkBufferUsageFlags BufferUsage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
-	Allocate(GetCapacity(), BufferUsage, 0);
-
-	switch (InStride)
-	{
-	case 1:
-		mIndexType = VK_INDEX_TYPE_UINT8_KHR;
-		break;
-	case 2:
-		mIndexType = VK_INDEX_TYPE_UINT16;
-		break;
-	case 4:
-		mIndexType = VK_INDEX_TYPE_UINT32;
-		break;
-	default:
-		REV_CORE_ASSERT(false, "[FVulkanIndexBuffer] Unknown index buffer type");
-		break;
-	}
-}
-
-FVulkanIndexBuffer::~FVulkanIndexBuffer()
-{
-}
-
 FVulkanUniformBuffer::FVulkanUniformBuffer(uint32 InSize)
 	: FRHIUniformBuffer(InSize)
 {

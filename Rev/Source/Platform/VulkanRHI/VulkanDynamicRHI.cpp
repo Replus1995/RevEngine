@@ -3,7 +3,6 @@
 #include "VulkanBuffer.h"
 #include "VulkanTexture.h"
 #include "VulkanRenderTarget.h"
-#include "VulkanPrimitive.h"
 #include "VulkanRenderPass.h"
 #include "VulkanContext.h"
 #include "Rev/Core/Hash.h"
@@ -48,16 +47,6 @@ Scope<FRHIContext> FVulkanDynamicRHI::RHICreateContext()
 	return CreateScope<FVulkanContext>();
 }
 
-Ref<FRHIVertexBuffer> FVulkanDynamicRHI::CreateVertexBuffer(uint32 InSize, bool bDynamic)
-{
-	return CreateRef<FVulkanVertexBuffer>(InSize, bDynamic);
-}
-
-Ref<FRHIIndexBuffer> FVulkanDynamicRHI::CreateIndexBuffer(uint32 InStride, uint32 InCount, bool bDynamic)
-{
-	return CreateRef<FVulkanIndexBuffer>(InStride, InCount, bDynamic);
-}
-
 Ref<FRHIUniformBuffer> FVulkanDynamicRHI::CreateUniformBuffer(uint32 InSize)
 {
 	return CreateRef<FVulkanUniformBuffer>(InSize);
@@ -66,11 +55,6 @@ Ref<FRHIUniformBuffer> FVulkanDynamicRHI::CreateUniformBuffer(uint32 InSize)
 Ref<FRHIBuffer> FVulkanDynamicRHI::RHICreateBuffer(uint32 InSize, uint32 InStride, EBufferUsageFlags InFlags)
 {
 	return CreateRef<FVulkanBuffer>(InSize, InStride, InFlags);
-}
-
-Ref<FRHIPrimitive> FVulkanDynamicRHI::CreatePrimitive(EPrimitiveTopology InTopology)
-{
-	return CreateRef<FVulkanPrimitive>(InTopology);
 }
 
 Ref<FRHITexture> FVulkanDynamicRHI::CreateTexture(const FRHITextureDesc& InDesc)

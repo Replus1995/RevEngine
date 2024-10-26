@@ -6,11 +6,8 @@
 
 namespace Rev
 {
-class FRHIVertexBuffer;
-class FRHIIndexBuffer;
 class FRHIBuffer;
 class FRHIUniformBuffer;
-class FRHIPrimitive;
 class FRHIShaderProgram;
 class FRHITexture;
 class FRHISamplerState;
@@ -52,8 +49,6 @@ public:
 	* @param Size : content size
 	* @param Offset : content offset
 	*/
-	virtual void UpdateBufferData(const Ref<FRHIVertexBuffer>& Buffer, const void* Content, uint32 Size, uint32 Offset = 0) = 0;
-	virtual void UpdateBufferData(const Ref<FRHIIndexBuffer>& Buffer, const void* Content, uint32 Size, uint32 Offset = 0) = 0;
 	virtual void UpdateBufferData(FRHIBuffer* Buffer, const void* Content, uint32 Size, uint32 Offset = 0) = 0;
 
 	//RHILockBuffer
@@ -64,9 +59,6 @@ public:
 	virtual void BindProgram(FRHIShaderProgram* InProgram) = 0;
 
 	virtual void SetGraphicsPipelineState(const FRHIGraphicsPipelineStateDesc& InState) = 0;
-
-	virtual void DrawPrimitive(const Ref<FRHIPrimitive>& InPrimitive) = 0;
-
 
 	virtual void RHISetVertexStream(uint32 StreamIndex, FRHIBuffer* VertexBuffer,  uint32 Offset = 0) = 0;
 	virtual void RHIDrawPrimitive(uint32 NumPrimitives, uint32 StartVertex = 0) = 0;

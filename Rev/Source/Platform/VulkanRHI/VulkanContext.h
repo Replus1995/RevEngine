@@ -49,8 +49,6 @@ public:
 //Data transfer
 	virtual void UpdateTexture(FRHITexture* InTexture, const void* InContent, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex) override;
 	virtual void ClearTexture(FRHITexture* InTexture, uint8 InMipLevel, uint8 InMipCount, uint16 InArrayIndex, uint16 InArrayCount) override;
-	virtual void UpdateBufferData(const Ref<FRHIVertexBuffer>& Buffer, const void* Content, uint32 Size, uint32 Offset) override;
-	virtual void UpdateBufferData(const Ref<FRHIIndexBuffer>& Buffer, const void* Content, uint32 Size, uint32 Offset) override;
 	virtual void UpdateBufferData(FRHIBuffer* Buffer, const void* Content, uint32 Size, uint32 Offset = 0) override;
 
 //Draw
@@ -63,8 +61,6 @@ public:
 	virtual void BindProgram(FRHIShaderProgram* InProgram) override;
 
 	virtual void SetGraphicsPipelineState(const FRHIGraphicsPipelineStateDesc& InState) override;
-
-	virtual void DrawPrimitive(const Ref<FRHIPrimitive>& InPrimitive) override;
 
 	virtual void RHISetVertexStream(uint32 StreamIndex, FRHIBuffer* VertexBuffer, uint32 Offset) override;
 	virtual void RHIDrawPrimitive(uint32 NumPrimitives, uint32 StartVertex) override;

@@ -10,7 +10,6 @@ namespace Rev
 {
 class FVulkanRenderPass;
 class FVulkanShaderProgram;
-class FVulkanPrimitive;
 
 class FVulkanPipelineLayout
 {
@@ -34,8 +33,7 @@ public:
     void BuildGraphics(FVulkanPipelineLayout* InLayout, 
         const FRHIGraphicsPipelineStateDesc& InStateDesc,
         const FVulkanRenderPass* RenderPass,
-        const FVulkanShaderProgram* InProgram, 
-        const FVulkanPrimitive* InPrimitive);
+        const FVulkanShaderProgram* InProgram);
 
     void Release();
 
@@ -52,8 +50,7 @@ public:
     FVulkanPipeline* GetOrCreatePipeline(
         const FRHIGraphicsPipelineStateDesc& InStateDesc, 
         const FVulkanRenderPass* InRenderPass,
-        const FVulkanShaderProgram* InProgram,
-        const FVulkanPrimitive* InPrimitive);
+        const FVulkanShaderProgram* InProgram);
 
     void ClearAll();
 
@@ -68,7 +65,7 @@ public:
         FCacheKey(const FRHIGraphicsPipelineStateDesc& InStateDesc,
             const FVulkanRenderPass* InRenderPass,
             const FVulkanShaderProgram* InProgram,
-            const FVulkanPrimitive* InPrimitive);
+            uint64 InVertexHash);
 
         friend bool operator==(const FVulkanGraphicsPipelineCache::FCacheKey& L, const FVulkanGraphicsPipelineCache::FCacheKey& R);
         friend bool operator<(const FVulkanGraphicsPipelineCache::FCacheKey& L, const FVulkanGraphicsPipelineCache::FCacheKey& R);
