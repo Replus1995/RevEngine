@@ -324,12 +324,11 @@ void FShadercFactory::ReflectShaderInfo(FShadercCompiledData& Data)
 		Uniform.TexFormat = sSpirvFormatMapping[uint32(TextureType.format)];
 		Uniform.TexDimension = TranslateTextureDimension(TextureType.dim, TextureType.arrayed);
 
-		std::string SamplerName = Texture.name + "Sampler";
-
+		size_t NameCompareLength = Texture.name.size() - sizeof("Texture");
 		bool isCompareSampler = false;
 		for (auto& Sampler : ResourceRefl.separate_samplers)
 		{
-			if (SamplerName == Sampler.name)
+			if (strncmp(Texture.name.data(), Sampler.name.data(), NameCompareLength) == 0)
 			{
 				Uniform.SamplerBinding = Refl.get_decoration(Sampler.id, spv::Decoration::DecorationBinding);
 				Uniform.bSamplerCompare = Refl.variable_is_depth_or_compare(Sampler.id);

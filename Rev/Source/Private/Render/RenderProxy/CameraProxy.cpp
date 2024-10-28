@@ -23,7 +23,7 @@ void FCameraProxy::Prepare(const Ref<FScene>& Scene)
 	}
 }
 
-void FCameraProxy::SyncResource()
+void FCameraProxy::SyncResource(FRHICommandList& RHICmdList)
 {
 }
 

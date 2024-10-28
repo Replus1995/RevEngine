@@ -21,7 +21,7 @@ protected:
 	uint32 mSize;
 };
 
-class FRHIBuffer : public FRHIResource
+class REV_API FRHIBuffer : public FRHIResource
 {
 public:
 	FRHIBuffer(uint32 InSize, uint32 InStride, EBufferUsageFlags InUsage) : Size(InSize), Stride(InStride), Usage(InUsage) {}

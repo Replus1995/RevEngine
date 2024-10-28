@@ -108,6 +108,25 @@ public:
 };
 extern REV_API TGlobalResource<FStaticMeshVertexInputState> GStaticMeshVertexInputState;
 
+class FDefaultSamplerState : public FRenderResource
+{
+public:
+	Ref<FRHISamplerState> SamplerStateRHI;
+
+	FDefaultSamplerState() {}
+	virtual ~FDefaultSamplerState() {}
+	virtual void InitRHI()
+	{
+		FRHISamplerStateDesc StateDesc;
+		SamplerStateRHI = GDynamicRHI->RHICreateSamplerState(StateDesc);
+	}
+	virtual void ReleaseRHI() override
+	{
+		SamplerStateRHI.reset();
+	}
+};
+extern REV_API TGlobalResource<FDefaultSamplerState> GDefaultSamplerState;
+
 class REV_API RenderUtils
 {
 public:

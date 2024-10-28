@@ -1,0 +1,95 @@
+#include "/Engine/Shaders/Core/Light.rsh"
+
+cbuffer SceneUB : register(b0)
+{
+	FSceneUniform uScene;
+};
+
+cbuffer LightUB : register(b2)
+{
+	FDirectionalLightUniform uDirectionalLight;
+};
+
+struct FPBRMaterialUniform
+{
+	float4 BaseColorFactor;
+	float Metallic;
+	float Roughness;
+	float NormalScale;
+	float OcclusionStrength;
+	float3 EmissiveFactor;
+};
+
+cbuffer PBRMaterialUB : register(b3)
+{
+	FPBRMaterialUniform uPBRMaterial;
+};
+
+SAMPLER2D(sBaseColor, 0);
+SAMPLER2D(sMetallicRoughness, 1);
+SAMPLER2D(sNormal, 2);
+SAMPLER2D(sOcclusion, 3);
+SAMPLER2D(sEmissive, 4);
+
+struct PSInput
+{
+    float4 vPosition : SV_POSITION;
+    float4 vColor : COLOR0;
+    float2 vTexCoord0 : TEXCOORD0;
+    float3 vWorldPos : TEXCOORD1;
+    float3 vNormal : NORMAL;
+    float3 vTangent : TANGENT;
+    float3 vBitangent : BINORMAL;
+};
+
+struct PSOutput
+{
+    float4 oColor : SV_Target;
+};
+
+PSOutput main(const PSInput Input)
+{
+	float4 BaseColor = Sample2D(sBaseColor, Input.vTexCoord0);
+	BaseColor *= uPBRMaterial.BaseColorFactor;
+
+	float3x3 TBN = float3x3(Input.vTangent, Input.vBitangent, Input.vNormal);
+    float3 TexNormal = normalize((Sample2D(sNormal, Input.vTexCoord0).xyz * 2.0 - 1.0) * float3(uPBRMaterial.NormalScale, uPBRMaterial.NormalScale, 1.0f));
+    float3 Normal = normalize(TBN * TexNormal);
+
+	float Metallic = uPBRMaterial.Metallic * Sample2D(sMetallicRoughness, Input.vTexCoord0).b;
+    float Roughness = uPBRMaterial.Roughness * Sample2D(sMetallicRoughness, Input.vTexCoord0).g;
+	float Occlution = uPBRMaterial.OcclusionStrength * Sample2D(sOcclusion, Input.vTexCoord0).r;
+    float3 Emissive = Sample2D(sEmissive, Input.vTexCoord0).rgb * uPBRMaterial.EmissiveFactor;
+
+	float3 ViewDir = normalize(uScene.ViewPos.xyz - Input.vWorldPos);
+    float NdV = max(dot(Normal, ViewDir), 0.0);
+    float3 F0 = mix(kDielectric, BaseColor.rgb, Metallic);
+
+	float3 SumLightColor = float3(0.0);
+    for(uint i = 0; i < uDirectionalLight.Count; i++)
+    {
+        float3 LightDir = -uDirectionalLight.Lights[i].Direction.xyz;
+        float Radiance = uDirectionalLight.Lights[i].Intensity;
+        /*
+        if(Radiance == 0.0)
+        {
+            continue;
+        }
+        */
+        float3 LightColor = ComputeLightPBR(BaseColor.rgb, Roughness, Metallic, Normal, ViewDir, LightDir, NdV, F0, Radiance);
+        LightColor *= uDirectionalLight.Lights[i].Color.rgb;
+        //TODO: Shadow
+
+        //LightColor += (diffuseBRDF + specularBRDF) * Radiance * NdL;
+        SumLightColor += LightColor;
+    }
+
+	//TODO: IBL Lighting
+    float3 AmbientColor = kAmbientFactor * BaseColor.rgb * Occlution;
+
+    PSOutput Result;
+    Result.oColor.rgb = AmbientColor + SumLightColor + Emissive;
+    //Result.oColor.rgb = pow(o_Color.rgb, vec3(1.0/2.2)); //Gamma Correction
+    Result.oColor.a = BaseColor.a;
+    return Result;
+}

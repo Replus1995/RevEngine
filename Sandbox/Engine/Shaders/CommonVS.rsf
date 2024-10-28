@@ -1,0 +1,52 @@
+#include "Engine/Shaders/Core/Base.rsh"
+
+cbuffer SceneUB : register(b0, space0)
+{
+	FSceneUniform uScene;
+};
+
+cbuffer StaticMeshUB : register(b1, space0)
+{
+	FStaticMeshUniform uStaticMesh;
+};
+
+struct VSInput
+{
+    float4 aPosition : POSITION0;
+    float4 aColor : COLOR0;
+    float4 aNormal : NORMAL;
+    float4 aTangent : TANGENT;
+    float4 aTexCoord0 : TEXCOORD0;
+    //float4 aTexCoord1 : TEXCOORD1;
+};
+
+struct VSOutput
+{
+    float4 vPosition : SV_POSITION;
+    float4 vColor : COLOR0;
+    float2 vTexCoord0 : TEXCOORD0;
+    float3 vWorldPos : TEXCOORD1;
+    float3 vNormal : NORMAL;
+    float3 vTangent : TANGENT;
+    float3 vBitangent : BINORMAL;
+};
+
+VSOutput main(VSInput Input)
+{
+    VSOutput Result;
+    Result.vColor = Input.aColor;
+    Result.vTexCoord0 = Input.aTexCoord0;
+
+    float3x3 NormalMat = float3x3(uStaticMesh.ModelMat);
+    float3 wNormal = normalize(mul(NormalMat, Input.aNormal.xyz));
+    float3 wTangent = normalize(mul(NormalMat, Input.aTangent.xyz));
+
+    Result.vNormal = wNormal;
+    Result.vTangent = wTangent;
+    Result.vBitangent = normalize(cross(wNormal, wTangent) * Input.aTangent.w);
+
+    float4 wPosition =  mul(uStaticMesh.ModelMat, Input.aPosition);
+    Result.vWorldPos = wPosition.xyz;
+    Result.vPosition = mul(uScene.ViewProjMat, wPosition);
+    return Result;
+}

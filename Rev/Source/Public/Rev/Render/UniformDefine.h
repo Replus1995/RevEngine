@@ -32,7 +32,6 @@ struct FShadowUniform
 
 struct FDirectionalLightUniform
 {
-	uint32 Count = 0;
 	struct alignas(16) Info {
 		Math::FVector4 Direction;
 		Math::FVector4 Color;
@@ -40,6 +39,7 @@ struct FDirectionalLightUniform
 		int32 ShadowIndex;
 		uint32 ShadowCount;
 	}  Lights[REV_MAX_DIRECTIONAL_LIGHTS];
+	uint32 Count = 0;
 };
 
 struct FSpotLightUniform

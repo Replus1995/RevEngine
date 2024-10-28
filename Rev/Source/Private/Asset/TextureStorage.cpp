@@ -53,6 +53,7 @@ Ref<FTexture> FTextureStorage::CreateTexture(bool bForceSRGB)
 
 	if(bForceSRGB)
 		TextureDesc.AddFlags(ETextureCreateFlags::SRGB);
+	TextureDesc.AddFlags(ETextureCreateFlags::ShaderResource);
 
 	if (TextureDesc.Dimension == ETextureDimension::TextureCube && ImageData.NumLayers() == 6)
 	{

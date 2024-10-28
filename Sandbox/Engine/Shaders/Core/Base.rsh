@@ -24,3 +24,30 @@ struct FStaticMeshUniform
 {
     column_major matrix ModelMat;
 };
+
+//Default SamplerStates
+/*
+SamplerState GLinearSampler
+{
+    Filter = MIN_MAG_MIP_LINEAR;
+    AddressU = Wrap;
+    AddressV = Wrap;
+    AddressW = Wrap;
+};
+*/
+
+//Texture/Sampler defines
+struct FSampler2D
+{
+	Texture2D Texture;
+	SamplerState Sampler;
+};
+#define SAMPLER2D(_name, _reg) \
+    uniform Texture2D _name ## Texture : REGISTER(t, _reg); \
+    uniform SamplerState _name ## Sampler : REGISTER(s, _reg); \
+    static FSampler2D _name = { _name ## Texture, _name ## Sampler }
+
+float4 Sample2D(FSampler2D _sampler, float2 _coord)
+{
+	return _sampler.Texture.Sample(_sampler.Sampler, _coord);
+}

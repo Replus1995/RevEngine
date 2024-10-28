@@ -1,6 +1,7 @@
 #include "Rev/Render/RenderProxy/SceneProxy.h" 
 #include "Rev/Render/RHI/DynamicRHI.h"
 #include "Rev/Render/RHI/RHICommandList.h"
+#include "Rev/Render/RHI/RHIBuffer.h"
 #include "Rev/Render/UniformLayout.h"
 
 #include "Rev/Core/Application.h"
@@ -15,7 +16,7 @@ void FSceneProxy::Prepare(const Ref<FScene>& Scene)
 
 	mCameraProxy.Prepare(Scene);
 	mStaticMeshProxy.Prepare(Scene);
-	mDirectionalLightProxy.Prepare(Scene);
+	mLightProxy.Prepare(Scene);
 	//mSkyProxy.Prepare(Scene);
 
 	auto pWindow = Application::GetApp().GetWindow();
@@ -29,8 +30,8 @@ void FSceneProxy::SyncResource(FRHICommandList& RHICmdList)
 
 	//Should run on render thread
 	//Update uniform buffer
-	mCameraProxy.SyncResource();
-	mDirectionalLightProxy.SyncResource();
+	mCameraProxy.SyncResource(RHICmdList);
+	mLightProxy.SyncResource(RHICmdList);
 	//mSkyProxy.SyncResource();
 
 	{
@@ -52,7 +53,7 @@ void FSceneProxy::FreeResource()
 {
 	mCameraProxy.FreeResource();
 	mStaticMeshProxy.FreeResource();
-	mDirectionalLightProxy.FreeResource();
+	mLightProxy.FreeResource();
 }
 
 void FSceneProxy::Cleanup()

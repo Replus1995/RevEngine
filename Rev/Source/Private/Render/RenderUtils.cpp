@@ -50,6 +50,7 @@ TGlobalResource<F2DQuadVertexBuffer> G2DQuadVertexBuffer;
 TGlobalResource<FTileVertexInputState> GTileVertexInputState;
 TGlobalResource<FNullVertexBuffer> GNullVertexBuffer;
 TGlobalResource<FStaticMeshVertexInputState> GStaticMeshVertexInputState;
+TGlobalResource<FDefaultSamplerState> GDefaultSamplerState;
 
 
 void RenderUtils::Init()

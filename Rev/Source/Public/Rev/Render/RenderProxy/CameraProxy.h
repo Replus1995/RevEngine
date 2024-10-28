@@ -15,7 +15,7 @@ public:
 	~FCameraProxy();
 
 	void Prepare(const Ref<FScene>& Scene);
-	void SyncResource();
+	void SyncResource(FRHICommandList& RHICmdList);
 	void FreeResource();
 
 	const Math::FVector3& GetViewPos() const { return mViewPos; }

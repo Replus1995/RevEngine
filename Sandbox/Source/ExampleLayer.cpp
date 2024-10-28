@@ -28,7 +28,7 @@ ExampleLayer::ExampleLayer()
 
 	//FAssetLibrary::GetDefaultSurfaceMaterial();
 
-	{
+	/*{
 		auto pBoxMat = CreateRef<ExampleMaterial>();
 		pBoxMat->Compile();
 		pBoxMat->SetColor(Math::FLinearColor(.7, .9, .8, 1));
@@ -38,7 +38,7 @@ ExampleLayer::ExampleLayer()
 		meshComp.StaticMesh = FAssetLibrary::CreateBasicGeometry(EBasicGeometry::Box, pBoxMat);
 		auto& transformComp = meshEntity.GetComponent<TransformComponent>();
 		transformComp.SetLocation(Math::FVector3(0, 0.6, -5));
-	}
+	}*/
 
 	//{
 	//	//auto importRes = FAssetLibrary::ImportMesh(FPath("/Game/Assets/Models/Cube/Cube.gltf"));
@@ -58,29 +58,28 @@ ExampleLayer::ExampleLayer()
 	//	
 	//}
 
-	//{
-	//	auto pPlaneMat = CreateRef<PBRMaterial>();
-	//	pPlaneMat->Compile();
-	//	pPlaneMat->BaseColorFactor = (Math::FLinearColor(.8, .8, .8, 1));
+	{
+		auto pPlaneMat = CreateRef<FPBRMaterial>();
+		pPlaneMat->Compile();
+		pPlaneMat->PBRMaterialParams.BaseColorFactor = (Math::FLinearColor(.8, .8, .8, 1));
 
-	//	auto meshEntity = mScene->CreateEntity();
-	//	auto& meshComp = meshEntity.AddComponent<StaticMeshComponent>();
-	//	meshComp.StaticMesh = FAssetLibrary::CreateBasicGeometry(EBasicGeometry::Plane, pPlaneMat);
-	//	auto& transformComp = meshEntity.GetComponent<TransformComponent>();
-	//	transformComp.SetLocation(Math::FVector3(0, 0, -5));
-	//	transformComp.SetRotation(Math::FRotator(-90.0F, 0, 0));
-	//	transformComp.SetScale(Math::FVector3(5, 5, 0));
-	//}
+		auto meshEntity = mScene->CreateEntity();
+		auto& meshComp = meshEntity.AddComponent<StaticMeshComponent>();
+		meshComp.StaticMesh = FAssetLibrary::CreateBasicGeometry(EBasicGeometry::Plane, pPlaneMat);
+		auto& transformComp = meshEntity.GetComponent<TransformComponent>();
+		transformComp.SetLocation(Math::FVector3(0, 0, -5));
+		transformComp.SetRotation(Math::FRotator(-90.0F, 0, 0));
+		transformComp.SetScale(Math::FVector3(5, 5, 0));
+	}
 
-	//{
-
-	//	auto lightEntity = mScene->CreateEntity();
-	//	auto& dirLightComp = lightEntity.AddComponent<DirectionalLightComponent>();
-	//	dirLightComp.Light.SetColorByTemperature(6500.0f);
-	//	auto& transformComp = lightEntity.GetComponent<TransformComponent>();
-	//	transformComp.SetLocation(Math::FVector3(0, 0, 0));
-	//	transformComp.SetRotation(Math::FRotator(0, 0, 45.0f));
-	//}
+	{
+		auto lightEntity = mScene->CreateEntity();
+		auto& dirLightComp = lightEntity.AddComponent<DirectionalLightComponent>();
+		dirLightComp.Light.SetColorByTemperature(6500.0f);
+		auto& transformComp = lightEntity.GetComponent<TransformComponent>();
+		transformComp.SetLocation(Math::FVector3(0, 0, 0));
+		transformComp.SetRotation(Math::FRotator(0, 0, 45.0f));
+	}
 
 	{
 		auto camEntity = mScene->CreateEntity();

@@ -6,7 +6,7 @@ namespace Rev
 {
 
 class FTexture;
-
+class FRHIUniformBuffer;
 struct alignas(16) FPBRMaterialUniform
 {
 	Math::FLinearColor BaseColorFactor = Math::FLinearColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -27,13 +27,15 @@ public:
 	virtual void Compile() override;
 	virtual void PreDraw(FRHICommandList& RHICmdList) override;
 
-	FPBRMaterialUniform Params;
+	FPBRMaterialUniform PBRMaterialParams;
 	Ref<FTexture> BaseColorTexture = nullptr;
 	Ref<FTexture> MetallicRoughnessTexture = nullptr;
 	Ref<FTexture> NormalTexture = nullptr;
 	Ref<FTexture> OcclusionTexture = nullptr;
 	Ref<FTexture> EmissiveTexture = nullptr;
 
+protected:
+	Ref<FRHIUniformBuffer> MaterialUB;
 };
 
 }

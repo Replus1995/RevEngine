@@ -5,20 +5,21 @@
 
 namespace Rev
 {
-
+class FRHIUniformBuffer;
 class FScene;
-class FDirectionalLightProxy
+class FLightProxy
 {
 public:
-	FDirectionalLightProxy();
-	~FDirectionalLightProxy();
+	FLightProxy();
+	~FLightProxy();
 
 	void Prepare(const Ref<FScene>& Scene);
-	void SyncResource() const;
+	void SyncResource(FRHICommandList& RHICmdList);
 	void FreeResource();
 
 private:
-	//TUniform<FDirectionalLightUniform, 10> uLight;
+	FDirectionalLightUniform mDirectionalLightParams;
+	Ref<FRHIUniformBuffer> mLightUB;
 };
 
 }
