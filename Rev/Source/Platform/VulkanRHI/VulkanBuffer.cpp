@@ -167,6 +167,17 @@ void FVulkanUniformBuffer::UpdateSubData(const void* Data, uint32 Size, uint32 O
 }
 
 
+//DynamicRHI
+Ref<FRHIBuffer> FVulkanDynamicRHI::RHICreateBuffer(uint32 InSize, uint32 InStride, EBufferUsageFlags InFlags)
+{
+	return CreateRef<FVulkanBuffer>(InSize, InStride, InFlags);
+}
+
+Ref<FRHIUniformBuffer> FVulkanDynamicRHI::RHICreateUniformBuffer(uint32 InSize)
+{
+	return CreateRef<FVulkanUniformBuffer>(InSize);
+}
+
 
 
 }

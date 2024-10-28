@@ -2,7 +2,6 @@
 #include "VulkanPixelFormat.h"
 #include "VulkanBuffer.h"
 #include "VulkanTexture.h"
-#include "VulkanRenderTarget.h"
 #include "VulkanRenderPass.h"
 #include "VulkanContext.h"
 #include "Rev/Core/Hash.h"
@@ -45,31 +44,6 @@ void FVulkanDynamicRHI::Cleanup()
 Scope<FRHIContext> FVulkanDynamicRHI::RHICreateContext()
 {
 	return CreateScope<FVulkanContext>();
-}
-
-Ref<FRHIUniformBuffer> FVulkanDynamicRHI::CreateUniformBuffer(uint32 InSize)
-{
-	return CreateRef<FVulkanUniformBuffer>(InSize);
-}
-
-Ref<FRHIBuffer> FVulkanDynamicRHI::RHICreateBuffer(uint32 InSize, uint32 InStride, EBufferUsageFlags InFlags)
-{
-	return CreateRef<FVulkanBuffer>(InSize, InStride, InFlags);
-}
-
-Ref<FRHITexture> FVulkanDynamicRHI::CreateTexture(const FRHITextureDesc& InDesc)
-{
-	return CreateVulkanTexture(InDesc);
-}
-
-Ref<FRHIRenderTarget> FVulkanDynamicRHI::CreateRenderTarget(const FRenderTargetDesc& InDesc)
-{
-	return CreateRef<FVulkanRenderTarget>(InDesc);
-}
-
-Ref<FRHIRenderPass> FVulkanDynamicRHI::CreateRenderPass(const FRHIRenderPassDesc& InDesc)
-{
-	return CreateRef<FVulkanRenderPass>(InDesc);
 }
 
 FVulkanDynamicRHI* FVulkanDynamicRHI::GetVulkanRHI()

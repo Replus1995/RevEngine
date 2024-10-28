@@ -2,6 +2,7 @@
 #include "VulkanPixelFormat.h"
 #include "VulkanUtils.h"
 #include "VulkanDynamicRHI.h"
+#include "Core/VulkanEnum.h"
 #include "Rev/Core/Assert.h"
 
 namespace Rev
@@ -11,24 +12,11 @@ FVulkanTexture2D::FVulkanTexture2D(const FRHITextureDesc& InDesc)
 	: FVulkanTexture(InDesc)
 {
 	REV_CORE_ASSERT(InDesc.Dimension == ETextureDimension::Texture2D);
-    VkImageUsageFlags UsageFlags = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
-	CreateResource(UsageFlags);
-}
-
-FVulkanTexture2D::FVulkanTexture2D(const FRHITextureDesc& InDesc, VkImageUsageFlags InUsageFlags)
-    : FVulkanTexture(InDesc)
-{
-    REV_CORE_ASSERT(InDesc.Dimension == ETextureDimension::Texture2D);
-    CreateResource(InUsageFlags);
+    Init();
 }
 
 FVulkanTexture2D::~FVulkanTexture2D()
 {
-    REV_CORE_ASSERT(FVulkanDynamicRHI::GetDevice());
-    REV_CORE_ASSERT(FVulkanDynamicRHI::GetAllocator());
-
-    vkDestroyImageView(FVulkanDynamicRHI::GetDevice(), mImageView, nullptr);
-    vmaDestroyImage(FVulkanDynamicRHI::GetAllocator(), mImage, mAllocation);
 }
 
 void FVulkanTexture2D::UpdateContent(FVulkanContext* Context, const void* InContent, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex)
@@ -47,8 +35,7 @@ void FVulkanTexture2D::UpdateContent(FVulkanContext* Context, const void* InCont
     FVulkanUtils::ImmediateUploadImage(Context, mImage, mImageAspectFlags, { MipSize.width, MipSize.height, 1 }, InContent, InSize, InMipLevel, 0, 0);
 }
 
-
-void FVulkanTexture2D::CreateResource(VkImageUsageFlags InUsageFlags)
+void FVulkanTexture2D::Init()
 {
     REV_CORE_ASSERT(FVulkanDynamicRHI::GetDevice());
     REV_CORE_ASSERT(FVulkanDynamicRHI::GetAllocator());
@@ -66,7 +53,7 @@ void FVulkanTexture2D::CreateResource(VkImageUsageFlags InUsageFlags)
     ImageCreateInfo.format = ImageFormat;
     ImageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
     ImageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    ImageCreateInfo.usage = InUsageFlags;
+    ImageCreateInfo.usage = FVulkanEnum::Translate(mDesc.Flags);
     ImageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
     ImageCreateInfo.samples = (VkSampleCountFlagBits)mDesc.NumSamples;
     ImageCreateInfo.flags = 0;

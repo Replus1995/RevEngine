@@ -25,7 +25,7 @@ void FSceneProxy::Prepare(const Ref<FScene>& Scene)
 void FSceneProxy::SyncResource(FRHICommandList& RHICmdList)
 {
 	if(!mSceneUB)
-		mSceneUB = GDynamicRHI->CreateUniformBuffer(sizeof(FSceneUniform));
+		mSceneUB = GDynamicRHI->RHICreateUniformBuffer(sizeof(FSceneUniform));
 
 	//Should run on render thread
 	//Update uniform buffer

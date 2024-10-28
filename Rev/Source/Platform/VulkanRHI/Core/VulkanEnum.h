@@ -31,6 +31,9 @@ public:
 
     //Buffer
     static VkFormat Translate(EVertexElmentType InType);
+
+    //Texture
+    static VkImageUsageFlags Translate(ETextureCreateFlags InFlags);
 };
 
 }

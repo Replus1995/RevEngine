@@ -5,7 +5,6 @@
 #include "Rev/Render/RHI/RHIState.h"
 #include "Rev/Render/RHI/RHIBuffer.h"
 #include "Rev/Render/RHI/RHITexture.h"
-#include "Rev/Render/RHI/RHIRenderTarget.h"
 #include "Rev/Render/RHI/RHIRenderPass.h"
 
 namespace Rev
@@ -22,12 +21,12 @@ public:
 
 	virtual Scope<FRHIContext> RHICreateContext() = 0;
 	//Buffer
-	virtual Ref<FRHIUniformBuffer> CreateUniformBuffer(uint32 InSize) = 0;
 	virtual Ref<FRHIBuffer> RHICreateBuffer(uint32 InSize, uint32 InStride, EBufferUsageFlags InFlags) = 0;
+	virtual Ref<FRHIUniformBuffer> RHICreateUniformBuffer(uint32 InSize) = 0;
 
 	//Texture
-	virtual Ref<FRHITexture> CreateTexture(const FRHITextureDesc& InDesc) = 0;
-	virtual Ref<FRHIRenderTarget> CreateRenderTarget(const FRenderTargetDesc& InDesc) = 0;
+	virtual Ref<FRHITexture> RHICreateTexture(const FRHITextureDesc& InDesc) = 0;
+	virtual void RHIResizeTexture(FRHITexture* InTexture, uint32 InWidth, uint32 InHeight, uint32 InDepth) = 0;
 
 	//State
 	virtual Ref<FRHISamplerState> RHICreateSamplerState(const FRHISamplerStateDesc& InDesc) = 0;
@@ -37,7 +36,7 @@ public:
 	virtual Ref<FRHIVertexInputState> RHICreateVertexInputState(const FRHIVertexInputStateDesc& InDesc) = 0;
 
 	//Pipeline
-	virtual Ref<FRHIRenderPass> CreateRenderPass(const FRHIRenderPassDesc& InDesc) = 0;
+	virtual Ref<FRHIRenderPass> RHICreateRenderPass(const FRHIRenderPassDesc& InDesc) = 0;
 
 };
 

@@ -21,12 +21,12 @@ public:
 
 	virtual Scope<FRHIContext> RHICreateContext() override;
 	//Buffer
-	virtual Ref<FRHIUniformBuffer> CreateUniformBuffer(uint32 InSize) override;
 	virtual Ref<FRHIBuffer> RHICreateBuffer(uint32 InSize, uint32 InStride, EBufferUsageFlags InFlags) override;
+	virtual Ref<FRHIUniformBuffer> RHICreateUniformBuffer(uint32 InSize) override;
 
 	//Texture
-	virtual Ref<FRHITexture> CreateTexture(const FRHITextureDesc& InDesc ) override;
-	virtual Ref<FRHIRenderTarget> CreateRenderTarget(const FRenderTargetDesc& InDesc) override;
+	virtual Ref<FRHITexture> RHICreateTexture(const FRHITextureDesc& InDesc) override;
+	virtual void RHIResizeTexture(FRHITexture* InTexture, uint32 InWidth, uint32 InHeight, uint32 InDepth) override;
 
 	//State
 	virtual Ref<FRHISamplerState> RHICreateSamplerState(const FRHISamplerStateDesc& InDesc) override;
@@ -36,7 +36,7 @@ public:
 	virtual Ref<FRHIVertexInputState> RHICreateVertexInputState(const FRHIVertexInputStateDesc& InDesc) override;
 
 	//Pipeline
-	virtual Ref<FRHIRenderPass> CreateRenderPass(const FRHIRenderPassDesc& InDesc) override;
+	virtual Ref<FRHIRenderPass> RHICreateRenderPass(const FRHIRenderPassDesc& InDesc) override;
 
 public:
 	static FVulkanDynamicRHI* GetVulkanRHI();

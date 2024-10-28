@@ -2,10 +2,16 @@
 #include "VulkanUtils.h"
 #include "Rev/Core/Assert.h"
 
+#include "VulkanDynamicRHI.h"
 #include "VulkanTexture2D.h"
 
 namespace Rev
 {
+
+FVulkanTexture::~FVulkanTexture()
+{
+	Release();
+}
 
 void FVulkanTexture::Transition(VkImageLayout DstLayout, VkCommandBuffer InCmdBuffer)
 {
@@ -30,6 +36,19 @@ FVulkanTexture::FVulkanTexture(const FRHITextureDesc& InDesc)
 		mImageAspectFlags |= VK_IMAGE_ASPECT_STENCIL_BIT;
 	if (mImageAspectFlags == VK_IMAGE_ASPECT_NONE)
 		mImageAspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
+}
+
+void FVulkanTexture::Release()
+{
+	REV_CORE_ASSERT(FVulkanDynamicRHI::GetDevice());
+	REV_CORE_ASSERT(FVulkanDynamicRHI::GetAllocator());
+
+	vkDestroyImageView(FVulkanDynamicRHI::GetDevice(), mImageView, nullptr);
+	vmaDestroyImage(FVulkanDynamicRHI::GetAllocator(), mImage, mAllocation);
+	mImage = VK_NULL_HANDLE;
+	mImageView = VK_NULL_HANDLE;
+	mImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	mAllocation = VK_NULL_HANDLE;
 }
 
 VkExtent3D FVulkanTexture::GetExtent()
@@ -90,8 +109,21 @@ void FVulkanTexture::ClearContent(FVulkanContext* Context, uint8 InMipLevel, uin
 	FVulkanUtils::ImmediateClearImage(Context, mImage, mImageAspectFlags, GetClearValue(), InMipLevel, InMipCount, InArrayIndex, InArrayCount);
 }
 
+void FVulkanTexture::Resize(uint32 InWidth, uint32 InHeight, uint32 InDepth)
+{
+	if (InWidth != mDesc.Width || InHeight != mDesc.Height || InDepth != mDesc.Depth)
+	{
+		Release();
+		mDesc.Width = InWidth;
+		mDesc.Height = InHeight;
+		mDesc.Depth = InDepth;
+		Init();
+	}
+}
 
-Ref<FVulkanTexture> CreateVulkanTexture(const FRHITextureDesc& InDesc)
+
+//DynamicRHI
+Ref<FRHITexture> FVulkanDynamicRHI::RHICreateTexture(const FRHITextureDesc& InDesc)
 {
 	switch (InDesc.Dimension)
 	{
@@ -110,6 +142,15 @@ Ref<FVulkanTexture> CreateVulkanTexture(const FRHITextureDesc& InDesc)
 	}
 	REV_CORE_ASSERT(false, "Unsupported Texture Dimension!");
 	return nullptr;
+}
+
+void FVulkanDynamicRHI::RHIResizeTexture(FRHITexture* InTexture, uint32 InWidth, uint32 InHeight, uint32 InDepth)
+{
+	FVulkanTexture* Texture = FVulkanTexture::Cast(InTexture);
+	if (Texture)
+	{
+		Texture->Resize(InWidth, InHeight, InDepth);
+	}
 }
 
 }

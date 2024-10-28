@@ -2,7 +2,6 @@
 #include "VulkanUtils.h"
 #include "VulkanShader.h"
 #include "VulkanTexture.h"
-#include "VulkanRenderTarget.h"
 #include "VulkanState.h"
 #include "VulkanBuffer.h"
 #include "VulkanShader.h"
@@ -241,23 +240,22 @@ void FVulkanContext::UpdateBufferData(FRHIBuffer* Buffer, const void* Content, u
 void FVulkanContext::BeginRenderPass(FRHIRenderPass* InRenderPass)
 {
 	FVulkanRenderPass* RenderPass = static_cast<FVulkanRenderPass*>(InRenderPass);
-	if(!RenderPass || !RenderPass->GetRenderTarget())
+	if(!RenderPass)
 		return;
 	mFrameState.CurrentPass = RenderPass;
-	FVulkanRenderTarget* pRenderTarget = static_cast<FVulkanRenderTarget*>(RenderPass->GetRenderTarget().get());
-	pRenderTarget->FlushResource((VkRenderPass)RenderPass->GetNativeHandle());
+	RenderPass->PrepareForDraw();
 
 	VkRenderPassBeginInfo RenderPassInfo{};
 	RenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 	RenderPassInfo.pNext = NULL;
 	RenderPassInfo.renderPass = (VkRenderPass)RenderPass->GetNativeHandle();
-	RenderPassInfo.framebuffer = (VkFramebuffer)pRenderTarget->GetNativeHandle();
+	RenderPassInfo.framebuffer = (VkFramebuffer)RenderPass->GetFramebuffer();
 	RenderPassInfo.renderArea.offset.x = 0;
 	RenderPassInfo.renderArea.offset.y = 0;
-	RenderPassInfo.renderArea.extent.width = RenderPass->GetRenderTarget()->GetWidth();
-	RenderPassInfo.renderArea.extent.height = RenderPass->GetRenderTarget()->GetHeight();
-	RenderPassInfo.clearValueCount = pRenderTarget->GetNumClearValues();
-	RenderPassInfo.pClearValues = pRenderTarget->GetClearValues();
+	RenderPassInfo.renderArea.extent.width = RenderPass->GetFrameWidth() > 0 ? RenderPass->GetFrameWidth() : mSwapchain.GetExtent().width;
+	RenderPassInfo.renderArea.extent.height = RenderPass->GetFrameHeight() > 0 ? RenderPass->GetFrameHeight() : mSwapchain.GetExtent().height;
+	RenderPassInfo.clearValueCount = RenderPass->GetNumAttachments();
+	RenderPassInfo.pClearValues = RenderPass->GetClearValues();
 
 	VkSubpassBeginInfo SubpassBeginInfo{};
 	SubpassBeginInfo.sType = VK_STRUCTURE_TYPE_SUBPASS_BEGIN_INFO;
@@ -286,11 +284,14 @@ void FVulkanContext::EndRenderPass(bool bBlitToBack)
 
 	if (bBlitToBack)
 	{
-		auto ColorTex = mFrameState.CurrentPass->GetRenderTarget()->GetTargetTexture(RTA_ColorAttachment0);
-		FVulkanUtils::TransitionImage(GetActiveCmdBuffer(), (VkImage)ColorTex->GetNativeHandle(), VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
-		FVulkanUtils::TransitionImage(GetActiveCmdBuffer(), mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-		FVulkanUtils::BlitImage(GetActiveCmdBuffer(), (VkImage)ColorTex->GetNativeHandle(), mSwapchain.GetImages()[mCurSwapchainImageIndex], mDrawExtent, mSwapchain.GetExtent());
-		FVulkanUtils::TransitionImage(GetActiveCmdBuffer(), mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+		FRHITexture* ColorTex = mFrameState.CurrentPass->GetDesc().ColorRenderTargets[RTA_ColorAttachment0].ColorTarget;
+		if (ColorTex)
+		{
+			FVulkanUtils::TransitionImage(GetActiveCmdBuffer(), (VkImage)ColorTex->GetNativeHandle(), VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+			FVulkanUtils::TransitionImage(GetActiveCmdBuffer(), mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+			FVulkanUtils::BlitImage(GetActiveCmdBuffer(), (VkImage)ColorTex->GetNativeHandle(), mSwapchain.GetImages()[mCurSwapchainImageIndex], mDrawExtent, mSwapchain.GetExtent());
+			FVulkanUtils::TransitionImage(GetActiveCmdBuffer(), mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+		}
 	}
 }
 

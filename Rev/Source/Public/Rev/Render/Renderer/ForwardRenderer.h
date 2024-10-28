@@ -5,7 +5,7 @@
 
 namespace Rev
 {
-class FRHIRenderTarget;
+class FRHITexture;
 class FRHIRenderPass;
 class FForwardRenderer : public FRenderer
 {
@@ -18,8 +18,11 @@ public:
 	virtual void EndFrame() override;
 
 private:
+	uint32 FrameWidth = 0;
+	uint32 FrameHeight = 0;
 	Ref<FRHIRenderPass> mBasePass = nullptr;
-	Ref<FRHIRenderTarget> mBasePassTarget = nullptr;
+	Ref<FRHITexture> mBasePassColor = nullptr;
+	Ref<FRHITexture> mBasePassDepth = nullptr;
 
 	FGammaCorrectPass mGammaCorrectPass;
 };

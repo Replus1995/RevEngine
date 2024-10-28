@@ -36,7 +36,7 @@ VkPipeline FVulkanPipelineBuilder::BuildGraphics(VkDevice InDevice, VkPipelineLa
     const FVulkanShaderProgram* InProgram)
 {
     const FRHIRenderPassDesc& RenderPassDesc = RenderPass->GetDesc();
-    uint32 ColorAttachmentCount = RenderPassDesc.NumColorAttachments;
+    uint32 ColorAttachmentCount = RenderPassDesc.NumColorRenderTargets;
     REV_CORE_ASSERT(ColorAttachmentCount <= RTA_MaxColorAttachments);
     REV_CORE_ASSERT(InStateDesc.VertexInputState);
 
@@ -53,9 +53,14 @@ VkPipeline FVulkanPipelineBuilder::BuildGraphics(VkDevice InDevice, VkPipelineLa
     VkFormat ColorFormats[RTA_MaxColorAttachments];
     for (uint32 i = 0; i < ColorAttachmentCount; i++)
     {
-        ColorFormats[i] = (VkFormat)GPixelFormats[RenderPassDesc.ColorAttachments[i].Format].PlatformFormat;
+        REV_CORE_ASSERT(RenderPassDesc.ColorRenderTargets[i].ColorTarget);
+        ColorFormats[i] = (VkFormat)GPixelFormats[RenderPassDesc.ColorRenderTargets[i].ColorTarget->GetFormat()].PlatformFormat;
     }
-    VkFormat DepthFormat = (VkFormat)GPixelFormats[RenderPassDesc.DepthStencilAttchment.Format].PlatformFormat;
+    VkFormat DepthFormat = VK_FORMAT_UNDEFINED;
+    if (RenderPassDesc.DepthStencilRenderTarget.DepthStencilTarget)
+    {
+        DepthFormat = (VkFormat)GPixelFormats[RenderPassDesc.DepthStencilRenderTarget.DepthStencilTarget->GetFormat()].PlatformFormat;
+    }
 
     VkPipelineInputAssemblyStateCreateInfo InputAssemblyState = MakeInputAssemblyStateInfo(FVulkanEnum::Translate(InStateDesc.PrimitiveTopology));
     VkPipelineTessellationStateCreateInfo TessellationState = MakeTessellationStateInfo();

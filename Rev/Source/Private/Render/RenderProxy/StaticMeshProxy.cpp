@@ -43,7 +43,7 @@ void FStaticMeshProxy::Prepare(const Ref<FScene>& Scene)
 			FStaticMeshRenderData RenderData;
 			RenderData.StaticMesh = MeshComp.StaticMesh;
 			RenderData.MeshParams.ModelMat = TransComp.Transform.ToMatrix();
-			RenderData.MeshUB = GDynamicRHI->CreateUniformBuffer(sizeof(FStaticMeshUniform));
+			RenderData.MeshUB = GDynamicRHI->RHICreateUniformBuffer(sizeof(FStaticMeshUniform));
 			RenderData.MeshUB->UpdateSubData(&RenderData.MeshParams, sizeof(FStaticMeshUniform));
 			mRenderDataArr.emplace_back(std::move(RenderData));
 		}

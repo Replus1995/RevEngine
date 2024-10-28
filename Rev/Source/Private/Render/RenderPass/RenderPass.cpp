@@ -1,12 +1,10 @@
 #include "Rev/Render/RenderPass/RenderPass.h"
-#include "Rev/Render/RHI/RHIRenderTarget.h"
 
 namespace Rev
 {
 
 FRenderPass::FRenderPass(std::string_view InName)
 	: mName(InName)
-	, mRenderTarget(nullptr)
 {
 }
 
@@ -24,21 +22,6 @@ void FRenderPass::EndPass()
 {
 	//RenderCmd::BindRenderTarget(nullptr);
 	mInPass = false;
-}
-
-const Ref<FRHIRenderTarget>& FRenderPass::GetRenderTarget() const
-{
-	return mRenderTarget;
-}
-
-void FRenderPass::SetRenderTarget(const Ref<FRHIRenderTarget>& InTarget)
-{
-	if (mInPass)
-	{
-		REV_CORE_ASSERT(false, "Never set render target in pass.")
-		return;
-	}
-	mRenderTarget = InTarget;
 }
 
 }

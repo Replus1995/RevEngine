@@ -3,7 +3,6 @@
 
 namespace Rev
 {
-class FRHIRenderTarget;
 class FRenderPass
 {
 public:
@@ -15,12 +14,8 @@ public:
 
 	const std::string& GetName() const { return mName; }
 
-	const Ref<FRHIRenderTarget>& GetRenderTarget() const;
-	void SetRenderTarget(const Ref<FRHIRenderTarget>& InTarget);
-
 protected:
 	std::string mName;
-	Ref<FRHIRenderTarget> mRenderTarget;
 	bool mInPass = false;
 };
 

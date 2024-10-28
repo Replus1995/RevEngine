@@ -3,6 +3,7 @@
 #include "Rev/Render/RHI/RHIContext.h"
 #include "Rev/Render/RHI/RHICommandList.h"
 #include "Rev/Render/RHI/RHIPipeline.h"
+#include "Rev/Render/RHI/RHITexture.h"
 #include "Rev/Render/RenderProxy/SceneProxy.h"
 #include "Rev/Render/RenderUtils.h"
 
@@ -22,38 +23,36 @@ void FForwardRenderer::BeginFrame()
 {
 	//prepare resource
 
+	if (!mBasePassColor)
+	{
+		FRHITextureDesc Desc = FRHITextureDesc::Make2D(mSceneProxy->GetFrameWidth(), mSceneProxy->GetFrameHeight(), PF_R8G8B8A8).SetClearColor(Math::FLinearColor(0, 0, 0, 1)).SetFlags(ETextureCreateFlags::RenderTargetable);
+		mBasePassColor = GDynamicRHI->RHICreateTexture(Desc);
+
+	}
+	if (!mBasePassDepth)
+	{
+		FRHITextureDesc Desc = FRHITextureDesc::Make2D(mSceneProxy->GetFrameWidth(), mSceneProxy->GetFrameHeight(), PF_DepthStencil).SetClearColor(FRHITextureClearColor(1.0, 0)).SetFlags(ETextureCreateFlags::DepthStencilTargetable);
+		mBasePassDepth = GDynamicRHI->RHICreateTexture(Desc);
+	}
+
 	if (!mBasePass)
 	{
-		FRHISubpassDesc SubpassDesc;
-		SubpassDesc.PipelineBindPoint = PBP_Graphics;
-		SubpassDesc.ColorAttachments[0] = RTA_ColorAttachment0;
-		SubpassDesc.DepthStencilAttachment = RTA_DepthStencilAttachment;
-		SubpassDesc.NumColorAttachments = 1;
-		SubpassDesc.NumInputAttachments = 0;
-
 
 		FRHIRenderPassDesc BasePassDesc;
-		BasePassDesc.ColorAttachments[0] = {PF_R8G8B8A8, ALO_Clear, ASO_Store};
-		BasePassDesc.NumColorAttachments = 1;
-		BasePassDesc.DepthStencilAttchment  = {PF_DepthStencil, ALO_Clear, ASO_Store, ALO_DontCare, ASO_DontCare};
-		BasePassDesc.SubpassDescs.push_back(SubpassDesc);
-
-		mBasePass = GDynamicRHI->CreateRenderPass(BasePassDesc);
+		BasePassDesc.ColorRenderTargets[0] = { mBasePassColor.get(), nullptr, -1, 0, ALO_Clear, ASO_Store};
+		BasePassDesc.NumColorRenderTargets = 1;
+		BasePassDesc.DepthStencilRenderTarget  = { mBasePassDepth.get(), nullptr, ALO_Clear, ASO_Store, ALO_DontCare, ASO_DontCare};
+		mBasePass = GDynamicRHI->RHICreateRenderPass(BasePassDesc);
 	}
 
-	if (!mBasePassTarget)
+	if (FrameWidth != mSceneProxy->GetFrameWidth() || FrameHeight != mSceneProxy->GetFrameHeight())
 	{
-		std::vector<FColorTargetDesc> vColorDesc;
-		vColorDesc.push_back({ PF_R8G8B8A8, Math::FLinearColor(0, 0, 0, 1) });
-		FRenderTargetDesc Desc = FRenderTargetDesc::Make2D(mSceneProxy->GetFrameWidth(), mSceneProxy->GetFrameHeight(), vColorDesc.data(), vColorDesc.size(), {PF_DepthStencil});
-		mBasePassTarget = GDynamicRHI->CreateRenderTarget(Desc);
-
-
-		mBasePass->SetRenderTarget(mBasePassTarget);
-		//RenderCmd::BindTexture(mLinearScreenTarget->GetTargetTexture(RTA_ColorAttachment0), UL::SLinearScreenTex); //to be optimized
+		FrameWidth = mSceneProxy->GetFrameWidth();
+		FrameHeight = mSceneProxy->GetFrameHeight();
+		GDynamicRHI->RHIResizeTexture(mBasePassColor.get(), FrameWidth, FrameHeight, 1);
+		GDynamicRHI->RHIResizeTexture(mBasePassDepth.get(), FrameWidth, FrameHeight, 1);
+		mBasePass->MarkFramebufferDirty();
 	}
-
-	mBasePassTarget->ResizeTargets(mSceneProxy->GetFrameWidth(), mSceneProxy->GetFrameHeight());
 
 	//else
 	//{
