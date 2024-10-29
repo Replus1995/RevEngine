@@ -108,7 +108,7 @@ void FStaticMeshProxy::DrawMeshesOpaque(FRHICommandList& RHICmdList)
 
 void FStaticMeshProxy::PrepareMeshDraw(FRHICommandList& RHICmdList, const FStaticMeshRenderData& InData)
 {
-	RHICmdList.GetContext()->BindUniformBuffer(UL::BStaticMesh, InData.MeshUB.get());
+	RHICmdList.GetContext()->RHIBindUniformBuffer(UL::BStaticMesh, InData.MeshUB.get());
 	InData.StaticMesh->PrepareForDraw();
 	InData.StaticMesh->GetVertexBuffer().UpdateVertexStreams(RHICmdList);
 }

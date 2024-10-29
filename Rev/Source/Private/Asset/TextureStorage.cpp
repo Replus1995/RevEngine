@@ -65,7 +65,7 @@ Ref<FTexture> FTextureStorage::CreateTexture(bool bForceSRGB)
 			for (uint8 iMip = 0; iMip < TextureDesc.NumMips; iMip++)
 			{
 				FBuffer& ImageBuffer = ImageData.At(iMip, iCubeFace);
-				FRenderCore::GetMainContext()->UpdateTexture(mCache->GetTextureRHI(), ImageBuffer.Data(), ImageBuffer.Size(), iMip, iCubeFace);
+				FRenderCore::GetMainContext()->RHIUpdateTexture(mCache->GetTextureRHI(), ImageBuffer.Data(), ImageBuffer.Size(), iMip, iCubeFace);
 			}
 		}
 		return mCache;
@@ -82,7 +82,7 @@ Ref<FTexture> FTextureStorage::CreateTexture(bool bForceSRGB)
 				for (uint8 iMip = 0; iMip < TextureDesc.NumMips; iMip++)
 				{
 					FBuffer& ImageBuffer = ImageData.At(iMip, iLayer * 6 + iCubeFace);
-					FRenderCore::GetMainContext()->UpdateTexture(mCache->GetTextureRHI(), ImageBuffer.Data(), ImageBuffer.Size(), iLayer * 6 + iCubeFace);
+					FRenderCore::GetMainContext()->RHIUpdateTexture(mCache->GetTextureRHI(), ImageBuffer.Data(), ImageBuffer.Size(), iLayer * 6 + iCubeFace);
 				}
 			}
 		}
@@ -100,7 +100,7 @@ Ref<FTexture> FTextureStorage::CreateTexture(bool bForceSRGB)
 		for (uint8 iMip = 0; iMip < TextureDesc.NumMips; iMip++)
 		{
 			FBuffer& ImageBuffer = ImageData.At(iMip, iLayer);
-			FRenderCore::GetMainContext()->UpdateTexture(mCache->GetTextureRHI(), ImageBuffer.Data(), ImageBuffer.Size(), iMip, iLayer);
+			FRenderCore::GetMainContext()->RHIUpdateTexture(mCache->GetTextureRHI(), ImageBuffer.Data(), ImageBuffer.Size(), iMip, iLayer);
 		}
 	}
 	return mCache;

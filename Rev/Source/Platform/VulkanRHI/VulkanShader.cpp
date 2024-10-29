@@ -31,21 +31,21 @@ FVulkanShader::~FVulkanShader()
 	vkDestroyShaderModule(FVulkanDynamicRHI::GetDevice(), mModule, nullptr);
 }
 
-VkShaderStageFlagBits FVulkanShader::TranslateShaderStage(ERHIShaderStage InStage)
+VkShaderStageFlagBits FVulkanShader::TranslateShaderStage(EShaderStage InStage)
 {
 	switch (InStage)
 	{
-	case ERHIShaderStage::Vertex:
+	case EShaderStage::Vertex:
 		return VK_SHADER_STAGE_VERTEX_BIT;
-	case ERHIShaderStage::Pixel:
+	case EShaderStage::Pixel:
 		return VK_SHADER_STAGE_FRAGMENT_BIT;
-	case ERHIShaderStage::Hull:
+	case EShaderStage::Hull:
 		return VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT;
-	case ERHIShaderStage::Domain:
+	case EShaderStage::Domain:
 		return VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT;
-	case ERHIShaderStage::Geometry:
+	case EShaderStage::Geometry:
 		return VK_SHADER_STAGE_GEOMETRY_BIT;
-	case ERHIShaderStage::Compute:
+	case EShaderStage::Compute:
 		return VK_SHADER_STAGE_COMPUTE_BIT;
 	default:
 		break;
@@ -65,66 +65,60 @@ FVulkanShaderProgram::~FVulkanShaderProgram()
 {
 }
 
-std::vector<VkPipelineShaderStageCreateInfo> FVulkanShaderProgram::GenShaderStageInfo() const
+uint32 FVulkanShaderProgram::GenShaderStageInfo(VkPipelineShaderStageCreateInfo* OutInfos) const
 {
-    std::vector<VkPipelineShaderStageCreateInfo> StageInfoVec;
-    for (uint8 i = (uint8)ERHIShaderStage::Vertex; i < (uint8)ERHIShaderStage::Compute; i++)
+	uint32 StageCount = 0;
+    for (uint8 i = (uint8)EShaderStage::Vertex; i < (uint8)EShaderStage::NumGfx; i++)
     {
-        const auto& pShader = mShaders[(ERHIShaderStage)i];
+        const auto& pShader = mShaders[(EShaderStage)i];
         if(!pShader)
             continue;
-        VkPipelineShaderStageCreateInfo StageInfo{};
+        VkPipelineShaderStageCreateInfo& StageInfo = OutInfos[StageCount++];
+		StageInfo = {};
         StageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
         StageInfo.pNext = nullptr;
-        StageInfo.stage = FVulkanShader::TranslateShaderStage((ERHIShaderStage)i);
+        StageInfo.stage = FVulkanShader::TranslateShaderStage((EShaderStage)i);
         StageInfo.module = (VkShaderModule)pShader->GetNativeHandle();
         StageInfo.pName = "main";
-
-        StageInfoVec.emplace_back(std::move(StageInfo));
     }
-    return StageInfoVec;
+    return StageCount;
 }
 
-std::vector<VkDescriptorSetLayoutBinding> FVulkanShaderProgram::GenLayoutBindings() const
+uint32 FVulkanShaderProgram::GenLayoutBindings(VkDescriptorSetLayoutBinding* OutBindings) const
 {
-	std::vector<VkDescriptorSetLayoutBinding> AllBindings;
+	uint32 BindingsCount = 0;
 	for (const FVulkanUniformInfo& Uniform : mProgramUniforms)
 	{
 		switch (Uniform.Type)
 		{
-		case ERHIUniformType::Buffer:
+		case EShaderUniformType::Buffer:
 		{
-			VkDescriptorSetLayoutBinding Binding{};
+			VkDescriptorSetLayoutBinding& Binding = OutBindings[BindingsCount++];
+			Binding = {};
 			Binding.stageFlags = Uniform.StageFlags;
 			Binding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 			Binding.binding = Uniform.Binding;
 			Binding.pImmutableSamplers = NULL;
 			Binding.descriptorCount = 1;
-
-			AllBindings.push_back(Binding);
 		}
 		break;
-		case ERHIUniformType::Texture:
+		case EShaderUniformType::Texture:
 		{
-			VkDescriptorSetLayoutBinding Binding{};
+			VkDescriptorSetLayoutBinding& Binding = OutBindings[BindingsCount++];
 			Binding.stageFlags = Uniform.StageFlags;
 			Binding.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
 			Binding.binding = Uniform.Binding;
 			Binding.pImmutableSamplers = NULL;
 			Binding.descriptorCount = 1;
 
-			AllBindings.push_back(Binding);
-
 			if (Uniform.SamplerBinding >= 0)
 			{
-				VkDescriptorSetLayoutBinding Binding{};
+				VkDescriptorSetLayoutBinding& Binding = OutBindings[BindingsCount++];
 				Binding.stageFlags = Uniform.StageFlags;
 				Binding.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
 				Binding.binding = Uniform.SamplerBinding;
 				Binding.pImmutableSamplers = NULL;
 				Binding.descriptorCount = 1;
-
-				AllBindings.push_back(Binding);
 			}
 		}
 		break;
@@ -133,16 +127,16 @@ std::vector<VkDescriptorSetLayoutBinding> FVulkanShaderProgram::GenLayoutBinding
 		}
 	}
 
-	return AllBindings;
+	return BindingsCount;
 }
 
 void FVulkanShaderProgram::UpdateProgramUniforms()
 {
 	mProgramUniforms.clear();
 
-	for (uint8 i = (uint8)ERHIShaderStage::Vertex; i < (uint8)ERHIShaderStage::Compute; i++)
+	for (uint8 i = (uint8)EShaderStage::Vertex; i < (uint8)EShaderStage::NumGfx; i++)
 	{
-		const auto& pShader = mShaders[(ERHIShaderStage)i];
+		const auto& pShader = mShaders[(EShaderStage)i];
 		if (!pShader)
 			continue;
 		FVulkanShader* pVulkanShader = static_cast<FVulkanShader*>(pShader.get());
@@ -162,8 +156,8 @@ void FVulkanShaderProgram::UpdateProgramUniforms()
 
 				switch (StageUniform.Type)
 				{
-				case ERHIUniformType::Buffer:
-				case ERHIUniformType::Texture:
+				case EShaderUniformType::Buffer:
+				case EShaderUniformType::Texture:
 					bUniformValid = true;
 					break;
 				default:

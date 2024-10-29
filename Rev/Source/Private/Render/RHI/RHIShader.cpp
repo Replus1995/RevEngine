@@ -4,19 +4,19 @@
 
 namespace Rev
 {
-Ref<FRHIShader>& FRHIGraphicsShaders::operator[](ERHIShaderStage Stage)
+Ref<FRHIShader>& FRHIGraphicsShaders::operator[](EShaderStage Stage)
 {
 	switch (Stage)
 	{
-	case Rev::ERHIShaderStage::Vertex:
+	case EShaderStage::Vertex:
 		return VertexShader;
-	case Rev::ERHIShaderStage::Hull:
+	case EShaderStage::Hull:
 		return HullShader;
-	case Rev::ERHIShaderStage::Domain:
+	case EShaderStage::Domain:
 		return DomainShader;
-	case Rev::ERHIShaderStage::Pixel:
+	case EShaderStage::Pixel:
 		return PixelShader;
-	case Rev::ERHIShaderStage::Geometry:
+	case EShaderStage::Geometry:
 		return GeometryShader;
 	default:
 		break;
@@ -25,19 +25,19 @@ Ref<FRHIShader>& FRHIGraphicsShaders::operator[](ERHIShaderStage Stage)
 	return VertexShader;
 }
 
-const Ref<FRHIShader>& FRHIGraphicsShaders::operator[](ERHIShaderStage Stage) const
+const Ref<FRHIShader>& FRHIGraphicsShaders::operator[](EShaderStage Stage) const
 {
 	switch (Stage)
 	{
-	case Rev::ERHIShaderStage::Vertex:
+	case EShaderStage::Vertex:
 		return VertexShader;
-	case Rev::ERHIShaderStage::Hull:
+	case EShaderStage::Hull:
 		return HullShader;
-	case Rev::ERHIShaderStage::Domain:
+	case EShaderStage::Domain:
 		return DomainShader;
-	case Rev::ERHIShaderStage::Pixel:
+	case EShaderStage::Pixel:
 		return PixelShader;
-	case Rev::ERHIShaderStage::Geometry:
+	case EShaderStage::Geometry:
 		return GeometryShader;
 	default:
 		break;

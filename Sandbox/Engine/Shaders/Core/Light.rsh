@@ -23,8 +23,8 @@ struct FDirectionalLightUniform
 };
 
 //PBR const
-const float3 kDielectric = float3(0.04);
-const float3 kAmbientFactor = float3(0.03);
+static const float3 kDielectric = float3(0.04);
+static const float3 kAmbientFactor = float3(0.03);
 
 
 //copies of UE4

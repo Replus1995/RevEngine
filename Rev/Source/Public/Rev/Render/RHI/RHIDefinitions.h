@@ -86,7 +86,7 @@ enum ERenderTargetAttachment : uint8
 };
 
 //Shader
-enum class ERHIUniformType : uint8
+enum class EShaderUniformType : uint8
 {
 	Unknown,
 	Buffer,
@@ -94,18 +94,18 @@ enum class ERHIUniformType : uint8
 	Texture,
 };
 
-enum class ERHIShaderStage : uint8
+enum class EShaderStage : uint8
 {
-	Unknown = 0,
-	Vertex = 1,
-	Pixel = 2,
-	Hull = 3, //unsupported
-	Domain = 4, //unsupported
-	Geometry = 5, //unsupported
-	Compute = 6, //unsupported
+	Vertex = 0,
+	Pixel = 1,
+	Hull = 2, //has not been supported
+	Domain = 3, //has not been supported
+	Geometry = 4, //has not been supported
+	Compute = 5, //has not been supported
+	Unknown = 6,
 	Count = 7,
-	NumGfxStages = 5,
-	NumComputeStages = 1
+	NumGfx = 5,
+	NumCompute = 1
 };
 
 //Buffer

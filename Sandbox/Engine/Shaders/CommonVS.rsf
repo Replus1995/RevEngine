@@ -37,9 +37,13 @@ VSOutput main(VSInput Input)
     Result.vColor = Input.aColor;
     Result.vTexCoord0 = Input.aTexCoord0;
 
-    float3x3 NormalMat = float3x3(uStaticMesh.ModelMat);
+    float3x3 NormalMat = ToMatrix3(uStaticMesh.ModelMat);
+    //float3 wNormal = normalize(mul(uStaticMesh.ModelMat, Input.aNormal).xyz);
+    //float3 wTangent = normalize(mul(uStaticMesh.ModelMat, Input.aTangent).xyz);
     float3 wNormal = normalize(mul(NormalMat, Input.aNormal.xyz));
     float3 wTangent = normalize(mul(NormalMat, Input.aTangent.xyz));
+    //float3 wNormal = Input.aNormal.xyz;
+    //float3 wTangent = Input.aTangent.xyz;
 
     Result.vNormal = wNormal;
     Result.vTangent = wTangent;

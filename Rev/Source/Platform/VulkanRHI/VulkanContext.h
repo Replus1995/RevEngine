@@ -36,31 +36,30 @@ public:
 	virtual void BeginFrame(bool bClearBackBuffer) override;
 	virtual void EndFrame() override;
 	virtual void PresentFrame() override;
-
 	virtual void ImmediateSubmit(std::function<void(VkCommandBuffer)>&& Func);
 
 //Command
-	virtual void SetVSync(bool bEnable) override;
-	virtual void SetViewport(uint32 InX, uint32 InY, uint32 InWidth, uint32 InHeight) override;
-	virtual void SetClearColor(const Math::FLinearColor& InColor) override;
-	virtual void SetClearDepthStencil(float InDepth, uint32 InStencil);
-	virtual void ClearBackBuffer() override;
+	virtual void RHISetVSync(bool bEnable) override;
+	virtual void RHISetViewport(uint32 InX, uint32 InY, uint32 InWidth, uint32 InHeight) override;
+	virtual void RHISetClearColor(const Math::FLinearColor& InColor) override;
+	virtual void RHISetClearDepthStencil(float InDepth, uint32 InStencil);
+	virtual void RHIClearBackBuffer() override;
 
 //Data transfer
-	virtual void UpdateTexture(FRHITexture* InTexture, const void* InContent, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex) override;
-	virtual void ClearTexture(FRHITexture* InTexture, uint8 InMipLevel, uint8 InMipCount, uint16 InArrayIndex, uint16 InArrayCount) override;
-	virtual void UpdateBufferData(FRHIBuffer* Buffer, const void* Content, uint32 Size, uint32 Offset = 0) override;
+	virtual void RHIUpdateTexture(FRHITexture* InTexture, const void* InContent, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex) override;
+	virtual void RHIClearTexture(FRHITexture* InTexture, uint8 InMipLevel, uint8 InMipCount, uint16 InArrayIndex, uint16 InArrayCount) override;
+	virtual void RHIUpdateBufferData(FRHIBuffer* Buffer, const void* Content, uint32 Size, uint32 Offset = 0) override;
 
 //Draw
-	virtual void BeginRenderPass(FRHIRenderPass* InRenderPass) override;
-	virtual void EndRenderPass(bool bBlitToBack) override;
-	virtual void NextSubpass() override;
+	virtual void RHIBeginRenderPass(FRHIRenderPass* InRenderPass) override;
+	virtual void RHIEndRenderPass(bool bBlitToBack) override;
+	virtual void RHINextSubpass() override;
 
-	virtual void BindUniformBuffer(uint16 InBinding, FRHIUniformBuffer* InBuffer) override;
-	virtual void BindTexture(uint16 InBinding, FRHITexture* InTexture, FRHISamplerState* InSamplerState) override;
-	virtual void BindProgram(FRHIShaderProgram* InProgram) override;
+	virtual void RHIBindUniformBuffer(uint16 InBinding, FRHIUniformBuffer* InBuffer) override;
+	virtual void RHIBindTexture(uint16 InBinding, FRHITexture* InTexture, FRHISamplerState* InSamplerState) override;
+	virtual void RHIBindProgram(FRHIShaderProgram* InProgram) override;
 
-	virtual void SetGraphicsPipelineState(const FRHIGraphicsPipelineStateDesc& InState) override;
+	virtual void RHISetGraphicsPipelineState(const FRHIGraphicsPipelineStateDesc& InState) override;
 
 	virtual void RHISetVertexStream(uint32 StreamIndex, FRHIBuffer* VertexBuffer, uint32 Offset) override;
 	virtual void RHIDrawPrimitive(uint32 NumPrimitives, uint32 StartVertex) override;

@@ -17,7 +17,7 @@ public:
     FVulkanPipelineLayout();
     ~FVulkanPipelineLayout();
 
-    void Build(const std::vector<VkDescriptorSetLayoutBinding>& InBindingInfo);
+    void Build(const VkDescriptorSetLayoutBinding* InBindingInfo, uint32 InBindingsCount);
     void Release();
 
     VkDescriptorSetLayout DescriptorSetLayout = VK_NULL_HANDLE;

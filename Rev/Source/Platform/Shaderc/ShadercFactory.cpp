@@ -4,6 +4,7 @@
 #include "Rev/Core/Log.h"
 #include "Rev/Render/RHI/RHITexture.h"
 #include "Rev/Render/RHI/RHIBuffer.h"
+#include "Rev/Render/RHI/RHIShaderLibrary.h"
 #include <filesystem>
 
 #include <shaderc/shaderc.hpp>
@@ -201,16 +202,16 @@ void ShaderIncluder::ReleaseInclude(shaderc_include_result* data)
 	delete data;
 }
 
-static shaderc_shader_kind ShaderStageToShadercKind(ERHIShaderStage InStage)
+static shaderc_shader_kind ShaderStageToShadercKind(EShaderStage InStage)
 {
 	switch (InStage)
 	{
-	case ERHIShaderStage::Vertex:		return shaderc_vertex_shader;
-	case ERHIShaderStage::Hull:			return shaderc_tess_control_shader;
-	case ERHIShaderStage::Domain:		return shaderc_tess_evaluation_shader;
-	case ERHIShaderStage::Pixel:		return shaderc_fragment_shader;
-	case ERHIShaderStage::Geometry:		return shaderc_geometry_shader;
-	case ERHIShaderStage::Compute:		return shaderc_compute_shader;
+	case EShaderStage::Vertex:		return shaderc_vertex_shader;
+	case EShaderStage::Hull:		return shaderc_tess_control_shader;
+	case EShaderStage::Domain:		return shaderc_tess_evaluation_shader;
+	case EShaderStage::Pixel:		return shaderc_fragment_shader;
+	case EShaderStage::Geometry:	return shaderc_geometry_shader;
+	case EShaderStage::Compute:		return shaderc_compute_shader;
 	}
 	REV_CORE_ASSERT(false, "Unknown Shader Stage");
 	return (shaderc_shader_kind)0;
@@ -222,16 +223,19 @@ static void InitCompileOptions(shaderc::CompileOptions& Options)
 	{
 	case Rev::ERenderAPI::Vulkan:
 		Options.SetTargetEnvironment(shaderc_target_env_vulkan, shaderc_env_version_vulkan_1_3);
-		Options.SetBindingBase(shaderc_uniform_kind_buffer, 0);
-		Options.SetBindingBase(shaderc_uniform_kind_sampler, 16);
-		Options.SetBindingBase(shaderc_uniform_kind_texture, 32);
-
+		Options.SetInvertY(true);
 		break;
 	default:
 		REV_CORE_ASSERT(false, "Unknow Render API")
 			break;
 	}
+
+	Options.SetBindingBase(shaderc_uniform_kind_buffer, GShaderCompileConfig.BufferOffset);
+	Options.SetBindingBase(shaderc_uniform_kind_sampler, GShaderCompileConfig.SamplerOffset);
+	Options.SetBindingBase(shaderc_uniform_kind_texture, GShaderCompileConfig.TextureOffset);
+
 	Options.SetSourceLanguage(shaderc_source_language_hlsl);
+	Options.SetHlslIoMapping(true);
 	Options.SetIncluder(CreateScope<ShaderIncluder>());
 
 	//Todo: shader limits
@@ -255,7 +259,7 @@ void FShadercFactory::ReflectShaderInfo(FShadercCompiledData& Data)
 	REV_CORE_TRACE("Shaderc::Reflect - {0} {1}", Data.Name.c_str(), FShadercUtils::ShaderStageToString(Data.Stage));
 #endif
 
-	if (Data.Stage == ERHIShaderStage::Vertex)
+	if (Data.Stage == EShaderStage::Vertex)
 	{
 #ifdef REV_DEBUG
 		REV_CORE_TRACE("Vertex Input:");
@@ -299,14 +303,14 @@ void FShadercFactory::ReflectShaderInfo(FShadercCompiledData& Data)
 
 		FRHIShaderUniform Uniform;
 		Uniform.Name = Buffer.name;
-		Uniform.Type = ERHIUniformType::Buffer;
+		Uniform.Type = EShaderUniformType::Buffer;
 		Uniform.Num = 1;
 		Uniform.Binding = Refl.get_decoration(Buffer.id, spv::Decoration::DecorationBinding);
 
 		Data.Uniforms.push_back(Uniform);
 
 #ifdef REV_DEBUG
-		REV_CORE_TRACE("  {0}: Binding = {1}, Size = {2}, Members = {3}", Uniform.Name.c_str(), Uniform.Binding, BufferSize, MemberCount);
+		REV_CORE_TRACE("  {0}: Binding = {1}, Size = {2}, Members = {3}", Uniform.Name.c_str(), Uniform.Binding - GShaderCompileConfig.BufferOffset, BufferSize, MemberCount);
 #endif
 	}
 
@@ -321,7 +325,7 @@ void FShadercFactory::ReflectShaderInfo(FShadercCompiledData& Data)
 
 		FRHIShaderUniform Uniform;
 		Uniform.Name = Texture.name;
-		Uniform.Type = ERHIUniformType::Texture;
+		Uniform.Type = EShaderUniformType::Texture;
 		Uniform.Num = 1;
 		Uniform.Binding = uint16(TextureBinding);
 
@@ -343,7 +347,7 @@ void FShadercFactory::ReflectShaderInfo(FShadercCompiledData& Data)
 		Data.Uniforms.push_back(Uniform);
 
 #ifdef REV_DEBUG
-		REV_CORE_TRACE(" {0}: Binding = {1}, SamplerBinding = {2}", Uniform.Name.c_str(), Uniform.Binding, Uniform.SamplerBinding);
+		REV_CORE_TRACE(" {0}: Binding = {1}, SamplerBinding = {2}", Uniform.Name.c_str(), Uniform.Binding - GShaderCompileConfig.TextureOffset, Uniform.SamplerBinding - GShaderCompileConfig.SamplerOffset);
 #endif
 	}
 }
@@ -380,7 +384,7 @@ void FShadercFactory::CompileShaders(const FShadercSource& InSource, const FRHIS
 	REV_CORE_INFO("Shader '{0}' compile took {1} ms", OutData.Name.c_str(), timer.ElapsedMillis());
 }
 
-FShadercCompiledData FShadercFactory::LoadOrCompileShader(const FPath& InPath, const FRHIShaderCompileOptions& InOptions, ERHIShaderStage InStage)
+FShadercCompiledData FShadercFactory::LoadOrCompileShader(const FPath& InPath, const FRHIShaderCompileOptions& InOptions, EShaderStage InStage)
 {
 	FShadercCompiledData Result;
 	Result.Name = InPath.ToString(false);
@@ -405,7 +409,7 @@ FShadercCompiledData FShadercFactory::LoadOrCompileShader(const FPath& InPath, c
 	if (bNeedCompile)
 	{
 		auto ShaderSource = FShadercUtils::LoadShaderSource(InPath);
-		ShaderSource.Stage = InStage != ERHIShaderStage::Unknown ? InStage : DetectShaderStage(ShaderSource);
+		ShaderSource.Stage = InStage != EShaderStage::Unknown ? InStage : DetectShaderStage(ShaderSource);
 		CompileShaders(ShaderSource, InOptions, Result);
 		ReflectShaderInfo(Result);
 		//FShadercUtils::SaveShaderCompiledData(ShaderCachePath, Result);
@@ -414,10 +418,10 @@ FShadercCompiledData FShadercFactory::LoadOrCompileShader(const FPath& InPath, c
 	return Result;
 }
 
-ERHIShaderStage FShadercFactory::DetectShaderStage(const FShadercSource& InSource)
+EShaderStage FShadercFactory::DetectShaderStage(const FShadercSource& InSource)
 {
 	//TODO
-	return ERHIShaderStage::Compute;
+	return EShaderStage::Compute;
 }
 
 }

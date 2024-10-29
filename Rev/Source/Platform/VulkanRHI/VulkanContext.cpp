@@ -15,6 +15,7 @@
 #include "Rev/Core/Application.h"
 #include "Rev/Core/Window.h"
 #include "Rev/Render/RHI/RHIUtils.h"
+#include "Rev/Render/RHI/RHIShaderLibrary.h"
 
 #define VMA_IMPLEMENTATION
 #include <vk_mem_alloc.h>
@@ -28,8 +29,6 @@ FVulkanContext::FVulkanContext()
 	for (size_t i = 0; i < 4; i++)
 	{
 		mClearColor.float32[i] = 0.0f;
-		mClearColor.int32[i] = 0;
-		mClearColor.uint32[i] = 0;
 	}
 	mClearDepthStencil.depth = 1.0f;
 	mClearDepthStencil.stencil = 0;
@@ -83,13 +82,13 @@ void FVulkanContext::BeginFrame(bool bClearBackBuffer)
 	VkCommandBufferBeginInfo CmdBufferBeginInfo = FVulkanInit::CmdBufferBeginInfo(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 	REV_VK_CHECK(vkBeginCommandBuffer(CmdBuffer, &CmdBufferBeginInfo));
 
-	if (bClearBackBuffer)
+	/*if (bClearBackBuffer)
 	{
 		FVulkanUtils::TransitionImage(CmdBuffer, GetSwapchainImage(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL);
 		ClearBackBuffer();
 		FVulkanUtils::TransitionImage(CmdBuffer, GetSwapchainImage(), VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 	}
-	else
+	else*/
 	{
 		FVulkanUtils::TransitionImage(CmdBuffer, GetSwapchainImage(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 	}
@@ -107,7 +106,7 @@ void FVulkanContext::EndFrame()
 	FVkUtils::BlitImage(CmdBuffer, mSwapchain.GetBackImage().Image, mSwapchain.GetImages()[mCurSwapchainImageIndex], mDrawExtent, mSwapchain.GetExtent());
 	FVkUtils::TransitionImage(CmdBuffer, mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);*/
 
-	FVulkanUtils::TransitionImage(CmdBuffer, mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+	FVulkanUtils::TransitionImage(CmdBuffer, GetSwapchainImage(), VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 
 	REV_VK_CHECK(vkEndCommandBuffer(CmdBuffer));
 
@@ -177,17 +176,19 @@ void FVulkanContext::ImmediateSubmit(std::function<void(VkCommandBuffer)>&& Func
 	REV_VK_CHECK(vkWaitForFences(FVulkanDynamicRHI::GetDevice(), 1, &mImmFence, true, 9999999999));
 }
 
-void FVulkanContext::SetVSync(bool bEnable)
+void FVulkanContext::RHISetVSync(bool bEnable)
 {
 	mTargetPresentMode = bEnable ? VK_PRESENT_MODE_FIFO_KHR : VK_PRESENT_MODE_MAILBOX_KHR;
 }
 
-void FVulkanContext::SetViewport(uint32 InX, uint32 InY, uint32 InWidth, uint32 InHeight)
+void FVulkanContext::RHISetViewport(uint32 InX, uint32 InY, uint32 InWidth, uint32 InHeight)
 {
 	mViewport.x = InX;
-	mViewport.y = InY + InHeight;
+	mViewport.y = InY;
+	//mViewport.y = InY + InHeight;
 	mViewport.width = InWidth;
-	mViewport.height = InHeight * -1.0f; //flip viewport to use opengl coordinates
+	mViewport.height = InHeight;
+	//mViewport.height = InHeight * -1.0f; //flip viewport to use opengl coordinates
 	mViewport.minDepth = 0.0f;
 	mViewport.maxDepth = 1.0f;
 
@@ -197,7 +198,7 @@ void FVulkanContext::SetViewport(uint32 InX, uint32 InY, uint32 InWidth, uint32 
 	mScissor.extent.height = InHeight;
 }
 
-void FVulkanContext::SetClearColor(const Math::FLinearColor& InColor)
+void FVulkanContext::RHISetClearColor(const Math::FLinearColor& InColor)
 {
 	for (size_t i = 0; i < 4; i++)
 	{
@@ -205,13 +206,13 @@ void FVulkanContext::SetClearColor(const Math::FLinearColor& InColor)
 	}
 }
 
-void FVulkanContext::SetClearDepthStencil(float InDepth, uint32 InStencil)
+void FVulkanContext::RHISetClearDepthStencil(float InDepth, uint32 InStencil)
 {
 	mClearDepthStencil.depth = InDepth;
 	mClearDepthStencil.stencil = InStencil;
 }
 
-void FVulkanContext::ClearBackBuffer()
+void FVulkanContext::RHIClearBackBuffer()
 {
 	VkImageSubresourceRange ColorImageRange = FVulkanInit::ImageSubresourceRange(VK_IMAGE_ASPECT_COLOR_BIT);
 	vkCmdClearColorImage(GetActiveCmdBuffer(), GetSwapchainImage(), VK_IMAGE_LAYOUT_GENERAL, &mClearColor, 1, &ColorImageRange);
@@ -219,25 +220,25 @@ void FVulkanContext::ClearBackBuffer()
 	vkCmdClearDepthStencilImage(CmdBuffer, mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_GENERAL, &mClearDepthStencil, 1, &DepthImageRange);*/
 }
 
-void FVulkanContext::UpdateTexture(FRHITexture* InTexture, const void* InContent, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex)
+void FVulkanContext::RHIUpdateTexture(FRHITexture* InTexture, const void* InContent, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex)
 {
 	if(!InTexture) return;
 	FVulkanTexture::Cast(InTexture)->UpdateContent(this, InContent, InSize, InMipLevel, InArrayIndex);
 }
 
-void FVulkanContext::ClearTexture(FRHITexture* InTexture, uint8 InMipLevel, uint8 InMipCount, uint16 InArrayIndex, uint16 InArrayCount)
+void FVulkanContext::RHIClearTexture(FRHITexture* InTexture, uint8 InMipLevel, uint8 InMipCount, uint16 InArrayIndex, uint16 InArrayCount)
 {
 	if (!InTexture) return;
 	FVulkanTexture::Cast(InTexture)->ClearContent(this, InMipLevel, InMipCount, InArrayIndex, InArrayCount);
 }
 
-void FVulkanContext::UpdateBufferData(FRHIBuffer* Buffer, const void* Content, uint32 Size, uint32 Offset)
+void FVulkanContext::RHIUpdateBufferData(FRHIBuffer* Buffer, const void* Content, uint32 Size, uint32 Offset)
 {
 	REV_CORE_ASSERT(Size + Offset <= Buffer->GetSize());
 	FVulkanUtils::ImmediateUploadBuffer(this, (VkBuffer)Buffer->GetNativeHandle(), Content, Size, Offset);
 }
 
-void FVulkanContext::BeginRenderPass(FRHIRenderPass* InRenderPass)
+void FVulkanContext::RHIBeginRenderPass(FRHIRenderPass* InRenderPass)
 {
 	FVulkanRenderPass* RenderPass = static_cast<FVulkanRenderPass*>(InRenderPass);
 	if(!RenderPass)
@@ -271,7 +272,7 @@ void FVulkanContext::BeginRenderPass(FRHIRenderPass* InRenderPass)
 }
 
 
-void FVulkanContext::EndRenderPass(bool bBlitToBack)
+void FVulkanContext::RHIEndRenderPass(bool bBlitToBack)
 {
 	if(!mFrameState.CurrentPass)
 		return;
@@ -288,14 +289,14 @@ void FVulkanContext::EndRenderPass(bool bBlitToBack)
 		if (ColorTex)
 		{
 			FVulkanUtils::TransitionImage(GetActiveCmdBuffer(), (VkImage)ColorTex->GetNativeHandle(), VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
-			FVulkanUtils::TransitionImage(GetActiveCmdBuffer(), mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+			FVulkanUtils::TransitionImage(GetActiveCmdBuffer(), GetSwapchainImage(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 			FVulkanUtils::BlitImage(GetActiveCmdBuffer(), (VkImage)ColorTex->GetNativeHandle(), mSwapchain.GetImages()[mCurSwapchainImageIndex], mDrawExtent, mSwapchain.GetExtent());
-			FVulkanUtils::TransitionImage(GetActiveCmdBuffer(), mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+			FVulkanUtils::TransitionImage(GetActiveCmdBuffer(), GetSwapchainImage(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 		}
 	}
 }
 
-void FVulkanContext::NextSubpass()
+void FVulkanContext::RHINextSubpass()
 {
 	VkSubpassBeginInfo SubpassBeginInfo{};
 	SubpassBeginInfo.sType = VK_STRUCTURE_TYPE_SUBPASS_BEGIN_INFO;
@@ -309,29 +310,27 @@ void FVulkanContext::NextSubpass()
 	vkCmdNextSubpass2(GetActiveCmdBuffer(), &SubpassBeginInfo, &SubpassEndInfo);
 }
 
-void FVulkanContext::BindUniformBuffer(uint16 InBinding, FRHIUniformBuffer* InBuffer)
+void FVulkanContext::RHIBindUniformBuffer(uint16 InBinding, FRHIUniformBuffer* InBuffer)
 {
 	if(!InBuffer) return;
-	mFrameState.UniformBuffers[InBinding] = static_cast<FVulkanUniformBuffer*>(InBuffer);
+	mFrameState.UniformBuffers[InBinding + GShaderCompileConfig.BufferOffset] = static_cast<FVulkanUniformBuffer*>(InBuffer);
 }
 
-void FVulkanContext::BindTexture(uint16 InBinding, FRHITexture* InTexture, FRHISamplerState* InSamplerState)
+void FVulkanContext::RHIBindTexture(uint16 InBinding, FRHITexture* InTexture, FRHISamplerState* InSamplerState)
 {
 	if (!InTexture) return;
 
 	FVulkanTexture* pTexture = static_cast<FVulkanTexture*>(InTexture);
 	FVulkanSamplerState* pSamplerState = static_cast<FVulkanSamplerState*>(InSamplerState);
-	mFrameState.Textures[InBinding] = { pTexture, pSamplerState };
-
-	//FVulkanUtils::TransitionImage(GetActiveCmdBuffer(), (VkImage)pTexture->GetNativeHandle(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+	mFrameState.Textures[InBinding + GShaderCompileConfig.TextureOffset] = { pTexture, pSamplerState };
 }
 
-void FVulkanContext::BindProgram(FRHIShaderProgram* InProgram)
+void FVulkanContext::RHIBindProgram(FRHIShaderProgram* InProgram)
 {
 	mFrameState.CurrentProgram = static_cast<FVulkanShaderProgram*>(InProgram);
 }
 
-void FVulkanContext::SetGraphicsPipelineState(const FRHIGraphicsPipelineStateDesc& InState)
+void FVulkanContext::RHISetGraphicsPipelineState(const FRHIGraphicsPipelineStateDesc& InState)
 {
 	mFrameState.CurrentState = InState;
 }
@@ -434,7 +433,7 @@ VkDescriptorSet FVulkanContext::GetDescriptorSet(const FVulkanShaderProgram* InP
 		uint32 BindingIdx = Uniform.Binding;
 		switch (Uniform.Type)
 		{
-		case ERHIUniformType::Buffer:
+		case EShaderUniformType::Buffer:
 		{
 			FVulkanUniformBuffer* UniformBuffer = mFrameState.FindUniformBuffer(BindingIdx);
 			if (UniformBuffer)
@@ -459,7 +458,7 @@ VkDescriptorSet FVulkanContext::GetDescriptorSet(const FVulkanShaderProgram* InP
 			}
 		}
 		break;
-		case ERHIUniformType::Texture:
+		case EShaderUniformType::Texture:
 		{
 			auto TextureAndSamplerState = mFrameState.FindTexture(BindingIdx);
 			FVulkanTexture* Texture = TextureAndSamplerState.first;

@@ -22,7 +22,7 @@ void FRenderCore::Init(ERenderAPI InAPI)
 
 	GIsRHIInitialized = true;
 
-	sMainContext->SetClearColor(Math::FLinearColor(0, 0, 0, 1));
+	sMainContext->RHISetClearColor(Math::FLinearColor(0, 0, 0, 1));
 	
 }
 

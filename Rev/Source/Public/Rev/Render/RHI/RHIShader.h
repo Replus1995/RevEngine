@@ -21,7 +21,7 @@ struct FRHIShaderAttribute
 struct FRHIShaderUniform
 {
     std::string Name;
-    ERHIUniformType Type = ERHIUniformType::Buffer;
+    EShaderUniformType Type = EShaderUniformType::Buffer;
     uint8 Num = 1;
     uint16 Binding = 0;
 
@@ -35,12 +35,12 @@ class REV_API FRHIShader : public FRHIResource
 {
 public:
     virtual ~FRHIShader() = default;
-    ERHIShaderStage GetStage() const { return mStage; }
+    EShaderStage GetStage() const { return mStage; }
 
 protected:
-    FRHIShader(ERHIShaderStage InStage) : mStage(InStage) {}
+    FRHIShader(EShaderStage InStage) : mStage(InStage) {}
 protected:
-    ERHIShaderStage mStage;
+    EShaderStage mStage;
 };
 
 class REV_API FRHIShaderProgram : public FRHIResource
@@ -88,8 +88,8 @@ struct REV_API FRHIGraphicsShaders
     Ref<FRHIShader> PixelShader = nullptr;
     Ref<FRHIShader> GeometryShader = nullptr;
 
-    Ref<FRHIShader>& operator[](ERHIShaderStage Stage);
-    const Ref<FRHIShader>& operator[](ERHIShaderStage Stage) const;
+    Ref<FRHIShader>& operator[](EShaderStage Stage);
+    const Ref<FRHIShader>& operator[](EShaderStage Stage) const;
 };
 
 }

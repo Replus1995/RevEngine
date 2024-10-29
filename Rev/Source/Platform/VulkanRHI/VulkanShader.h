@@ -25,7 +25,7 @@ public:
 	virtual ~FVulkanShader();
 	virtual const void* GetNativeHandle() const override { return mModule; }
 
-	static VkShaderStageFlagBits TranslateShaderStage(ERHIShaderStage InStage);
+	static VkShaderStageFlagBits TranslateShaderStage(EShaderStage InStage);
 
 	uint32 GetHash() const { return mHash; }
 	VkShaderStageFlagBits GetStageFlag() const { return mStageFlag; }
@@ -48,8 +48,8 @@ public:
 
 	const FRHIGraphicsShaders& GetShaders() const { return mShaders; }
 	const std::vector<FVulkanUniformInfo>& GetProgramUniforms() const { return mProgramUniforms; };
-	std::vector<VkPipelineShaderStageCreateInfo> GenShaderStageInfo() const;
-	std::vector<VkDescriptorSetLayoutBinding> GenLayoutBindings() const;
+	uint32 GenShaderStageInfo(VkPipelineShaderStageCreateInfo* OutInfos) const;
+	uint32 GenLayoutBindings(VkDescriptorSetLayoutBinding* OutBindings) const;
 
 private:
 	void UpdateProgramUniforms();

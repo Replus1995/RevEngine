@@ -73,10 +73,10 @@ VkClearValue FVulkanTexture::GetClearValue()
 	VkClearValue ClearValue;
 	if (bColorImage)
 	{
-		for (size_t i = 0; i < 4; i++)
+		/*for (size_t i = 0; i < 4; i++)
 		{
 			ClearValue.color.float32[i] = mDesc.ClearColor.RGBA[i];
-			/*switch (GPixelFormats[mDesc.Format].NumComponents)
+			switch (GPixelFormats[mDesc.Format].NumComponents)
 			{
 			case 1:
 				ClearValue.color.int32[i] = int32(mDesc.ClearColor.RGBA.R * float(0x7F));
@@ -90,8 +90,9 @@ VkClearValue FVulkanTexture::GetClearValue()
 				ClearValue.color.int32[i] = int32(double(mDesc.ClearColor.RGBA.R) * double(0x7FFFFFFF));
 				ClearValue.color.uint32[i] = uint32(mDesc.ClearColor.RGBA.R * double(0xFFFFFFFF));
 				break;;
-			}*/
-		}
+			}
+		}*/
+		memcpy(&(ClearValue.color.float32), &(mDesc.ClearColor.RGBA), 4 * sizeof(float));
 	}
 	else
 	{

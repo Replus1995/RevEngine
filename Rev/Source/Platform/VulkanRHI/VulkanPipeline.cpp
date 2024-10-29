@@ -45,7 +45,8 @@ VkPipeline FVulkanPipelineBuilder::BuildGraphics(VkDevice InDevice, VkPipelineLa
     FVulkanColorBlendState ColorBlendStateRHI(InStateDesc.ColorBlendStateDesc);
     //FVulkanVertexInputState VertexInputStataRHI(InStateDesc.VertexInputStateDesc);
     FVulkanVertexInputState* VertexInputStataRHI = static_cast<FVulkanVertexInputState*>(InStateDesc.VertexInputState);
-    auto ShaderStageInfo = InProgram->GenShaderStageInfo();
+    VkPipelineShaderStageCreateInfo ShaderStageInfos[(uint8)EShaderStage::NumGfx];
+    uint32 NumShaderStageInfos = InProgram->GenShaderStageInfo(ShaderStageInfos);
 
     VkDynamicState DynamicStates[] = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
     //std::vector<VkDynamicState> DynamicStates = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR, VK_DYNAMIC_STATE_PRIMITIVE_TOPOLOGY };
@@ -78,8 +79,8 @@ VkPipeline FVulkanPipelineBuilder::BuildGraphics(VkDevice InDevice, VkPipelineLa
     // connect the renderInfo to the pNext extension mechanism
     PipelineInfo.pNext = &Rendering;
 
-    PipelineInfo.stageCount = (uint32_t)ShaderStageInfo.size();
-    PipelineInfo.pStages = ShaderStageInfo.data();
+    PipelineInfo.stageCount = NumShaderStageInfos;
+    PipelineInfo.pStages = ShaderStageInfos;
     PipelineInfo.pVertexInputState = &VertexInputStataRHI->VertexInputState;
     PipelineInfo.pInputAssemblyState = &InputAssemblyState;
     PipelineInfo.pViewportState = &ViewportState;
@@ -192,14 +193,14 @@ FVulkanPipelineLayout::~FVulkanPipelineLayout()
     Release();
 }
 
-void FVulkanPipelineLayout::Build(const std::vector<VkDescriptorSetLayoutBinding>& InBindingInfo)
+void FVulkanPipelineLayout::Build(const VkDescriptorSetLayoutBinding* InBindingInfo, uint32 InBindingsCount)
 {
     VkDescriptorSetLayoutCreateInfo DescSetLayoutCreateInfo{};
     DescSetLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
     DescSetLayoutCreateInfo.pNext = NULL;
     DescSetLayoutCreateInfo.flags = 0;
-    DescSetLayoutCreateInfo.bindingCount = (uint32_t)InBindingInfo.size();
-    DescSetLayoutCreateInfo.pBindings = InBindingInfo.data();
+    DescSetLayoutCreateInfo.bindingCount = InBindingsCount;
+    DescSetLayoutCreateInfo.pBindings = InBindingInfo;
 
     REV_VK_CHECK_THROW(vkCreateDescriptorSetLayout(FVulkanDynamicRHI::GetDevice(), &DescSetLayoutCreateInfo, nullptr, &DescriptorSetLayout), "failed to create descriptor set layout");
 
@@ -270,8 +271,10 @@ FVulkanPipeline* FVulkanGraphicsPipelineCache::GetOrCreatePipeline(const FRHIGra
     {
         FVulkanPipelineLayout* pLayout = nullptr;
         {
-            std::vector<VkDescriptorSetLayoutBinding> Bindings = InProgram->GenLayoutBindings();
-            uint32 LayoutCacheKey = FCityHash::Gen(Bindings.data(), Bindings.size() * sizeof(VkDescriptorSetLayoutBinding));
+            VkDescriptorSetLayoutBinding Bindings[REV_VK_MAX_DESCRIPTORSETS];
+
+            uint32 NumBindings = InProgram->GenLayoutBindings(Bindings);
+            uint32 LayoutCacheKey = FCityHash::Gen(Bindings, NumBindings * sizeof(VkDescriptorSetLayoutBinding));
 
             if (auto LayoutIter = mLayoutCache.find(LayoutCacheKey); LayoutIter != mLayoutCache.end())
             {
@@ -280,7 +283,7 @@ FVulkanPipeline* FVulkanGraphicsPipelineCache::GetOrCreatePipeline(const FRHIGra
             if (!pLayout)
             {
                 Scope<FVulkanPipelineLayout> NewLayout = CreateScope<FVulkanPipelineLayout>();
-                NewLayout->Build(Bindings);
+                NewLayout->Build(Bindings, NumBindings);
                 auto LayoutIter = mLayoutCache.emplace(LayoutCacheKey, std::move(NewLayout)).first;
                 pLayout = LayoutIter->second.get();
             }
@@ -309,9 +312,9 @@ FVulkanGraphicsPipelineCache::FCacheKey::FCacheKey(const FRHIGraphicsPipelineSta
     StateHash = FCityHash::Gen(&InStateDesc, sizeof(InStateDesc));
     RenderPass = (VkRenderPass)InRenderPass->GetNativeHandle();
 
-    for (uint8 i = (uint8)ERHIShaderStage::Vertex; i < (uint8)ERHIShaderStage::Compute; i++)
+    for (uint8 i = (uint8)EShaderStage::Vertex; i < (uint8)EShaderStage::Compute; i++)
     {
-        const auto& pShaderRHI = InProgram->GetShaders()[(ERHIShaderStage)i];
+        const auto& pShaderRHI = InProgram->GetShaders()[(EShaderStage)i];
         FVulkanShader* pShaderVk = static_cast<FVulkanShader*>(pShaderRHI.get());
         if (!pShaderVk)
             continue;

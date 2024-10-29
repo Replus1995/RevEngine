@@ -10,12 +10,25 @@
 namespace Rev
 {
 
+FShaderCompileConfig GShaderCompileConfig;
+
 static FRHIShaderLibrary* sRHIShaderLibrary_Inst = nullptr;
 static constexpr std::string_view sRHIShaderExtension = ".rsf";
 
 void FRHIShaderLibrary::CreateInstance()
 {
 	sRHIShaderLibrary_Inst = new FRHIShaderLibrary;
+
+	switch (GetRenderAPI())
+	{
+	case ERenderAPI::Vulkan:
+		GShaderCompileConfig.BufferOffset = 0;
+		GShaderCompileConfig.SamplerOffset = 16;
+		GShaderCompileConfig.TextureOffset = 32;
+		break;
+	default:
+		break;
+	}
 }
 
 void FRHIShaderLibrary::ReleaseInstance()
@@ -33,11 +46,11 @@ FRHIShaderLibrary& FRHIShaderLibrary::GetInstance()
 Ref<FRHIShaderProgram> FRHIShaderLibrary::CreateGraphicsProgram(const std::string& InProgramName, const FRHIShaderCreateDesc& InVertexDesc, const FRHIShaderCreateDesc& InFragmentDesc, const FRHIShaderCreateDesc& InTessControlDesc, const FRHIShaderCreateDesc& InTessEvalDesc, const FRHIShaderCreateDesc& InGeometryDesc)
 {
 	FRHIGraphicsShaders Shaders;
-	Shaders.VertexShader = CreateShader(InVertexDesc, ERHIShaderStage::Vertex);
-	Shaders.PixelShader = CreateShader(InFragmentDesc, ERHIShaderStage::Pixel);
-	Shaders.HullShader = CreateShader(InTessControlDesc, ERHIShaderStage::Hull);
-	Shaders.DomainShader = CreateShader(InTessEvalDesc, ERHIShaderStage::Domain);
-	Shaders.GeometryShader = CreateShader(InGeometryDesc, ERHIShaderStage::Geometry);
+	Shaders.VertexShader = CreateShader(InVertexDesc, EShaderStage::Vertex);
+	Shaders.PixelShader = CreateShader(InFragmentDesc, EShaderStage::Pixel);
+	Shaders.HullShader = CreateShader(InTessControlDesc, EShaderStage::Hull);
+	Shaders.DomainShader = CreateShader(InTessEvalDesc, EShaderStage::Domain);
+	Shaders.GeometryShader = CreateShader(InGeometryDesc, EShaderStage::Geometry);
 
 	switch (GetRenderAPI())
 	{
@@ -50,7 +63,7 @@ Ref<FRHIShaderProgram> FRHIShaderLibrary::CreateGraphicsProgram(const std::strin
 	return nullptr;
 }
 
-Ref<FRHIShader> FRHIShaderLibrary::LoadOrCompileShader(const FPath& InPath, const FRHIShaderCompileOptions& InOptions, ERHIShaderStage InStage)
+Ref<FRHIShader> FRHIShaderLibrary::LoadOrCompileShader(const FPath& InPath, const FRHIShaderCompileOptions& InOptions, EShaderStage InStage)
 {
 	auto CompiledData = FShadercFactory::LoadOrCompileShader(InPath, InOptions, InStage);
 	if (CompiledData.Empty())
@@ -74,7 +87,7 @@ Ref<FRHIShader> FRHIShaderLibrary::LoadOrCompileShader(const FPath& InPath, cons
 	return {};
 }
 
-Ref<FRHIShader> FRHIShaderLibrary::CreateShader(const FRHIShaderCreateDesc& InDesc, ERHIShaderStage InStage)
+Ref<FRHIShader> FRHIShaderLibrary::CreateShader(const FRHIShaderCreateDesc& InDesc, EShaderStage InStage)
 {
 	if (InDesc.Name.empty()) return nullptr;
 	Ref<FRHIShader> Result = nullptr;

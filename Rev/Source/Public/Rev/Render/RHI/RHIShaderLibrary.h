@@ -23,13 +23,12 @@ public:
 
     void ClearShadersCache();
 private:
-    Ref<FRHIShader> LoadOrCompileShader(const FPath& InPath, const FRHIShaderCompileOptions& InOptions, ERHIShaderStage InStage = ERHIShaderStage::Unknown);
-    Ref<FRHIShader> CreateShader(const FRHIShaderCreateDesc& InDesc, ERHIShaderStage InStage = ERHIShaderStage::Unknown);
+    Ref<FRHIShader> LoadOrCompileShader(const FPath& InPath, const FRHIShaderCompileOptions& InOptions, EShaderStage InStage = EShaderStage::Unknown);
+    Ref<FRHIShader> CreateShader(const FRHIShaderCreateDesc& InDesc, EShaderStage InStage = EShaderStage::Unknown);
 
 private:
     FRHIShaderLibrary() = default;
     ~FRHIShaderLibrary() = default;
-    friend class RenderCmd;
     friend class FRenderCore;
     static void CreateInstance();
     static void ReleaseInstance();
@@ -38,5 +37,12 @@ private:
     std::unordered_map<std::string, FCompiledShaders> mShadersCache;
 };
 
+struct FShaderCompileConfig
+{
+    uint32 BufferOffset = 0;
+    uint32 SamplerOffset = 0;
+    uint32 TextureOffset = 0;
+};
+extern FShaderCompileConfig GShaderCompileConfig;
 
 }

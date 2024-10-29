@@ -44,7 +44,7 @@ void FSceneProxy::SyncResource(FRHICommandList& RHICmdList)
 
 		mSceneUB->UpdateSubData(&mSceneParams, sizeof(FSceneUniform));
 
-		RHICmdList.GetContext()->BindUniformBuffer(UL::BScene, mSceneUB.get());
+		RHICmdList.GetContext()->RHIBindUniformBuffer(UL::BScene, mSceneUB.get());
 	}
 
 }

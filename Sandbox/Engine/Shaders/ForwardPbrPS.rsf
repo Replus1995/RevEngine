@@ -50,11 +50,12 @@ struct PSOutput
 PSOutput main(const PSInput Input)
 {
 	float4 BaseColor = Sample2D(sBaseColor, Input.vTexCoord0);
-	BaseColor *= uPBRMaterial.BaseColorFactor;
+	//BaseColor *= uPBRMaterial.BaseColorFactor;
 
-	float3x3 TBN = float3x3(Input.vTangent, Input.vBitangent, Input.vNormal);
+	float3x3 TBN = MatrixFromCols(Input.vTangent, Input.vBitangent, Input.vNormal);
     float3 TexNormal = normalize((Sample2D(sNormal, Input.vTexCoord0).xyz * 2.0 - 1.0) * float3(uPBRMaterial.NormalScale, uPBRMaterial.NormalScale, 1.0f));
-    float3 Normal = normalize(TBN * TexNormal);
+    float3 Normal = normalize(mul(TBN, TexNormal));
+	//Normal = float3(0,1,0);
 
 	float Metallic = uPBRMaterial.Metallic * Sample2D(sMetallicRoughness, Input.vTexCoord0).b;
     float Roughness = uPBRMaterial.Roughness * Sample2D(sMetallicRoughness, Input.vTexCoord0).g;
@@ -91,6 +92,7 @@ PSOutput main(const PSInput Input)
     Result.oColor.rgb = AmbientColor + SumLightColor + Emissive;
     //Result.oColor.rgb = pow(o_Color.rgb, vec3(1.0/2.2)); //Gamma Correction
     Result.oColor.a = BaseColor.a;
-    Result.oColor = BaseColor;
+    Result.oColor = float4(Input.vNormal, 1.0);
+	//Result.oColor = float4(1.0);
     return Result;
 }

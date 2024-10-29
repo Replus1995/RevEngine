@@ -71,19 +71,19 @@ void FForwardRenderer::DrawFrame(FRHICommandList& RHICmdList)
 		// end render pass
 	// end cmd buffer
 
-	RHICmdList.GetContext()->BeginRenderPass(mBasePass.get());
+	RHICmdList.GetContext()->RHIBeginRenderPass(mBasePass.get());
 
 	FRHIGraphicsPipelineStateDesc Desc;
 	Desc.VertexInputState = GStaticMeshVertexInputState.VertexInputStateRHI.get();
 	Desc.DepthStencilStateDesc.bEnableDepthWrite = true;
 	Desc.DepthStencilStateDesc.DepthTestFunc = CF_Less;
 	Desc.ColorBlendStateDesc.Attachments[0].bEnableBlend = true;
-	RHICmdList.GetContext()->SetGraphicsPipelineState(Desc);
+	RHICmdList.GetContext()->RHISetGraphicsPipelineState(Desc);
 
 	mSceneProxy->SyncResource(RHICmdList);
 	mSceneProxy->DrawScene(RHICmdList);
 
-	RHICmdList.GetContext()->EndRenderPass(true);
+	RHICmdList.GetContext()->RHIEndRenderPass(true);
 
 	/*
 	RenderCmd::SetCullFaceMode(CFM_Back);
