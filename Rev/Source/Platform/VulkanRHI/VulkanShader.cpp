@@ -104,6 +104,30 @@ std::vector<VkDescriptorSetLayoutBinding> FVulkanShaderProgram::GenLayoutBinding
 			AllBindings.push_back(Binding);
 		}
 		break;
+		case ERHIUniformType::Texture:
+		{
+			VkDescriptorSetLayoutBinding Binding{};
+			Binding.stageFlags = Uniform.StageFlags;
+			Binding.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+			Binding.binding = Uniform.Binding;
+			Binding.pImmutableSamplers = NULL;
+			Binding.descriptorCount = 1;
+
+			AllBindings.push_back(Binding);
+
+			if (Uniform.SamplerBinding >= 0)
+			{
+				VkDescriptorSetLayoutBinding Binding{};
+				Binding.stageFlags = Uniform.StageFlags;
+				Binding.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
+				Binding.binding = Uniform.SamplerBinding;
+				Binding.pImmutableSamplers = NULL;
+				Binding.descriptorCount = 1;
+
+				AllBindings.push_back(Binding);
+			}
+		}
+		break;
 		default:
 			break;
 		}
@@ -126,10 +150,10 @@ void FVulkanShaderProgram::UpdateProgramUniforms()
 		for (const FRHIShaderUniform& StageUniform : StageUniforms)
 		{
 
-			if (auto iter = std::find_if(mProgramUniforms.begin(), mProgramUniforms.end(), [&StageUniform](const FVulkanUniformInfo& Elem) { return Elem.Binding == StageUniform.Binding; });
+			if (auto iter = std::find_if(mProgramUniforms.begin(), mProgramUniforms.end(), [&StageUniform](const FVulkanUniformInfo& Elem) { return Elem.Type == StageUniform.Type && Elem.Binding == StageUniform.Binding; });
 				iter != mProgramUniforms.end())
 			{
-				//REV_CORE_ASSERT(iter->descriptorType == Binding.descriptorType);
+				//REV_CORE_ASSERT(iter->Type == StageUniform.Type);
 				iter->StageFlags |= pVulkanShader->GetStageFlag();
 			}
 			else
@@ -139,11 +163,9 @@ void FVulkanShaderProgram::UpdateProgramUniforms()
 				switch (StageUniform.Type)
 				{
 				case ERHIUniformType::Buffer:
-				{
+				case ERHIUniformType::Texture:
 					bUniformValid = true;
-				}
-				break;
-
+					break;
 				default:
 					break;
 				}
@@ -154,7 +176,7 @@ void FVulkanShaderProgram::UpdateProgramUniforms()
 		}
 	}
 
-	REV_CORE_ASSERT(mProgramUniforms.size() <= REV_VK_MAX_DESCRIPTORSETS);
+	REV_CORE_ASSERT(mProgramUniforms.size() <= REV_VK_MAX_SHADER_UNIFORMS);
 }
 
 }

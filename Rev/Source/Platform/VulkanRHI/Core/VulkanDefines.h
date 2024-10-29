@@ -18,7 +18,8 @@
 #define REV_VK_MAX_SHADER_UNIFORM_BUFFERS 16
 #define REV_VK_MAX_SHADER_UNIFORM_SAMPLERS 16
 #define REV_VK_MAX_SHADER_UNIFORMS 32
-#define REV_VK_MAX_DESCRIPTORSETS 32
+#define REV_VK_MAX_DESCRIPTORSETS 64
+
 
 template< class T >
 static inline void ZeroVulkanStruct(T& VkStruct, int32 VkStructureType)

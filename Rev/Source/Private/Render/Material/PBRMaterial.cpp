@@ -76,7 +76,7 @@ void FPBRMaterial::PreDraw(FRHICommandList& RHICmdList)
 	if (EmissiveTexture)
 		RHICmdList.GetContext()->BindTexture(UL::SEmissiveTex, EmissiveTexture->GetTextureRHI(), EmissiveTexture->GetSamplerStateRHI());
 	else
-		RHICmdList.GetContext()->BindTexture(UL::SOcclusionTex, GBlackTexture->TextureRHI.get(), GBlackTexture->SamplerStateRHI.get());
+		RHICmdList.GetContext()->BindTexture(UL::SEmissiveTex, GBlackTexture->TextureRHI.get(), GBlackTexture->SamplerStateRHI.get());
 }
 
 }

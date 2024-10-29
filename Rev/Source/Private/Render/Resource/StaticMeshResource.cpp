@@ -189,15 +189,6 @@ void FStaticMeshIndexBuffer::Init(uint32 InNumIndices, bool bUse32Bit)
 	NumIndices = InNumIndices;
 	b32Bit = bUse32Bit;
 	Cleanup();
-
-	if (b32Bit)
-	{
-		IndexData.Allocate<uint32>(NumIndices);
-	}
-	else
-	{
-		IndexData.Allocate<uint16>(NumIndices);
-	}
 }
 
 void FStaticMeshIndexBuffer::Cleanup()

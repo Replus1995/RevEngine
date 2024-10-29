@@ -103,7 +103,9 @@ enum class ERHIShaderStage : uint8
 	Domain = 4, //unsupported
 	Geometry = 5, //unsupported
 	Compute = 6, //unsupported
-	Count = 7
+	Count = 7,
+	NumGfxStages = 5,
+	NumComputeStages = 1
 };
 
 //Buffer

@@ -24,6 +24,7 @@ public:
 	bool IsEmpty() const;
 	const FStaticMeshVertexBuffer& GetVertexBuffer() const { return VertexBuffer; }
 	const FStaticMeshIndexBuffer& GetIndexBuffer() const { return IndexBuffer; }
+	void PrepareForDraw();
 	bool IsReadyForDraw() const { return VertexBuffer.IsReadyForDraw() && IndexBuffer.IsReadyForDraw(); }
 
 	uint32 GetNumMaterials() const { return Materials.size(); }
@@ -79,6 +80,7 @@ protected:
 
 protected:
 	Ref<FStaticMesh> StaticMesh;
+	bool bMeshDataDirty = false;
 };
 
 }

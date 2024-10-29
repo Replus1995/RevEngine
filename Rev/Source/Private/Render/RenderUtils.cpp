@@ -21,6 +21,8 @@ public:
 
 		const FRHISamplerStateDesc SamplerDesc(SF_Nearest, SW_Repeat, SW_Repeat, SW_Repeat);
 		SamplerStateRHI = GDynamicRHI->RHICreateSamplerState(SamplerDesc);
+
+		FRenderCore::GetMainContext()->ClearTexture(TextureRHI.get());
 	}
 };
 

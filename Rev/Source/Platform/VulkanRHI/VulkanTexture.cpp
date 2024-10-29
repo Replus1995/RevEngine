@@ -13,19 +13,19 @@ FVulkanTexture::~FVulkanTexture()
 	Release();
 }
 
-void FVulkanTexture::Transition(VkImageLayout DstLayout, VkCommandBuffer InCmdBuffer)
-{
-	REV_CORE_ASSERT(InCmdBuffer);
-	FVulkanUtils::TransitionImage(InCmdBuffer, mImage, mImageLayout, DstLayout);
-	mImageLayout = DstLayout;
-}
-
-void FVulkanTexture::Transition(VkImageLayout SrcLayout, VkImageLayout DstLayout, VkCommandBuffer InCmdBuffer)
-{
-    REV_CORE_ASSERT(InCmdBuffer);
-    FVulkanUtils::TransitionImage(InCmdBuffer, mImage, SrcLayout, DstLayout);
-    mImageLayout = DstLayout;
-}
+//void FVulkanTexture::Transition(VkImageLayout DstLayout, VkCommandBuffer InCmdBuffer)
+//{
+//	REV_CORE_ASSERT(InCmdBuffer);
+//	FVulkanUtils::TransitionImage(InCmdBuffer, mImage, mImageLayout, DstLayout);
+//	mImageLayout = DstLayout;
+//}
+//
+//void FVulkanTexture::Transition(VkImageLayout SrcLayout, VkImageLayout DstLayout, VkCommandBuffer InCmdBuffer)
+//{
+//    REV_CORE_ASSERT(InCmdBuffer);
+//    FVulkanUtils::TransitionImage(InCmdBuffer, mImage, SrcLayout, DstLayout);
+//    mImageLayout = DstLayout;
+//}
 
 FVulkanTexture::FVulkanTexture(const FRHITextureDesc& InDesc)
     : FRHITexture(InDesc)
@@ -47,7 +47,7 @@ void FVulkanTexture::Release()
 	vmaDestroyImage(FVulkanDynamicRHI::GetAllocator(), mImage, mAllocation);
 	mImage = VK_NULL_HANDLE;
 	mImageView = VK_NULL_HANDLE;
-	mImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	//mImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 	mAllocation = VK_NULL_HANDLE;
 }
 
@@ -73,11 +73,10 @@ VkClearValue FVulkanTexture::GetClearValue()
 	VkClearValue ClearValue;
 	if (bColorImage)
 	{
-		VkClearColorValue ClearColor{};
 		for (size_t i = 0; i < 4; i++)
 		{
 			ClearValue.color.float32[i] = mDesc.ClearColor.RGBA[i];
-			switch (GPixelFormats[mDesc.Format].NumComponents)
+			/*switch (GPixelFormats[mDesc.Format].NumComponents)
 			{
 			case 1:
 				ClearValue.color.int32[i] = int32(mDesc.ClearColor.RGBA.R * float(0x7F));
@@ -91,7 +90,7 @@ VkClearValue FVulkanTexture::GetClearValue()
 				ClearValue.color.int32[i] = int32(double(mDesc.ClearColor.RGBA.R) * double(0x7FFFFFFF));
 				ClearValue.color.uint32[i] = uint32(mDesc.ClearColor.RGBA.R * double(0xFFFFFFFF));
 				break;;
-			}
+			}*/
 		}
 	}
 	else

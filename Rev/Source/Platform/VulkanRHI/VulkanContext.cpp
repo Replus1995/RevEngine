@@ -322,6 +322,8 @@ void FVulkanContext::BindTexture(uint16 InBinding, FRHITexture* InTexture, FRHIS
 	FVulkanTexture* pTexture = static_cast<FVulkanTexture*>(InTexture);
 	FVulkanSamplerState* pSamplerState = static_cast<FVulkanSamplerState*>(InSamplerState);
 	mFrameState.Textures[InBinding] = { pTexture, pSamplerState };
+
+	//FVulkanUtils::TransitionImage(GetActiveCmdBuffer(), (VkImage)pTexture->GetNativeHandle(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
 void FVulkanContext::BindProgram(FRHIShaderProgram* InProgram)
@@ -464,7 +466,7 @@ VkDescriptorSet FVulkanContext::GetDescriptorSet(const FVulkanShaderProgram* InP
 			FVulkanSamplerState* SamplerState = TextureAndSamplerState.second;
 			if (Texture)
 			{
-				ImageInfos[ImageCount].imageLayout = Texture->GetImageLayout();
+				ImageInfos[ImageCount].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 				ImageInfos[ImageCount].imageView = Texture->GetImageView();
 				ImageInfos[ImageCount].sampler = SamplerState ? SamplerState->Sampler : VK_NULL_HANDLE;
 				

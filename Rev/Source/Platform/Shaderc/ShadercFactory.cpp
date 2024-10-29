@@ -222,6 +222,10 @@ static void InitCompileOptions(shaderc::CompileOptions& Options)
 	{
 	case Rev::ERenderAPI::Vulkan:
 		Options.SetTargetEnvironment(shaderc_target_env_vulkan, shaderc_env_version_vulkan_1_3);
+		Options.SetBindingBase(shaderc_uniform_kind_buffer, 0);
+		Options.SetBindingBase(shaderc_uniform_kind_sampler, 16);
+		Options.SetBindingBase(shaderc_uniform_kind_texture, 32);
+
 		break;
 	default:
 		REV_CORE_ASSERT(false, "Unknow Render API")

@@ -1,3 +1,6 @@
+#ifndef _LIGHT_RSH_
+#define _LIGHT_RSH_
+
 #include "Engine/Shaders/Core/Base.rsh"
 
 #define REV_MAX_DIRECTIONAL_LIGHTS 4
@@ -16,7 +19,7 @@ struct FDirectionalLight
 struct FDirectionalLightUniform
 {
 	FDirectionalLight Lights[REV_MAX_DIRECTIONAL_LIGHTS];
-	uint Count = 0;
+	uint Count;
 };
 
 //PBR const
@@ -109,9 +112,11 @@ float3 ComputeLightPBR(
     float D = D_GGX(Roughness, NdH);
     float G = G_SchlickGGX(Roughness, NdV, NdL);
 
-    float3 kd = mix(float3(1.0) - F, float3(0.0), Metallic);
+    float3 kd = lerp(float3(1.0) - F, float3(0.0), Metallic);
     float3 diffuseBRDF = kd * BaseColor / PI;
     float3 specularBRDF = (F * D * G) / max(EPSILON, 4.0 * NdL * NdV);
 
     return (diffuseBRDF + specularBRDF) * Radiance * NdL;
 }
+
+#endif

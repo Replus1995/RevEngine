@@ -19,6 +19,12 @@ bool FStaticMesh::IsEmpty() const
 	return VertexBuffer.GetNumVertices() == 0 && IndexBuffer.GetNumIndices() == 0;
 }
 
+void FStaticMesh::PrepareForDraw()
+{
+	VertexBuffer.InitResource();
+	IndexBuffer.InitResource();
+}
+
 std::vector<const FStaticMeshSection*> FStaticMesh::GetSectionsForMaterial(uint32 InMaterialIndex) const
 {
 	std::vector<const FStaticMeshSection*> OutSections;
@@ -43,15 +49,13 @@ void FStaticMeshBuilder::Init(uint32 InNumVertices, uint32 InNumTexCoords, uint3
 {
 	if (InNumVertices != StaticMesh->VertexBuffer.GetNumVertices() || InNumTexCoords != StaticMesh->VertexBuffer.GetNumTexCoords())
 	{
-		StaticMesh->VertexBuffer.Cleanup();
 		StaticMesh->VertexBuffer.Init(InNumVertices, InNumTexCoords);
 	}
 	if (InNumIndices != StaticMesh->IndexBuffer.GetNumIndices() || bUse32Bit != StaticMesh->IndexBuffer.Is32Bit())
 	{
-		StaticMesh->IndexBuffer.Cleanup();
 		StaticMesh->IndexBuffer.Init(InNumIndices, bUse32Bit);
 	}
-
+	bMeshDataDirty = false;
 }
 
 void FStaticMeshBuilder::InitVertices(uint32 InNumVertices, uint32 InNumTexCoords, FBuffer&& InPositionData, FBuffer&& InNormalData, FBuffer&& InTangentData, FBuffer* InTexCoordData, FBuffer&& InColorData)
@@ -84,6 +88,7 @@ void FStaticMeshBuilder::InitVertices(uint32 InNumVertices, uint32 InNumTexCoord
 		REV_CORE_ASSERT(InNumVertices * sizeof(Math::FColor) == InColorData.Size());
 		StaticMesh->VertexBuffer.ColorData = std::move(InColorData);
 	}
+	bMeshDataDirty = true;
 }
 
 void FStaticMeshBuilder::InitIndices(uint32 InNumIndices, bool bUse32Bit, FBuffer&& InIndexData)
@@ -94,6 +99,7 @@ void FStaticMeshBuilder::InitIndices(uint32 InNumIndices, bool bUse32Bit, FBuffe
 	StaticMesh->IndexBuffer.NumIndices = InNumIndices;
 	StaticMesh->IndexBuffer.b32Bit = bUse32Bit;
 	StaticMesh->IndexBuffer.IndexData = std::move(InIndexData);
+	bMeshDataDirty = true;
 }
 
 void FStaticMeshBuilder::SetMaterials(const std::vector<Ref<FMaterial>>& InMaterials)
@@ -104,40 +110,51 @@ void FStaticMeshBuilder::SetMaterials(const std::vector<Ref<FMaterial>>& InMater
 void FStaticMeshBuilder::FillPositions(const float* Content, uint32 Size, uint32 Offset)
 {
 	StaticMesh->VertexBuffer.FillPositions(Content, Size, Offset);
+	bMeshDataDirty = true;
 }
 
 void FStaticMeshBuilder::FillNormals(const float* Content, uint32 Size, uint32 Offset)
 {
 	StaticMesh->VertexBuffer.FillNormals(Content, Size, Offset);
+	bMeshDataDirty = true;
 }
 
 void FStaticMeshBuilder::FillTangents(const float* Content, uint32 Size, uint32 Offset)
 {
 	StaticMesh->VertexBuffer.FillTangents(Content, Size, Offset);
+	bMeshDataDirty = true;
 }
 
 void FStaticMeshBuilder::FillTexCoords(uint32 UVIndex, const float* Content, uint32 Size, uint32 Offset)
 {
 	StaticMesh->VertexBuffer.FillTexCoords(UVIndex, Content, Size, Offset);
+	bMeshDataDirty = true;
 }
 
 void FStaticMeshBuilder::FillColors(const uint8* Content, uint32 Size, uint32 Offset)
 {
 	StaticMesh->VertexBuffer.FillColors(Content, Size, Offset);
+	bMeshDataDirty = true;
 }
 
 void FStaticMeshBuilder::FillIndices(const uint16* Content, uint32 Size, uint32 Offset)
 {
 	StaticMesh->IndexBuffer.FillIndices(Content, Size, Offset);
+	bMeshDataDirty = true;
 }
 
 void FStaticMeshBuilder::FillIndices(const uint32* Content, uint32 Size, uint32 Offset)
 {
 	StaticMesh->IndexBuffer.FillIndices(Content, Size, Offset);
+	bMeshDataDirty = true;
 }
 
 Ref<FStaticMesh> FStaticMeshBuilder::Build(bool bComputeNormal, bool bComputeTangent)
 {
+	if(!bMeshDataDirty)
+		return StaticMesh;
+	bMeshDataDirty = false;
+
 	if (bComputeNormal)
 	{
 		ComputeNormals();
@@ -154,9 +171,6 @@ Ref<FStaticMesh> FStaticMeshBuilder::Build(bool bComputeNormal, bool bComputeTan
 
 	StaticMesh->VertexBuffer.ReleaseResource();
 	StaticMesh->IndexBuffer.ReleaseResource();
-
-	StaticMesh->VertexBuffer.InitResource();
-	StaticMesh->IndexBuffer.InitResource();
 
 	return StaticMesh;
 }

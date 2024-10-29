@@ -34,7 +34,7 @@ SAMPLER2D(sEmissive, 4);
 struct PSInput
 {
     float4 vPosition : SV_POSITION;
-    float4 vColor : COLOR0;
+    uint vColor : COLOR0;
     float2 vTexCoord0 : TEXCOORD0;
     float3 vWorldPos : TEXCOORD1;
     float3 vNormal : NORMAL;
@@ -63,7 +63,7 @@ PSOutput main(const PSInput Input)
 
 	float3 ViewDir = normalize(uScene.ViewPos.xyz - Input.vWorldPos);
     float NdV = max(dot(Normal, ViewDir), 0.0);
-    float3 F0 = mix(kDielectric, BaseColor.rgb, Metallic);
+    float3 F0 = lerp(kDielectric, BaseColor.rgb, Metallic);
 
 	float3 SumLightColor = float3(0.0);
     for(uint i = 0; i < uDirectionalLight.Count; i++)
@@ -91,5 +91,6 @@ PSOutput main(const PSInput Input)
     Result.oColor.rgb = AmbientColor + SumLightColor + Emissive;
     //Result.oColor.rgb = pow(o_Color.rgb, vec3(1.0/2.2)); //Gamma Correction
     Result.oColor.a = BaseColor.a;
+    Result.oColor = BaseColor;
     return Result;
 }
