@@ -10,7 +10,7 @@ class FRHIUniformBuffer;
 struct alignas(16) FPBRMaterialUniform
 {
 	Math::FLinearColor BaseColorFactor = Math::FLinearColor(1.0f, 1.0f, 1.0f, 1.0f);
-	float Metallic = 1.0f;
+	float Metallic = 0.0f;
 	float Roughness = 1.0f;
 	float NormalScale = 1.0f;
 	float OcclusionStrength = 1.0f;

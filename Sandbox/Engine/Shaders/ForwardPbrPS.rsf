@@ -92,7 +92,7 @@ PSOutput main(const PSInput Input)
     Result.oColor.rgb = AmbientColor + SumLightColor + Emissive;
     //Result.oColor.rgb = pow(o_Color.rgb, vec3(1.0/2.2)); //Gamma Correction
     Result.oColor.a = BaseColor.a;
-    Result.oColor = float4(Input.vNormal, 1.0);
+    //Result.oColor = float4(Input.vNormal, 1.0);
 	//Result.oColor = float4(1.0);
     return Result;
 }
