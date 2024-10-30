@@ -60,7 +60,7 @@ public:
 	virtual void InitRHI()
 	{
 		FRHIVertexInputStateDesc StateDesc;
-		StateDesc.Add(FVertexElement(EVertexElmentType::Float2, 0, 0, sizeof(Math::FVector2)));
+		StateDesc.Add(FRHIVertexElement(EVertexElmentType::Float2, 0, 0, sizeof(Math::FVector2)));
 		VertexInputStateRHI = GDynamicRHI->RHICreateVertexInputState(StateDesc);
 	}
 
@@ -97,12 +97,12 @@ public:
 	virtual void InitRHI()
 	{
 		FRHIVertexInputStateDesc StateDesc;
-		StateDesc.Add(FVertexElement(EVertexElmentType::Float3, 0, 0, sizeof(Math::FVector3))); //Position
-		StateDesc.Add(FVertexElement(EVertexElmentType::Color, 1, 1, sizeof(Math::FColor))); //Color
-		StateDesc.Add(FVertexElement(EVertexElmentType::Float3, 2, 2, sizeof(Math::FVector3))); //Normal
-		StateDesc.Add(FVertexElement(EVertexElmentType::Float4, 3, 3, sizeof(Math::FVector4))); //Tangent
-		StateDesc.Add(FVertexElement(EVertexElmentType::Float2, 4, 4, sizeof(Math::FVector2))); //TexCoord0
-		StateDesc.Add(FVertexElement(EVertexElmentType::Float2, 5, 5, sizeof(Math::FVector2))); //TexCoord1
+		StateDesc.Add(FRHIVertexElement(EVertexElmentType::Float3, 0, 0, sizeof(Math::FVector3))); //Position
+		StateDesc.Add(FRHIVertexElement(EVertexElmentType::Color, 1, 1, sizeof(Math::FColor))); //Color
+		StateDesc.Add(FRHIVertexElement(EVertexElmentType::Float3, 2, 2, sizeof(Math::FVector3))); //Normal
+		StateDesc.Add(FRHIVertexElement(EVertexElmentType::Float4, 3, 3, sizeof(Math::FVector4))); //Tangent
+		StateDesc.Add(FRHIVertexElement(EVertexElmentType::Float2, 4, 4, sizeof(Math::FVector2))); //TexCoord0
+		StateDesc.Add(FRHIVertexElement(EVertexElmentType::Float2, 5, 5, sizeof(Math::FVector2))); //TexCoord1
 		VertexInputStateRHI = GDynamicRHI->RHICreateVertexInputState(StateDesc);
 	}
 };
@@ -127,11 +127,14 @@ public:
 };
 extern REV_API TGlobalResource<FDefaultSamplerState> GDefaultSamplerState;
 
+class FRHICommandList;
 class REV_API RenderUtils
 {
 public:
 	static void Init();
 	static void Shutdown();
+	static void PostProcessDraw(FRHICommandList& RHICmdList);
+
 };
 
 }

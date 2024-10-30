@@ -23,7 +23,8 @@ public:
 	void FreeResource();
 	void Cleanup();
 
-	void DrawScene(FRHICommandList& RHICmdList);
+	void DrawSceneOpaque(FRHICommandList& RHICmdList);
+	void DrawSkybox(FRHICommandList& RHICmdList);
 
 	uint32 GetFrameWidth() const;
 	uint32 GetFrameHeight() const;

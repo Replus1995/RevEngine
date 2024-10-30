@@ -24,6 +24,7 @@
 
 namespace Rev
 {
+
 FVulkanContext::FVulkanContext()
 {
 	for (size_t i = 0; i < 4; i++)
@@ -263,10 +264,7 @@ void FVulkanContext::RHIBeginRenderPass(FRHIRenderPass* InRenderPass)
 	SubpassBeginInfo.pNext = NULL;
 	SubpassBeginInfo.contents = VK_SUBPASS_CONTENTS_INLINE;
 
-
-
 	vkCmdBeginRenderPass2(GetActiveCmdBuffer(), &RenderPassInfo, &SubpassBeginInfo);
-
 	vkCmdSetViewport(GetActiveCmdBuffer(), 0, 1, &mViewport);
 	vkCmdSetScissor(GetActiveCmdBuffer(), 0, 1, &mScissor);
 }
@@ -385,6 +383,24 @@ void FVulkanContext::RHIDrawPrimitiveIndexed(FRHIBuffer* IndexBuffer, uint32 Num
 
 	uint32 NumVertices = ComputeVertexCount(NumPrimitives, mFrameState.CurrentState.PrimitiveTopology);
 	vkCmdDrawIndexed(GetActiveCmdBuffer(), NumVertices, 1, StartIndex, 0, 0);
+}
+
+void FVulkanContext::RHIBeginDebugLabel(const char* LabelContext, const Math::FLinearColor& Color)
+{
+	VkDebugUtilsLabelEXT Label = {};
+	Label.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_LABEL_EXT;
+	Label.pNext = nullptr;
+	Label.pLabelName = LabelContext;
+	Label.color[0] = Color[0];
+	Label.color[1] = Color[1];
+	Label.color[2] = Color[2];
+	Label.color[3] = Color[3];
+	VulkanCmdBeginDebugUtilsLabelEXT(GetActiveCmdBuffer(), &Label);
+}
+
+void FVulkanContext::RHIEndDebugLabel()
+{
+	VulkanCmdEndDebugUtilsLabelEXT(GetActiveCmdBuffer());
 }
 
 FVulkanContext* FVulkanContext::Cast(FRHIContext* InContext)

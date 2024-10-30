@@ -146,7 +146,7 @@ FVulkanVertexInputState::FVulkanVertexInputState(const FRHIVertexInputStateDesc&
 	std::map<uint32, uint32> BindingsMap;//<StreamIndex,Stride>
 	for (uint8 i = 0; i < Desc.NumVertexElements; i++)
 	{
-		const FVertexElement& VertexElement = Desc.VertexElements[i];
+		const FRHIVertexElement& VertexElement = Desc.VertexElements[i];
 		REV_CORE_ASSERT(VertexElement.StreamIndex < REV_MAX_VERTEX_ELEMENTS);
 		REV_CORE_ASSERT(VertexElement.AttributeIndex < REV_MAX_VERTEX_ELEMENTS);
 

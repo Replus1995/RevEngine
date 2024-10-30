@@ -19,7 +19,7 @@ bool operator==(const FRHISamplerStateDesc& A, const FRHISamplerStateDesc& B)
 	return bSame;
 }
 
-uint8 FVertexElement::GetComponentSize()
+uint8 FRHIVertexElement::GetComponentSize()
 {
 	switch (Type)
 	{
@@ -39,7 +39,7 @@ uint8 FVertexElement::GetComponentSize()
 	return 0;
 }
 
-uint8 FVertexElement::GetComponentCount()
+uint8 FRHIVertexElement::GetComponentCount()
 {
 	switch (Type)
 	{
@@ -59,7 +59,7 @@ uint8 FVertexElement::GetComponentCount()
 	return 0;
 }
 
-uint32 FVertexElement::GetElementSize()
+uint32 FRHIVertexElement::GetElementSize()
 {
 	return uint32(GetComponentSize()) * uint32(GetComponentCount());
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include "Rev/Render/RHI/RHIContext.h"
 #include "Rev/Core/Deleter.h"
+#include "Rev/Math/Maths.h"
 #include <vector>
 #include <map>
 #include <vulkan/vulkan.h>
@@ -64,6 +65,9 @@ public:
 	virtual void RHISetVertexStream(uint32 StreamIndex, FRHIBuffer* VertexBuffer, uint32 Offset) override;
 	virtual void RHIDrawPrimitive(uint32 NumPrimitives, uint32 StartVertex) override;
 	virtual void RHIDrawPrimitiveIndexed(FRHIBuffer* IndexBuffer, uint32 NumPrimitives, uint32 StartIndex, int32 VertexOffset) override;
+
+	virtual void RHIBeginDebugLabel(const char* LabelContext, const Math::FLinearColor& Color) override;
+	virtual void RHIEndDebugLabel() override;
 
 	const FVulkanSwapchain& GetSwapchain() const { return mSwapchain; }
 	VkImage GetSwapchainImage() { return mSwapchain.GetImages()[mCurSwapchainImageIndex]; }

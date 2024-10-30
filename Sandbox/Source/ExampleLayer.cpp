@@ -60,8 +60,8 @@ ExampleLayer::ExampleLayer()
 		auto pPlaneMat = CreateRef<FPBRMaterial>();
 		pPlaneMat->Compile();
 		//pPlaneMat->PBRMaterialParams.BaseColorFactor = (Math::FLinearColor(.8, .8, .8, 1));
-		pPlaneMat->PBRMaterialParams.Metallic = 0.5f;
-		pPlaneMat->PBRMaterialParams.Roughness = 0.9f;
+		pPlaneMat->PBRMaterialParams.Metallic = 0.3f;
+		pPlaneMat->PBRMaterialParams.Roughness = 0.8f;
 
 		auto meshEntity = mScene->CreateEntity();
 		auto& meshComp = meshEntity.AddComponent<StaticMeshComponent>();
@@ -76,7 +76,7 @@ ExampleLayer::ExampleLayer()
 		auto lightEntity = mScene->CreateEntity();
 		auto& dirLightComp = lightEntity.AddComponent<DirectionalLightComponent>();
 		dirLightComp.Light.SetColorByTemperature(6500.0f);
-		dirLightComp.Light.SetIntensity(10.0f);
+		dirLightComp.Light.SetIntensity(5.0f);
 		auto& transformComp = lightEntity.GetComponent<TransformComponent>();
 		transformComp.SetLocation(Math::FVector3(0, 0, 0));
 		transformComp.SetRotation(Math::FRotator(0, 0, 45.0f));

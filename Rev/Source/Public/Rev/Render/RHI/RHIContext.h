@@ -64,5 +64,9 @@ public:
 	virtual void RHIDrawPrimitive(uint32 NumPrimitives, uint32 StartVertex = 0) = 0;
 	virtual void RHIDrawPrimitiveIndexed(FRHIBuffer* IndexBuffer, uint32 NumPrimitives, uint32 StartIndex = 0, int32 VertexOffset = 0) = 0;
 
+//Debug
+	virtual void RHIBeginDebugLabel(const char* LabelContext, const Math::FLinearColor& Color) = 0;
+	virtual void RHIEndDebugLabel() = 0;
+
 };
 }

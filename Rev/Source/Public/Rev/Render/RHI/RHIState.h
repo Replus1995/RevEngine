@@ -159,7 +159,7 @@ struct FRHIColorBlendStateDesc
 	//Math::FLinearColor BlendConstants;
 };
 
-struct FVertexElement
+struct FRHIVertexElement
 {
 	EVertexElmentType Type = EVertexElmentType::Unknown;
 	uint8 StreamIndex = 0;
@@ -167,8 +167,8 @@ struct FVertexElement
 	uint8 Offset = 0;
 	uint16 Stride = 0;
 
-	FVertexElement() {}
-	FVertexElement(EVertexElmentType InType, uint8 InStreamIndex, uint8 InAttributeIndex, uint16 InStride, uint8 InOffset = 0)
+	FRHIVertexElement() {}
+	FRHIVertexElement(EVertexElmentType InType, uint8 InStreamIndex, uint8 InAttributeIndex, uint16 InStride, uint8 InOffset = 0)
 		: Type(InType)
 		, StreamIndex(InStreamIndex)
 		, AttributeIndex(InAttributeIndex)
@@ -184,10 +184,10 @@ struct FVertexElement
 
 struct FRHIVertexInputStateDesc
 {
-	FVertexElement VertexElements[REV_MAX_VERTEX_ELEMENTS];
+	FRHIVertexElement VertexElements[REV_MAX_VERTEX_ELEMENTS];
 	uint8 NumVertexElements = 0;
 
-	void Add(const FVertexElement& InElement)
+	void Add(const FRHIVertexElement& InElement)
 	{
 		VertexElements[NumVertexElements] = InElement;
 		NumVertexElements++;

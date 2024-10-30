@@ -1,8 +1,11 @@
 #include "Rev/Render/RenderUtils.h"
 #include "Rev/Render/RenderCore.h"
-#include "Rev/Render/RHI/DynamicRHI.h"
 #include "Rev/Render/RHI/RHIBuffer.h"
 #include "Rev/Render/RHI/DynamicRHI.h"
+#include "Rev/Render/RHI/RHICommandList.h"
+#include "Rev/Render/RHI/RHIContext.h"
+#include "Rev/Render/RHI/RHIState.h"
+#include "Rev/Render/RHI/RHIPipeline.h"
 #include "Rev/Render/Resource/TextureResource.h"
 
 namespace Rev
@@ -70,6 +73,23 @@ void RenderUtils::Shutdown()
     SAFE_DELETE(GWhiteTexture);
     SAFE_DELETE(GBlackTexture);
     SAFE_DELETE(GNormalTexture);
+}
+
+void RenderUtils::PostProcessDraw(FRHICommandList& RHICmdList)
+{
+	FRHIGraphicsPipelineStateDesc Desc;
+	Desc.VertexInputState = GStaticMeshVertexInputState.VertexInputStateRHI.get();
+	Desc.RasterizerStateDesc.CullMode = CM_Back;
+	Desc.DepthStencilStateDesc.bEnableDepthWrite = false;
+	Desc.DepthStencilStateDesc.DepthTestFunc = CF_Never;
+	Desc.ColorBlendStateDesc.Attachments[0].bEnableBlend = true;
+	Desc.ColorBlendStateDesc.Attachments[0].SrcColorFactor = BF_SrcAlpha;
+	Desc.ColorBlendStateDesc.Attachments[0].DstColorFactor = BF_OneMinusSrcAlpha;
+
+	RHICmdList.GetContext()->RHISetGraphicsPipelineState(Desc);
+
+	RHICmdList.GetContext()->RHISetVertexStream(0, G2DQuadVertexBuffer.VertexBufferRHI.get());
+	RHICmdList.GetContext()->RHIDrawPrimitiveIndexed(G2DQuadIndexBuffer.IndexBufferRHI.get(), 2, 0);
 }
 
 
