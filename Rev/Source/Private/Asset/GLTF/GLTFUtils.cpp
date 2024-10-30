@@ -67,7 +67,26 @@ FBuffer LoadTexCoordData(const tinygltf::Accessor& InAccessor, const tinygltf::M
 	const tinygltf::BufferView& BufferView = InModel.bufferViews[InAccessor.bufferView];
 	const tinygltf::Buffer& Buffer = InModel.buffers[BufferView.buffer];
 	const uint8* DataMem = Buffer.data.data() + BufferView.byteOffset + InAccessor.byteOffset;
-	const uint32 Count = BufferView.byteLength / BufferView.byteStride;
+	const uint32 Count = InAccessor.count;
+	uint32 Stride = BufferView.byteStride;
+	if (Stride == 0)
+	{
+		switch (InAccessor.componentType)
+		{
+		case TINYGLTF_COMPONENT_TYPE_FLOAT:
+			Stride = sizeof(float) * 2;
+			break;
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
+			Stride = sizeof(uint8) * 2;
+			break;
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
+			Stride = sizeof(uint16) * 2;
+			break;
+		default:
+			break;
+		}
+	}
+	REV_CORE_ASSERT(Stride != 0);
 
 	FBuffer OutBuffer;
 	OutBuffer.Allocate<Math::FVector2>(Count);
@@ -78,21 +97,21 @@ FBuffer LoadTexCoordData(const tinygltf::Accessor& InAccessor, const tinygltf::M
 		{
 		case TINYGLTF_COMPONENT_TYPE_FLOAT:
 		{
-			float* Src = (float*)(DataMem + BufferView.byteStride * i);
+			float* Src = (float*)(DataMem + Stride * i);
 			UV.X = Src[0];
 			UV.Y = Src[1];
  		}
 		break;
 		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
 		{
-			uint8* Src = (uint8*)(DataMem + BufferView.byteStride * i);
+			uint8* Src = (uint8*)(DataMem + Stride * i);
 			UV.X = float(Src[0]) / 255.0f;
 			UV.Y = float(Src[1]) / 255.0f;
 		}
 		break;
 		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
 		{
-			uint16* Src = (uint16*)(DataMem + BufferView.byteStride * i);
+			uint16* Src = (uint16*)(DataMem + Stride * i);
 			UV.X = float(Src[0]) / 65535.0f;
 			UV.Y = float(Src[1]) / 65535.0f;
 		}
@@ -110,7 +129,27 @@ FBuffer LoadColorData(const tinygltf::Accessor& InAccessor, const tinygltf::Mode
 	const tinygltf::BufferView& BufferView = InModel.bufferViews[InAccessor.bufferView];
 	const tinygltf::Buffer& Buffer = InModel.buffers[BufferView.buffer];
 	const uint8* DataMem = Buffer.data.data() + BufferView.byteOffset + InAccessor.byteOffset;
-	const uint32 Count = BufferView.byteLength / BufferView.byteStride;
+	const uint32 Count = InAccessor.count;
+	uint32 Stride = BufferView.byteStride;
+	if (Stride == 0)
+	{
+		const uint32 NumComps = InAccessor.type == TINYGLTF_TYPE_VEC4 ? 4 : 3;
+		switch (InAccessor.componentType)
+		{
+		case TINYGLTF_COMPONENT_TYPE_FLOAT:
+			Stride = sizeof(float) * NumComps;
+			break;
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
+			Stride = sizeof(uint8) * NumComps;
+			break;
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
+			Stride = sizeof(uint16) * NumComps;
+			break;
+		default:
+			break;
+		}
+	}
+	REV_CORE_ASSERT(Stride != 0);
 
 	FBuffer OutBuffer;
 	OutBuffer.Allocate<Math::FColor>(Count);
@@ -121,7 +160,7 @@ FBuffer LoadColorData(const tinygltf::Accessor& InAccessor, const tinygltf::Mode
 		{
 		case TINYGLTF_COMPONENT_TYPE_FLOAT:
 		{
-			float* Src = (float*)(DataMem + BufferView.byteStride * i);
+			float* Src = (float*)(DataMem + Stride * i);
 			LinearColor.R = Src[0];
 			LinearColor.G = Src[1];
 			LinearColor.B = Src[2];
@@ -131,7 +170,7 @@ FBuffer LoadColorData(const tinygltf::Accessor& InAccessor, const tinygltf::Mode
 		break;
 		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
 		{
-			uint8* Src = (uint8*)(DataMem + BufferView.byteStride * i);
+			uint8* Src = (uint8*)(DataMem + Stride * i);
 			LinearColor.R = float(Src[0]) / 255.0f;
 			LinearColor.G = float(Src[1]) / 255.0f;
 			LinearColor.B = float(Src[2]) / 255.0f;
@@ -141,7 +180,7 @@ FBuffer LoadColorData(const tinygltf::Accessor& InAccessor, const tinygltf::Mode
 		break;
 		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
 		{
-			uint16* Src = (uint16*)(DataMem + BufferView.byteStride * i);
+			uint16* Src = (uint16*)(DataMem + Stride * i);
 			LinearColor.R = float(Src[0]) / 65535.0f;
 			LinearColor.G = float(Src[1]) / 65535.0f;
 			LinearColor.B = float(Src[2]) / 65535.0f;
@@ -166,7 +205,29 @@ FBuffer LoadIndexData(const tinygltf::Accessor& InAccessor, const tinygltf::Mode
 	const tinygltf::BufferView& BufferView = InModel.bufferViews[InAccessor.bufferView];
 	const tinygltf::Buffer& Buffer = InModel.buffers[BufferView.buffer];
 	const uint8* DataMem = Buffer.data.data() + BufferView.byteOffset + InAccessor.byteOffset;
-	const uint32 Count = BufferView.byteLength / BufferView.byteStride;
+	const uint32 Count = InAccessor.count;
+	uint32 Stride = BufferView.byteStride;
+	if (Stride == 0)
+	{
+		switch (InAccessor.componentType)
+		{
+		case TINYGLTF_COMPONENT_TYPE_BYTE:
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
+			Stride = sizeof(uint8);
+			break;
+		case TINYGLTF_COMPONENT_TYPE_SHORT:
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
+			Stride = sizeof(uint16);
+			break;
+		case TINYGLTF_COMPONENT_TYPE_INT:
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
+			Stride = sizeof(uint32);
+			break;
+		default:
+			break;
+		}
+	}
+	REV_CORE_ASSERT(Stride != 0);
 
 	FBuffer OutBuffer;
 	OutBuffer.Allocate<IndexType>(Count);
@@ -176,22 +237,22 @@ FBuffer LoadIndexData(const tinygltf::Accessor& InAccessor, const tinygltf::Mode
 		switch (InAccessor.componentType)
 		{
 		case TINYGLTF_COMPONENT_TYPE_BYTE:
-			IndexValue = *(int8*)(DataMem + BufferView.byteStride * i);
+			IndexValue = *(int8*)(DataMem + Stride * i);
 			break;
 		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
-			IndexValue = *(uint8*)(DataMem + BufferView.byteStride * i);
+			IndexValue = *(uint8*)(DataMem + Stride * i);
 			break;
 		case TINYGLTF_COMPONENT_TYPE_SHORT:
-			IndexValue = *(int16*)(DataMem + BufferView.byteStride * i);
+			IndexValue = *(int16*)(DataMem + Stride * i);
 			break;
 		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
-			IndexValue = *(uint16*)(DataMem + BufferView.byteStride * i);
+			IndexValue = *(uint16*)(DataMem + Stride * i);
 			break;
 		case TINYGLTF_COMPONENT_TYPE_INT:
-			IndexValue = *(int32*)(DataMem + BufferView.byteStride * i);
+			IndexValue = *(int32*)(DataMem + Stride * i);
 			break;
 		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
-			IndexValue = *(uint32*)(DataMem + BufferView.byteStride * i);
+			IndexValue = *(uint32*)(DataMem + Stride * i);
 			break;
 		default:
 			break;
@@ -439,7 +500,7 @@ Ref<FStaticMesh> FGLTFUtils::ImportMeshPrimitive(const tinygltf::Primitive& InPr
 		}
 	}
 
-	MeshBuilder.InitVertices(Storage.NumVertices, Storage.NumVertices, 
+	MeshBuilder.InitVertices(Storage.NumVertices, Storage.NumTexCoord, 
 		std::move(Storage.PositionData), 
 		std::move(Storage.NormalData),
 		std::move(Storage.TangentData),

@@ -76,12 +76,9 @@ void FStaticMeshBuilder::InitVertices(uint32 InNumVertices, uint32 InNumTexCoord
 		REV_CORE_ASSERT(InNumVertices * sizeof(Math::FVector4) == InTangentData.Size());
 		StaticMesh->VertexBuffer.TangentData = std::move(InTangentData);
 	}
-	if (InNumTexCoords > 0)
+	for (uint32 i = 0; i < InNumTexCoords; i++)
 	{
-		for (uint32 i = 0; i < InNumVertices; i++)
-		{
-			StaticMesh->VertexBuffer.TexCoordData[i] = std::move(InTexCoordData[i]);
-		}
+		StaticMesh->VertexBuffer.TexCoordData[i] = std::move(InTexCoordData[i]);
 	}
 	if (!InColorData.Empty())
 	{

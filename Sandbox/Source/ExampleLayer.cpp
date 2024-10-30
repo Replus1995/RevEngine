@@ -40,30 +40,28 @@ ExampleLayer::ExampleLayer()
 		transformComp.SetLocation(Math::FVector3(0, 0.6, -5));
 	}*/
 
-	//{
-	//	//auto importRes = FAssetLibrary::ImportMesh(FPath("/Game/Assets/Models/Cube/Cube.gltf"));
-	//	auto importRes = FAssetLibrary::ImportModel(FPath("/Game/Assets/Models/DamagedHelmet.glb"));
-	//	if (!importRes.StaticMeshes.empty())
-	//	{
-	//		auto meshStorage = importRes.StaticMeshes[0];
-
-	//		auto meshEntity = mScene->CreateEntity();
-	//		auto& meshComp = meshEntity.AddComponent<StaticMeshComponent>();
-	//		meshComp.StaticMesh = meshStorage->CreateStaticMesh();
-	//		auto & transformComp = meshEntity.GetComponent<TransformComponent>();
-	//		transformComp.SetLocation(Math::FVector3(0, 0.6, -5));
-	//		transformComp.SetScale(Math::FVector3(0.5, 0.5, 0.5));
-	//		transformComp.SetRotation(Math::FRotator(90, 0, 0));
-	//	}
-	//	
-	//}
+	{
+		//auto importRes = FAssetLibrary::ImportMesh(FPath("/Game/Assets/Models/Cube/Cube.gltf"));
+		auto importRes = FAssetLibrary::ImportModel(FPath("/Game/Assets/Models/DamagedHelmet.glb"));
+		if (!importRes.StaticMeshes.empty())
+		{
+			auto meshEntity = mScene->CreateEntity();
+			auto& meshComp = meshEntity.AddComponent<StaticMeshComponent>();
+			meshComp.StaticMesh = importRes.StaticMeshes[0];
+			auto & transformComp = meshEntity.GetComponent<TransformComponent>();
+			transformComp.SetLocation(Math::FVector3(0, 0.6, -5));
+			transformComp.SetScale(Math::FVector3(0.5, 0.5, 0.5));
+			transformComp.SetRotation(Math::FRotator(90, 0, 0));
+		}
+		
+	}
 
 	{
 		auto pPlaneMat = CreateRef<FPBRMaterial>();
 		pPlaneMat->Compile();
-		pPlaneMat->PBRMaterialParams.BaseColorFactor = (Math::FLinearColor(.8, .8, .8, 1));
-		pPlaneMat->PBRMaterialParams.Metallic = 0.8f;
-		pPlaneMat->PBRMaterialParams.Roughness = 0.5f;
+		//pPlaneMat->PBRMaterialParams.BaseColorFactor = (Math::FLinearColor(.8, .8, .8, 1));
+		pPlaneMat->PBRMaterialParams.Metallic = 0.5f;
+		pPlaneMat->PBRMaterialParams.Roughness = 0.9f;
 
 		auto meshEntity = mScene->CreateEntity();
 		auto& meshComp = meshEntity.AddComponent<StaticMeshComponent>();
@@ -71,13 +69,14 @@ ExampleLayer::ExampleLayer()
 		auto& transformComp = meshEntity.GetComponent<TransformComponent>();
 		transformComp.SetLocation(Math::FVector3(0, 0, -5));
 		transformComp.SetRotation(Math::FRotator(-90.0F, 0, 0));
-		transformComp.SetScale(Math::FVector3(5, 5, 1));
+		transformComp.SetScale(Math::FVector3(5, 5, 0));
 	}
 
 	{
 		auto lightEntity = mScene->CreateEntity();
 		auto& dirLightComp = lightEntity.AddComponent<DirectionalLightComponent>();
 		dirLightComp.Light.SetColorByTemperature(6500.0f);
+		dirLightComp.Light.SetIntensity(10.0f);
 		auto& transformComp = lightEntity.GetComponent<TransformComponent>();
 		transformComp.SetLocation(Math::FVector3(0, 0, 0));
 		transformComp.SetRotation(Math::FRotator(0, 0, 45.0f));

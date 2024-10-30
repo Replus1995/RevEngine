@@ -60,6 +60,7 @@ Ref<FTexture> FTextureStorage::CreateTexture(bool bForceSRGB)
 		REV_CORE_ASSERT(TextureDesc.NumMips == ImageData.NumMips());
 		mCache = CreateRef<FTexture>();
 		mCache->TextureRHI = GDynamicRHI->RHICreateTexture(TextureDesc);
+		mCache->SamplerStateRHI = GDynamicRHI->RHICreateSamplerState({ SF_Nearest, SW_Repeat, SW_Repeat, SW_Repeat });
 		for (uint8 iCubeFace = 0; iCubeFace < 6; iCubeFace++)
 		{
 			for (uint8 iMip = 0; iMip < TextureDesc.NumMips; iMip++)
@@ -75,6 +76,7 @@ Ref<FTexture> FTextureStorage::CreateTexture(bool bForceSRGB)
 		REV_CORE_ASSERT(TextureDesc.NumMips == ImageData.NumMips());
 		mCache = CreateRef<FTexture>();
 		mCache->TextureRHI = GDynamicRHI->RHICreateTexture(TextureDesc);
+		mCache->SamplerStateRHI = GDynamicRHI->RHICreateSamplerState({ SF_Nearest, SW_Repeat, SW_Repeat, SW_Repeat });
 		for (uint8 iLayer = 0; iLayer < TextureDesc.ArraySize; iLayer++)
 		{
 			for (uint8 iCubeFace = 0; iCubeFace < 6; iCubeFace++)
@@ -95,6 +97,7 @@ Ref<FTexture> FTextureStorage::CreateTexture(bool bForceSRGB)
 	
 	mCache = CreateRef<FTexture>();
 	mCache->TextureRHI = GDynamicRHI->RHICreateTexture(TextureDesc);
+	mCache->SamplerStateRHI = GDynamicRHI->RHICreateSamplerState({ SF_Bilinear, SW_Repeat, SW_Repeat, SW_Repeat });
 	for (uint8 iLayer = 0; iLayer < TextureDesc.ArraySize; iLayer++)
 	{
 		for (uint8 iMip = 0; iMip < TextureDesc.NumMips; iMip++)
