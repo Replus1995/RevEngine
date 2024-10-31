@@ -16,4 +16,21 @@ private:
 };
 
 
+class FVulkanTextureSwapchain : public FVulkanTexture
+{
+public:
+	FVulkanTextureSwapchain(VkImage InSwapchainImage, VkFormat InFormat, uint16 InWidth, uint16 InHeight);
+	virtual ~FVulkanTextureSwapchain();
+	virtual void UpdateContent(FVulkanContext* Context, const void* InContent, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex) override {}
+	virtual bool IsSwapchainTexture() const { return true; }
+
+private:
+	virtual void Init() override;
+	virtual void Release() override;
+
+private:
+	VkFormat mPlatformFormat = VK_FORMAT_UNDEFINED;
+};
+
+
 }

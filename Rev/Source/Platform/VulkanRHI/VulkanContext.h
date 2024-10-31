@@ -70,8 +70,8 @@ public:
 	virtual void RHIEndDebugLabel() override;
 
 	const FVulkanSwapchain& GetSwapchain() const { return mSwapchain; }
-	VkImage GetSwapchainImage() { return mSwapchain.GetImages()[mCurSwapchainImageIndex]; }
-	VkImageView GetSwapchainImageView() { return mSwapchain.GetImageViews()[mCurSwapchainImageIndex]; }
+	VkImage GetSwapchainImage() const { return mSwapchain.GetCurrentImage(); }
+	VkImageView GetSwapchainImageView() const { return mSwapchain.GetCurrentImageView(); }
 
 	FVulkanFrameData& GetActiveFrameData() { return mFrameData[mFrameDataIndex]; }
 	VkCommandBuffer GetActiveCmdBuffer() { return mFrameData[mFrameDataIndex].CmdBuffer; }
@@ -90,7 +90,6 @@ private:
 	VkPresentModeKHR mTargetPresentMode = VK_PRESENT_MODE_MAILBOX_KHR;
 
 	//frame data
-	uint32 mCurSwapchainImageIndex = 0;
 	uint32 mFrameDataIndex = 0;
 	FVulkanFrameData mFrameData[REV_VK_FRAME_OVERLAP];
 

@@ -29,10 +29,5 @@ static inline void ZeroVulkanStruct(T& VkStruct, int32 VkStructureType)
 	memset(((uint8*)&VkStruct) + sizeof(VkStructureType), 0, sizeof(T) - sizeof(VkStructureType));
 }
 
-VkResult VulkanCreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pMessenger);
-void VulkanDestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT messenger, const VkAllocationCallbacks* pAllocator);
-void VulkanSubmitDebugUtilsMessageEXT(VkInstance instance, VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageTypes, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData);
-
-void VulkanCmdBeginDebugUtilsLabelEXT(VkCommandBuffer commandBuffer, const VkDebugUtilsLabelEXT* pLabelInfo);
-void VulkanCmdEndDebugUtilsLabelEXT(VkCommandBuffer commandBuffer);
-void VulkanCmdInsertDebugUtilsLabelEXT(VkCommandBuffer commandBuffer, const VkDebugUtilsLabelEXT* pLabelInfo);
+//Debug
+void VulkanLoadDebugFunctions(VkInstance instance);

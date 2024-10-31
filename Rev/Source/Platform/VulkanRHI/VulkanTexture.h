@@ -27,6 +27,8 @@ public:
 	void ClearContent(FVulkanContext* Context, uint8 InMipLevel, uint8 InMipCount, uint16 InArrayIndex, uint16 InArrayCount);
 	void Resize(uint32 InWidth, uint32 InHeight, uint32 InDepth);
 
+	virtual bool IsSwapchainTexture() const { return false; }
+
 protected:
 	FVulkanTexture(const FRHITextureDesc& InDesc);
 	virtual void Init() = 0;

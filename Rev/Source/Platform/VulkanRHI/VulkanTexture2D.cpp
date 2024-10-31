@@ -81,4 +81,46 @@ void FVulkanTexture2D::Init()
     REV_VK_CHECK(vkCreateImageView(FVulkanDynamicRHI::GetDevice(), &ImageViewCreateInfo, nullptr, &mImageView));
 }
 
+FVulkanTextureSwapchain::FVulkanTextureSwapchain(VkImage InSwapchainImage, VkFormat InFormat, uint16 InWidth, uint16 InHeight)
+    : FVulkanTexture(FRHITextureDesc::Make2D(InWidth, InHeight, PF_Unknown))
+    , mPlatformFormat(InFormat)
+{
+    mImage = InSwapchainImage; 
+    Init();
+}
+
+FVulkanTextureSwapchain::~FVulkanTextureSwapchain()
+{
+}
+
+void FVulkanTextureSwapchain::Init()
+{
+    VkImageViewCreateInfo ImageViewCreateInfo{};
+    ImageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+    ImageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+    ImageViewCreateInfo.image = mImage;
+    ImageViewCreateInfo.format = mPlatformFormat;
+    ImageViewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+    ImageViewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+    ImageViewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+    ImageViewCreateInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+    ImageViewCreateInfo.subresourceRange.aspectMask = mImageAspectFlags;
+    ImageViewCreateInfo.subresourceRange.baseMipLevel = 0;
+    ImageViewCreateInfo.subresourceRange.levelCount = 1;
+    ImageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
+    ImageViewCreateInfo.subresourceRange.layerCount = 1;
+
+    REV_VK_CHECK(vkCreateImageView(FVulkanDynamicRHI::GetDevice(), &ImageViewCreateInfo, nullptr, &mImageView));
+}
+
+void FVulkanTextureSwapchain::Release()
+{
+    REV_CORE_ASSERT(FVulkanDynamicRHI::GetDevice());
+
+    vkDestroyImageView(FVulkanDynamicRHI::GetDevice(), mImageView, nullptr);
+    mImage = VK_NULL_HANDLE;
+    mImageView = VK_NULL_HANDLE;
+}
+
+
 }

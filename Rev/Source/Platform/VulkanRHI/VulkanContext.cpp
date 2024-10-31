@@ -71,7 +71,7 @@ void FVulkanContext::BeginFrame(bool bClearBackBuffer)
 	REV_VK_CHECK(vkWaitForFences(FVulkanDynamicRHI::GetDevice(), 1, &FrameData.Fence, true, kWaitTime));
 	REV_VK_CHECK(vkResetFences(FVulkanDynamicRHI::GetDevice(), 1, &FrameData.Fence));
 
-	REV_VK_CHECK(vkAcquireNextImageKHR(FVulkanDynamicRHI::GetDevice(), mSwapchain.GetSwapchain(), kWaitTime, FrameData.SwapchainSemaphore, nullptr, &mCurSwapchainImageIndex));
+	mSwapchain.NextFrame(kWaitTime, FrameData.SwapchainSemaphore, nullptr);
 
 	mDrawExtent.width = mSwapchain.GetExtent().width;
 	mDrawExtent.height = mSwapchain.GetExtent().height;
@@ -128,6 +128,8 @@ void FVulkanContext::EndFrame()
 void FVulkanContext::PresentFrame()
 {
 	auto& FrameData = GetActiveFrameData();
+	uint32 SwapchainImageIndex = mSwapchain.GetCurrentTextureIndex();
+
 
 	//present
 	VkPresentInfoKHR PresentInfo{};
@@ -137,7 +139,7 @@ void FVulkanContext::PresentFrame()
 	PresentInfo.swapchainCount = 1;
 	PresentInfo.pWaitSemaphores = &FrameData.RenderSemaphore;
 	PresentInfo.waitSemaphoreCount = 1;
-	PresentInfo.pImageIndices = &mCurSwapchainImageIndex;
+	PresentInfo.pImageIndices = &SwapchainImageIndex;
 	auto PresentRes = vkQueuePresentKHR(FVulkanDynamicRHI::GetQueue(VQK_Graphics), &PresentInfo);
 
 	if (PresentRes == VK_ERROR_OUT_OF_DATE_KHR || PresentRes == VK_SUBOPTIMAL_KHR || mCurPresentMode != mTargetPresentMode)
@@ -153,7 +155,6 @@ void FVulkanContext::PresentFrame()
 	}
 
 	mFrameDataIndex = (mFrameDataIndex + 1) % REV_VK_FRAME_OVERLAP;
-	//mCurSwapchainImageIndex = 0;
 
 }
 
@@ -288,7 +289,7 @@ void FVulkanContext::RHIEndRenderPass(bool bBlitToBack)
 		{
 			FVulkanUtils::TransitionImage(GetActiveCmdBuffer(), (VkImage)ColorTex->GetNativeHandle(), VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
 			FVulkanUtils::TransitionImage(GetActiveCmdBuffer(), GetSwapchainImage(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-			FVulkanUtils::BlitImage(GetActiveCmdBuffer(), (VkImage)ColorTex->GetNativeHandle(), mSwapchain.GetImages()[mCurSwapchainImageIndex], mDrawExtent, mSwapchain.GetExtent());
+			FVulkanUtils::BlitImage(GetActiveCmdBuffer(), (VkImage)ColorTex->GetNativeHandle(), GetSwapchainImage(), mDrawExtent, mSwapchain.GetExtent());
 			FVulkanUtils::TransitionImage(GetActiveCmdBuffer(), GetSwapchainImage(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 		}
 	}
@@ -395,12 +396,12 @@ void FVulkanContext::RHIBeginDebugLabel(const char* LabelContext, const Math::FL
 	Label.color[1] = Color[1];
 	Label.color[2] = Color[2];
 	Label.color[3] = Color[3];
-	VulkanCmdBeginDebugUtilsLabelEXT(GetActiveCmdBuffer(), &Label);
+	vkCmdBeginDebugUtilsLabelEXT(GetActiveCmdBuffer(), &Label);
 }
 
 void FVulkanContext::RHIEndDebugLabel()
 {
-	VulkanCmdEndDebugUtilsLabelEXT(GetActiveCmdBuffer());
+	vkCmdEndDebugUtilsLabelEXT(GetActiveCmdBuffer());
 }
 
 FVulkanContext* FVulkanContext::Cast(FRHIContext* InContext)

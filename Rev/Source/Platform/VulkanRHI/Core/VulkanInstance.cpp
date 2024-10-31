@@ -173,7 +173,12 @@ void FVulkanInstance::CreateInstance()
 		InstanceCreateInfo.pNext = &DebugMessengerCreateInfo;
 	}
 
-	REV_VK_CHECK_THROW(vkCreateInstance(&InstanceCreateInfo, nullptr, &mInstance), "[FVkInstance] Failed to create vulkan instance!")
+	REV_VK_CHECK_THROW(vkCreateInstance(&InstanceCreateInfo, nullptr, &mInstance), "[FVkInstance] Failed to create vulkan instance!");
+
+	if(sVkEnableValidationLayers)
+	{
+		VulkanLoadDebugFunctions(mInstance);
+	}
 }
 
 void FVulkanInstance::CreateSurface()
@@ -419,14 +424,14 @@ FVulkanSurfaceSupport FVulkanInstance::QuerySurfaceSupport(VkPhysicalDevice InDe
 
 	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(InDevice, InSurface, &Details.Capabilities);
 
-	uint32 FormatCount;
+	uint32 FormatCount = 0;
 	vkGetPhysicalDeviceSurfaceFormatsKHR(InDevice, InSurface, &FormatCount, nullptr);
 	if (FormatCount != 0) {
 		Details.Formats.resize(FormatCount);
 		vkGetPhysicalDeviceSurfaceFormatsKHR(InDevice, InSurface, &FormatCount, Details.Formats.data());
 	}
 
-	uint32 PresentModeCount;
+	uint32 PresentModeCount = 0;
 	vkGetPhysicalDeviceSurfacePresentModesKHR(InDevice, InSurface, &PresentModeCount, nullptr);
 	if (PresentModeCount != 0) {
 		Details.PresentModes.resize(PresentModeCount);

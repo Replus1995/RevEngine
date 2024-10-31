@@ -76,7 +76,7 @@ ExampleLayer::ExampleLayer()
 		auto lightEntity = mScene->CreateEntity();
 		auto& dirLightComp = lightEntity.AddComponent<DirectionalLightComponent>();
 		dirLightComp.Light.SetColorByTemperature(6500.0f);
-		dirLightComp.Light.SetIntensity(5.0f);
+		dirLightComp.Light.SetIntensity(8.0f);
 		auto& transformComp = lightEntity.GetComponent<TransformComponent>();
 		transformComp.SetLocation(Math::FVector3(0, 0, 0));
 		transformComp.SetRotation(Math::FRotator(0, 0, 45.0f));
