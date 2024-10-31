@@ -323,19 +323,18 @@ EPixelFormat FGLTFUtils::TranslateImageFormat(const tinygltf::Image& InImage)
 	}
 	case 2:
 	{
-		break;
-	}
-	case 3:
-	{
 		switch (InImage.pixel_type)
 		{
 		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
-			return PF_R8G8B8;
+			return PF_R8G8;
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
+			return PF_R16G16;
 		default:
 			break;
 		}
 		break;
 	}
+	case 3:
 	case 4:
 	{
 		switch (InImage.pixel_type)
@@ -553,6 +552,8 @@ Ref<FTextureStorage> FGLTFUtils::ImportTexture(const tinygltf::Texture& InTextur
 	Storage->TextureDesc = FRHITextureDesc::Make2D(InImage.width, InImage.height, TranslateImageFormat(InImage));
 	Storage->SamplerDesc = TranslateSampler(InSampler);
 	{
+		REV_CORE_ASSERT(InImage.component != 3);
+
 		Storage->ImageData.Resize(1, 1);
 		FBuffer& ImageBuffer = Storage->ImageData.At(0, 0);
 		//Decoded data

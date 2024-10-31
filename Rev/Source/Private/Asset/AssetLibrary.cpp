@@ -19,6 +19,9 @@
 namespace Rev
 {
 
+
+
+
 static Ref<FMaterial> sDefaultSurfaceMaterial = nullptr;
 
 void FAssetLibrary::Init()
@@ -70,6 +73,7 @@ FTextureStorage FAssetLibrary::ImportTexture(const FPath& InPath)
 	{
 		Result.TextureDesc = FRHITextureDesc::Make2D(image.Width(), image.Height(), image.Format());
 		Result.ImageData.Resize(1, 1);
+
 		FBuffer& ImageBuffer = Result.ImageData.At(0, 0);
 		ImageBuffer.Allocate(image.Width() * image.Height() * image.Channels() * image.PixelDepth());
 		memcpy(ImageBuffer.Data(), image.Data(), ImageBuffer.Size());

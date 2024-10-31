@@ -19,8 +19,6 @@ FVulkanDynamicRHI::~FVulkanDynamicRHI()
 
 void FVulkanDynamicRHI::Init()
 {
-	FVulkanPixelFormat::InitPlatformFormats();
-
 	mInstance.CreateInstance();
 	mInstance.CreateSurface();
 	mInstance.PickPhysicalDevice();
@@ -32,6 +30,8 @@ void FVulkanDynamicRHI::Init()
 	AllocatorCreateInfo.instance = mInstance.GetInstance();
 	AllocatorCreateInfo.flags = VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT;
 	vmaCreateAllocator(&AllocatorCreateInfo, &mAllocator);
+
+	FVulkanPixelFormat::InitPlatformFormats();
 }
 
 void FVulkanDynamicRHI::Cleanup()

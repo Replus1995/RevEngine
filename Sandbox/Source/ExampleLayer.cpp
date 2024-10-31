@@ -98,24 +98,24 @@ ExampleLayer::ExampleLayer()
 		}
 	}
 
-	//{
-	//	//CubeMap
-	//	auto CubeTexStorage = FAssetLibrary::ImportTextureCube(
-	//		"/Game/Assets/Textures/Skybox/right.jpg", 
-	//		"/Game/Assets/Textures/Skybox/left.jpg",
-	//		"/Game/Assets/Textures/Skybox/top.jpg",
-	//		"/Game/Assets/Textures/Skybox/bottom.jpg",
-	//		"/Game/Assets/Textures/Skybox/front.jpg",
-	//		"/Game/Assets/Textures/Skybox/back.jpg");
-	//	auto CubeTex = CubeTexStorage.CreateTexture();
-	//	if (CubeTex)
-	//	{ 
-	//		//Enviornment
-	//		auto  skyEntity = mScene->CreateEntity();
-	//		auto& skyComp = skyEntity.AddComponent<SkyComponent>();
-	//		skyComp.Skybox.SetEnvironmentTexture(CubeTex);
-	//	}
-	//}
+	{
+		//CubeMap
+		auto CubeTexStorage = FAssetLibrary::ImportTextureCube(
+			"/Game/Assets/Textures/Skybox/right.jpg", 
+			"/Game/Assets/Textures/Skybox/left.jpg",
+			"/Game/Assets/Textures/Skybox/top.jpg",
+			"/Game/Assets/Textures/Skybox/bottom.jpg",
+			"/Game/Assets/Textures/Skybox/front.jpg",
+			"/Game/Assets/Textures/Skybox/back.jpg");
+		auto CubeTex = CubeTexStorage.CreateTexture();
+		if (CubeTex)
+		{ 
+			//Enviornment
+			auto  skyEntity = mScene->CreateEntity();
+			auto& skyComp = skyEntity.AddComponent<SkyComponent>();
+			skyComp.Skybox.SetEnvironmentTexture(CubeTex);
+		}
+	}
 }
 
 ExampleLayer::~ExampleLayer()

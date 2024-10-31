@@ -12,6 +12,8 @@ FVulkanTexture2D::FVulkanTexture2D(const FRHITextureDesc& InDesc)
 	: FVulkanTexture(InDesc)
 {
 	REV_CORE_ASSERT(InDesc.Dimension == ETextureDimension::Texture2D);
+    REV_CORE_ASSERT(InDesc.Depth == 1);
+    REV_CORE_ASSERT(InDesc.ArraySize == 1);
     Init();
 }
 
@@ -46,17 +48,18 @@ void FVulkanTexture2D::Init()
 
     VkImageCreateInfo ImageCreateInfo{};
     ImageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+    ImageCreateInfo.pNext = nullptr;
+    ImageCreateInfo.flags = 0;
     ImageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
+    ImageCreateInfo.format = ImageFormat;
     ImageCreateInfo.extent = GetExtent();
     ImageCreateInfo.mipLevels = mDesc.NumMips;
-    ImageCreateInfo.arrayLayers = mDesc.ArraySize;
-    ImageCreateInfo.format = ImageFormat;
+    ImageCreateInfo.arrayLayers = 1;
+    ImageCreateInfo.samples = (VkSampleCountFlagBits)mDesc.NumSamples;
     ImageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-    ImageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
     ImageCreateInfo.usage = FVulkanEnum::Translate(mDesc.Flags);
     ImageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-    ImageCreateInfo.samples = (VkSampleCountFlagBits)mDesc.NumSamples;
-    ImageCreateInfo.flags = 0;
+    ImageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 
     //for the draw image, we want to allocate it from gpu local memory
     VmaAllocationCreateInfo ImageAllocinfo = {};
@@ -72,11 +75,11 @@ void FVulkanTexture2D::Init()
     ImageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
     ImageViewCreateInfo.image = mImage;
     ImageViewCreateInfo.format = ImageFormat;
+    ImageViewCreateInfo.subresourceRange.aspectMask = mImageAspectFlags;
     ImageViewCreateInfo.subresourceRange.baseMipLevel = 0;
-    ImageViewCreateInfo.subresourceRange.levelCount = 1;
+    ImageViewCreateInfo.subresourceRange.levelCount = mDesc.NumMips;
     ImageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
     ImageViewCreateInfo.subresourceRange.layerCount = 1;
-    ImageViewCreateInfo.subresourceRange.aspectMask = mImageAspectFlags;
 
     REV_VK_CHECK(vkCreateImageView(FVulkanDynamicRHI::GetDevice(), &ImageViewCreateInfo, nullptr, &mImageView));
 }
