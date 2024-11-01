@@ -23,6 +23,7 @@ private:
 	Ref<FRHIRenderPass> mBasePass = nullptr;
 	Ref<FRHITexture> mBasePassColor = nullptr;
 	Ref<FRHITexture> mBasePassDepth = nullptr;
+	Ref<FRHIRenderPass> mSkyPass = nullptr;
 
 	FGammaCorrectPass mGammaCorrectPass;
 };

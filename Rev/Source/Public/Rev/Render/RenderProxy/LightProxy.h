@@ -15,7 +15,6 @@ public:
 
 	void Prepare(const Ref<FScene>& Scene);
 	void SyncResource(FRHICommandList& RHICmdList);
-	void FreeResource();
 
 private:
 	FDirectionalLightUniform mDirectionalLightParams;

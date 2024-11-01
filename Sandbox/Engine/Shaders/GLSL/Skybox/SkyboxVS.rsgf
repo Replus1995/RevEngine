@@ -1,0 +1,23 @@
+#version 460 core
+#pragma shader_stage(vertex)
+#extension GL_ARB_separate_shader_objects : enable
+#extension GL_GOOGLE_include_directive : enable
+
+#include "/Engine/Shaders/Include/Global.rsh"
+
+layout(location = 0) in vec3 a_Position;
+layout(location = 0) out Vertex
+{
+    vec3 ViewDir;
+} OUT;
+
+void main(void)
+{
+    vec3 Pos = a_Position;
+    mat4 InvProjMat = inverse(ub_Camera.ProjMat);
+    Pos.xy *= vec2(InvProjMat[0][0], InvProjMat[1][1]);
+    Pos.z = -1.0f;
+
+    OUT.ViewDir = transpose(mat3(ub_Camera.ViewMat)) * normalize(Pos);
+    gl_Position = vec4(a_Position.xy, 1.0, 1.0);
+}

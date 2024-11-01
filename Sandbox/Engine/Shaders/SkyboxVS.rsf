@@ -1,0 +1,30 @@
+#include "Engine/Shaders/Core/Base.rsh"
+
+cbuffer SceneUB : register(b0)
+{
+	FSceneUniform uScene;
+};
+
+struct VSInput
+{
+    float4 Position : POSITION0;
+};
+
+struct VSOutput
+{
+    float4 Position : SV_POSITION;
+    float3 ViewDir : TEXCOORD0;
+};
+
+VSOutput main(VSInput Input)
+{
+    float3 Pos = (float3)Input.Position;
+    float4x4 InvProjMat = MatrixInverse(uScene.ProjMat);
+    Pos.xy *= float2(InvProjMat[0][0], InvProjMat[1][1]);
+    Pos.z = -1.0f;
+
+    VSOutput Result;
+    Result.ViewDir = transpose(ToMatrix3(uScene.ViewMat)) * normalize(Pos);
+    Result.Position = float4(Input.Position.xy, 1.0, 1.0);
+    return Result;
+}

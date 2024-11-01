@@ -20,7 +20,6 @@ public:
 
 	void Prepare(const Ref<FScene>& Scene);
 	void SyncResource(FRHICommandList& RHICmdList);
-	void FreeResource();
 	void Cleanup();
 
 	void DrawSceneOpaque(FRHICommandList& RHICmdList);

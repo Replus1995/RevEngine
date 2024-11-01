@@ -14,7 +14,7 @@ public:
 
 	void Prepare(const Ref<FScene>& Scene);
 	void Cleanup();
-	void SyncResource() const;
+	void SyncResource(FRHICommandList& RHICmdList) const;
 
 	void DrawSkybox(FRHICommandList& RHICmdList) const;
 

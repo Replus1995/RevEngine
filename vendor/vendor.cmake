@@ -35,6 +35,11 @@ group_target(physfs-static "vendor")
 #cityhash
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/cityhash ${CMAKE_CURRENT_BINARY_DIR}/cityhash)
 group_target(cityhash "vendor")
+
+#skaarj1989/FrameGraph
+set(FG_BUILD_TEST OFF CACHE BOOL "Disable FrameGraph uint test")
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/FrameGraph ${CMAKE_CURRENT_BINARY_DIR}/FrameGraph)
+group_target(FrameGraph "vendor")
 #========Compile From Source========#
 
 #========Header Only========#

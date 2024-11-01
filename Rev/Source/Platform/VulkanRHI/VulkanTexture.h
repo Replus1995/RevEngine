@@ -19,6 +19,7 @@ public:
 
 	VkImage GetImage() const { return mImage; } //For easy to understand
 	VkImageView GetImageView() const { return mImageView; }
+	VkImageAspectFlags GetAspectFlags() const { return mImageAspectFlags; }
 	//VkImageLayout GetImageLayout() const { return mImageLayout; }
 	VkClearValue GetClearValue();
 	static FVulkanTexture* Cast(FRHITexture* InTexture) { return static_cast<FVulkanTexture*>(InTexture); }

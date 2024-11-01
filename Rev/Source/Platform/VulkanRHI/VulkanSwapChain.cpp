@@ -88,7 +88,7 @@ void FVulkanSwapchain::NextFrame(uint64_t timeout, VkSemaphore semaphore, VkFenc
     REV_VK_CHECK(vkAcquireNextImageKHR(FVulkanDynamicRHI::GetDevice(), mSwapchain, timeout, semaphore, fence, &mCurrentTextureIndex));
 }
 
-const FVulkanTextureSwapchain* FVulkanSwapchain::GetTexture(uint32 Index) const
+FVulkanTextureSwapchain* FVulkanSwapchain::GetTexture(uint32 Index) const
 {
     REV_CORE_ASSERT(Index < mTextures.size());
     return mTextures[Index].get();

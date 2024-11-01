@@ -16,7 +16,6 @@ public:
 
 	void Prepare(const Ref<FScene>& Scene);
 	void SyncResource(FRHICommandList& RHICmdList);
-	void FreeResource();
 
 	const Math::FVector3& GetViewPos() const { return mViewPos; }
 	const Math::FMatrix4& GetViewMat() const { return mViewMatrix; }

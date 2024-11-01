@@ -27,8 +27,4 @@ void FCameraProxy::SyncResource(FRHICommandList& RHICmdList)
 {
 }
 
-void FCameraProxy::FreeResource()
-{
-}
-
 }

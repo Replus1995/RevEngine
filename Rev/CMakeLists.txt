@@ -63,6 +63,7 @@ if(WIN32)
         GPUOpen::VulkanMemoryAllocator
         imgui
         cityhash
+        FrameGraph
     )
 endif()
 

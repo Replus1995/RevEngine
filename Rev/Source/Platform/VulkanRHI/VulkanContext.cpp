@@ -2,6 +2,7 @@
 #include "VulkanUtils.h"
 #include "VulkanShader.h"
 #include "VulkanTexture.h"
+#include "VulkanTexture2D.h"
 #include "VulkanState.h"
 #include "VulkanBuffer.h"
 #include "VulkanShader.h"
@@ -91,7 +92,7 @@ void FVulkanContext::BeginFrame(bool bClearBackBuffer)
 	}
 	else*/
 	{
-		FVulkanUtils::TransitionImage(CmdBuffer, GetSwapchainImage(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+		FVulkanUtils::TransitionImage(CmdBuffer, GetSwapchainImage(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_ASPECT_COLOR_BIT);
 	}
 
 }
@@ -107,7 +108,7 @@ void FVulkanContext::EndFrame()
 	FVkUtils::BlitImage(CmdBuffer, mSwapchain.GetBackImage().Image, mSwapchain.GetImages()[mCurSwapchainImageIndex], mDrawExtent, mSwapchain.GetExtent());
 	FVkUtils::TransitionImage(CmdBuffer, mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);*/
 
-	FVulkanUtils::TransitionImage(CmdBuffer, GetSwapchainImage(), VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+	FVulkanUtils::TransitionImage(CmdBuffer, GetSwapchainImage(), VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, VK_IMAGE_ASPECT_COLOR_BIT);
 
 	REV_VK_CHECK(vkEndCommandBuffer(CmdBuffer));
 
@@ -216,10 +217,7 @@ void FVulkanContext::RHISetClearDepthStencil(float InDepth, uint32 InStencil)
 
 void FVulkanContext::RHIClearBackBuffer()
 {
-	VkImageSubresourceRange ColorImageRange = FVulkanInit::ImageSubresourceRange(VK_IMAGE_ASPECT_COLOR_BIT);
-	vkCmdClearColorImage(GetActiveCmdBuffer(), GetSwapchainImage(), VK_IMAGE_LAYOUT_GENERAL, &mClearColor, 1, &ColorImageRange);
-	/*VkImageSubresourceRange DepthImageRange = FVkInit::ImageSubresourceRange(VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT);
-	vkCmdClearDepthStencilImage(CmdBuffer, mSwapchain.GetImages()[mCurSwapchainImageIndex], VK_IMAGE_LAYOUT_GENERAL, &mClearDepthStencil, 1, &DepthImageRange);*/
+	mSwapchain.GetCurrentTexture()->ClearContent(this, 0, 1, 0, 1);
 }
 
 void FVulkanContext::RHIUpdateTexture(FRHITexture* InTexture, const void* InContent, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex)
@@ -282,16 +280,31 @@ void FVulkanContext::RHIEndRenderPass(bool bBlitToBack)
 
 	vkCmdEndRenderPass2(GetActiveCmdBuffer(), &SubpassEndInfo);
 
+	const FRHIRenderPassDesc& PassDesc = mFrameState.CurrentPass->GetDesc();
+
 	if (bBlitToBack)
 	{
-		FRHITexture* ColorTex = mFrameState.CurrentPass->GetDesc().ColorRenderTargets[RTA_ColorAttachment0].ColorTarget;
+		FRHITexture* ColorTex = PassDesc.ColorRenderTargets[RTA_ColorAttachment0].ColorTarget;
 		if (ColorTex)
 		{
-			FVulkanUtils::TransitionImage(GetActiveCmdBuffer(), (VkImage)ColorTex->GetNativeHandle(), VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
-			FVulkanUtils::TransitionImage(GetActiveCmdBuffer(), GetSwapchainImage(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+			FVulkanUtils::TransitionImage(GetActiveCmdBuffer(), (VkImage)ColorTex->GetNativeHandle(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, VK_IMAGE_ASPECT_COLOR_BIT);
+			FVulkanUtils::TransitionImage(GetActiveCmdBuffer(), GetSwapchainImage(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_ASPECT_COLOR_BIT);
 			FVulkanUtils::BlitImage(GetActiveCmdBuffer(), (VkImage)ColorTex->GetNativeHandle(), GetSwapchainImage(), mDrawExtent, mSwapchain.GetExtent());
-			FVulkanUtils::TransitionImage(GetActiveCmdBuffer(), GetSwapchainImage(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+			FVulkanUtils::TransitionImage(GetActiveCmdBuffer(), GetSwapchainImage(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_ASPECT_COLOR_BIT);
 		}
+	}
+
+	for (uint32 i = 0; i < PassDesc.NumColorRenderTargets; i++)
+	{
+		FVulkanTexture* ColorTex = FVulkanTexture::Cast(PassDesc.ColorRenderTargets[RTA_ColorAttachment0].ColorTarget);
+		FVulkanUtils::TransitionImage(GetActiveCmdBuffer(), (VkImage)ColorTex->GetNativeHandle(),
+			VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, ColorTex->GetAspectFlags());
+	}
+	if (PassDesc.DepthStencilRenderTarget.DepthStencilTarget)
+	{
+		FVulkanTexture* DepthStencilTex = FVulkanTexture::Cast(PassDesc.DepthStencilRenderTarget.DepthStencilTarget);
+		FVulkanUtils::TransitionImage(GetActiveCmdBuffer(), (VkImage)DepthStencilTex->GetNativeHandle(),
+			VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, DepthStencilTex->GetAspectFlags());
 	}
 }
 

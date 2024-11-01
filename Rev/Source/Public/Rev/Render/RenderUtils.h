@@ -128,7 +128,7 @@ public:
 extern REV_API TGlobalResource<FDefaultSamplerState> GDefaultSamplerState;
 
 class FRHICommandList;
-class REV_API RenderUtils
+class REV_API FRenderUtils
 {
 public:
 	static void Init();

@@ -89,6 +89,7 @@ FVulkanTextureSwapchain::FVulkanTextureSwapchain(VkImage InSwapchainImage, VkFor
     , mPlatformFormat(InFormat)
 {
     mImage = InSwapchainImage; 
+    mImageAspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
     Init();
 }
 

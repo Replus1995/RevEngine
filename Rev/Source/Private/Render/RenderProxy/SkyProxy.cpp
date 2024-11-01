@@ -2,8 +2,11 @@
 #include "Rev/Render/UniformLayout.h"
 #include "Rev/Render/RenderUtils.h"
 #include "Rev/Render/Resource/RenderResource.h"
+#include "Rev/Render/Resource/TextureResource.h"
 #include "Rev/Render/Material/Material.h"
 #include "Rev/Render/RHI/RHIShaderLibrary.h"
+#include "Rev/Render/RHI/RHICommandList.h"
+#include "Rev/Render/RHI/RHIContext.h"
 #include "Rev/World/Entity.h"
 
 
@@ -24,8 +27,8 @@ public:
 	{
 		ShaderProgram = FRHIShaderLibrary::GetInstance().CreateGraphicsProgram(
 			"SkyboxProgram",
-			{ "/Engine/Shaders/Skybox/SkyboxVS" },
-			{ "/Engine/Shaders/Skybox/SkyboxFS" }
+			{ "/Engine/Shaders/SkyboxVS" },
+			{ "/Engine/Shaders/SkyboxPS" }
 		);
 	}
 
@@ -66,17 +69,17 @@ void FSkyProxy::Cleanup()
 	mSkybox = {};
 }
 
-void FSkyProxy::SyncResource() const
+void FSkyProxy::SyncResource(FRHICommandList& RHICmdList) const
 {
-	if (auto& EnvTex = mSkybox.GetEnvironmentTexture(); EnvTex)
-	{
-		//RenderCmd::BindTexture(EnvTex->GetResource(), UL::SEnviornmentTex);
-	}
 	if (!mSkyboxMat)
 	{
 		FSkyProxy* pThis = const_cast<FSkyProxy*>(this);
 		pThis->mSkyboxMat = CreateRef<SkyboxMaterial>();
 		pThis->mSkyboxMat->Compile();
+	}
+	if (auto& EnvTex = mSkybox.GetEnvironmentTexture(); EnvTex)
+	{
+		RHICmdList.GetContext()->RHIBindTexture(UL::SEnviornmentTex, EnvTex->GetTextureRHI(), EnvTex->GetSamplerStateRHI());
 	}
 }
 
@@ -85,7 +88,7 @@ void FSkyProxy::DrawSkybox(FRHICommandList& RHICmdList) const
 	if (auto& EnvTex = mSkybox.GetEnvironmentTexture(); EnvTex)
 	{
 		mSkyboxMat->PreDraw(RHICmdList);
-		//RenderUtils::DrawScreenQuad();
+		FRenderUtils::PostProcessDraw(RHICmdList);
 		mSkyboxMat->PostDraw(RHICmdList);
 	}
 }

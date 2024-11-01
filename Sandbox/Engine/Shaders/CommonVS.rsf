@@ -1,11 +1,11 @@
 #include "Engine/Shaders/Core/Base.rsh"
 
-cbuffer SceneUB : register(b0, space0)
+cbuffer SceneUB : register(b0)
 {
 	FSceneUniform uScene;
 };
 
-cbuffer StaticMeshUB : register(b1, space0)
+cbuffer StaticMeshUB : register(b1)
 {
 	FStaticMeshUniform uStaticMesh;
 };

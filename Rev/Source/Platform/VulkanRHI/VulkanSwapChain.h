@@ -16,8 +16,8 @@ public:
 	const VkSwapchainKHR& GetSwapchain() const { return mSwapchain; }
 	const VkExtent2D& GetExtent() const { return mExtent; }
 	const VkFormat& GetFormat() const { return mFormat; }
-	const FVulkanTextureSwapchain* GetTexture(uint32 Index) const;
-	const FVulkanTextureSwapchain* GetCurrentTexture() const { return GetTexture(mCurrentTextureIndex); }
+	FVulkanTextureSwapchain* GetTexture(uint32 Index) const;
+	FVulkanTextureSwapchain* GetCurrentTexture() const { return GetTexture(mCurrentTextureIndex); }
 	VkImage GetCurrentImage() const;
 	VkImageView GetCurrentImageView() const;
 	const uint32 GetCurrentTextureIndex() const { return mCurrentTextureIndex; }

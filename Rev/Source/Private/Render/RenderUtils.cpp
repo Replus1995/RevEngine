@@ -61,12 +61,12 @@ TGlobalResource<FStaticMeshVertexInputState> GStaticMeshVertexInputState;
 TGlobalResource<FDefaultSamplerState> GDefaultSamplerState;
 
 
-void RenderUtils::Init()
+void FRenderUtils::Init()
 {
     InitGlobalResources();
 }
 
-void RenderUtils::Shutdown()
+void FRenderUtils::Shutdown()
 {
     ReleaseGlobalResources();
 
@@ -75,18 +75,8 @@ void RenderUtils::Shutdown()
     SAFE_DELETE(GNormalTexture);
 }
 
-void RenderUtils::PostProcessDraw(FRHICommandList& RHICmdList)
+void FRenderUtils::PostProcessDraw(FRHICommandList& RHICmdList)
 {
-	FRHIGraphicsPipelineStateDesc Desc;
-	Desc.VertexInputState = GStaticMeshVertexInputState.VertexInputStateRHI.get();
-	Desc.RasterizerStateDesc.CullMode = CM_Back;
-	Desc.DepthStencilStateDesc.bEnableDepthWrite = false;
-	Desc.DepthStencilStateDesc.DepthTestFunc = CF_Never;
-	Desc.ColorBlendStateDesc.Attachments[0].bEnableBlend = true;
-	Desc.ColorBlendStateDesc.Attachments[0].SrcColorFactor = BF_SrcAlpha;
-	Desc.ColorBlendStateDesc.Attachments[0].DstColorFactor = BF_OneMinusSrcAlpha;
-
-	RHICmdList.GetContext()->RHISetGraphicsPipelineState(Desc);
 
 	RHICmdList.GetContext()->RHISetVertexStream(0, G2DQuadVertexBuffer.VertexBufferRHI.get());
 	RHICmdList.GetContext()->RHIDrawPrimitiveIndexed(G2DQuadIndexBuffer.IndexBufferRHI.get(), 2, 0);

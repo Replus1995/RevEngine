@@ -48,10 +48,6 @@ void FLightProxy::SyncResource(FRHICommandList& RHICmdList)
 	RHICmdList.GetContext()->RHIBindUniformBuffer(UL::BLight, mLightUB.get());
 }
 
-void FLightProxy::FreeResource()
-{
-}
-
 }
 
 

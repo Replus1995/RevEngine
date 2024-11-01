@@ -44,6 +44,15 @@ void FForwardRenderer::BeginFrame()
 		BasePassDesc.DepthStencilRenderTarget  = { mBasePassDepth.get(), nullptr, ALO_Clear, ASO_Store, ALO_DontCare, ASO_DontCare};
 		mBasePass = GDynamicRHI->RHICreateRenderPass(BasePassDesc);
 	}
+	
+	if (!mSkyPass)
+	{
+		FRHIRenderPassDesc SkyPassDesc;
+		SkyPassDesc.ColorRenderTargets[0] = { mBasePassColor.get(), nullptr, -1, 0, ALO_Load, ASO_Store };
+		SkyPassDesc.NumColorRenderTargets = 1;
+		SkyPassDesc.DepthStencilRenderTarget = { mBasePassDepth.get(), nullptr, ALO_Load, ASO_DontCare, ALO_DontCare, ASO_DontCare };
+		mSkyPass = GDynamicRHI->RHICreateRenderPass(SkyPassDesc);
+	}
 
 	if (FrameWidth != mSceneProxy->GetFrameWidth() || FrameHeight != mSceneProxy->GetFrameHeight())
 	{
@@ -70,22 +79,48 @@ void FForwardRenderer::DrawFrame(FRHICommandList& RHICmdList)
 			// end sub pass
 		// end render pass
 	// end cmd buffer
-	RHICmdList.GetContext()->RHIBeginDebugLabel("Base Pass", Math::FLinearColor(0.8f, 0.8f, 0.0f));
-	RHICmdList.GetContext()->RHIBeginRenderPass(mBasePass.get());
 
-	FRHIGraphicsPipelineStateDesc Desc;
-	Desc.VertexInputState = GStaticMeshVertexInputState.VertexInputStateRHI.get();
-	Desc.RasterizerStateDesc.CullMode = CM_Back;
-	Desc.DepthStencilStateDesc.bEnableDepthWrite = true;
-	Desc.DepthStencilStateDesc.DepthTestFunc = CF_Less;
-	Desc.ColorBlendStateDesc.Attachments[0].bEnableBlend = true;
-	RHICmdList.GetContext()->RHISetGraphicsPipelineState(Desc);
 
 	mSceneProxy->SyncResource(RHICmdList);
-	mSceneProxy->DrawSceneOpaque(RHICmdList);
 
-	RHICmdList.GetContext()->RHIEndRenderPass(true);
-	RHICmdList.GetContext()->RHIEndDebugLabel();
+	{
+		RHICmdList.GetContext()->RHIBeginDebugLabel("Base Pass", Math::FLinearColor(0.8f, 0.8f, 0.0f));
+		RHICmdList.GetContext()->RHIBeginRenderPass(mBasePass.get());
+
+		FRHIGraphicsPipelineStateDesc Desc;
+		Desc.VertexInputState = GStaticMeshVertexInputState.VertexInputStateRHI.get();
+		Desc.RasterizerStateDesc.CullMode = CM_Back;
+		Desc.DepthStencilStateDesc.bEnableDepthWrite = true;
+		Desc.DepthStencilStateDesc.DepthTestFunc = CF_Less;
+		Desc.ColorBlendStateDesc.Attachments[0].bEnableBlend = true;
+		RHICmdList.GetContext()->RHISetGraphicsPipelineState(Desc);
+
+		mSceneProxy->DrawSceneOpaque(RHICmdList);
+
+		RHICmdList.GetContext()->RHIEndRenderPass();
+		RHICmdList.GetContext()->RHIEndDebugLabel();
+	}
+
+	{
+		RHICmdList.GetContext()->RHIBeginDebugLabel("Sky Pass", Math::FLinearColor(0.6f, 0.6f, 0.9f));
+		RHICmdList.GetContext()->RHIBeginRenderPass(mSkyPass.get());
+
+		FRHIGraphicsPipelineStateDesc Desc;
+		Desc.VertexInputState = GTileVertexInputState.VertexInputStateRHI.get();
+		Desc.RasterizerStateDesc.CullMode = CM_Back;
+		Desc.DepthStencilStateDesc.bEnableDepthWrite = false;
+		Desc.DepthStencilStateDesc.DepthTestFunc = CF_LessEqual;
+		Desc.ColorBlendStateDesc.Attachments[0].bEnableBlend = true;
+		/*Desc.ColorBlendStateDesc.Attachments[0].SrcColorFactor = BF_SrcAlpha;
+		Desc.ColorBlendStateDesc.Attachments[0].DstColorFactor = BF_OneMinusSrcAlpha;*/
+		RHICmdList.GetContext()->RHISetGraphicsPipelineState(Desc);
+
+		mSceneProxy->DrawSkybox(RHICmdList);
+
+		RHICmdList.GetContext()->RHIEndRenderPass(true);
+		RHICmdList.GetContext()->RHIEndDebugLabel();
+	}
+	
 
 	/*
 	RenderCmd::SetCullFaceMode(CFM_Back);

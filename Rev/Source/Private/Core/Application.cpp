@@ -32,7 +32,7 @@ namespace Rev
 		mWindow->SetEventCallback(RE_BIND_EVENT_FN(Application::OnEvent, this));
 
 		FRenderCore::Init(ERenderAPI::Vulkan);
-		RenderUtils::Init();
+		FRenderUtils::Init();
 		FAssetLibrary::Init();
 	}
 
@@ -42,7 +42,7 @@ namespace Rev
 
 		mLayerStack.PopAll();
 		FAssetLibrary::Shutdown();
-		RenderUtils::Shutdown();
+		FRenderUtils::Shutdown();
 		FRenderCore::Cleanup();
 	}
 

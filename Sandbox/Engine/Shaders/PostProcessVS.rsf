@@ -1,6 +1,6 @@
 #include "Engine/Shaders/Core/Base.rsh"
 
-cbuffer SceneUB : register(b0, space0)
+cbuffer SceneUB : register(b0)
 {
 	FSceneUniform uScene;
 };
