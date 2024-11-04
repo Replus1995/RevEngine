@@ -107,7 +107,7 @@ void FForwardRenderer::DrawFrame(FRHICommandList& RHICmdList)
 
 		mSceneProxy->DrawSceneOpaque(RHICmdList);
 
-		RHICmdList.GetContext()->RHIEndRenderPass();
+		RHICmdList.GetContext()->RHIEndRenderPass(true);
 		RHICmdList.GetContext()->RHIEndDebugLabel();
 	}
 
@@ -131,9 +131,6 @@ void FForwardRenderer::DrawFrame(FRHICommandList& RHICmdList)
 		ColorBlendStateDesc.Attachments[0].bEnableBlend = false;
 		PipelineStateDesc.ColorBlendState = FRHIPipelineStateCache::Get()->GetOrCreateColorBlendState(ColorBlendStateDesc);
 
-
-		/*Desc.ColorBlendStateDesc.Attachments[0].SrcColorFactor = BF_SrcAlpha;
-		Desc.ColorBlendStateDesc.Attachments[0].DstColorFactor = BF_OneMinusSrcAlpha;*/
 		RHICmdList.GetContext()->RHISetGraphicsPipelineState(PipelineStateDesc);
 
 		mSceneProxy->DrawSkybox(RHICmdList);

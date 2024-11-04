@@ -263,6 +263,21 @@ void FVulkanContext::RHIBeginRenderPass(FRHIRenderPass* InRenderPass)
 	SubpassBeginInfo.pNext = NULL;
 	SubpassBeginInfo.contents = VK_SUBPASS_CONTENTS_INLINE;
 
+	const FRHIRenderPassDesc& PassDesc = mFrameState.CurrentPass->GetDesc();
+	for (uint32 i = 0; i < PassDesc.NumColorRenderTargets; i++)
+	{
+		FVulkanTexture* ColorTex = FVulkanTexture::Cast(PassDesc.ColorRenderTargets[RTA_ColorAttachment0].ColorTarget);
+		FVulkanUtils::TransitionImage(GetActiveCmdBuffer(), (VkImage)ColorTex->GetNativeHandle(),
+			VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, ColorTex->GetAspectFlags());
+	}
+	if (PassDesc.DepthStencilRenderTarget.DepthStencilTarget)
+	{
+		FVulkanTexture* DepthStencilTex = FVulkanTexture::Cast(PassDesc.DepthStencilRenderTarget.DepthStencilTarget);
+		FVulkanUtils::TransitionImage(GetActiveCmdBuffer(), (VkImage)DepthStencilTex->GetNativeHandle(),
+			VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, DepthStencilTex->GetAspectFlags());
+	}
+
+
 	vkCmdBeginRenderPass2(GetActiveCmdBuffer(), &RenderPassInfo, &SubpassBeginInfo);
 	vkCmdSetViewport(GetActiveCmdBuffer(), 0, 1, &mViewport);
 	vkCmdSetScissor(GetActiveCmdBuffer(), 0, 1, &mScissor);
@@ -294,7 +309,7 @@ void FVulkanContext::RHIEndRenderPass(bool bBlitToBack)
 		}
 	}
 
-	for (uint32 i = 0; i < PassDesc.NumColorRenderTargets; i++)
+	/*for (uint32 i = 0; i < PassDesc.NumColorRenderTargets; i++)
 	{
 		FVulkanTexture* ColorTex = FVulkanTexture::Cast(PassDesc.ColorRenderTargets[RTA_ColorAttachment0].ColorTarget);
 		FVulkanUtils::TransitionImage(GetActiveCmdBuffer(), (VkImage)ColorTex->GetNativeHandle(),
@@ -305,7 +320,7 @@ void FVulkanContext::RHIEndRenderPass(bool bBlitToBack)
 		FVulkanTexture* DepthStencilTex = FVulkanTexture::Cast(PassDesc.DepthStencilRenderTarget.DepthStencilTarget);
 		FVulkanUtils::TransitionImage(GetActiveCmdBuffer(), (VkImage)DepthStencilTex->GetNativeHandle(),
 			VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, DepthStencilTex->GetAspectFlags());
-	}
+	}*/
 }
 
 void FVulkanContext::RHINextSubpass()

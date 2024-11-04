@@ -21,6 +21,7 @@ FVulkanTextureCube::FVulkanTextureCube(const FRHITextureDesc& InDesc)
 
 FVulkanTextureCube::~FVulkanTextureCube()
 {
+    Release();
 }
 
 void FVulkanTextureCube::UpdateContent(FVulkanContext* Context, const void* InContent, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex)

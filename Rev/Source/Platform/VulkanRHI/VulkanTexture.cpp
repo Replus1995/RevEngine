@@ -11,7 +11,6 @@ namespace Rev
 
 FVulkanTexture::~FVulkanTexture()
 {
-	Release();
 }
 
 //void FVulkanTexture::Transition(VkImageLayout DstLayout, VkCommandBuffer InCmdBuffer)

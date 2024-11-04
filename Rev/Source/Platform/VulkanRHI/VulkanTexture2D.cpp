@@ -19,6 +19,7 @@ FVulkanTexture2D::FVulkanTexture2D(const FRHITextureDesc& InDesc)
 
 FVulkanTexture2D::~FVulkanTexture2D()
 {
+    Release();
 }
 
 void FVulkanTexture2D::UpdateContent(FVulkanContext* Context, const void* InContent, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex)
@@ -95,6 +96,7 @@ FVulkanTextureSwapchain::FVulkanTextureSwapchain(VkImage InSwapchainImage, VkFor
 
 FVulkanTextureSwapchain::~FVulkanTextureSwapchain()
 {
+    Release();
 }
 
 void FVulkanTextureSwapchain::Init()
