@@ -1,8 +1,10 @@
 #pragma once
 #include "Rev/Core/Base.h"
 #include "Rev/Math/Maths.h"
+#include "Rev/Render/RenderCore.h"
 #include "Rev/Render/RHI/RHIDefinitions.h"
 #include "Rev/Render/RHI/RHIState.h"
+#include <unordered_map>
 
 namespace Rev
 {
@@ -14,13 +16,35 @@ struct FRHIGraphicsPipelineStateDesc
 public:
 	EPrimitiveTopology PrimitiveTopology = PT_Triangles;
 
-	FRHIRasterizerStateDesc RasterizerStateDesc;
-	FRHIDepthStencilStateDesc DepthStencilStateDesc;
-	FRHIColorBlendStateDesc ColorBlendStateDesc;
+	FRHIRasterizerState* RasterizerState;
+	FRHIDepthStencilState* DepthStencilState;
+	FRHIColorBlendState* ColorBlendState;
 	FRHIVertexInputState* VertexInputState;
+
+	friend bool operator==(const FRHIGraphicsPipelineStateDesc& A, const FRHIGraphicsPipelineStateDesc& B);
 };
 
+class FRHIPipelineStateCache
+{
+public:
+	static void Initialize(ERenderAPI InAPI);
+	static void Shutdown();
+	static inline FRHIPipelineStateCache* Get() { return PipelineStateCache; }
 
+	FRHIRasterizerState* GetOrCreateRasterizerState(const FRHIRasterizerStateDesc& InDesc);
+	FRHIDepthStencilState* GetOrCreateDepthStencilState(const FRHIDepthStencilStateDesc& InDesc);
+	FRHIColorBlendState* GetOrCreateColorBlendState(const FRHIColorBlendStateDesc& InDesc);
+
+private:
+	FRHIPipelineStateCache() = default;
+	~FRHIPipelineStateCache() = default;
+
+private:
+	static FRHIPipelineStateCache* PipelineStateCache;
+	std::unordered_map<FRHIRasterizerStateDesc, Ref<FRHIRasterizerState>> RasterizerStateCache;
+	std::unordered_map<FRHIDepthStencilStateDesc, Ref<FRHIDepthStencilState>> DepthStencilStateCache;
+	std::unordered_map<FRHIColorBlendStateDesc, Ref<FRHIColorBlendState>> ColorBlendStatCache;
+};
 
 
 }

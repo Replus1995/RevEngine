@@ -29,3 +29,13 @@ private:
 };
 
 }
+
+#define STD_MAP_HASH(KeyClass)						\
+template<>											\
+struct std::hash<KeyClass>							\
+{													\
+	std::size_t operator()(const KeyClass& k) const \
+	{												\
+		return Rev::FCityHash::Gen<KeyClass>(k);	\
+	}												\
+};

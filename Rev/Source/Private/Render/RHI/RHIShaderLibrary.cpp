@@ -12,14 +12,16 @@ namespace Rev
 
 FShaderCompileConfig GShaderCompileConfig;
 
-static FRHIShaderLibrary* sRHIShaderLibrary_Inst = nullptr;
 static constexpr std::string_view sRHIShaderExtension = ".rsf";
+FRHIShaderLibrary* FRHIShaderLibrary::ShaderLibrary = nullptr;
 
-void FRHIShaderLibrary::CreateInstance()
+void FRHIShaderLibrary::Initialize(ERenderAPI InAPI)
 {
-	sRHIShaderLibrary_Inst = new FRHIShaderLibrary;
+	if(ShaderLibrary != nullptr)
+		return;
 
-	switch (GetRenderAPI())
+	ShaderLibrary = new FRHIShaderLibrary;
+	switch (InAPI)
 	{
 	case ERenderAPI::Vulkan:
 		GShaderCompileConfig.BufferOffset = 0;
@@ -31,26 +33,22 @@ void FRHIShaderLibrary::CreateInstance()
 	}
 }
 
-void FRHIShaderLibrary::ReleaseInstance()
+void FRHIShaderLibrary::Shutdown()
 {
-	delete sRHIShaderLibrary_Inst;
-	sRHIShaderLibrary_Inst = nullptr;
-}
+	if(ShaderLibrary == nullptr)
+		return;
 
-FRHIShaderLibrary& FRHIShaderLibrary::GetInstance()
-{
-	REV_CORE_ASSERT(sRHIShaderLibrary_Inst != nullptr);
-	return *sRHIShaderLibrary_Inst;
+	SAFE_DELETE(ShaderLibrary)
 }
 
 Ref<FRHIShaderProgram> FRHIShaderLibrary::CreateGraphicsProgram(const std::string& InProgramName, const FRHIShaderCreateDesc& InVertexDesc, const FRHIShaderCreateDesc& InFragmentDesc, const FRHIShaderCreateDesc& InTessControlDesc, const FRHIShaderCreateDesc& InTessEvalDesc, const FRHIShaderCreateDesc& InGeometryDesc)
 {
 	FRHIGraphicsShaders Shaders;
-	Shaders.VertexShader = CreateShader(InVertexDesc, EShaderStage::Vertex);
-	Shaders.PixelShader = CreateShader(InFragmentDesc, EShaderStage::Pixel);
-	Shaders.HullShader = CreateShader(InTessControlDesc, EShaderStage::Hull);
-	Shaders.DomainShader = CreateShader(InTessEvalDesc, EShaderStage::Domain);
-	Shaders.GeometryShader = CreateShader(InGeometryDesc, EShaderStage::Geometry);
+	Shaders.VertexShader = CreateShader(InVertexDesc, SS_Vertex);
+	Shaders.PixelShader = CreateShader(InFragmentDesc,SS_Pixel);
+	Shaders.HullShader = CreateShader(InTessControlDesc,SS_Hull);
+	Shaders.DomainShader = CreateShader(InTessEvalDesc,SS_Domain);
+	Shaders.GeometryShader = CreateShader(InGeometryDesc,SS_Geometry);
 
 	switch (GetRenderAPI())
 	{

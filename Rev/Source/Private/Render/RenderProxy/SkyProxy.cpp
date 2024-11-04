@@ -25,7 +25,7 @@ public:
 
 	virtual void Compile() override
 	{
-		ShaderProgram = FRHIShaderLibrary::GetInstance().CreateGraphicsProgram(
+		ShaderProgram = FRHIShaderLibrary::Get()->CreateGraphicsProgram(
 			"SkyboxProgram",
 			{ "/Engine/Shaders/SkyboxVS" },
 			{ "/Engine/Shaders/SkyboxPS" }

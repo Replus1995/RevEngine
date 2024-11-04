@@ -2,6 +2,7 @@
 #include "Rev/Render/RHI/RHIDefinitions.h"
 #include "Rev/Render/RHI/RHIResource.h"
 #include "Rev/Math/Maths.h"
+#include "Rev/Core/Hash.h"
 
 namespace Rev
 {
@@ -42,7 +43,6 @@ class FRHIVertexInputState
 public:
 	FRHIVertexInputState() {}
 	virtual bool GetDesc(struct FRHIVertexInputStateDesc& OutDesc) const { return false; }
-	uint64 GetHash() const { return (uint64)this; }
 };
 
 template <typename TRHIState, typename TRHIStateDesc>
@@ -104,7 +104,7 @@ struct FRHISamplerStateDesc
 	{
 	}
 
-	REV_API friend bool operator==(const FRHISamplerStateDesc& A, const FRHISamplerStateDesc& B);
+	REV_API friend bool operator==(const Rev::FRHISamplerStateDesc& A, const Rev::FRHISamplerStateDesc& B);
 };
 
 struct FRHIRasterizerStateDesc
@@ -117,6 +117,8 @@ struct FRHIRasterizerStateDesc
 	EDepthClipMode DepthClipMode = DCM_Clip;
 	bool bAllowMSAA = false;
 	bool bEnableLineAA = false;
+
+	REV_API friend bool operator==(const Rev::FRHIRasterizerStateDesc& A, const Rev::FRHIRasterizerStateDesc& B);
 };
 
 struct FRHIDepthStencilStateDesc
@@ -140,6 +142,8 @@ struct FRHIDepthStencilStateDesc
 	uint8 StencilReadMask = 0;
 	uint8 StencilWriteMask = 0;
 
+	REV_API friend bool operator==(const Rev::FRHIDepthStencilStateDesc& A, const Rev::FRHIDepthStencilStateDesc& B);
+
 };
 
 struct FRHIColorBlendStateDesc
@@ -157,6 +161,8 @@ struct FRHIColorBlendStateDesc
 
 	FAttachment Attachments[RTA_MaxColorAttachments];
 	//Math::FLinearColor BlendConstants;
+
+	REV_API friend bool operator==(const Rev::FRHIColorBlendStateDesc& A, const Rev::FRHIColorBlendStateDesc& B);
 };
 
 struct FRHIVertexElement
@@ -180,6 +186,8 @@ struct FRHIVertexElement
 	uint8 GetComponentSize();
 	uint8 GetComponentCount();
 	uint32 GetElementSize(); // GetComponentSize * ComponentCount
+
+	REV_API friend bool operator==(const Rev::FRHIVertexElement& A, const Rev::FRHIVertexElement& B);
 };
 
 struct FRHIVertexInputStateDesc
@@ -192,7 +200,15 @@ struct FRHIVertexInputStateDesc
 		VertexElements[NumVertexElements] = InElement;
 		NumVertexElements++;
 	}
+
+	REV_API friend bool operator==(const Rev::FRHIVertexInputStateDesc& A, const Rev::FRHIVertexInputStateDesc& B);
 };
 
 
 }
+
+STD_MAP_HASH(Rev::FRHISamplerStateDesc)
+STD_MAP_HASH(Rev::FRHIRasterizerStateDesc)
+STD_MAP_HASH(Rev::FRHIDepthStencilStateDesc)
+STD_MAP_HASH(Rev::FRHIColorBlendStateDesc)
+STD_MAP_HASH(Rev::FRHIVertexInputStateDesc)

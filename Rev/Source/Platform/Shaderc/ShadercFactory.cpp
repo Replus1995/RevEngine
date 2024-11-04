@@ -206,12 +206,12 @@ static shaderc_shader_kind ShaderStageToShadercKind(EShaderStage InStage)
 {
 	switch (InStage)
 	{
-	case EShaderStage::Vertex:		return shaderc_vertex_shader;
-	case EShaderStage::Hull:		return shaderc_tess_control_shader;
-	case EShaderStage::Domain:		return shaderc_tess_evaluation_shader;
-	case EShaderStage::Pixel:		return shaderc_fragment_shader;
-	case EShaderStage::Geometry:	return shaderc_geometry_shader;
-	case EShaderStage::Compute:		return shaderc_compute_shader;
+	case SS_Vertex:		return shaderc_vertex_shader;
+	case SS_Hull:		return shaderc_tess_control_shader;
+	case SS_Domain:		return shaderc_tess_evaluation_shader;
+	case SS_Pixel:		return shaderc_fragment_shader;
+	case SS_Geometry:	return shaderc_geometry_shader;
+	case SS_Compute:		return shaderc_compute_shader;
 	}
 	REV_CORE_ASSERT(false, "Unknown Shader Stage");
 	return (shaderc_shader_kind)0;
@@ -259,7 +259,7 @@ void FShadercFactory::ReflectShaderInfo(FShadercCompiledData& Data)
 	REV_CORE_TRACE("Shaderc::Reflect - {0} {1}", Data.Name.c_str(), FShadercUtils::ShaderStageToString(Data.Stage));
 #endif
 
-	if (Data.Stage == EShaderStage::Vertex)
+	if (Data.Stage == SS_Vertex)
 	{
 #ifdef REV_DEBUG
 		REV_CORE_TRACE("Vertex Input:");
@@ -409,7 +409,7 @@ FShadercCompiledData FShadercFactory::LoadOrCompileShader(const FPath& InPath, c
 	if (bNeedCompile)
 	{
 		auto ShaderSource = FShadercUtils::LoadShaderSource(InPath);
-		ShaderSource.Stage = InStage != EShaderStage::Unknown ? InStage : DetectShaderStage(ShaderSource);
+		ShaderSource.Stage = InStage != SS_Unknown ? InStage : DetectShaderStage(ShaderSource);
 		CompileShaders(ShaderSource, InOptions, Result);
 		ReflectShaderInfo(Result);
 		//FShadercUtils::SaveShaderCompiledData(ShaderCachePath, Result);
@@ -421,7 +421,7 @@ FShadercCompiledData FShadercFactory::LoadOrCompileShader(const FPath& InPath, c
 EShaderStage FShadercFactory::DetectShaderStage(const FShadercSource& InSource)
 {
 	//TODO
-	return EShaderStage::Compute;
+	return SS_Compute;
 }
 
 }

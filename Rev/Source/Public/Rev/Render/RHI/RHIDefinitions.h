@@ -94,18 +94,18 @@ enum class EShaderUniformType : uint8
 	Texture,
 };
 
-enum class EShaderStage : uint8
+enum EShaderStage : uint8
 {
-	Vertex = 0,
-	Pixel = 1,
-	Hull = 2, //has not been supported
-	Domain = 3, //has not been supported
-	Geometry = 4, //has not been supported
-	Compute = 5, //has not been supported
-	Unknown = 6,
-	Count = 7,
-	NumGfx = 5,
-	NumCompute = 1
+	SS_Vertex = 0,
+	SS_Pixel = 1,
+	SS_Geometry = 2,
+	SS_Hull = 3, //has not been supported
+	SS_Domain = 4, //has not been supported
+	SS_Compute = 5,
+	SS_Unknown = 6,
+	SS_Count = 7,
+	SS_NumGraphics = 5,
+	SS_NumCompute = 1
 };
 
 //Buffer

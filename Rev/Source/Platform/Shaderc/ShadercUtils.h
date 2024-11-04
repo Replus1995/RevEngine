@@ -17,7 +17,7 @@ struct FShadercSource
 {
 	FPath FilePath;
 	FBuffer FileContent;
-	EShaderStage Stage = EShaderStage::Unknown;
+	EShaderStage Stage = SS_Unknown;
 
 	FShadercSource() = default;
 	FShadercSource(FShadercSource&& Other) noexcept
@@ -31,7 +31,7 @@ struct FShadercSource
 struct FShadercCompiledData
 {
 	std::string Name;
-	EShaderStage Stage = EShaderStage::Unknown;
+	EShaderStage Stage = SS_Unknown;
 	FBuffer Binary;
 	std::vector<FRHIShaderUniform> Uniforms;
 	std::vector<FRHIShaderAttribute> Attributes; //only for vertex shader input

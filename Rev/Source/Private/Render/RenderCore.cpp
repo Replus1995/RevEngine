@@ -2,6 +2,7 @@
 #include "Rev/Core/Assert.h"
 #include "Rev/Render/RHI/DynamicRHI.h"
 #include "Rev/Render/RHI/RHIShaderLibrary.h"
+#include "Rev/Render/RHI/RHIPipeline.h"
 
 namespace Rev
 {
@@ -18,7 +19,8 @@ void FRenderCore::Init(ERenderAPI InAPI)
 	RHIInit(InAPI);
 	sMainContext = GDynamicRHI->RHICreateContext();
 	sMainContext->Init();
-	FRHIShaderLibrary::CreateInstance();
+	FRHIShaderLibrary::Initialize(InAPI);
+	FRHIPipelineStateCache::Initialize(InAPI);
 
 	GIsRHIInitialized = true;
 
@@ -28,8 +30,9 @@ void FRenderCore::Init(ERenderAPI InAPI)
 
 void FRenderCore::Cleanup()
 {
-	FRHIShaderLibrary::GetInstance().ClearShadersCache();
-	FRHIShaderLibrary::ReleaseInstance();
+	FRHIPipelineStateCache::Shutdown();
+	FRHIShaderLibrary::Get()->ClearShadersCache();
+	FRHIShaderLibrary::Shutdown();
 	sMainContext->Cleanup();
 	sMainContext.reset();
 	RHIExit();

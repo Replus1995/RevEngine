@@ -12,6 +12,22 @@ extern REV_API class FTexture* GWhiteTexture;
 extern REV_API class FTexture* GBlackTexture;
 extern REV_API class FTexture* GNormalTexture;
 
+class FNullVertexBuffer : public FVertexBuffer
+{
+public:
+	/**
+	* Initialize the RHI for this rendering resource
+	*/
+	virtual void InitRHI() override
+	{
+		// create a static vertex buffer
+		VertexBufferRHI = GDynamicRHI->RHICreateBuffer(sizeof(uint32) * 4, 0, EBufferUsageFlags::Static | EBufferUsageFlags::VertexBuffer);
+		static const uint32 Vertices[4] = { 0, 0, 0, 0 };
+		FRenderCore::GetMainContext()->RHIUpdateBufferData(VertexBufferRHI.get(), Vertices, sizeof(uint32) * 4);
+	}
+};
+extern REV_API TGlobalResource<FNullVertexBuffer> GNullVertexBuffer;
+
 class F2DQuadIndexBuffer : public FIndexBuffer
 {
 public:
@@ -71,21 +87,6 @@ public:
 };
 extern REV_API TGlobalResource<FTileVertexInputState> GTileVertexInputState;
 
-class FNullVertexBuffer: public FVertexBuffer
-{
-public:
-	/**
-	* Initialize the RHI for this rendering resource
-	*/
-	virtual void InitRHI() override
-	{
-		// create a static vertex buffer
-		VertexBufferRHI = GDynamicRHI->RHICreateBuffer(sizeof(uint32) * 4, 0, EBufferUsageFlags::Static | EBufferUsageFlags::VertexBuffer);
-		static const uint32 Vertices[4] = { 0, 0, 0, 0 };
-		FRenderCore::GetMainContext()->RHIUpdateBufferData(VertexBufferRHI.get(), Vertices, sizeof(uint32) * 4);
-	}
-};
-extern REV_API TGlobalResource<FNullVertexBuffer> GNullVertexBuffer;
 
 
 class FStaticMeshVertexInputState : public FVertexInputState

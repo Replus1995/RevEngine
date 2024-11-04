@@ -1,9 +1,7 @@
 #include "VulkanShader.h"
 #include "VulkanContext.h"
-#include "VulkanRenderPass.h"
 #include "VulkanDynamicRHI.h"
 #include "Rev/Core/Assert.h"
-#include "Rev/Core/Hash.h"
 
 namespace Rev
 {
@@ -14,7 +12,6 @@ FVulkanShader::FVulkanShader(const FShadercCompiledData& InCompiledData)
 	, mStageFlag(TranslateShaderStage(InCompiledData.Stage))
 {
 	REV_CORE_ASSERT(!mName.empty());
-	mHash = FCityHash::Gen(mName);
 
 	VkShaderModuleCreateInfo ShaderModuleCreateInfo{};
 	ShaderModuleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
@@ -35,17 +32,17 @@ VkShaderStageFlagBits FVulkanShader::TranslateShaderStage(EShaderStage InStage)
 {
 	switch (InStage)
 	{
-	case EShaderStage::Vertex:
+	case SS_Vertex:
 		return VK_SHADER_STAGE_VERTEX_BIT;
-	case EShaderStage::Pixel:
+	case SS_Pixel:
 		return VK_SHADER_STAGE_FRAGMENT_BIT;
-	case EShaderStage::Hull:
+	case SS_Hull:
 		return VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT;
-	case EShaderStage::Domain:
+	case SS_Domain:
 		return VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT;
-	case EShaderStage::Geometry:
+	case SS_Geometry:
 		return VK_SHADER_STAGE_GEOMETRY_BIT;
-	case EShaderStage::Compute:
+	case SS_Compute:
 		return VK_SHADER_STAGE_COMPUTE_BIT;
 	default:
 		break;
@@ -68,9 +65,9 @@ FVulkanShaderProgram::~FVulkanShaderProgram()
 uint32 FVulkanShaderProgram::GenShaderStageInfo(VkPipelineShaderStageCreateInfo* OutInfos) const
 {
 	uint32 StageCount = 0;
-    for (uint8 i = (uint8)EShaderStage::Vertex; i < (uint8)EShaderStage::NumGfx; i++)
+    for (uint8 i = SS_Vertex; i < SS_NumGraphics; i++)
     {
-        const auto& pShader = mShaders[(EShaderStage)i];
+        const auto& pShader = mShaders[i];
         if(!pShader)
             continue;
         VkPipelineShaderStageCreateInfo& StageInfo = OutInfos[StageCount++];
@@ -134,9 +131,9 @@ void FVulkanShaderProgram::UpdateProgramUniforms()
 {
 	mProgramUniforms.clear();
 
-	for (uint8 i = (uint8)EShaderStage::Vertex; i < (uint8)EShaderStage::NumGfx; i++)
+	for (uint8 i = SS_Vertex; i < SS_NumGraphics; i++)
 	{
-		const auto& pShader = mShaders[(EShaderStage)i];
+		const auto& pShader = mShaders[i];
 		if (!pShader)
 			continue;
 		FVulkanShader* pVulkanShader = static_cast<FVulkanShader*>(pShader.get());

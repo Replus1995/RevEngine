@@ -53,10 +53,12 @@ FTexture* GWhiteTexture = new TGlobalResource<FColoredTexture<255, 255, 255, 255
 FTexture* GBlackTexture = new TGlobalResource<FColoredTexture<0, 0, 0, 255>>;
 FTexture* GNormalTexture = new TGlobalResource<FColoredTexture<127, 127, 255, 255, false>>;
 
+TGlobalResource<FNullVertexBuffer> GNullVertexBuffer;
 TGlobalResource<F2DQuadIndexBuffer> G2DQuadIndexBuffer;
 TGlobalResource<F2DQuadVertexBuffer> G2DQuadVertexBuffer;
+
+//State
 TGlobalResource<FTileVertexInputState> GTileVertexInputState;
-TGlobalResource<FNullVertexBuffer> GNullVertexBuffer;
 TGlobalResource<FStaticMeshVertexInputState> GStaticMeshVertexInputState;
 TGlobalResource<FDefaultSamplerState> GDefaultSamplerState;
 

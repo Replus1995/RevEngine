@@ -25,7 +25,7 @@ void FPBRMaterial::Compile()
 {
 	FRHIShaderCompileOptions FragCompileOps;
 
-	ShaderProgram = FRHIShaderLibrary::GetInstance().CreateGraphicsProgram("PbrProgram",
+	ShaderProgram = FRHIShaderLibrary::Get()->CreateGraphicsProgram("PbrProgram",
 		{ "/Engine/Shaders/CommonVS" },
 		{ "/Engine/Shaders/ForwardPbrPS", FragCompileOps }
 	);

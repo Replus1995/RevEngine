@@ -17,7 +17,7 @@ public:
 
 	virtual void Compile() override
 	{
-		ShaderProgram = FRHIShaderLibrary::GetInstance().CreateGraphicsProgram(
+		ShaderProgram = FRHIShaderLibrary::Get()->CreateGraphicsProgram(
 			"GammaCorrectProgram",
 			{ "/Engine/Shaders/PostVS" },
 			{ "/Engine/Shaders/GammaCorrectFS" }

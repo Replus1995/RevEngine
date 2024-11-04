@@ -87,13 +87,23 @@ void FForwardRenderer::DrawFrame(FRHICommandList& RHICmdList)
 		RHICmdList.GetContext()->RHIBeginDebugLabel("Base Pass", Math::FLinearColor(0.8f, 0.8f, 0.0f));
 		RHICmdList.GetContext()->RHIBeginRenderPass(mBasePass.get());
 
-		FRHIGraphicsPipelineStateDesc Desc;
-		Desc.VertexInputState = GStaticMeshVertexInputState.VertexInputStateRHI.get();
-		Desc.RasterizerStateDesc.CullMode = CM_Back;
-		Desc.DepthStencilStateDesc.bEnableDepthWrite = true;
-		Desc.DepthStencilStateDesc.DepthTestFunc = CF_Less;
-		Desc.ColorBlendStateDesc.Attachments[0].bEnableBlend = true;
-		RHICmdList.GetContext()->RHISetGraphicsPipelineState(Desc);
+		FRHIGraphicsPipelineStateDesc PipelineStateDesc;
+		PipelineStateDesc.VertexInputState = GStaticMeshVertexInputState.VertexInputStateRHI.get();
+
+		FRHIRasterizerStateDesc RasterizerStateDesc;
+		RasterizerStateDesc.CullMode = CM_Back;
+		PipelineStateDesc.RasterizerState = FRHIPipelineStateCache::Get()->GetOrCreateRasterizerState(RasterizerStateDesc);
+
+		FRHIDepthStencilStateDesc DepthStencilStateDesc;
+		DepthStencilStateDesc.bEnableDepthWrite = true;
+		DepthStencilStateDesc.DepthTestFunc = CF_Less;
+		PipelineStateDesc.DepthStencilState = FRHIPipelineStateCache::Get()->GetOrCreateDepthStencilState(DepthStencilStateDesc);
+
+		FRHIColorBlendStateDesc ColorBlendStateDesc;
+		ColorBlendStateDesc.Attachments[0].bEnableBlend = true;
+		PipelineStateDesc.ColorBlendState = FRHIPipelineStateCache::Get()->GetOrCreateColorBlendState(ColorBlendStateDesc);
+
+		RHICmdList.GetContext()->RHISetGraphicsPipelineState(PipelineStateDesc);
 
 		mSceneProxy->DrawSceneOpaque(RHICmdList);
 
@@ -105,15 +115,26 @@ void FForwardRenderer::DrawFrame(FRHICommandList& RHICmdList)
 		RHICmdList.GetContext()->RHIBeginDebugLabel("Sky Pass", Math::FLinearColor(0.6f, 0.6f, 0.9f));
 		RHICmdList.GetContext()->RHIBeginRenderPass(mSkyPass.get());
 
-		FRHIGraphicsPipelineStateDesc Desc;
-		Desc.VertexInputState = GTileVertexInputState.VertexInputStateRHI.get();
-		Desc.RasterizerStateDesc.CullMode = CM_Back;
-		Desc.DepthStencilStateDesc.bEnableDepthWrite = false;
-		Desc.DepthStencilStateDesc.DepthTestFunc = CF_LessEqual;
-		Desc.ColorBlendStateDesc.Attachments[0].bEnableBlend = true;
+		FRHIGraphicsPipelineStateDesc PipelineStateDesc;
+		PipelineStateDesc.VertexInputState = GTileVertexInputState.VertexInputStateRHI.get();
+
+		FRHIRasterizerStateDesc RasterizerStateDesc;
+		RasterizerStateDesc.CullMode = CM_Back;
+		PipelineStateDesc.RasterizerState = FRHIPipelineStateCache::Get()->GetOrCreateRasterizerState(RasterizerStateDesc);
+
+		FRHIDepthStencilStateDesc DepthStencilStateDesc;
+		DepthStencilStateDesc.bEnableDepthWrite = false;
+		DepthStencilStateDesc.DepthTestFunc = CF_LessEqual;
+		PipelineStateDesc.DepthStencilState = FRHIPipelineStateCache::Get()->GetOrCreateDepthStencilState(DepthStencilStateDesc);
+
+		FRHIColorBlendStateDesc ColorBlendStateDesc;
+		ColorBlendStateDesc.Attachments[0].bEnableBlend = false;
+		PipelineStateDesc.ColorBlendState = FRHIPipelineStateCache::Get()->GetOrCreateColorBlendState(ColorBlendStateDesc);
+
+
 		/*Desc.ColorBlendStateDesc.Attachments[0].SrcColorFactor = BF_SrcAlpha;
 		Desc.ColorBlendStateDesc.Attachments[0].DstColorFactor = BF_OneMinusSrcAlpha;*/
-		RHICmdList.GetContext()->RHISetGraphicsPipelineState(Desc);
+		RHICmdList.GetContext()->RHISetGraphicsPipelineState(PipelineStateDesc);
 
 		mSceneProxy->DrawSkybox(RHICmdList);
 

@@ -100,31 +100,31 @@ const char* FShadercUtils::GetCacheExtension()
 EShaderStage FShadercUtils::StringToShaderStage(std::string_view InStr)
 {
 	if (InStr == "vertex")
-		return EShaderStage::Vertex;
+		return SS_Vertex;
 	else if (InStr == "fragment" || InStr == "pixel")
-		return EShaderStage::Pixel;
+		return SS_Pixel;
 	else if (InStr == "tesscontrol" || InStr == "hull")
-		return EShaderStage::Hull;
+		return SS_Hull;
 	else if (InStr == "tesseval" || InStr == "domain")
-		return EShaderStage::Domain;
+		return SS_Domain;
 	else if (InStr == "geometry")
-		return EShaderStage::Geometry;
+		return SS_Geometry;
 	else if (InStr == "compute")
-		return EShaderStage::Compute;
+		return SS_Compute;
 
-	return EShaderStage::Unknown;
+	return SS_Unknown;
 }
 
 const char* FShadercUtils::ShaderStageToString(EShaderStage InStage)
 {
 	switch (InStage)
 	{
-	case EShaderStage::Vertex:		return "Vertex";
-	case EShaderStage::Pixel:		return "Pixel";
-	case EShaderStage::Hull:		return "Hull";
-	case EShaderStage::Domain:		return "Domain";
-	case EShaderStage::Geometry:	return "Geometry";
-	case EShaderStage::Compute:		return "Compute";
+	case SS_Vertex:		return "Vertex";
+	case SS_Pixel:		return "Pixel";
+	case SS_Hull:		return "Hull";
+	case SS_Domain:		return "Domain";
+	case SS_Geometry:	return "Geometry";
+	case SS_Compute:	return "Compute";
 	}
 	REV_CORE_ASSERT(false);
 	return nullptr;
