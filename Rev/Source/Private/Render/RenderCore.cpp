@@ -23,8 +23,6 @@ void FRenderCore::Init(ERenderAPI InAPI)
 	FRHIPipelineStateCache::Initialize(InAPI);
 
 	GIsRHIInitialized = true;
-
-	sMainContext->RHISetClearColor(Math::FLinearColor(0, 0, 0, 1));
 	
 }
 

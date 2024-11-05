@@ -42,18 +42,20 @@ public:
 //Command
 	virtual void RHISetVSync(bool bEnable) override;
 	virtual void RHISetViewport(uint32 InX, uint32 InY, uint32 InWidth, uint32 InHeight) override;
-	virtual void RHISetClearColor(const Math::FLinearColor& InColor) override;
-	virtual void RHISetClearDepthStencil(float InDepth, uint32 InStencil);
-	virtual void RHIClearBackBuffer() override;
+	virtual void RHIClearBackTexture(const Math::FLinearColor& InColor) override;
 
 //Data transfer
 	virtual void RHIUpdateTexture(FRHITexture* InTexture, const void* InContent, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex) override;
 	virtual void RHIClearTexture(FRHITexture* InTexture, uint8 InMipLevel, uint8 InMipCount, uint16 InArrayIndex, uint16 InArrayCount) override;
+	virtual void RHIBlitTexture(FRHITexture* DstTexture, FRHITexture* SrcTexture) override;
+	virtual void RHIBlitToBackTexture(FRHITexture* SrcTexture) override;
+
+
 	virtual void RHIUpdateBufferData(FRHIBuffer* Buffer, const void* Content, uint32 Size, uint32 Offset = 0) override;
 
 //Draw
 	virtual void RHIBeginRenderPass(FRHIRenderPass* InRenderPass) override;
-	virtual void RHIEndRenderPass(bool bBlitToBack) override;
+	virtual void RHIEndRenderPass() override;
 	virtual void RHINextSubpass() override;
 
 	virtual void RHIBindUniformBuffer(uint16 InBinding, FRHIUniformBuffer* InBuffer) override;
@@ -72,6 +74,7 @@ public:
 	const FVulkanSwapchain& GetSwapchain() const { return mSwapchain; }
 	VkImage GetSwapchainImage() const { return mSwapchain.GetCurrentImage(); }
 	VkImageView GetSwapchainImageView() const { return mSwapchain.GetCurrentImageView(); }
+	FVulkanTextureSwapchain* GetSwapchainTexture() const { return mSwapchain.GetCurrentTexture(); }
 
 	FVulkanFrameData& GetActiveFrameData() { return mFrameData[mFrameDataIndex]; }
 	VkCommandBuffer GetActiveCmdBuffer() { return mFrameData[mFrameDataIndex].CmdBuffer; }
@@ -94,8 +97,6 @@ private:
 	FVulkanFrameData mFrameData[REV_VK_FRAME_OVERLAP];
 
 	//dynamic state
-	VkClearColorValue mClearColor;
-	VkClearDepthStencilValue mClearDepthStencil;
 	VkExtent2D mDrawExtent = {0, 0};
 	VkViewport mViewport;
 	VkRect2D mScissor;

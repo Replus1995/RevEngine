@@ -15,6 +15,8 @@ struct alignas(16) FSceneUniform
 	Math::FMatrix4 ViewMat;
 	Math::FMatrix4 ProjMat;
 	Math::FMatrix4 ViewProjMat;
+	Math::FMatrix4 InvViewMat;
+	Math::FMatrix4 InvProjMat;
 	Math::FMatrix4 InvViewProjMat;
 };
 

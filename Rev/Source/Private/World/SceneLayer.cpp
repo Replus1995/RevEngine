@@ -69,8 +69,6 @@ void SceneLayer::OnDraw(FRHICommandList& RHICmdList)
 
 	//uint32 WinWidth = Application::GetApp().GetWindow()->GetWidth();
 	//uint32 WinHeight = Application::GetApp().GetWindow()->GetHeight();
-
-	RHICmdList.GetContext()->RHISetClearColor(Math::FLinearColor(0, 0, 0));
 	RHICmdList.GetContext()->RHISetViewport(0, 0, mSceneProxy->GetFrameWidth(), mSceneProxy->GetFrameHeight());
 
 

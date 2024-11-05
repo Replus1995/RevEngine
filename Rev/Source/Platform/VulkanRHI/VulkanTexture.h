@@ -14,15 +14,16 @@ public:
 	virtual ~FVulkanTexture();
 	virtual const void* GetNativeHandle() const override { return mImage; }
 
-	//void Transition(VkImageLayout DstLayout, VkCommandBuffer InCmdBuffer = VK_NULL_HANDLE);
-	//void Transition(VkImageLayout SrcLayout, VkImageLayout DstLayout, VkCommandBuffer InCmdBuffer = VK_NULL_HANDLE);
-
 	VkImage GetImage() const { return mImage; } //For easy to understand
 	VkImageView GetImageView() const { return mImageView; }
 	VkImageAspectFlags GetAspectFlags() const { return mImageAspectFlags; }
-	//VkImageLayout GetImageLayout() const { return mImageLayout; }
+	VkImageLayout GetImageLayout() const { return mImageLayout; }
 	VkClearValue GetClearValue();
+	VkExtent3D GetExtent();
+
 	static FVulkanTexture* Cast(FRHITexture* InTexture) { return static_cast<FVulkanTexture*>(InTexture); }
+
+	void DoTransition(VkCommandBuffer InCmdBuffer, VkImageLayout TargetLayout);
 
 	virtual void UpdateContent(FVulkanContext* Context, const void* InContent, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex) = 0;
 	void ClearContent(FVulkanContext* Context, uint8 InMipLevel, uint8 InMipCount, uint16 InArrayIndex, uint16 InArrayCount);
@@ -34,14 +35,13 @@ protected:
 	FVulkanTexture(const FRHITextureDesc& InDesc);
 	virtual void Init() = 0;
 	virtual void Release();
-	VkExtent3D GetExtent();
 	VkExtent2D CalculateMipSize2D(uint32 InMipLevel);
 	VkExtent3D CalculateMipSize3D(uint32 InMipLevel);
 protected:
 	VkImage mImage = VK_NULL_HANDLE;
 	VkImageView mImageView = VK_NULL_HANDLE;
-	//VkImageLayout mImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 	VkImageAspectFlags mImageAspectFlags = VK_IMAGE_ASPECT_NONE;
+	VkImageLayout mImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 	VmaAllocation mAllocation = VK_NULL_HANDLE;
 	Ref<FVulkanSamplerState> mSampler = nullptr;
 };

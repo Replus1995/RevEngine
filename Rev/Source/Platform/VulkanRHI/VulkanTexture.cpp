@@ -13,20 +13,6 @@ FVulkanTexture::~FVulkanTexture()
 {
 }
 
-//void FVulkanTexture::Transition(VkImageLayout DstLayout, VkCommandBuffer InCmdBuffer)
-//{
-//	REV_CORE_ASSERT(InCmdBuffer);
-//	FVulkanUtils::TransitionImage(InCmdBuffer, mImage, mImageLayout, DstLayout);
-//	mImageLayout = DstLayout;
-//}
-//
-//void FVulkanTexture::Transition(VkImageLayout SrcLayout, VkImageLayout DstLayout, VkCommandBuffer InCmdBuffer)
-//{
-//    REV_CORE_ASSERT(InCmdBuffer);
-//    FVulkanUtils::TransitionImage(InCmdBuffer, mImage, SrcLayout, DstLayout);
-//    mImageLayout = DstLayout;
-//}
-
 FVulkanTexture::FVulkanTexture(const FRHITextureDesc& InDesc)
     : FRHITexture(InDesc)
 {
@@ -36,35 +22,6 @@ FVulkanTexture::FVulkanTexture(const FRHITextureDesc& InDesc)
 		mImageAspectFlags |= VK_IMAGE_ASPECT_STENCIL_BIT;
 	if (mImageAspectFlags == VK_IMAGE_ASPECT_NONE)
 		mImageAspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
-}
-
-void FVulkanTexture::Release()
-{
-	REV_CORE_ASSERT(FVulkanDynamicRHI::GetDevice());
-	REV_CORE_ASSERT(FVulkanDynamicRHI::GetAllocator());
-
-	vkDestroyImageView(FVulkanDynamicRHI::GetDevice(), mImageView, nullptr);
-	vmaDestroyImage(FVulkanDynamicRHI::GetAllocator(), mImage, mAllocation);
-	mImage = VK_NULL_HANDLE;
-	mImageView = VK_NULL_HANDLE;
-	//mImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-	mAllocation = VK_NULL_HANDLE;
-}
-
-VkExtent3D FVulkanTexture::GetExtent()
-{
-	uint32 Depth = mDesc.Depth <= 0 ? 1 : mDesc.Depth;
-    return { mDesc.Width, mDesc.Height, Depth };
-}
-
-VkExtent2D FVulkanTexture::CalculateMipSize2D(uint32 InMipLevel)
-{
-    return { std::max<uint32>(1, GetWidth() >> InMipLevel), std::max<uint32>(1, GetHeight() >> InMipLevel) };
-}
-
-VkExtent3D FVulkanTexture::CalculateMipSize3D(uint32 InMipLevel)
-{
-    return { std::max<uint32>(1, GetWidth() >> InMipLevel), std::max<uint32>(1, GetHeight() >> InMipLevel), std::max<uint32>(1, GetDepth() >> InMipLevel) };
 }
 
 VkClearValue FVulkanTexture::GetClearValue()
@@ -103,6 +60,46 @@ VkClearValue FVulkanTexture::GetClearValue()
 	return ClearValue;
 }
 
+VkExtent3D FVulkanTexture::GetExtent()
+{
+	uint32 Depth = mDesc.Depth <= 0 ? 1 : mDesc.Depth;
+	return { mDesc.Width, mDesc.Height, Depth };
+}
+
+void FVulkanTexture::Release()
+{
+	REV_CORE_ASSERT(FVulkanDynamicRHI::GetDevice());
+	REV_CORE_ASSERT(FVulkanDynamicRHI::GetAllocator());
+
+	vkDestroyImageView(FVulkanDynamicRHI::GetDevice(), mImageView, nullptr);
+	vmaDestroyImage(FVulkanDynamicRHI::GetAllocator(), mImage, mAllocation);
+	mImage = VK_NULL_HANDLE;
+	mImageView = VK_NULL_HANDLE;
+	//mImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	mAllocation = VK_NULL_HANDLE;
+}
+
+VkExtent2D FVulkanTexture::CalculateMipSize2D(uint32 InMipLevel)
+{
+    return { std::max<uint32>(1, GetWidth() >> InMipLevel), std::max<uint32>(1, GetHeight() >> InMipLevel) };
+}
+
+VkExtent3D FVulkanTexture::CalculateMipSize3D(uint32 InMipLevel)
+{
+    return { std::max<uint32>(1, GetWidth() >> InMipLevel), std::max<uint32>(1, GetHeight() >> InMipLevel), std::max<uint32>(1, GetDepth() >> InMipLevel) };
+}
+
+
+void FVulkanTexture::DoTransition(VkCommandBuffer InCmdBuffer, VkImageLayout TargetLayout)
+{
+	if(mImageLayout == TargetLayout)
+		return;
+
+	REV_CORE_ASSERT(InCmdBuffer);
+	FVulkanUtils::TransitionImage(InCmdBuffer, mImage, mImageLayout, TargetLayout, mImageAspectFlags);
+	mImageLayout = TargetLayout;
+}
+
 void FVulkanTexture::ClearContent(FVulkanContext* Context, uint8 InMipLevel, uint8 InMipCount, uint16 InArrayIndex, uint16 InArrayCount)
 {
 	REV_CORE_ASSERT(InMipLevel < mDesc.NumMips, "MipLevel out of range");
@@ -120,7 +117,6 @@ void FVulkanTexture::Resize(uint32 InWidth, uint32 InHeight, uint32 InDepth)
 		Init();
 	}
 }
-
 
 //DynamicRHI
 Ref<FRHITexture> FVulkanDynamicRHI::RHICreateTexture(const FRHITextureDesc& InDesc)

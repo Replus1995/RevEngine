@@ -19,6 +19,8 @@ struct FSceneUniform
 	float4x4 ViewMat;
     float4x4 ProjMat;
     float4x4 ViewProjMat;
+    float4x4 InvViewMat;
+    float4x4 InvProjMat;
     float4x4 InvViewProjMat;
 };
 

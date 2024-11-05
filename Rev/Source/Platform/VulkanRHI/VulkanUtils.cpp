@@ -32,7 +32,7 @@ void FVulkanUtils::TransitionImage(VkCommandBuffer CmdBuffer, VkImage Image, VkI
 	vkCmdPipelineBarrier2(CmdBuffer, &DependencyInfo);
 }
 
-void FVulkanUtils::BlitImage(VkCommandBuffer CmdBuffer, VkImage SrcImage, VkImage DstImage, VkExtent2D SrcExtent, VkExtent2D DstExtent)
+void FVulkanUtils::BlitImage(VkCommandBuffer CmdBuffer, VkImage DstImage, VkExtent3D DstExtent, VkImage SrcImage, VkExtent3D SrcExtent)
 {
 	VkImageBlit2 BlitRegion{};
 	BlitRegion.sType = VK_STRUCTURE_TYPE_IMAGE_BLIT_2;
@@ -40,11 +40,11 @@ void FVulkanUtils::BlitImage(VkCommandBuffer CmdBuffer, VkImage SrcImage, VkImag
 
 	BlitRegion.srcOffsets[1].x = SrcExtent.width;
 	BlitRegion.srcOffsets[1].y = SrcExtent.height;
-	BlitRegion.srcOffsets[1].z = 1;
+	BlitRegion.srcOffsets[1].z = SrcExtent.depth;
 
 	BlitRegion.dstOffsets[1].x = DstExtent.width;
 	BlitRegion.dstOffsets[1].y = DstExtent.height;
-	BlitRegion.dstOffsets[1].z = 1;
+	BlitRegion.dstOffsets[1].z = DstExtent.depth;
 
 	BlitRegion.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 	BlitRegion.srcSubresource.baseArrayLayer = 0;

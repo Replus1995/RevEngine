@@ -32,17 +32,19 @@ public:
 	//virtual void EndCompute() = 0;
 
 	virtual void RHISetVSync(bool bEnable) = 0;
-	virtual void RHISetViewport(uint32 x, uint32 y, uint32 width, uint32 height) = 0;
-	virtual void RHISetClearColor(const Math::FLinearColor& color) = 0;
-	virtual void RHIClearBackBuffer() = 0; //to be removed
+	virtual void RHISetViewport(uint32 InX, uint32 InY, uint32 InWidth, uint32 InHeight) = 0;
+	virtual void RHIClearBackTexture(const Math::FLinearColor& InColor) = 0;
 
 	virtual void RHIBeginRenderPass(FRHIRenderPass* InRenderPass) = 0;
-	virtual void RHIEndRenderPass(bool bBlitToBack = false) = 0;
+	virtual void RHIEndRenderPass() = 0;
 	virtual void RHINextSubpass() = 0;
 
 
 	virtual void RHIUpdateTexture(FRHITexture* InTexture, const void* InContent, uint32 InSize, uint8 InMipLevel = 0, uint16 InArrayIndex = 0) = 0;
 	virtual void RHIClearTexture(FRHITexture* InTexture, uint8 InMipLevel = 0, uint8 InMipCount = 1, uint16 InArrayIndex = 0, uint16 InArrayCount = 1) = 0;
+	virtual void RHIBlitTexture(FRHITexture* DstTexture, FRHITexture* SrcTexture) = 0;
+	virtual void RHIBlitToBackTexture(FRHITexture* SrcTexture) = 0;
+
 	/**
 	* @brief Update index buffer data
 	* @param Content : memory pointer

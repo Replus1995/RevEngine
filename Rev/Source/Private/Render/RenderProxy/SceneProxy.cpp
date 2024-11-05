@@ -40,6 +40,8 @@ void FSceneProxy::SyncResource(FRHICommandList& RHICmdList)
 		mSceneParams.ViewMat = mCameraProxy.GetViewMat();
 		mSceneParams.ProjMat = mCameraProxy.GetProjMat();
 		mSceneParams.ViewProjMat = mCameraProxy.GetViewProjMat();
+		mSceneParams.InvViewMat = mSceneParams.ViewMat.Inverse();
+		mSceneParams.InvProjMat = mSceneParams.ProjMat.Inverse();
 		mSceneParams.InvViewProjMat = mSceneParams.ViewProjMat.Inverse();
 
 		mSceneUB->UpdateSubData(&mSceneParams, sizeof(FSceneUniform));

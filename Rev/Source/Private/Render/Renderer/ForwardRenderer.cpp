@@ -41,7 +41,7 @@ void FForwardRenderer::BeginFrame()
 		FRHIRenderPassDesc BasePassDesc;
 		BasePassDesc.ColorRenderTargets[0] = { mBasePassColor.get(), nullptr, -1, 0, ALO_Clear, ASO_Store};
 		BasePassDesc.NumColorRenderTargets = 1;
-		BasePassDesc.DepthStencilRenderTarget  = { mBasePassDepth.get(), nullptr, ALO_Clear, ASO_Store, ALO_DontCare, ASO_DontCare};
+		BasePassDesc.DepthStencilRenderTarget  = { mBasePassDepth.get(), nullptr, ALO_Clear, ASO_Store, ALO_DontCare, ASO_DontCare };
 		mBasePass = GDynamicRHI->RHICreateRenderPass(BasePassDesc);
 	}
 	
@@ -107,7 +107,7 @@ void FForwardRenderer::DrawFrame(FRHICommandList& RHICmdList)
 
 		mSceneProxy->DrawSceneOpaque(RHICmdList);
 
-		RHICmdList.GetContext()->RHIEndRenderPass(true);
+		RHICmdList.GetContext()->RHIEndRenderPass();
 		RHICmdList.GetContext()->RHIEndDebugLabel();
 	}
 
@@ -119,7 +119,7 @@ void FForwardRenderer::DrawFrame(FRHICommandList& RHICmdList)
 		PipelineStateDesc.VertexInputState = GTileVertexInputState.VertexInputStateRHI.get();
 
 		FRHIRasterizerStateDesc RasterizerStateDesc;
-		RasterizerStateDesc.CullMode = CM_Back;
+		RasterizerStateDesc.CullMode = CM_None;
 		PipelineStateDesc.RasterizerState = FRHIPipelineStateCache::Get()->GetOrCreateRasterizerState(RasterizerStateDesc);
 
 		FRHIDepthStencilStateDesc DepthStencilStateDesc;
@@ -135,10 +135,12 @@ void FForwardRenderer::DrawFrame(FRHICommandList& RHICmdList)
 
 		mSceneProxy->DrawSkybox(RHICmdList);
 
-		RHICmdList.GetContext()->RHIEndRenderPass(true);
+		RHICmdList.GetContext()->RHIEndRenderPass();
 		RHICmdList.GetContext()->RHIEndDebugLabel();
 	}
 	
+	RHICmdList.GetContext()->RHIBlitToBackTexture(mBasePassColor.get());
+
 
 	/*
 	RenderCmd::SetCullFaceMode(CFM_Back);

@@ -47,6 +47,19 @@ void FVulkanTexture2D::Init()
     if((mDesc.Flags & ETextureCreateFlags::SRGB) != ETextureCreateFlags::None)
         ImageFormat = FVulkanPixelFormat::GetPlatformFormatSRGB(ImageFormat);
 
+    /*mImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    if (EnumHasAnyFlags(mDesc.Flags, ETextureCreateFlags::RenderTargetable))
+    {
+        if (FPixelFormatInfo::HasDepth(mDesc.Format))
+        {
+            mImageLayout = FPixelFormatInfo::HasStencil(mDesc.Format) ? VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL : VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL_KHR;
+        }
+        if (mImageLayout == VK_IMAGE_LAYOUT_UNDEFINED)
+        {
+            mImageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        }
+    }*/
+
     VkImageCreateInfo ImageCreateInfo{};
     ImageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     ImageCreateInfo.pNext = nullptr;
@@ -60,7 +73,7 @@ void FVulkanTexture2D::Init()
     ImageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
     ImageCreateInfo.usage = FVulkanEnum::Translate(mDesc.Flags);
     ImageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-    ImageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    ImageCreateInfo.initialLayout = mImageLayout;
 
     //for the draw image, we want to allocate it from gpu local memory
     VmaAllocationCreateInfo ImageAllocinfo = {};

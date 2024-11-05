@@ -187,14 +187,14 @@ enum EStencilOperation
 
 enum ECompareFunction : uint8
 {
-	CF_Never = 0,
-	CF_Less = 1,
-	CF_Equal = 2,
-	CF_Greater = 3,
-	CF_NotEqual = 4,
-	CF_LessEqual = 5,
+	CF_Never		= 0,
+	CF_Less			= 1,
+	CF_Equal		= 2,
+	CF_LessEqual	= 3,
+	CF_Greater		= 4,
+	CF_NotEqual		= 5,
 	CF_GreaterEqual = 6,
-	CF_Always = 7
+	CF_Always		= 7
 };
 
 enum EBlendFactor : uint8
