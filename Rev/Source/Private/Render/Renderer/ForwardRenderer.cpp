@@ -6,8 +6,8 @@
 #include "Rev/Render/RHI/RHITexture.h"
 #include "Rev/Render/RenderProxy/SceneProxy.h"
 #include "Rev/Render/RenderUtils.h"
+#include "Rev/Render/RenderOptions.h"
 
-#define TEMP_MSAA_LEVEL 4
 
 namespace Rev
 {
@@ -32,7 +32,7 @@ void FForwardRenderer::BeginFrame()
 	}
 	if (!mBaseColorResolveTex)
 	{
-		FRHITextureDesc Desc = FRHITextureDesc::Make2D(mSceneProxy->GetFrameWidth(), mSceneProxy->GetFrameHeight(), PF_R8G8B8A8).SetClearColor(Math::FLinearColor(0, 0, 0, 1)).SetFlags(ETextureCreateFlags::ColorTarget).SetNumSamples(TEMP_MSAA_LEVEL);
+		FRHITextureDesc Desc = FRHITextureDesc::Make2D(mSceneProxy->GetFrameWidth(), mSceneProxy->GetFrameHeight(), PF_R8G8B8A8).SetClearColor(Math::FLinearColor(0, 0, 0, 1)).SetFlags(ETextureCreateFlags::ColorTarget).SetNumSamples(GRenderOptions.GetNumSamples());
 		mBaseColorResolveTex = GDynamicRHI->RHICreateTexture(Desc);
 	}
 	if (!mBaseDepthTex)
@@ -42,7 +42,7 @@ void FForwardRenderer::BeginFrame()
 	}
 	if (!mBaseDepthResolveTex)
 	{
-		FRHITextureDesc Desc = FRHITextureDesc::Make2D(mSceneProxy->GetFrameWidth(), mSceneProxy->GetFrameHeight(), PF_DepthStencil).SetClearColor(FRHITextureClearColor(1.0, 0)).SetFlags(ETextureCreateFlags::DepthStencilTarget).SetNumSamples(TEMP_MSAA_LEVEL);
+		FRHITextureDesc Desc = FRHITextureDesc::Make2D(mSceneProxy->GetFrameWidth(), mSceneProxy->GetFrameHeight(), PF_DepthStencil).SetClearColor(FRHITextureClearColor(1.0, 0)).SetFlags(ETextureCreateFlags::DepthStencilTarget).SetNumSamples(GRenderOptions.GetNumSamples());
 		mBaseDepthResolveTex = GDynamicRHI->RHICreateTexture(Desc);
 	}
 	if (!mBasePass)
@@ -99,7 +99,7 @@ void FForwardRenderer::DrawFrame(FRHICommandList& RHICmdList)
 
 		FRHIGraphicsPipelineStateDesc PipelineStateDesc;
 		PipelineStateDesc.VertexInputState = GStaticMeshVertexInputState.VertexInputStateRHI.get();
-		PipelineStateDesc.NumSamples = TEMP_MSAA_LEVEL;
+		PipelineStateDesc.NumSamples = GRenderOptions.GetNumSamples();
 
 		FRHIRasterizerStateDesc RasterizerStateDesc;
 		RasterizerStateDesc.CullMode = CM_Back;

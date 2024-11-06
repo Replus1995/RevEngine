@@ -95,6 +95,10 @@ static FVkQueueFamilyIndices FindQueueFamilies(VkPhysicalDevice InDevice, VkSurf
 		{
 			Indices[VQK_Compute] = i;
 		}
+		if (QueueFamilies[i].queueFlags & VK_QUEUE_TRANSFER_BIT)
+		{
+			Indices[VQK_Transfer] = i;
+		}
 
 		VkBool32 bPresentSupport = false;
 		vkGetPhysicalDeviceSurfaceSupportKHR(InDevice, i, InSurface, &bPresentSupport);
@@ -113,8 +117,10 @@ static FVkQueueFamilyIndices FindQueueFamilies(VkPhysicalDevice InDevice, VkSurf
 static void PopulateQueueCreateInfos(std::vector<VkDeviceQueueCreateInfo>& QueueCreateInfos, const uint32* QueueFamilies)
 {
 	std::set<uint32> UniqueQueueFamilies;
-	UniqueQueueFamilies.insert(QueueFamilies[VQK_Graphics]);
 	UniqueQueueFamilies.insert(QueueFamilies[VQK_Present]);
+	UniqueQueueFamilies.insert(QueueFamilies[VQK_Graphics]);
+	UniqueQueueFamilies.insert(QueueFamilies[VQK_Compute]);
+	UniqueQueueFamilies.insert(QueueFamilies[VQK_Transfer]);
 
 	float QueuePriority = 1.0f;
 	for (auto QueueFamily : UniqueQueueFamilies)
@@ -271,8 +277,10 @@ void FVulkanInstance::CreateLogicalDevice()
 		throw std::runtime_error("[FVkDevice] Failed to create logical device!");
 	}
 
-	vkGetDeviceQueue(mDevice, mQueueFamilies[VQK_Graphics], 0, &mQueues[VQK_Graphics]);
 	vkGetDeviceQueue(mDevice, mQueueFamilies[VQK_Present], 0, &mQueues[VQK_Present]);
+	vkGetDeviceQueue(mDevice, mQueueFamilies[VQK_Graphics], 0, &mQueues[VQK_Graphics]);
+	vkGetDeviceQueue(mDevice, mQueueFamilies[VQK_Compute], 0, &mQueues[VQK_Compute]);
+	vkGetDeviceQueue(mDevice, mQueueFamilies[VQK_Transfer], 0, &mQueues[VQK_Transfer]);
 }
 
 void FVulkanInstance::QueryDeviceCapacity(FRHIDeviceCapacity& Capacity)

@@ -137,12 +137,12 @@ VkPipelineMultisampleStateCreateInfo FVulkanPipelineBuilder::MakeMultisampleStat
 {
     VkPipelineMultisampleStateCreateInfo StateInfo{};
     StateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-    StateInfo.sampleShadingEnable = VK_FALSE;
     StateInfo.rasterizationSamples = SampleCountFlag;
+    StateInfo.sampleShadingEnable = VK_FALSE;
     StateInfo.minSampleShading = 1.0f;
     StateInfo.pSampleMask = nullptr;
-    StateInfo.alphaToCoverageEnable = VK_FALSE;
-    StateInfo.alphaToOneEnable = bAlphaToCoverage;
+    StateInfo.alphaToCoverageEnable = bAlphaToCoverage;
+    StateInfo.alphaToOneEnable = VK_FALSE;
     return StateInfo;
 }
 

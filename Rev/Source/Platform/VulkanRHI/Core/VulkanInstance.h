@@ -13,7 +13,8 @@ enum EVulkanQueueKind : uint8
 	VQK_Present = 0,
 	VQK_Graphics = 1,
 	VQK_Compute = 2,
-	VQK_Count = 3
+	VQK_Transfer = 3,
+	VQK_Count = 4
 };
 
 struct FVulkanSurfaceSupport

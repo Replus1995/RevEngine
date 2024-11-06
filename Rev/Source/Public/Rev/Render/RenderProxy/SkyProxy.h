@@ -6,6 +6,7 @@ namespace Rev
 {
 class FMaterial;
 class FScene;
+class FRHICommandList;
 class FSkyProxy
 {
 public:
