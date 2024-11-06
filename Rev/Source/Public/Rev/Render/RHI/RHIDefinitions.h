@@ -49,11 +49,12 @@ enum class ETextureDimension : uint8
 enum class ETextureCreateFlags : uint64
 {
 	None							= 0,
-	RenderTargetable				= 1ull << 0,
-	ResolveTargetable				= 1ull << 1,
-	DepthStencilTargetable			= 1ull << 2,
-	ShaderResource					= 1ull << 3,
-	SRGB							= 1ull << 4,
+	ColorTarget				= 1ull << 0,
+	ColorResolveTarget				= 1ull << 1,
+	DepthStencilTarget			= 1ull << 2,
+	DepthStencilResolveTarget	= 1ull << 3,
+	ShaderResource					= 1ull << 4,
+	SRGB							= 1ull << 5,
 };
 ENUM_CLASS_FLAGS(ETextureCreateFlags)
 
@@ -254,6 +255,11 @@ enum EAttachmentStoreOp : uint8
 {
 	ASO_Store = 0,
 	ASO_DontCare
+};
+
+struct FRHIDeviceCapacity
+{
+	uint8 MaxNumSamples = 1;
 };
 
 }

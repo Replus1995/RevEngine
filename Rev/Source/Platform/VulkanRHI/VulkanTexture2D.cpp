@@ -44,26 +44,17 @@ void FVulkanTexture2D::Init()
     REV_CORE_ASSERT(FVulkanDynamicRHI::GetAllocator());
 
     VkFormat ImageFormat = (VkFormat)GPixelFormats[mDesc.Format].PlatformFormat;
-    if((mDesc.Flags & ETextureCreateFlags::SRGB) != ETextureCreateFlags::None)
-        ImageFormat = FVulkanPixelFormat::GetPlatformFormatSRGB(ImageFormat);
-
-    /*mImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    if (EnumHasAnyFlags(mDesc.Flags, ETextureCreateFlags::RenderTargetable))
+    VkImageCreateFlags ImageFlags = 0;
+    if (EnumHasAllFlags(mDesc.Flags, ETextureCreateFlags::SRGB))
     {
-        if (FPixelFormatInfo::HasDepth(mDesc.Format))
-        {
-            mImageLayout = FPixelFormatInfo::HasStencil(mDesc.Format) ? VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL : VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL_KHR;
-        }
-        if (mImageLayout == VK_IMAGE_LAYOUT_UNDEFINED)
-        {
-            mImageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-        }
-    }*/
+        ImageFormat = FVulkanPixelFormat::GetPlatformFormatSRGB(ImageFormat);
+        ImageFlags |= VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT;
+    }
 
     VkImageCreateInfo ImageCreateInfo{};
     ImageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     ImageCreateInfo.pNext = nullptr;
-    ImageCreateInfo.flags = 0;
+    ImageCreateInfo.flags = ImageFlags;
     ImageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
     ImageCreateInfo.format = ImageFormat;
     ImageCreateInfo.extent = GetExtent();
@@ -71,7 +62,7 @@ void FVulkanTexture2D::Init()
     ImageCreateInfo.arrayLayers = 1;
     ImageCreateInfo.samples = (VkSampleCountFlagBits)mDesc.NumSamples;
     ImageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-    ImageCreateInfo.usage = FVulkanEnum::Translate(mDesc.Flags);
+    ImageCreateInfo.usage = TranslateImageUsageFlags(mDesc.Flags);
     ImageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
     ImageCreateInfo.initialLayout = mImageLayout;
 

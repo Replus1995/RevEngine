@@ -20,7 +20,14 @@ void FVulkanUtils::TransitionImage(VkCommandBuffer CmdBuffer, VkImage Image, VkI
 	ImageBarrier.oldLayout = CurrentLayout;
 	ImageBarrier.newLayout = NextLayout;
 
-	ImageBarrier.subresourceRange = FVulkanInit::ImageSubresourceRange(AspectMask);
+	VkImageSubresourceRange ImageRange{};
+	ImageRange.aspectMask = AspectMask;
+	ImageRange.baseMipLevel = 0;
+	ImageRange.levelCount = VK_REMAINING_MIP_LEVELS;
+	ImageRange.baseArrayLayer = 0;
+	ImageRange.layerCount = VK_REMAINING_ARRAY_LAYERS;
+
+	ImageBarrier.subresourceRange = ImageRange;
 	ImageBarrier.image = Image;
 
 	VkDependencyInfo DependencyInfo{};

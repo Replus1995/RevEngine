@@ -16,10 +16,11 @@ struct FRHIGraphicsPipelineStateDesc
 public:
 	EPrimitiveTopology PrimitiveTopology = PT_Triangles;
 
-	FRHIRasterizerState* RasterizerState;
-	FRHIDepthStencilState* DepthStencilState;
-	FRHIColorBlendState* ColorBlendState;
-	FRHIVertexInputState* VertexInputState;
+	FRHIRasterizerState* RasterizerState = nullptr;
+	FRHIDepthStencilState* DepthStencilState = nullptr;
+	FRHIColorBlendState* ColorBlendState = nullptr;
+	FRHIVertexInputState* VertexInputState = nullptr;
+	uint8 NumSamples = 1;
 
 	friend bool operator==(const FRHIGraphicsPipelineStateDesc& A, const FRHIGraphicsPipelineStateDesc& B);
 };

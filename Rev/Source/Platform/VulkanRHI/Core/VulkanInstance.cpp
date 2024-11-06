@@ -275,6 +275,33 @@ void FVulkanInstance::CreateLogicalDevice()
 	vkGetDeviceQueue(mDevice, mQueueFamilies[VQK_Present], 0, &mQueues[VQK_Present]);
 }
 
+void FVulkanInstance::QueryDeviceCapacity(FRHIDeviceCapacity& Capacity)
+{
+	REV_CORE_ASSERT(mPhysicalDevice != VK_NULL_HANDLE);
+
+	VkPhysicalDeviceProperties DeviceProperties;
+	vkGetPhysicalDeviceProperties(mPhysicalDevice, &DeviceProperties);
+
+	VkSampleCountFlags SampleCount = DeviceProperties.limits.framebufferColorSampleCounts & DeviceProperties.limits.framebufferDepthSampleCounts;
+	if (SampleCount & VK_SAMPLE_COUNT_64_BIT)
+		Capacity.MaxNumSamples = VK_SAMPLE_COUNT_64_BIT;
+	else if (SampleCount & VK_SAMPLE_COUNT_32_BIT)
+		Capacity.MaxNumSamples = VK_SAMPLE_COUNT_32_BIT;
+	else if (SampleCount & VK_SAMPLE_COUNT_16_BIT)
+		Capacity.MaxNumSamples = VK_SAMPLE_COUNT_16_BIT;
+	else if (SampleCount & VK_SAMPLE_COUNT_8_BIT)
+		Capacity.MaxNumSamples = VK_SAMPLE_COUNT_8_BIT;
+	else if (SampleCount & VK_SAMPLE_COUNT_4_BIT)
+		Capacity.MaxNumSamples = VK_SAMPLE_COUNT_4_BIT;
+	else if (SampleCount & VK_SAMPLE_COUNT_2_BIT)
+		Capacity.MaxNumSamples = VK_SAMPLE_COUNT_2_BIT;
+	else
+		Capacity.MaxNumSamples = VK_SAMPLE_COUNT_1_BIT;
+
+
+
+}
+
 void FVulkanInstance::Cleanup()
 {
 	vkDestroyDevice(mDevice, nullptr);

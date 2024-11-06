@@ -41,13 +41,17 @@ void FVulkanTextureCube::Init()
     REV_CORE_ASSERT(FVulkanDynamicRHI::GetAllocator());
 
     VkFormat ImageFormat = (VkFormat)GPixelFormats[mDesc.Format].PlatformFormat;
-    if ((mDesc.Flags & ETextureCreateFlags::SRGB) != ETextureCreateFlags::None)
+    VkImageCreateFlags ImageFlags = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
+    if (EnumHasAllFlags(mDesc.Flags, ETextureCreateFlags::SRGB))
+    {
         ImageFormat = FVulkanPixelFormat::GetPlatformFormatSRGB(ImageFormat);
+        ImageFlags |= VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT;
+    }
 
     VkImageCreateInfo ImageCreateInfo{};
     ImageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     ImageCreateInfo.pNext = nullptr;
-    ImageCreateInfo.flags = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
+    ImageCreateInfo.flags = ImageFlags;
     ImageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
     ImageCreateInfo.format = ImageFormat;
     ImageCreateInfo.extent = GetExtent();
@@ -55,7 +59,7 @@ void FVulkanTextureCube::Init()
     ImageCreateInfo.arrayLayers = 6;
     ImageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT; //no support for cubemap multi-sample
     ImageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-    ImageCreateInfo.usage = FVulkanEnum::Translate(mDesc.Flags);
+    ImageCreateInfo.usage = TranslateImageUsageFlags(mDesc.Flags);
     ImageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
     ImageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 

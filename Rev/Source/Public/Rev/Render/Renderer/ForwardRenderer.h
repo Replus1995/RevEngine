@@ -21,8 +21,10 @@ private:
 	uint32 FrameWidth = 0;
 	uint32 FrameHeight = 0;
 	Ref<FRHIRenderPass> mBasePass = nullptr;
-	Ref<FRHITexture> mBasePassColor = nullptr;
-	Ref<FRHITexture> mBasePassDepth = nullptr;
+	Ref<FRHITexture> mBaseColorTex = nullptr;
+	Ref<FRHITexture> mBaseColorResolveTex = nullptr;
+	Ref<FRHITexture> mBaseDepthTex = nullptr;
+	Ref<FRHITexture> mBaseDepthResolveTex = nullptr;
 	Ref<FRHIRenderPass> mSkyPass = nullptr;
 
 	FGammaCorrectPass mGammaCorrectPass;

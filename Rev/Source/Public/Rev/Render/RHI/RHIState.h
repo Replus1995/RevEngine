@@ -104,7 +104,7 @@ struct FRHISamplerStateDesc
 	{
 	}
 
-	REV_API friend bool operator==(const Rev::FRHISamplerStateDesc& A, const Rev::FRHISamplerStateDesc& B);
+	REV_API bool operator==(const FRHISamplerStateDesc& B) const;
 };
 
 struct FRHIRasterizerStateDesc
@@ -118,7 +118,7 @@ struct FRHIRasterizerStateDesc
 	bool bAllowMSAA = false;
 	bool bEnableLineAA = false;
 
-	REV_API friend bool operator==(const Rev::FRHIRasterizerStateDesc& A, const Rev::FRHIRasterizerStateDesc& B);
+	REV_API bool operator==(const FRHIRasterizerStateDesc& B) const;
 };
 
 struct FRHIDepthStencilStateDesc
@@ -142,7 +142,7 @@ struct FRHIDepthStencilStateDesc
 	uint8 StencilReadMask = 0;
 	uint8 StencilWriteMask = 0;
 
-	REV_API friend bool operator==(const Rev::FRHIDepthStencilStateDesc& A, const Rev::FRHIDepthStencilStateDesc& B);
+	REV_API bool operator==(const FRHIDepthStencilStateDesc& B) const;
 
 };
 
@@ -160,9 +160,10 @@ struct FRHIColorBlendStateDesc
 	};
 
 	FAttachment Attachments[RTA_MaxColorAttachments];
+	bool bUseAlphaToCoverage = false;
 	//Math::FLinearColor BlendConstants;
 
-	REV_API friend bool operator==(const Rev::FRHIColorBlendStateDesc& A, const Rev::FRHIColorBlendStateDesc& B);
+	REV_API bool operator==(const FRHIColorBlendStateDesc& B) const;
 };
 
 struct FRHIVertexElement
@@ -187,7 +188,7 @@ struct FRHIVertexElement
 	uint8 GetComponentCount();
 	uint32 GetElementSize(); // GetComponentSize * ComponentCount
 
-	REV_API friend bool operator==(const Rev::FRHIVertexElement& A, const Rev::FRHIVertexElement& B);
+	REV_API bool operator==(const Rev::FRHIVertexElement& B) const;
 };
 
 struct FRHIVertexInputStateDesc
@@ -201,7 +202,7 @@ struct FRHIVertexInputStateDesc
 		NumVertexElements++;
 	}
 
-	REV_API friend bool operator==(const Rev::FRHIVertexInputStateDesc& A, const Rev::FRHIVertexInputStateDesc& B);
+	REV_API bool operator==(const Rev::FRHIVertexInputStateDesc& B) const;
 };
 
 

@@ -39,13 +39,22 @@ void FVulkanRenderPass::PrepareForDraw()
 
 	bool bFirstColorTarget = true;
 
-	std::array<VkImageView, RTA_MaxColorAttachments + 1> AttachmentViews;
+	VkImageView AttachmentViews[(RTA_MaxColorAttachments + 1) * 2];
 	uint32 NumAttachmentViews = 0;
 	for (uint32 i = 0; i < mDesc.NumColorRenderTargets; i++)
 	{
 		FVulkanTexture* ColorTarget = FVulkanTexture::Cast(mDesc.ColorRenderTargets[i].ColorTarget);
 		AttachmentViews[NumAttachmentViews] = ColorTarget->GetImageView();
 		NumAttachmentViews++;
+
+		if (mDesc.ColorRenderTargets[i].ResolveTarget)
+		{
+			FVulkanTexture* ResolveTarget = FVulkanTexture::Cast(mDesc.ColorRenderTargets[i].ResolveTarget);
+			AttachmentViews[NumAttachmentViews] = ResolveTarget->GetImageView();
+			NumAttachmentViews++;
+		}
+
+
 		if (bFirstColorTarget)
 		{
 			mFrameWidth = ColorTarget->GetWidth();
@@ -58,13 +67,20 @@ void FVulkanRenderPass::PrepareForDraw()
 		FVulkanTexture* DepthStencilTarget = FVulkanTexture::Cast(mDesc.DepthStencilRenderTarget.DepthStencilTarget);
 		AttachmentViews[NumAttachmentViews] = DepthStencilTarget->GetImageView();
 		NumAttachmentViews++;
+
+		if (mDesc.DepthStencilRenderTarget.ResolveTarget)
+		{
+			FVulkanTexture* ResolveTarget = FVulkanTexture::Cast(mDesc.DepthStencilRenderTarget.ResolveTarget);
+			AttachmentViews[NumAttachmentViews] = ResolveTarget->GetImageView();
+			NumAttachmentViews++;
+		}
 	}
 	
 	VkFramebufferCreateInfo FramebufferInfo{};
 	FramebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
 	FramebufferInfo.renderPass = mRenderPass;
 	FramebufferInfo.attachmentCount = NumAttachmentViews;
-	FramebufferInfo.pAttachments = AttachmentViews.data();
+	FramebufferInfo.pAttachments = AttachmentViews;
 	FramebufferInfo.width = mFrameWidth;
 	FramebufferInfo.height = mFrameHeight;
 	FramebufferInfo.layers = 1;
@@ -74,139 +90,239 @@ void FVulkanRenderPass::PrepareForDraw()
 
 void FVulkanRenderPass::Init()
 {
-	VkAttachmentDescription2 AttachmentDescs[RTA_MaxColorAttachments + 1];
+	struct FAttachmentIndices
+	{
+		uint32 Colors[RTA_MaxColorAttachments];
+		uint32 ColorResolves[RTA_MaxColorAttachments];
+		uint32 DepthStencil;
+		uint32 DepthStencilResolve;
+	};
+
+	constexpr uint32 MaxNumAttachments = (RTA_MaxColorAttachments + 1) * 2;
+	uint32 NumAttachmentDesc = 0;
+	FAttachmentIndices AttachmentIndices;
+
+	VkAttachmentDescription2 AttachmentDescs[MaxNumAttachments];
 	for (uint32 i = 0; i < mDesc.NumColorRenderTargets; i++)
 	{
 		const FRHIRenderPassDesc::FColorEntry& ColorEntry = mDesc.ColorRenderTargets[i];
 		FVulkanTexture* ColorTarget = FVulkanTexture::Cast(ColorEntry.ColorTarget);
 		REV_CORE_ASSERT(ColorTarget);
 
-		EPixelFormat ColorFormat = ColorTarget->GetFormat();
+		VkFormat ColorFormat = (VkFormat)GPixelFormats[ColorTarget->GetFormat()].PlatformFormat;
 
-		VkAttachmentDescription2& AttachmentDesc = AttachmentDescs[i];
-		AttachmentDesc = {};
-		AttachmentDesc.sType = VK_STRUCTURE_TYPE_ATTACHMENT_DESCRIPTION_2;
-		AttachmentDesc.format = (VkFormat)GPixelFormats[ColorFormat].PlatformFormat;
-		AttachmentDesc.samples = VK_SAMPLE_COUNT_1_BIT;
-		AttachmentDesc.loadOp = FVulkanEnum::Translate(ColorEntry.LoadOp);
-		AttachmentDesc.storeOp = FVulkanEnum::Translate(ColorEntry.StoreOp);
-		AttachmentDesc.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-		AttachmentDesc.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-		AttachmentDesc.initialLayout = ColorEntry.LoadOp == ALO_DontCare ? VK_IMAGE_LAYOUT_UNDEFINED : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-		AttachmentDesc.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+		VkAttachmentDescription2& ColorDesc = AttachmentDescs[NumAttachmentDesc];
+		ColorDesc = {};
+		ColorDesc.sType = VK_STRUCTURE_TYPE_ATTACHMENT_DESCRIPTION_2;
+		ColorDesc.format = ColorFormat;
+		ColorDesc.samples = ColorTarget->GetSamplerCount();
+		ColorDesc.loadOp = FVulkanEnum::Translate(ColorEntry.LoadOp);
+		ColorDesc.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		ColorDesc.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		ColorDesc.initialLayout = ColorEntry.LoadOp == ALO_DontCare ? VK_IMAGE_LAYOUT_UNDEFINED : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+		ColorDesc.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
-		mClearValues[i] = ColorTarget->GetClearValue();
+		if (ColorDesc.samples == VK_SAMPLE_COUNT_1_BIT)
+		{
+			ColorDesc.storeOp = FVulkanEnum::Translate(ColorEntry.StoreOp);
+		}
+		else
+		{
+			ColorDesc.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		}
+
+		mClearValues[NumAttachmentDesc] = ColorTarget->GetClearValue();
+		AttachmentIndices.Colors[i] = NumAttachmentDesc;
+		NumAttachmentDesc++;
+
+		if (ColorEntry.ResolveTarget)
+		{
+			FVulkanTexture* ResolveTarget = FVulkanTexture::Cast(ColorEntry.ResolveTarget);
+			VkAttachmentDescription2& ResolveDesc = AttachmentDescs[NumAttachmentDesc];
+			ResolveDesc = {};
+			ResolveDesc.sType = VK_STRUCTURE_TYPE_ATTACHMENT_DESCRIPTION_2;
+			ResolveDesc.format = ColorFormat;
+			ResolveDesc.samples = VK_SAMPLE_COUNT_1_BIT;
+			ResolveDesc.loadOp = FVulkanEnum::Translate(ColorEntry.LoadOp);
+			ResolveDesc.storeOp = FVulkanEnum::Translate(ColorEntry.StoreOp);
+			ResolveDesc.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+			ResolveDesc.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+			ResolveDesc.initialLayout = ColorEntry.LoadOp == ALO_DontCare ? VK_IMAGE_LAYOUT_UNDEFINED : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+			ResolveDesc.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+			mClearValues[NumAttachmentDesc] = ResolveTarget->GetClearValue();
+			AttachmentIndices.ColorResolves[i] = NumAttachmentDesc;
+			NumAttachmentDesc++;
+		}
 	}
 
-	int32 DepthStencilIndex = -1;
 	if (mDesc.DepthStencilRenderTarget.DepthStencilTarget)
 	{
-		FVulkanTexture* DepthStencilTarget = FVulkanTexture::Cast(mDesc.DepthStencilRenderTarget.DepthStencilTarget);
+		const FRHIRenderPassDesc::FDepthStencilEntry& DepthStencilEntry = mDesc.DepthStencilRenderTarget;
+		FVulkanTexture* DepthStencilTarget = FVulkanTexture::Cast(DepthStencilEntry.DepthStencilTarget);
 		EPixelFormat DepthFormat = DepthStencilTarget->GetFormat();
 		REV_CORE_ASSERT(FPixelFormatInfo::HasDepth(DepthFormat));
 		bool bHasStencil = FPixelFormatInfo::HasStencil(DepthFormat);
-	
-		DepthStencilIndex = mDesc.NumColorRenderTargets;
 
-		VkAttachmentDescription2& AttachmentDesc = AttachmentDescs[DepthStencilIndex];
-		AttachmentDesc = {};
-		AttachmentDesc.sType = VK_STRUCTURE_TYPE_ATTACHMENT_DESCRIPTION_2;
-		AttachmentDesc.format = (VkFormat)GPixelFormats[DepthFormat].PlatformFormat;
-		AttachmentDesc.samples = VK_SAMPLE_COUNT_1_BIT;
-		AttachmentDesc.loadOp = FVulkanEnum::Translate(mDesc.DepthStencilRenderTarget.DepthLoadOp);
-		AttachmentDesc.storeOp = FVulkanEnum::Translate(mDesc.DepthStencilRenderTarget.DepthStoreOp);
-		AttachmentDesc.stencilLoadOp = bHasStencil ? FVulkanEnum::Translate(mDesc.DepthStencilRenderTarget.StencilLoadOp) : VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-		AttachmentDesc.stencilStoreOp = bHasStencil ? FVulkanEnum::Translate(mDesc.DepthStencilRenderTarget.StencilStoreOp) : VK_ATTACHMENT_STORE_OP_DONT_CARE;
-		AttachmentDesc.initialLayout = mDesc.DepthStencilRenderTarget.DepthLoadOp == ALO_DontCare ? VK_IMAGE_LAYOUT_UNDEFINED : VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-		AttachmentDesc.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+		VkAttachmentDescription2& DepthStencilDesc = AttachmentDescs[NumAttachmentDesc];
+		DepthStencilDesc = {};
+		DepthStencilDesc.sType = VK_STRUCTURE_TYPE_ATTACHMENT_DESCRIPTION_2;
+		DepthStencilDesc.format = (VkFormat)GPixelFormats[DepthFormat].PlatformFormat;
+		DepthStencilDesc.samples = DepthStencilTarget->GetSamplerCount();
+		DepthStencilDesc.loadOp = FVulkanEnum::Translate(DepthStencilEntry.DepthLoadOp);
+		DepthStencilDesc.stencilLoadOp = bHasStencil ? FVulkanEnum::Translate(DepthStencilEntry.StencilLoadOp) : VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		DepthStencilDesc.initialLayout = DepthStencilEntry.DepthLoadOp == ALO_DontCare ? VK_IMAGE_LAYOUT_UNDEFINED : VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+		DepthStencilDesc.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+		
+		if (DepthStencilDesc.samples == VK_SAMPLE_COUNT_1_BIT)
+		{
+			DepthStencilDesc.storeOp = FVulkanEnum::Translate(DepthStencilEntry.DepthStoreOp);
+			DepthStencilDesc.stencilStoreOp = bHasStencil ? FVulkanEnum::Translate(DepthStencilEntry.StencilStoreOp) : VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		}
+		else
+		{
+			DepthStencilDesc.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+			DepthStencilDesc.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		}
+		
+		mClearValues[NumAttachmentDesc] = DepthStencilTarget->GetClearValue();
+		AttachmentIndices.DepthStencil = NumAttachmentDesc;
+		NumAttachmentDesc++;
 
-		mClearValues[DepthStencilIndex] = DepthStencilTarget->GetClearValue();
+		if (DepthStencilEntry.ResolveTarget)
+		{
+			FVulkanTexture* ResolveTarget = FVulkanTexture::Cast(DepthStencilEntry.ResolveTarget);
+			VkAttachmentDescription2& ResolveDesc = AttachmentDescs[NumAttachmentDesc];
+			ResolveDesc = {};
+			ResolveDesc.sType = VK_STRUCTURE_TYPE_ATTACHMENT_DESCRIPTION_2;
+			ResolveDesc.format = (VkFormat)GPixelFormats[DepthFormat].PlatformFormat;
+			ResolveDesc.samples = VK_SAMPLE_COUNT_1_BIT;
+			ResolveDesc.loadOp = FVulkanEnum::Translate(DepthStencilEntry.DepthLoadOp);
+			ResolveDesc.storeOp = FVulkanEnum::Translate(DepthStencilEntry.DepthStoreOp);
+			ResolveDesc.stencilLoadOp = bHasStencil ? FVulkanEnum::Translate(DepthStencilEntry.StencilLoadOp) : VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+			ResolveDesc.stencilStoreOp = bHasStencil ? FVulkanEnum::Translate(DepthStencilEntry.StencilStoreOp) : VK_ATTACHMENT_STORE_OP_DONT_CARE;
+			ResolveDesc.initialLayout = DepthStencilEntry.DepthLoadOp == ALO_DontCare ? VK_IMAGE_LAYOUT_UNDEFINED : VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+			ResolveDesc.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+			mClearValues[NumAttachmentDesc] = ResolveTarget->GetClearValue();
+			AttachmentIndices.DepthStencilResolve = NumAttachmentDesc;
+			NumAttachmentDesc++;
+		}
 	}
-
-	uint32 AttachmentCount = DepthStencilIndex >= 0 ? DepthStencilIndex + 1 : mDesc.NumColorRenderTargets;
 
 	struct FSubpassAttachmentRef
 	{
 		//uint32 InputAttachmentCount;
 		//VkAttachmentReference2 InputAttachments[RTA_MaxColorAttachments + 2];
-		uint32 ColorAttachmentCount;
+		uint32 NumColorAttachments;
 		VkAttachmentReference2 ColorAttachments[RTA_MaxColorAttachments];
-		VkAttachmentReference2 ResolveAttachments[RTA_MaxColorAttachments];
+		VkAttachmentReference2 ColorResolveAttachments[RTA_MaxColorAttachments];
 		VkAttachmentReference2 DepthStencilAttachment;
+		VkAttachmentReference2 DepthStencilResolveAttachment;
 	};
 
-
 	VkSubpassDescription2 SubpassDescs[REV_VK_MAX_SUBPASSES];
+	VkSubpassDescriptionDepthStencilResolve SubpassDescDepthStencilResolves[REV_VK_MAX_SUBPASSES];
 	FSubpassAttachmentRef AttachmentRefs[REV_VK_MAX_SUBPASSES];
+
 	uint32 NumSubpass = 0;
 	{
+		uint32 NumAttachmentRefs = 0;
+		bool bEnableColorResolve = false;
+		bool bEnableDepthStencil = false;
+		bool bEnableDepthStencilResolve = false;
+
+
 		//Main subpass
 		VkSubpassDescription2& SubpassDesc = SubpassDescs[NumSubpass];
 		FSubpassAttachmentRef& AttachmentRef = AttachmentRefs[NumSubpass];
 		NumSubpass++;
 
-		bool bEnableResolve = false;
-		AttachmentRef.ColorAttachmentCount = mDesc.NumColorRenderTargets;
-		for (uint32 i = 0; i < mDesc.NumColorRenderTargets; i++)
+		
+		AttachmentRef.NumColorAttachments = mDesc.NumColorRenderTargets;
+		for (uint32 i = 0; i < AttachmentRef.NumColorAttachments; i++)
 		{
+			const FRHIRenderPassDesc::FColorEntry& ColorEntry = mDesc.ColorRenderTargets[i];
 			VkAttachmentReference2& ColorRef = AttachmentRef.ColorAttachments[i];
 			ColorRef = {};
 			ColorRef.sType = VK_STRUCTURE_TYPE_ATTACHMENT_REFERENCE_2;
 			ColorRef.pNext = nullptr;
-			ColorRef.attachment = i;
+			ColorRef.attachment = AttachmentIndices.Colors[i];
 			ColorRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 			ColorRef.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 
-			/*const FRHIRenderPassDesc::FColorEntry& ColorEntry = mDesc.ColorRenderTargets[i];
 			if (ColorEntry.ResolveTarget)
 			{
-				VkAttachmentReference2& ResolveRef = AttachmentRef.ResolveAttachments[i];
+				VkAttachmentReference2& ResolveRef = AttachmentRef.ColorResolveAttachments[i];
 				ResolveRef = {};
 				ResolveRef.sType = VK_STRUCTURE_TYPE_ATTACHMENT_REFERENCE_2;
 				ResolveRef.pNext = nullptr;
-				ResolveRef.attachment = i + AttachmentRef.ColorAttachmentCount;
+				ResolveRef.attachment = AttachmentIndices.ColorResolves[i];
 				ResolveRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 				ResolveRef.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 
-				bEnableResolve = true;
-			}*/
+				bEnableColorResolve = true;
+			}
 		}
 
-		bool bEnableDepthStencil = false;
-		if (DepthStencilIndex >= 0)
+		if (mDesc.DepthStencilRenderTarget.DepthStencilTarget)
 		{
 			VkAttachmentReference2& DepthStencilRef = AttachmentRef.DepthStencilAttachment;
 			DepthStencilRef.sType = VK_STRUCTURE_TYPE_ATTACHMENT_REFERENCE_2;
 			DepthStencilRef.pNext = nullptr;
-			DepthStencilRef.attachment = (uint32)DepthStencilIndex;
+			DepthStencilRef.attachment = AttachmentIndices.DepthStencil;
 			DepthStencilRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 			DepthStencilRef.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
 
 			bEnableDepthStencil = true;
+
+			if (mDesc.DepthStencilRenderTarget.ResolveTarget)
+			{
+
+				VkAttachmentReference2& DepthStencilRef = AttachmentRef.DepthStencilResolveAttachment;
+				DepthStencilRef.sType = VK_STRUCTURE_TYPE_ATTACHMENT_REFERENCE_2;
+				DepthStencilRef.pNext = nullptr;
+				DepthStencilRef.attachment = AttachmentIndices.DepthStencilResolve;
+				DepthStencilRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+				DepthStencilRef.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
+
+				bEnableDepthStencilResolve = true;
+			}
 		}
 
 		SubpassDesc = {};
 		SubpassDesc.sType = VK_STRUCTURE_TYPE_SUBPASS_DESCRIPTION_2;
 		SubpassDesc.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-		SubpassDesc.colorAttachmentCount = AttachmentRef.ColorAttachmentCount;
+		SubpassDesc.colorAttachmentCount = AttachmentRef.NumColorAttachments;
 		SubpassDesc.pColorAttachments = AttachmentRef.ColorAttachments;
-		SubpassDesc.pResolveAttachments = bEnableResolve ? AttachmentRef.ResolveAttachments : nullptr;
+		SubpassDesc.pResolveAttachments = bEnableColorResolve ? AttachmentRef.ColorResolveAttachments : nullptr;
 		SubpassDesc.pDepthStencilAttachment = bEnableDepthStencil ? &AttachmentRef.DepthStencilAttachment : nullptr;
 		SubpassDesc.inputAttachmentCount = 0;
 		SubpassDesc.pInputAttachments = nullptr;
+
+		if (bEnableDepthStencilResolve)
+		{
+			VkSubpassDescriptionDepthStencilResolve SubpassDescDepthStencilResolve = SubpassDescDepthStencilResolves[NumSubpass];
+			SubpassDescDepthStencilResolve = {};
+			SubpassDescDepthStencilResolve.sType = VK_STRUCTURE_TYPE_SUBPASS_DESCRIPTION_DEPTH_STENCIL_RESOLVE;
+			SubpassDescDepthStencilResolve.pNext = nullptr;
+			SubpassDescDepthStencilResolve.depthResolveMode = VK_RESOLVE_MODE_AVERAGE_BIT;
+			SubpassDescDepthStencilResolve.stencilResolveMode = VK_RESOLVE_MODE_MIN_BIT;
+			SubpassDescDepthStencilResolve.pDepthStencilResolveAttachment = &AttachmentRef.DepthStencilResolveAttachment;
+
+			SubpassDesc.pNext = &SubpassDescDepthStencilResolve;
+		}
 	}
 
 
 	VkRenderPassCreateInfo2 RenderPassInfo{};
 	RenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO_2;
-	RenderPassInfo.attachmentCount = AttachmentCount;
+	RenderPassInfo.attachmentCount = NumAttachmentDesc;
 	RenderPassInfo.pAttachments = AttachmentDescs;
 	RenderPassInfo.subpassCount = NumSubpass;
 	RenderPassInfo.pSubpasses = SubpassDescs;
 
 	REV_VK_CHECK_THROW(vkCreateRenderPass2(FVulkanDynamicRHI::GetDevice(), &RenderPassInfo, nullptr, &mRenderPass), "failed to create render pass!");
 
-	mNumAttachments = AttachmentCount;
+	mNumAttachments = NumAttachmentDesc;
 }
 
 void FVulkanRenderPass::Release()

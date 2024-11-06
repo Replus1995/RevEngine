@@ -7,6 +7,8 @@
 #include "Rev/Render/RenderProxy/SceneProxy.h"
 #include "Rev/Render/RenderUtils.h"
 
+#define TEMP_MSAA_LEVEL 4
+
 namespace Rev
 {
 
@@ -23,34 +25,42 @@ void FForwardRenderer::BeginFrame()
 {
 	//prepare resource
 
-	if (!mBasePassColor)
+	if (!mBaseColorTex)
 	{
-		FRHITextureDesc Desc = FRHITextureDesc::Make2D(mSceneProxy->GetFrameWidth(), mSceneProxy->GetFrameHeight(), PF_R8G8B8A8).SetClearColor(Math::FLinearColor(0, 0, 0, 1)).SetFlags(ETextureCreateFlags::RenderTargetable);
-		mBasePassColor = GDynamicRHI->RHICreateTexture(Desc);
-
+		FRHITextureDesc Desc = FRHITextureDesc::Make2D(mSceneProxy->GetFrameWidth(), mSceneProxy->GetFrameHeight(), PF_R8G8B8A8).SetClearColor(Math::FLinearColor(0, 0, 0, 1)).SetFlags(ETextureCreateFlags::ColorTarget);
+		mBaseColorTex = GDynamicRHI->RHICreateTexture(Desc);
 	}
-	if (!mBasePassDepth)
+	if (!mBaseColorResolveTex)
 	{
-		FRHITextureDesc Desc = FRHITextureDesc::Make2D(mSceneProxy->GetFrameWidth(), mSceneProxy->GetFrameHeight(), PF_DepthStencil).SetClearColor(FRHITextureClearColor(1.0, 0)).SetFlags(ETextureCreateFlags::DepthStencilTargetable);
-		mBasePassDepth = GDynamicRHI->RHICreateTexture(Desc);
+		FRHITextureDesc Desc = FRHITextureDesc::Make2D(mSceneProxy->GetFrameWidth(), mSceneProxy->GetFrameHeight(), PF_R8G8B8A8).SetClearColor(Math::FLinearColor(0, 0, 0, 1)).SetFlags(ETextureCreateFlags::ColorTarget).SetNumSamples(TEMP_MSAA_LEVEL);
+		mBaseColorResolveTex = GDynamicRHI->RHICreateTexture(Desc);
 	}
-
+	if (!mBaseDepthTex)
+	{
+		FRHITextureDesc Desc = FRHITextureDesc::Make2D(mSceneProxy->GetFrameWidth(), mSceneProxy->GetFrameHeight(), PF_DepthStencil).SetClearColor(FRHITextureClearColor(1.0, 0)).SetFlags(ETextureCreateFlags::DepthStencilTarget);
+		mBaseDepthTex = GDynamicRHI->RHICreateTexture(Desc);
+	}
+	if (!mBaseDepthResolveTex)
+	{
+		FRHITextureDesc Desc = FRHITextureDesc::Make2D(mSceneProxy->GetFrameWidth(), mSceneProxy->GetFrameHeight(), PF_DepthStencil).SetClearColor(FRHITextureClearColor(1.0, 0)).SetFlags(ETextureCreateFlags::DepthStencilTarget).SetNumSamples(TEMP_MSAA_LEVEL);
+		mBaseDepthResolveTex = GDynamicRHI->RHICreateTexture(Desc);
+	}
 	if (!mBasePass)
 	{
 
 		FRHIRenderPassDesc BasePassDesc;
-		BasePassDesc.ColorRenderTargets[0] = { mBasePassColor.get(), nullptr, -1, 0, ALO_Clear, ASO_Store};
+		BasePassDesc.ColorRenderTargets[0] = { mBaseColorResolveTex.get(), mBaseColorTex.get(), -1, 0, ALO_Clear, ASO_Store};
 		BasePassDesc.NumColorRenderTargets = 1;
-		BasePassDesc.DepthStencilRenderTarget  = { mBasePassDepth.get(), nullptr, ALO_Clear, ASO_Store, ALO_DontCare, ASO_DontCare };
+		BasePassDesc.DepthStencilRenderTarget  = { mBaseDepthResolveTex.get(), mBaseDepthTex.get(), ALO_Clear, ASO_Store, ALO_DontCare, ASO_DontCare};
 		mBasePass = GDynamicRHI->RHICreateRenderPass(BasePassDesc);
 	}
 	
 	if (!mSkyPass)
 	{
 		FRHIRenderPassDesc SkyPassDesc;
-		SkyPassDesc.ColorRenderTargets[0] = { mBasePassColor.get(), nullptr, -1, 0, ALO_Load, ASO_Store };
+		SkyPassDesc.ColorRenderTargets[0] = { mBaseColorTex.get(), nullptr, -1, 0, ALO_Load, ASO_Store };
 		SkyPassDesc.NumColorRenderTargets = 1;
-		SkyPassDesc.DepthStencilRenderTarget = { mBasePassDepth.get(), nullptr, ALO_Load, ASO_DontCare, ALO_DontCare, ASO_DontCare };
+		SkyPassDesc.DepthStencilRenderTarget = { mBaseDepthTex.get(), nullptr, ALO_Load, ASO_DontCare, ALO_DontCare, ASO_DontCare };
 		mSkyPass = GDynamicRHI->RHICreateRenderPass(SkyPassDesc);
 	}
 
@@ -58,8 +68,8 @@ void FForwardRenderer::BeginFrame()
 	{
 		FrameWidth = mSceneProxy->GetFrameWidth();
 		FrameHeight = mSceneProxy->GetFrameHeight();
-		GDynamicRHI->RHIResizeTexture(mBasePassColor.get(), FrameWidth, FrameHeight, 1);
-		GDynamicRHI->RHIResizeTexture(mBasePassDepth.get(), FrameWidth, FrameHeight, 1);
+		GDynamicRHI->RHIResizeTexture(mBaseColorTex.get(), FrameWidth, FrameHeight, 1);
+		GDynamicRHI->RHIResizeTexture(mBaseDepthTex.get(), FrameWidth, FrameHeight, 1);
 		mBasePass->MarkFramebufferDirty();
 	}
 
@@ -89,6 +99,7 @@ void FForwardRenderer::DrawFrame(FRHICommandList& RHICmdList)
 
 		FRHIGraphicsPipelineStateDesc PipelineStateDesc;
 		PipelineStateDesc.VertexInputState = GStaticMeshVertexInputState.VertexInputStateRHI.get();
+		PipelineStateDesc.NumSamples = TEMP_MSAA_LEVEL;
 
 		FRHIRasterizerStateDesc RasterizerStateDesc;
 		RasterizerStateDesc.CullMode = CM_Back;
@@ -139,7 +150,7 @@ void FForwardRenderer::DrawFrame(FRHICommandList& RHICmdList)
 		RHICmdList.GetContext()->RHIEndDebugLabel();
 	}
 	
-	RHICmdList.GetContext()->RHIBlitToBackTexture(mBasePassColor.get());
+	RHICmdList.GetContext()->RHIBlitToBackTexture(mBaseColorTex.get());
 
 
 	/*

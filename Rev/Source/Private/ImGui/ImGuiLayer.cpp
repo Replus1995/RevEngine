@@ -222,7 +222,14 @@ static void ImGuiLayer_Vulkan_Draw(FRHICommandList& RHICmdList)
     VkImageView ImageView = pVkContext->GetSwapchainImageView();
     VkExtent2D Extent = pVkContext->GetSwapchain().GetExtent();
 
-    VkRenderingAttachmentInfo ColorAttachment = FVulkanInit::AttachmentInfo(ImageView, nullptr, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+    VkRenderingAttachmentInfo ColorAttachment{};
+    ColorAttachment.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
+    ColorAttachment.pNext = nullptr;
+    ColorAttachment.imageView = ImageView;
+    ColorAttachment.imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+    ColorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
+    ColorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+
     VkRenderingInfo RenderingInfo{};
     RenderingInfo.sType = VK_STRUCTURE_TYPE_RENDERING_INFO;
     RenderingInfo.pNext = nullptr;

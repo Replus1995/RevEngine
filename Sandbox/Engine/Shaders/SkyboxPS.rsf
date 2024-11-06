@@ -17,6 +17,7 @@ PSOutput main(const PSInput Input)
 {
     PSOutput Result;
     Result.Color.rgb = sEnv.Sample(Input.ViewDir).rgb;
+    Result.Color.rgb = pow(Result.Color.rgb, float3(1.0/2.2));
     Result.Color.a = 1.0f;
     return Result;
 }

@@ -106,7 +106,8 @@ ExampleLayer::ExampleLayer()
 			"/Game/Assets/Textures/Skybox/top.jpg",
 			"/Game/Assets/Textures/Skybox/bottom.jpg",
 			"/Game/Assets/Textures/Skybox/front.jpg",
-			"/Game/Assets/Textures/Skybox/back.jpg");
+			"/Game/Assets/Textures/Skybox/back.jpg",
+			true);
 		auto CubeTex = CubeTexStorage.CreateTexture();
 		if (CubeTex)
 		{ 

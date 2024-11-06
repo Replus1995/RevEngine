@@ -18,8 +18,9 @@ public:
 	VkImageView GetImageView() const { return mImageView; }
 	VkImageAspectFlags GetAspectFlags() const { return mImageAspectFlags; }
 	VkImageLayout GetImageLayout() const { return mImageLayout; }
-	VkClearValue GetClearValue();
-	VkExtent3D GetExtent();
+	VkClearValue GetClearValue() const;
+	VkExtent3D GetExtent() const;
+	VkSampleCountFlagBits GetSamplerCount() const;
 
 	static FVulkanTexture* Cast(FRHITexture* InTexture) { return static_cast<FVulkanTexture*>(InTexture); }
 
@@ -37,6 +38,9 @@ protected:
 	virtual void Release();
 	VkExtent2D CalculateMipSize2D(uint32 InMipLevel);
 	VkExtent3D CalculateMipSize3D(uint32 InMipLevel);
+	static VkImageUsageFlags TranslateImageUsageFlags(ETextureCreateFlags InFlags);
+
+
 protected:
 	VkImage mImage = VK_NULL_HANDLE;
 	VkImageView mImageView = VK_NULL_HANDLE;

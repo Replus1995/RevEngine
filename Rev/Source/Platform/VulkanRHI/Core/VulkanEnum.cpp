@@ -191,28 +191,4 @@ VkFormat FVulkanEnum::Translate(EVertexElmentType InType)
     return VK_FORMAT_UNDEFINED;
 }
 
-VkImageUsageFlags FVulkanEnum::Translate(ETextureCreateFlags InFlags)
-{
-    VkImageUsageFlags OutFlags = 0;
-    if (EnumHasAnyFlags(InFlags, ETextureCreateFlags::RenderTargetable))
-    {
-        OutFlags |= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
-    }
-    else if (EnumHasAnyFlags(InFlags, ETextureCreateFlags::DepthStencilTargetable))
-    {
-        OutFlags |= VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
-    }
-    else
-    {
-        OutFlags |= VK_IMAGE_USAGE_TRANSFER_DST_BIT;
-    }
-
-    if (EnumHasAnyFlags(InFlags, ETextureCreateFlags::ShaderResource))
-    {
-        OutFlags |= VK_IMAGE_USAGE_SAMPLED_BIT;
-    }
-
-    return OutFlags;
-}
-
 }

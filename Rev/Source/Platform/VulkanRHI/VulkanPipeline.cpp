@@ -21,7 +21,7 @@ private:
     static VkPipelineInputAssemblyStateCreateInfo MakeInputAssemblyStateInfo(VkPrimitiveTopology InTopology);
     static VkPipelineTessellationStateCreateInfo MakeTessellationStateInfo();
     static VkPipelineViewportStateCreateInfo MakeViewportStateInfo();
-    static VkPipelineMultisampleStateCreateInfo MakeMultisampleStateInfo();
+    static VkPipelineMultisampleStateCreateInfo MakeMultisampleStateInfo(VkSampleCountFlagBits SampleCountFlag, bool bAlphaToCoverage);
     static VkPipelineColorBlendStateCreateInfo MakeColorBlendStateInfo(const VkPipelineColorBlendAttachmentState* InColorBlendStates, uint32 InNumColorBlendStates);
     static VkPipelineDynamicStateCreateInfo MakeDynamicStateInfo(const VkDynamicState* InDynaimcStates, uint32 InNumDynaimcStates);
     static VkPipelineRenderingCreateInfo MakeRenderingInfo(const VkFormat* InColorFomats, uint32 InNumColorFormats, VkFormat InDepthFormat);
@@ -65,10 +65,12 @@ VkPipeline FVulkanPipelineBuilder::BuildGraphics(VkDevice InDevice, VkPipelineLa
         DepthFormat = (VkFormat)GPixelFormats[RenderPassDesc.DepthStencilRenderTarget.DepthStencilTarget->GetFormat()].PlatformFormat;
     }
 
+    bool bEnableAlphaToCoverage = InStateDesc.NumSamples > 1 && ColorBlendStateRHI->Desc.bUseAlphaToCoverage;
+
     VkPipelineInputAssemblyStateCreateInfo InputAssemblyState = MakeInputAssemblyStateInfo(FVulkanEnum::Translate(InStateDesc.PrimitiveTopology));
     VkPipelineTessellationStateCreateInfo TessellationState = MakeTessellationStateInfo();
     VkPipelineViewportStateCreateInfo ViewportState = MakeViewportStateInfo();
-    VkPipelineMultisampleStateCreateInfo MultisampleState = MakeMultisampleStateInfo();
+    VkPipelineMultisampleStateCreateInfo MultisampleState = MakeMultisampleStateInfo((VkSampleCountFlagBits)InStateDesc.NumSamples, bEnableAlphaToCoverage);
     VkPipelineColorBlendStateCreateInfo ColorBlendState = MakeColorBlendStateInfo(ColorBlendStateRHI->Attachments, ColorAttachmentCount);
     VkPipelineDynamicStateCreateInfo DynamicState = MakeDynamicStateInfo(DynamicStates, sizeof(DynamicStates) / sizeof(VkDynamicState));
     VkPipelineRenderingCreateInfo Rendering = MakeRenderingInfo(ColorFormats, ColorAttachmentCount, DepthFormat);
@@ -131,16 +133,16 @@ VkPipelineViewportStateCreateInfo FVulkanPipelineBuilder::MakeViewportStateInfo(
     return StateInfo;
 }
 
-VkPipelineMultisampleStateCreateInfo FVulkanPipelineBuilder::MakeMultisampleStateInfo()
+VkPipelineMultisampleStateCreateInfo FVulkanPipelineBuilder::MakeMultisampleStateInfo(VkSampleCountFlagBits SampleCountFlag, bool bAlphaToCoverage)
 {
     VkPipelineMultisampleStateCreateInfo StateInfo{};
     StateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
     StateInfo.sampleShadingEnable = VK_FALSE;
-    StateInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+    StateInfo.rasterizationSamples = SampleCountFlag;
     StateInfo.minSampleShading = 1.0f;
     StateInfo.pSampleMask = nullptr;
     StateInfo.alphaToCoverageEnable = VK_FALSE;
-    StateInfo.alphaToOneEnable = VK_FALSE;
+    StateInfo.alphaToOneEnable = bAlphaToCoverage;
     return StateInfo;
 }
 

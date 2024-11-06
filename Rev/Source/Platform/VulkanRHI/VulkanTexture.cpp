@@ -24,7 +24,7 @@ FVulkanTexture::FVulkanTexture(const FRHITextureDesc& InDesc)
 		mImageAspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
 }
 
-VkClearValue FVulkanTexture::GetClearValue()
+VkClearValue FVulkanTexture::GetClearValue() const
 {
 	bool bColorImage = mImageAspectFlags & VK_IMAGE_ASPECT_COLOR_BIT;
 	VkClearValue ClearValue;
@@ -60,10 +60,15 @@ VkClearValue FVulkanTexture::GetClearValue()
 	return ClearValue;
 }
 
-VkExtent3D FVulkanTexture::GetExtent()
+VkExtent3D FVulkanTexture::GetExtent() const
 {
 	uint32 Depth = mDesc.Depth <= 0 ? 1 : mDesc.Depth;
 	return { mDesc.Width, mDesc.Height, Depth };
+}
+
+VkSampleCountFlagBits FVulkanTexture::GetSamplerCount() const
+{
+	return (VkSampleCountFlagBits)mDesc.NumSamples;
 }
 
 void FVulkanTexture::Release()
@@ -87,6 +92,25 @@ VkExtent2D FVulkanTexture::CalculateMipSize2D(uint32 InMipLevel)
 VkExtent3D FVulkanTexture::CalculateMipSize3D(uint32 InMipLevel)
 {
     return { std::max<uint32>(1, GetWidth() >> InMipLevel), std::max<uint32>(1, GetHeight() >> InMipLevel), std::max<uint32>(1, GetDepth() >> InMipLevel) };
+}
+
+VkImageUsageFlags FVulkanTexture::TranslateImageUsageFlags(ETextureCreateFlags InFlags)
+{
+	VkImageUsageFlags OutFlags = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+	if (EnumHasAnyFlags(InFlags, ETextureCreateFlags::ColorTarget | ETextureCreateFlags::ColorResolveTarget))
+	{
+		OutFlags |= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+		if (EnumHasAnyFlags(InFlags, ETextureCreateFlags::ColorResolveTarget))
+			OutFlags |= VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT;
+	}
+	else if (EnumHasAnyFlags(InFlags, ETextureCreateFlags::DepthStencilTarget | ETextureCreateFlags::DepthStencilResolveTarget))
+	{
+		OutFlags |= VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+		/*if (EnumHasAnyFlags(InFlags, ETextureCreateFlags::DepthStencilResolveTarget))
+			OutFlags |= VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT;*/
+	}
+
+	return OutFlags;
 }
 
 

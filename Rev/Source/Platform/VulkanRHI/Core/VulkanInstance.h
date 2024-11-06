@@ -1,5 +1,6 @@
 #pragma once
 #include "Rev/Core/Base.h"
+#include "Rev/Render/RHI/RHIDefinitions.h"
 #include "VulkanDefines.h"
 #include <vulkan/vulkan.h>
 #include <vector>
@@ -29,6 +30,7 @@ public:
 	void CreateSurface();
 	void PickPhysicalDevice();
 	void CreateLogicalDevice();
+	void QueryDeviceCapacity(FRHIDeviceCapacity& Capacity);
 	void Cleanup();
 
 	const VkInstance& GetInstance() const { return mInstance; }
@@ -65,6 +67,7 @@ private:
 	VkQueue mQueues[VQK_Count];
 
 	FVulkanSurfaceSupport mSurfaceSupport;
+	VkFormatProperties mFormatProperties[REV_VK_FORMAT_RANGE_SIZE];
 };
 
 }

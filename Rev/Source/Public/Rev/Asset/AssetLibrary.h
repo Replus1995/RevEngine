@@ -39,7 +39,8 @@ public:
 	static FTextureStorage ImportTextureCube(
 		const FPath& InPathPX, const FPath& InPathNX,
 		const FPath& InPathPY, const FPath& InPathNY,
-		const FPath& InPathPZ, const FPath& InPathNZ
+		const FPath& InPathPZ, const FPath& InPathNZ,
+		bool bSRGB = false
 		);
 
 	static FModelImportResult ImportModel(const FPath& InPath);

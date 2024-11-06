@@ -23,6 +23,7 @@ void FVulkanDynamicRHI::Init()
 	mInstance.CreateSurface();
 	mInstance.PickPhysicalDevice();
 	mInstance.CreateLogicalDevice();
+	mInstance.QueryDeviceCapacity(mDeviceCapacity);
 
 	VmaAllocatorCreateInfo AllocatorCreateInfo = {};
 	AllocatorCreateInfo.physicalDevice = mInstance.GetPhysicalDevice();

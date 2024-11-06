@@ -4,57 +4,57 @@
 namespace Rev
 {
 
-bool operator==(const FRHISamplerStateDesc& A, const FRHISamplerStateDesc& B)
+bool FRHISamplerStateDesc::operator==(const FRHISamplerStateDesc& B) const
 {
-	bool bSame = A.Filter == B.Filter &&
-		A.WarpU == B.WarpU &&
-		A.WarpV == B.WarpV &&
-		A.WarpW == B.WarpW &&
-		A.MipBias == B.MipBias &&
-		A.MinMipLevel == B.MinMipLevel &&
-		A.MaxMipLevel == B.MaxMipLevel &&
-		A.MaxAnisotropy == B.MaxAnisotropy && 
-		A.BorderColor == B.BorderColor &&
-		A.CompareFunc == B.CompareFunc;
+	bool bSame = Filter == B.Filter &&
+		WarpU == B.WarpU &&
+		WarpV == B.WarpV &&
+		WarpW == B.WarpW &&
+		MipBias == B.MipBias &&
+		MinMipLevel == B.MinMipLevel &&
+		MaxMipLevel == B.MaxMipLevel &&
+		MaxAnisotropy == B.MaxAnisotropy &&
+		BorderColor == B.BorderColor &&
+		CompareFunc == B.CompareFunc;
 	return bSame;
 }
 
-bool operator==(const FRHIRasterizerStateDesc& A, const FRHIRasterizerStateDesc& B)
+bool FRHIRasterizerStateDesc::operator==(const FRHIRasterizerStateDesc& B) const
 {
-	bool bSame = A.FillMode == B.FillMode &&
-		A.CullMode == B.CullMode &&
-		A.DepthBias == B.DepthBias &&
-		A.DepthBiasSlopeFactor == B.DepthBiasSlopeFactor &&
-		A.DepthClipMode == B.DepthClipMode &&
-		A.bAllowMSAA == B.bAllowMSAA;
+	bool bSame = FillMode == B.FillMode &&
+		CullMode == B.CullMode &&
+		DepthBias == B.DepthBias &&
+		DepthBiasSlopeFactor == B.DepthBiasSlopeFactor &&
+		DepthClipMode == B.DepthClipMode &&
+		bAllowMSAA == B.bAllowMSAA;
 	return bSame;
 }
 
-bool operator==(const FRHIDepthStencilStateDesc& A, const FRHIDepthStencilStateDesc& B)
+bool FRHIDepthStencilStateDesc::operator==(const FRHIDepthStencilStateDesc& B) const
 {
-	bool bSame = A.bEnableDepthWrite == B.bEnableDepthWrite &&
-		A.DepthTestFunc == B.DepthTestFunc &&
-		A.bEnableFrontFaceStencil == B.bEnableFrontFaceStencil &&
-		A.bEnableBackFaceStencil == B.bEnableBackFaceStencil &&
-		A.FrontFaceStencilFailOp == B.FrontFaceStencilFailOp &&
-		A.FrontFaceStencilPassOp == B.FrontFaceStencilPassOp &&
-		A.FrontFaceStencilDepthFailOp == B.FrontFaceStencilDepthFailOp &&
-		A.FrontFaceStencilFunc == B.FrontFaceStencilFunc &&
-		A.BackFaceStencilFailOp == B.BackFaceStencilFailOp &&
-		A.BackFaceStencilPassOp == B.BackFaceStencilPassOp &&
-		A.BackFaceStencilDepthFailOp == B.BackFaceStencilDepthFailOp &&
-		A.BackFaceStencilFunc == B.BackFaceStencilFunc &&
-		A.StencilReadMask == B.StencilReadMask &&
-		A.StencilWriteMask == B.StencilWriteMask;
+	bool bSame = bEnableDepthWrite == B.bEnableDepthWrite &&
+		DepthTestFunc == B.DepthTestFunc &&
+		bEnableFrontFaceStencil == B.bEnableFrontFaceStencil &&
+		bEnableBackFaceStencil == B.bEnableBackFaceStencil &&
+		FrontFaceStencilFailOp == B.FrontFaceStencilFailOp &&
+		FrontFaceStencilPassOp == B.FrontFaceStencilPassOp &&
+		FrontFaceStencilDepthFailOp == B.FrontFaceStencilDepthFailOp &&
+		FrontFaceStencilFunc == B.FrontFaceStencilFunc &&
+		BackFaceStencilFailOp == B.BackFaceStencilFailOp &&
+		BackFaceStencilPassOp == B.BackFaceStencilPassOp &&
+		BackFaceStencilDepthFailOp == B.BackFaceStencilDepthFailOp &&
+		BackFaceStencilFunc == B.BackFaceStencilFunc &&
+		StencilReadMask == B.StencilReadMask &&
+		StencilWriteMask == B.StencilWriteMask;
 	return bSame;
 }
 
-bool operator==(const FRHIColorBlendStateDesc& A, const FRHIColorBlendStateDesc& B)
+bool FRHIColorBlendStateDesc::operator==(const FRHIColorBlendStateDesc& B) const
 {
-	bool bSame = true;
+	bool bSame = bUseAlphaToCoverage == B.bUseAlphaToCoverage;
 	for (uint8 i = 0; i < RTA_MaxColorAttachments; i++)
 	{
-		const FRHIColorBlendStateDesc::FAttachment& AA = A.Attachments[i];
+		const FRHIColorBlendStateDesc::FAttachment& AA = Attachments[i];
 		const FRHIColorBlendStateDesc::FAttachment& BB = B.Attachments[i];
 
 		bSame &= AA.bEnableBlend == BB.bEnableBlend &&
@@ -73,24 +73,24 @@ bool operator==(const FRHIColorBlendStateDesc& A, const FRHIColorBlendStateDesc&
 	return bSame;
 }
 
-bool operator==(const FRHIVertexElement& A, const FRHIVertexElement& B)
+bool FRHIVertexElement::operator==(const FRHIVertexElement& B) const
 {
-	bool bSame = A.Type == B.Type &&
-		A.StreamIndex == B.StreamIndex &&
-		A.AttributeIndex == B.AttributeIndex &&
-		A.Offset == B.Offset &&
-		A.Stride == B.Stride;
+	bool bSame = Type == B.Type &&
+		StreamIndex == B.StreamIndex &&
+		AttributeIndex == B.AttributeIndex &&
+		Offset == B.Offset &&
+		Stride == B.Stride;
 	return bSame;
 }
 
-bool operator==(const FRHIVertexInputStateDesc& A, const FRHIVertexInputStateDesc& B)
+bool FRHIVertexInputStateDesc::operator==(const FRHIVertexInputStateDesc& B) const
 {
-	bool bSame = A.NumVertexElements == B.NumVertexElements;
+	bool bSame = NumVertexElements == B.NumVertexElements;
 	if(!bSame)
 		return false;
-	for (uint8 i = 0; i < A.NumVertexElements; i++)
+	for (uint8 i = 0; i < NumVertexElements; i++)
 	{
-		bSame &= A.VertexElements[i] == B.VertexElements[i];
+		bSame &= VertexElements[i] == B.VertexElements[i];
 		if (!bSame)
 			break;
 	}
@@ -143,6 +143,5 @@ uint32 FRHIVertexElement::GetElementSize()
 {
 	return uint32(GetComponentSize()) * uint32(GetComponentCount());
 }
-
 
 }

@@ -18,6 +18,7 @@ public:
 
 	virtual void Init() override;
 	virtual void Cleanup() override;
+	virtual const FRHIDeviceCapacity& GetDeviceCapacity() override { return mDeviceCapacity; };
 
 	virtual Scope<FRHIContext> RHICreateContext() override;
 	//Buffer
@@ -53,6 +54,7 @@ public:
 private:
 	FVulkanInstance mInstance;
 	VmaAllocator mAllocator = nullptr;
+	FRHIDeviceCapacity mDeviceCapacity;
 
 	std::map<uint32, Ref<FVulkanSamplerState>> mSamplerMap;
 };

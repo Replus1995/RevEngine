@@ -18,6 +18,7 @@ public:
 
 	virtual void Init() = 0;
 	virtual void Cleanup() = 0;
+	virtual const FRHIDeviceCapacity& GetDeviceCapacity() = 0;
 
 	virtual Scope<FRHIContext> RHICreateContext() = 0;
 	//Buffer

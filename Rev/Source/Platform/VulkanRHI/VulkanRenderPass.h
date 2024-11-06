@@ -18,6 +18,7 @@ public:
 	uint32 GetNumAttachments() const { return mNumAttachments; }
 	uint32 GetFrameWidth() const { return mFrameWidth; }
 	uint32 GetFrameHeight() const { return mFrameHeight; }
+	VkSampleCountFlagBits GetSampleCountFlag() const { return mSampleCountFlag; }
 	const VkClearValue* GetClearValues() const { return &mClearValues[0]; }
 
 private:
@@ -30,7 +31,8 @@ private:
 	uint32 mNumAttachments = 0;
 	uint32 mFrameWidth = 0;
 	uint32 mFrameHeight = 0;
-	VkClearValue mClearValues[RTA_MaxColorAttachments + 1];
+	VkSampleCountFlagBits mSampleCountFlag = VK_SAMPLE_COUNT_1_BIT;
+	VkClearValue mClearValues[(RTA_MaxColorAttachments + 1) * 2];
 };
 
 

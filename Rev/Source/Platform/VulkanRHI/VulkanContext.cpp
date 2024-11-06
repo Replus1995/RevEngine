@@ -258,11 +258,21 @@ void FVulkanContext::RHIBeginRenderPass(FRHIRenderPass* InRenderPass)
 	{
 		FVulkanTexture* ColorTex = FVulkanTexture::Cast(PassDesc.ColorRenderTargets[i].ColorTarget);
 		ColorTex->DoTransition(GetActiveCmdBuffer(), VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+		if (PassDesc.ColorRenderTargets[i].ResolveTarget)
+		{
+			FVulkanTexture* ResolveTex = FVulkanTexture::Cast(PassDesc.ColorRenderTargets[i].ResolveTarget);
+			ResolveTex->DoTransition(GetActiveCmdBuffer(), VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+		}
 	}
 	if (PassDesc.DepthStencilRenderTarget.DepthStencilTarget)
 	{
 		FVulkanTexture* DepthStencilTex = FVulkanTexture::Cast(PassDesc.DepthStencilRenderTarget.DepthStencilTarget);
 		DepthStencilTex->DoTransition(GetActiveCmdBuffer(), VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
+		if (PassDesc.DepthStencilRenderTarget.ResolveTarget)
+		{
+			FVulkanTexture* ResolveTex = FVulkanTexture::Cast(PassDesc.DepthStencilRenderTarget.ResolveTarget);
+			ResolveTex->DoTransition(GetActiveCmdBuffer(), VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
+		}
 	}
 
 

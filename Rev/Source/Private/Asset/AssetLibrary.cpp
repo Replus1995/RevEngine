@@ -81,7 +81,7 @@ FTextureStorage FAssetLibrary::ImportTexture(const FPath& InPath)
 	return Result;
 }
 
-FTextureStorage FAssetLibrary::ImportTextureCube(const FPath& InPathPX, const FPath& InPathNX, const FPath& InPathPY, const FPath& InPathNY, const FPath& InPathPZ, const FPath& InPathNZ)
+FTextureStorage FAssetLibrary::ImportTextureCube(const FPath& InPathPX, const FPath& InPathNX, const FPath& InPathPY, const FPath& InPathNY, const FPath& InPathPZ, const FPath& InPathNZ, bool bSRG)
 {
 	FTextureStorage Result;
 	std::vector<FSTBImage2D> images(6);
@@ -100,6 +100,10 @@ FTextureStorage FAssetLibrary::ImportTextureCube(const FPath& InPathPX, const FP
 	REV_CORE_ASSERT(FSTBImage2D::SameSizeAndFormat(images[0], images[5]));
 
 	Result.TextureDesc = FRHITextureDesc::MakeCube(images[0].Width(), images[0].Height(), images[0].Format());
+	Result.TextureDesc.AddFlags(ETextureCreateFlags::ShaderResource);
+	if(bSRG)
+		Result.TextureDesc.AddFlags(ETextureCreateFlags::SRGB);
+
 	Result.ImageData.Resize(1, 6);
 	uint32 ImageDataSize = images[0].Width() * images[0].Height() * images[0].Channels() * images[0].PixelDepth() / 8;
 	for (uint16 i = 0; i < 6; i++)
