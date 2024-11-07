@@ -5,6 +5,7 @@
 
 namespace Rev
 {
+class FRHICommandList;
 class FRHIUniformBuffer;
 class FScene;
 class FLightProxy

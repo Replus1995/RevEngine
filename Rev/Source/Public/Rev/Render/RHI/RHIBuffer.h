@@ -8,31 +8,64 @@
 namespace Rev
 {
 
-class REV_API FRHIUniformBuffer : public FRHIResource
+struct FRHIBufferDesc
 {
-public:
-	FRHIUniformBuffer(uint32 InSize) : mSize(InSize) {}
-	virtual ~FRHIUniformBuffer() = default;
-	virtual void UpdateSubData(const void* Data, uint32 Size, uint32 Offset = 0) = 0;
+	uint32 Size = 0;
+	uint32 Stride = 0;
+	EBufferUsageFlags Usage = EBufferUsageFlags::None;
 
-	uint32 GetSize() const { return mSize; }
+	bool operator == (const FRHIBufferDesc& Other) const
+	{
+		bool bSame = Size == Other.Size &&
+			Stride == Other.Stride &&
+			Usage == Other.Usage;
+		return bSame;
+	}
 
-protected:
-	uint32 mSize;
+	bool operator != (const FRHIBufferDesc& Other) const
+	{
+		return !(*this == Other);
+	}
 };
 
 class REV_API FRHIBuffer : public FRHIResource
 {
 public:
-	FRHIBuffer(uint32 InSize, uint32 InStride, EBufferUsageFlags InUsage) : Size(InSize), Stride(InStride), Usage(InUsage) {}
+	FRHIBuffer(const FRHIBufferDesc& InDesc) : Desc(InDesc) {}
+	virtual ~FRHIBuffer() = default;
 
-	uint32 GetSize() const { return Size; }
-	uint32 GetStride() const { return Stride; }
-	EBufferUsageFlags GetUsage() const { return Usage; }
+	uint32 GetSize() const { return Desc.Size; }
+	uint32 GetStride() const { return Desc.Stride; }
+	EBufferUsageFlags GetUsage() const { return Desc.Usage; }
 private:
-	uint32 Size = 0;
-	uint32 Stride = 0;
-	EBufferUsageFlags Usage = EBufferUsageFlags::None;
+	FRHIBufferDesc Desc;
+};
+
+class REV_API FRHIUniformBuffer : public FRHIResource
+{
+public:
+	FRHIUniformBuffer(uint32 InSize) : BufferSize(InSize) {}
+	virtual ~FRHIUniformBuffer() = default;
+	virtual void UpdateSubData(const void* Data, uint32 Size, uint32 Offset = 0) = 0;
+
+	uint32 GetSize() const { return BufferSize; }
+
+protected:
+	uint32 BufferSize = 0;
+};
+
+class REV_API FRHIDynamicUniformBuffer : public FRHIResource
+{
+public:
+	FRHIDynamicUniformBuffer(uint32 InSize) : BufferSize(InSize) {}
+	virtual ~FRHIDynamicUniformBuffer() = default;
+	virtual void Resize(uint32 InSize) = 0;
+	virtual void UpdateSubData(const void* Data, uint32 Size, uint32 Offset = 0) = 0;
+
+	uint32 GetSize() const { return BufferSize; }
+
+protected:
+	uint32 BufferSize = 0;
 };
 
 }

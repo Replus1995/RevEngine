@@ -20,7 +20,7 @@ REV_API ERenderAPI GetRenderAPI();
 
 extern REV_API bool GIsRHIInitialized;
 
-class FRHIContext;
+class IRHIContext;
 class REV_API FRenderCore
 {
 public:
@@ -28,7 +28,7 @@ public:
     static void Cleanup();
 
     static ERenderAPI GetRenderAPI();
-    static FRHIContext* GetMainContext();
+    static IRHIContext* GetMainContext();
 };
 
 }

@@ -49,12 +49,12 @@ VkClearValue FVulkanTexture::GetClearValue() const
 				break;;
 			}
 		}*/
-		memcpy(&(ClearValue.color.float32), &(mDesc.ClearColor.RGBA), 4 * sizeof(float));
+		memcpy(&(ClearValue.color.float32), &(TextureDesc.ClearColor.RGBA), 4 * sizeof(float));
 	}
 	else
 	{
-		ClearValue.depthStencil.depth = mDesc.ClearColor.Depth;
-		ClearValue.depthStencil.stencil = mDesc.ClearColor.Stencil;
+		ClearValue.depthStencil.depth = TextureDesc.ClearColor.Depth;
+		ClearValue.depthStencil.stencil = TextureDesc.ClearColor.Stencil;
 	}
 
 	return ClearValue;
@@ -62,13 +62,13 @@ VkClearValue FVulkanTexture::GetClearValue() const
 
 VkExtent3D FVulkanTexture::GetExtent() const
 {
-	uint32 Depth = mDesc.Depth <= 0 ? 1 : mDesc.Depth;
-	return { mDesc.Width, mDesc.Height, Depth };
+	uint32 Depth = TextureDesc.Depth <= 0 ? 1 : TextureDesc.Depth;
+	return { TextureDesc.Width, TextureDesc.Height, Depth };
 }
 
 VkSampleCountFlagBits FVulkanTexture::GetSamplerCount() const
 {
-	return (VkSampleCountFlagBits)mDesc.NumSamples;
+	return (VkSampleCountFlagBits)TextureDesc.NumSamples;
 }
 
 void FVulkanTexture::Release()
@@ -126,18 +126,18 @@ void FVulkanTexture::DoTransition(VkCommandBuffer InCmdBuffer, VkImageLayout Tar
 
 void FVulkanTexture::ClearContent(FVulkanContext* Context, uint8 InMipLevel, uint8 InMipCount, uint16 InArrayIndex, uint16 InArrayCount)
 {
-	REV_CORE_ASSERT(InMipLevel < mDesc.NumMips, "MipLevel out of range");
+	REV_CORE_ASSERT(InMipLevel < TextureDesc.NumMips, "MipLevel out of range");
 	FVulkanUtils::ImmediateClearImage(Context, mImage, mImageAspectFlags, GetClearValue(), InMipLevel, InMipCount, InArrayIndex, InArrayCount);
 }
 
 void FVulkanTexture::Resize(uint32 InWidth, uint32 InHeight, uint32 InDepth)
 {
-	if (InWidth != mDesc.Width || InHeight != mDesc.Height || InDepth != mDesc.Depth)
+	if (InWidth != TextureDesc.Width || InHeight != TextureDesc.Height || InDepth != TextureDesc.Depth)
 	{
 		Release();
-		mDesc.Width = InWidth;
-		mDesc.Height = InHeight;
-		mDesc.Depth = InDepth;
+		TextureDesc.Width = InWidth;
+		TextureDesc.Height = InHeight;
+		TextureDesc.Depth = InDepth;
 		Init();
 	}
 }

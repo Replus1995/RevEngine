@@ -20,9 +20,9 @@ public:
 	virtual void Cleanup() = 0;
 	virtual const FRHIDeviceCapacity& GetDeviceCapacity() = 0;
 
-	virtual Scope<FRHIContext> RHICreateContext() = 0;
+	virtual Scope<IRHIContext> RHICreateContext() = 0;
 	//Buffer
-	virtual Ref<FRHIBuffer> RHICreateBuffer(uint32 InSize, uint32 InStride, EBufferUsageFlags InFlags) = 0;
+	virtual Ref<FRHIBuffer> RHICreateBuffer(const FRHIBufferDesc& InDesc) = 0;
 	virtual Ref<FRHIUniformBuffer> RHICreateUniformBuffer(uint32 InSize) = 0;
 
 	//Texture

@@ -75,7 +75,7 @@ Ref<FRHIShader> FRHIShaderLibrary::LoadOrCompileShader(const FPath& InPath, cons
 	case ERenderAPI::Vulkan:
 	{
 		auto pShader = CreateRef<FVulkanShader>(CompiledData);
-		mShadersCache[CompiledData.Name].Add(InOptions.GetHash(), pShader);
+		ShadersCache[CompiledData.Name].Add(InOptions.GetHash(), pShader);
 		return pShader;
 	}
 	default:
@@ -89,7 +89,7 @@ Ref<FRHIShader> FRHIShaderLibrary::CreateShader(const FRHIShaderCreateDesc& InDe
 {
 	if (InDesc.Name.empty()) return nullptr;
 	Ref<FRHIShader> Result = nullptr;
-	if (auto iter = mShadersCache.find(InDesc.Name); iter != mShadersCache.end())
+	if (auto iter = ShadersCache.find(InDesc.Name); iter != ShadersCache.end())
 	{
 		Result = iter->second[InDesc.Options.GetHash()];
 	}
@@ -102,7 +102,7 @@ Ref<FRHIShader> FRHIShaderLibrary::CreateShader(const FRHIShaderCreateDesc& InDe
 
 void FRHIShaderLibrary::ClearShadersCache()
 {
-	mShadersCache.clear();
+	ShadersCache.clear();
 }
 
 }

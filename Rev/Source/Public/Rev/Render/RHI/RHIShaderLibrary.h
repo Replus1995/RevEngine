@@ -35,7 +35,7 @@ private:
 
 private:
     static FRHIShaderLibrary* ShaderLibrary;
-    std::unordered_map<std::string, FCompiledShaders> mShadersCache;
+    std::unordered_map<std::string, FCompiledShaders> ShadersCache;
 };
 
 struct FShaderCompileConfig

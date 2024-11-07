@@ -27,10 +27,10 @@ FVulkanTextureCube::~FVulkanTextureCube()
 void FVulkanTextureCube::UpdateContent(FVulkanContext* Context, const void* InContent, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex)
 {
     REV_CORE_ASSERT(InArrayIndex >= 0 && InArrayIndex <= 5, "ArrayIndex must be in range [0, 5] for cube texture");
-    REV_CORE_ASSERT(InMipLevel < mDesc.NumMips, "MipLevel out of range");
+    REV_CORE_ASSERT(InMipLevel < TextureDesc.NumMips, "MipLevel out of range");
 
     VkExtent2D MipSize = CalculateMipSize2D(InMipLevel);
-    REV_CORE_ASSERT(InSize == MipSize.width * MipSize.height * GPixelFormats[mDesc.Format].BlockBytes, "Data size mismatch");
+    REV_CORE_ASSERT(InSize == MipSize.width * MipSize.height * GPixelFormats[TextureDesc.Format].BlockBytes, "Data size mismatch");
 
     FVulkanUtils::ImmediateUploadImage(Context, mImage, mImageAspectFlags, { MipSize.width, MipSize.height, 1 }, InContent, InSize, InMipLevel, InArrayIndex);
 }
@@ -40,9 +40,9 @@ void FVulkanTextureCube::Init()
     REV_CORE_ASSERT(FVulkanDynamicRHI::GetDevice());
     REV_CORE_ASSERT(FVulkanDynamicRHI::GetAllocator());
 
-    VkFormat ImageFormat = (VkFormat)GPixelFormats[mDesc.Format].PlatformFormat;
+    VkFormat ImageFormat = (VkFormat)GPixelFormats[TextureDesc.Format].PlatformFormat;
     VkImageCreateFlags ImageFlags = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
-    if (EnumHasAllFlags(mDesc.Flags, ETextureCreateFlags::SRGB))
+    if (EnumHasAllFlags(TextureDesc.Flags, ETextureCreateFlags::SRGB))
     {
         ImageFormat = FVulkanPixelFormat::GetPlatformFormatSRGB(ImageFormat);
         ImageFlags |= VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT;
@@ -55,11 +55,11 @@ void FVulkanTextureCube::Init()
     ImageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
     ImageCreateInfo.format = ImageFormat;
     ImageCreateInfo.extent = GetExtent();
-    ImageCreateInfo.mipLevels = mDesc.NumMips;
+    ImageCreateInfo.mipLevels = TextureDesc.NumMips;
     ImageCreateInfo.arrayLayers = 6;
     ImageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT; //no support for cubemap multi-sample
     ImageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-    ImageCreateInfo.usage = TranslateImageUsageFlags(mDesc.Flags);
+    ImageCreateInfo.usage = TranslateImageUsageFlags(TextureDesc.Flags);
     ImageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
     ImageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 

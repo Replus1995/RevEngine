@@ -24,16 +24,16 @@ FVulkanTexture2D::~FVulkanTexture2D()
 
 void FVulkanTexture2D::UpdateContent(FVulkanContext* Context, const void* InContent, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex)
 {
-    if (mDesc.NumSamples != 1)
+    if (TextureDesc.NumSamples != 1)
     {
         REV_CORE_ERROR("Updating multisample texture is not allowed");
         return;
     }
     REV_CORE_ASSERT(InArrayIndex == 0, "ArrayIndex must be 0 for 2d texture");
-    REV_CORE_ASSERT(InMipLevel < mDesc.NumMips, "MipLevel out of range");
+    REV_CORE_ASSERT(InMipLevel < TextureDesc.NumMips, "MipLevel out of range");
 
     VkExtent2D MipSize = CalculateMipSize2D(InMipLevel);
-    REV_CORE_ASSERT(InSize == MipSize.width * MipSize.height * GPixelFormats[mDesc.Format].BlockBytes, "Data size mismatch");
+    REV_CORE_ASSERT(InSize == MipSize.width * MipSize.height * GPixelFormats[TextureDesc.Format].BlockBytes, "Data size mismatch");
 
     FVulkanUtils::ImmediateUploadImage(Context, mImage, mImageAspectFlags, { MipSize.width, MipSize.height, 1 }, InContent, InSize, InMipLevel);
 }
@@ -43,9 +43,9 @@ void FVulkanTexture2D::Init()
     REV_CORE_ASSERT(FVulkanDynamicRHI::GetDevice());
     REV_CORE_ASSERT(FVulkanDynamicRHI::GetAllocator());
 
-    VkFormat ImageFormat = (VkFormat)GPixelFormats[mDesc.Format].PlatformFormat;
+    VkFormat ImageFormat = (VkFormat)GPixelFormats[TextureDesc.Format].PlatformFormat;
     VkImageCreateFlags ImageFlags = 0;
-    if (EnumHasAllFlags(mDesc.Flags, ETextureCreateFlags::SRGB))
+    if (EnumHasAllFlags(TextureDesc.Flags, ETextureCreateFlags::SRGB))
     {
         ImageFormat = FVulkanPixelFormat::GetPlatformFormatSRGB(ImageFormat);
         ImageFlags |= VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT;
@@ -58,11 +58,11 @@ void FVulkanTexture2D::Init()
     ImageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
     ImageCreateInfo.format = ImageFormat;
     ImageCreateInfo.extent = GetExtent();
-    ImageCreateInfo.mipLevels = mDesc.NumMips;
+    ImageCreateInfo.mipLevels = TextureDesc.NumMips;
     ImageCreateInfo.arrayLayers = 1;
-    ImageCreateInfo.samples = (VkSampleCountFlagBits)mDesc.NumSamples;
+    ImageCreateInfo.samples = (VkSampleCountFlagBits)TextureDesc.NumSamples;
     ImageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-    ImageCreateInfo.usage = TranslateImageUsageFlags(mDesc.Flags);
+    ImageCreateInfo.usage = TranslateImageUsageFlags(TextureDesc.Flags);
     ImageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
     ImageCreateInfo.initialLayout = mImageLayout;
 
@@ -82,7 +82,7 @@ void FVulkanTexture2D::Init()
     ImageViewCreateInfo.format = ImageFormat;
     ImageViewCreateInfo.subresourceRange.aspectMask = mImageAspectFlags;
     ImageViewCreateInfo.subresourceRange.baseMipLevel = 0;
-    ImageViewCreateInfo.subresourceRange.levelCount = mDesc.NumMips;
+    ImageViewCreateInfo.subresourceRange.levelCount = TextureDesc.NumMips;
     ImageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
     ImageViewCreateInfo.subresourceRange.layerCount = 1;
 
@@ -90,7 +90,7 @@ void FVulkanTexture2D::Init()
 }
 
 FVulkanTextureSwapchain::FVulkanTextureSwapchain(VkImage InSwapchainImage, VkFormat InFormat, uint16 InWidth, uint16 InHeight)
-    : FVulkanTexture(FRHITextureDesc::Make2D(InWidth, InHeight, PF_Unknown))
+    : FVulkanTexture(FRHITextureDesc::Create2D(InWidth, InHeight, PF_Unknown))
     , mPlatformFormat(InFormat)
 {
     mImage = InSwapchainImage; 

@@ -414,7 +414,7 @@ void FVulkanContext::RHIEndDebugLabel()
 	vkCmdEndDebugUtilsLabelEXT(GetActiveCmdBuffer());
 }
 
-FVulkanContext* FVulkanContext::Cast(FRHIContext* InContext)
+FVulkanContext* FVulkanContext::Cast(IRHIContext* InContext)
 {
 	REV_CORE_ASSERT(GetRenderAPI() == ERenderAPI::Vulkan);
 	return static_cast<FVulkanContext*>(InContext);

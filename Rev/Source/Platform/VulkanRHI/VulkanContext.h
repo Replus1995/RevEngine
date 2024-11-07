@@ -24,7 +24,7 @@ class FVulkanSamplerState;
 class FVulkanPipelineLayout;
 class FVulkanPipeline;
 
-class FVulkanContext : public FRHIContext
+class FVulkanContext : public IRHIContext
 {
 public:
 	FVulkanContext();
@@ -81,7 +81,7 @@ public:
 	FVulkanDescriptorPool& GetActiveDescriptorPool() { return mFrameData[mFrameDataIndex].DescriptorPool; }
 
 public:
-	static FVulkanContext* Cast(FRHIContext* InContext);
+	static FVulkanContext* Cast(IRHIContext* InContext);
 
 private:
 	void CreateImmediateData();

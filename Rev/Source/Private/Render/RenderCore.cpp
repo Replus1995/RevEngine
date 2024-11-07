@@ -10,7 +10,7 @@ namespace Rev
 bool GIsRHIInitialized = false;
 
 static ERenderAPI sRenderAPI = ERenderAPI::None;
-static Scope<FRHIContext> sMainContext;
+static Scope<IRHIContext> sMainContext;
 
 void FRenderCore::Init(ERenderAPI InAPI)
 {
@@ -43,7 +43,7 @@ ERenderAPI FRenderCore::GetRenderAPI()
 	return sRenderAPI;
 }
 
-FRHIContext* FRenderCore::GetMainContext()
+IRHIContext* FRenderCore::GetMainContext()
 {
 	return sMainContext.get();
 }

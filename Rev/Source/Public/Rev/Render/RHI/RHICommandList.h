@@ -3,17 +3,17 @@
 
 namespace Rev
 {
-class FRHIContext;
+class IRHIContext;
 class FRHICommandList
 {
 public:
-	FRHICommandList(FRHIContext* InContext);
+	FRHICommandList(IRHIContext* InContext);
 	~FRHICommandList();
 
-	FRHIContext* GetContext() { return mContext; };
+	IRHIContext* GetContext() { return mContext; };
 
 protected:
-	FRHIContext* mContext;
+	IRHIContext* mContext;
 };
 
 }

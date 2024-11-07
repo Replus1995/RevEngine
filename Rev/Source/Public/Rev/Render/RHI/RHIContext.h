@@ -15,10 +15,10 @@ class FRHIRenderTarget;
 class FRHIRenderPass;
 class FRHIGraphicsPipelineStateDesc;
 
-class FRHIContext
+class IRHIContext
 {
 public:
-	virtual ~FRHIContext() = default;
+	virtual ~IRHIContext() = default;
 
 	virtual void Init() = 0;
 	virtual void Cleanup() = 0;

@@ -549,7 +549,7 @@ Ref<FTextureStorage> FGLTFUtils::ImportTexture(const tinygltf::Texture& InTextur
 	const tinygltf::Sampler& InSampler = InModel.samplers[InTexture.sampler];
 
 	Ref<FTextureStorage> Storage = CreateRef<FTextureStorage>();
-	Storage->TextureDesc = FRHITextureDesc::Make2D(InImage.width, InImage.height, TranslateImageFormat(InImage));
+	Storage->TextureDesc = FRHITextureDesc::Create2D(InImage.width, InImage.height, TranslateImageFormat(InImage));
 	Storage->SamplerDesc = TranslateSampler(InSampler);
 	{
 		REV_CORE_ASSERT(InImage.component != 3);

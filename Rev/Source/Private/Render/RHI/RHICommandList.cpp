@@ -4,7 +4,7 @@
 namespace Rev
 {
 
-FRHICommandList::FRHICommandList(FRHIContext* InContext)
+FRHICommandList::FRHICommandList(IRHIContext* InContext)
 	: mContext(InContext)
 {
 	REV_CORE_ASSERT(mContext);

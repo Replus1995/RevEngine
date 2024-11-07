@@ -26,22 +26,22 @@ public:
     ~FCompiledShaders() = default;
     inline void Add(uint32 OptionHash, const Ref<FRHIShader>& InShader)
     {
-        mOptionShaderMap.emplace(OptionHash, InShader);
+        OptionShaderMap.emplace(OptionHash, InShader);
     }
     inline void Remove(uint32 OptionHash)
     {
-        mOptionShaderMap.erase(OptionHash);
+        OptionShaderMap.erase(OptionHash);
     }
     Ref<FRHIShader> operator[](uint32 OptionHash) const
     {
-        if (auto iter = mOptionShaderMap.find(OptionHash); iter != mOptionShaderMap.end())
+        if (auto iter = OptionShaderMap.find(OptionHash); iter != OptionShaderMap.end())
         {
             return iter->second;
         }
         return nullptr;
     }
 private:
-    std::map<uint32, Ref<FRHIShader>> mOptionShaderMap;
+    std::map<uint32, Ref<FRHIShader>> OptionShaderMap;
 };
 
 struct FRHIShaderCreateDesc

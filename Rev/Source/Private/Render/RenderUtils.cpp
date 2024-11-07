@@ -19,7 +19,7 @@ public:
 	virtual void InitRHI() override
 	{
 		const FRHITextureClearColor ClearColor(Math::FLinearColor::FromColor(Math::FColor(R, G, B, A), bSRGB));
-		FRHITextureDesc TextureDesc = FRHITextureDesc::Make2D(1, 1, PF_R8G8B8A8).SetClearColor(ClearColor).SetFlags(ETextureCreateFlags::ShaderResource);
+		FRHITextureDesc TextureDesc = FRHITextureDesc::Create2D(1, 1, PF_R8G8B8A8).SetClearColor(ClearColor).SetFlags(ETextureCreateFlags::ShaderResource);
 		if(bSRGB)
 			TextureDesc.AddFlags(ETextureCreateFlags::SRGB);
 

@@ -27,22 +27,22 @@ void FForwardRenderer::BeginFrame()
 
 	if (!mBaseColorTex)
 	{
-		FRHITextureDesc Desc = FRHITextureDesc::Make2D(mSceneProxy->GetFrameWidth(), mSceneProxy->GetFrameHeight(), PF_R8G8B8A8).SetClearColor(Math::FLinearColor(0, 0, 0, 1)).SetFlags(ETextureCreateFlags::ColorTarget);
+		FRHITextureDesc Desc = FRHITextureDesc::Create2D(mSceneProxy->GetFrameWidth(), mSceneProxy->GetFrameHeight(), PF_R8G8B8A8).SetClearColor(Math::FLinearColor(0, 0, 0, 1)).SetFlags(ETextureCreateFlags::ColorTarget);
 		mBaseColorTex = GDynamicRHI->RHICreateTexture(Desc);
 	}
 	if (!mBaseColorResolveTex)
 	{
-		FRHITextureDesc Desc = FRHITextureDesc::Make2D(mSceneProxy->GetFrameWidth(), mSceneProxy->GetFrameHeight(), PF_R8G8B8A8).SetClearColor(Math::FLinearColor(0, 0, 0, 1)).SetFlags(ETextureCreateFlags::ColorTarget).SetNumSamples(GRenderOptions.GetNumSamples());
+		FRHITextureDesc Desc = FRHITextureDesc::Create2D(mSceneProxy->GetFrameWidth(), mSceneProxy->GetFrameHeight(), PF_R8G8B8A8).SetClearColor(Math::FLinearColor(0, 0, 0, 1)).SetFlags(ETextureCreateFlags::ColorTarget).SetNumSamples(GRenderOptions.GetNumSamples());
 		mBaseColorResolveTex = GDynamicRHI->RHICreateTexture(Desc);
 	}
 	if (!mBaseDepthTex)
 	{
-		FRHITextureDesc Desc = FRHITextureDesc::Make2D(mSceneProxy->GetFrameWidth(), mSceneProxy->GetFrameHeight(), PF_DepthStencil).SetClearColor(FRHITextureClearColor(1.0, 0)).SetFlags(ETextureCreateFlags::DepthStencilTarget);
+		FRHITextureDesc Desc = FRHITextureDesc::Create2D(mSceneProxy->GetFrameWidth(), mSceneProxy->GetFrameHeight(), PF_DepthStencil).SetClearColor(FRHITextureClearColor(1.0, 0)).SetFlags(ETextureCreateFlags::DepthStencilTarget);
 		mBaseDepthTex = GDynamicRHI->RHICreateTexture(Desc);
 	}
 	if (!mBaseDepthResolveTex)
 	{
-		FRHITextureDesc Desc = FRHITextureDesc::Make2D(mSceneProxy->GetFrameWidth(), mSceneProxy->GetFrameHeight(), PF_DepthStencil).SetClearColor(FRHITextureClearColor(1.0, 0)).SetFlags(ETextureCreateFlags::DepthStencilTarget).SetNumSamples(GRenderOptions.GetNumSamples());
+		FRHITextureDesc Desc = FRHITextureDesc::Create2D(mSceneProxy->GetFrameWidth(), mSceneProxy->GetFrameHeight(), PF_DepthStencil).SetClearColor(FRHITextureClearColor(1.0, 0)).SetFlags(ETextureCreateFlags::DepthStencilTarget).SetNumSamples(GRenderOptions.GetNumSamples());
 		mBaseDepthResolveTex = GDynamicRHI->RHICreateTexture(Desc);
 	}
 	if (!mBasePass)

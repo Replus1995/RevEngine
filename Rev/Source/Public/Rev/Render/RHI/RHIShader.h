@@ -35,43 +35,18 @@ class REV_API FRHIShader : public FRHIResource
 {
 public:
     virtual ~FRHIShader() = default;
-    EShaderStage GetStage() const { return mStage; }
+    EShaderStage GetStage() const { return Stage; }
 
 protected:
-    FRHIShader(EShaderStage InStage) : mStage(InStage) {}
+    FRHIShader(EShaderStage InStage) : Stage(InStage) {}
 protected:
-    EShaderStage mStage;
+    EShaderStage Stage;
 };
 
 class REV_API FRHIShaderProgram : public FRHIResource
 {
 public:
     virtual ~FRHIShaderProgram() = default;
-
-   /* virtual uint16 GetUniformLocation(std::string_view name) = 0;
-
-    virtual void SetUniform(uint16 location, int value) = 0;
-    virtual void SetUniform(uint16 location, float value) = 0;
-    virtual void SetUniform(uint16 location, const Math::FVector2& value) = 0;
-    virtual void SetUniform(uint16 location, const Math::FVector3& value) = 0;
-    virtual void SetUniform(uint16 location, const Math::FVector4& value) = 0;
-    virtual void SetUniform(uint16 location, const Math::FMatrix3& value) = 0;
-    virtual void SetUniform(uint16 location, const Math::FMatrix4& value) = 0;
-
-    template<typename T>
-    void SetUniform(const std::string& name, const T& value)
-    {
-        this->SetUniform(GetUniformLocation(name), value);
-    }
-
-    virtual void SetUniformArray(uint16 location, const int* values, uint32_t count) = 0;
-
-    template<typename T>
-    void SetUniformArray(const std::string& name, const T& value)
-    {
-        this->SetUniformArray(GetUniformLocation(name), value);
-    }*/
-
     const std::string& GetName() const { return mProgramName; };
 
 protected:

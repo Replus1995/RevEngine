@@ -42,7 +42,7 @@ void FVulkanDynamicRHI::Cleanup()
 	mInstance.Cleanup();
 }
 
-Scope<FRHIContext> FVulkanDynamicRHI::RHICreateContext()
+Scope<IRHIContext> FVulkanDynamicRHI::RHICreateContext()
 {
 	return CreateScope<FVulkanContext>();
 }
