@@ -13,6 +13,20 @@ enum class ERGViewableResourceType : uint8
 	Count
 };
 
+enum class ERGTextureFlags : uint8
+{
+	None = 0,
+	MultiFrame = 1 << 0,
+};
+ENUM_CLASS_FLAGS(ERGTextureFlags)
+
+enum class ERGBufferFlags : uint8
+{
+	None = 0,
+	MultiFrame = 1 << 0,
+};
+ENUM_CLASS_FLAGS(ERGBufferFlags)
+
 struct FRGTextureDesc : public FRHITextureDesc
 {
 	static FRGTextureDesc Create2D(
@@ -107,10 +121,57 @@ struct FRGTextureDesc : public FRHITextureDesc
 
 };
 
-
 struct FRGBufferDesc
 {
+	static FRGBufferDesc CreateBuffer(uint32 ElementSize, uint32 NumElements)
+	{
+		FRGBufferDesc Desc;
+		Desc.Usage = EBufferUsageFlags::Static | EBufferUsageFlags::ShaderResource | EBufferUsageFlags::VertexBuffer;
+		Desc.ElementSize = ElementSize;
+		Desc.NumElements = NumElements;
+		return Desc;
+	}
 
+	uint32 GetSize() const
+	{
+		return ElementSize * NumElements;
+	}
+
+	bool operator == (const FRGBufferDesc& Other) const
+	{
+		bool bSame = ElementSize == Other.ElementSize &&
+			NumElements == Other.NumElements &&
+			Usage == Other.Usage;
+		return bSame;
+	}
+
+	bool operator != (const FRGBufferDesc& Other) const
+	{
+		return !(*this == Other);
+	}
+
+
+	uint32 ElementSize = 1;
+	uint32 NumElements = 1;
+	EBufferUsageFlags Usage = EBufferUsageFlags::None;
 };
+
+class FRGResource;
+using FRGResourceRef = FRGResource*;
+
+class FRGTexture;
+using FRGTextureRef = FRGTexture*;
+
+class FRGBuffer;
+using FRGBufferRef = FRGBuffer*;
+
+class FRGUniformBuffer;
+using FRGUniformBufferRef = FRGUniformBuffer*;
+
+class FRGPass;
+using FRGPassRef = FRGPass*;
+
+
+
 
 }

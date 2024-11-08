@@ -5,7 +5,7 @@
 #include "Rev/Core/Application.h"
 #include "Rev/Core/Window.h"
 
-#include "Rev/Render/Renderer/ForwardRenderer.h"
+#include "Rev/Render/Renderer.h"
 
 
 namespace Rev
@@ -34,7 +34,7 @@ void SceneLayer::OnAttach()
 	{
 		mScene->OnRuntimeStart();
 	}
-	mRenderer = CreateRef<FForwardRenderer>(mSceneProxy.get());
+	mRenderer = CreateRef<FRenderer>(mSceneProxy.get());
 }
 
 void SceneLayer::OnDetach()

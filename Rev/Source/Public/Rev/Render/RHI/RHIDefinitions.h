@@ -120,6 +120,7 @@ enum class EBufferUsageFlags : uint32
 	KeepCPUAccess		= 1u << 4,
 	VertexBuffer		= 1u << 5,
 	IndexBuffer			= 1u << 6,
+	StorageBuffer		= 1u << 7,
 };
 ENUM_CLASS_FLAGS(EBufferUsageFlags);
 

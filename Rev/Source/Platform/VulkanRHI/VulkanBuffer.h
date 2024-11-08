@@ -40,7 +40,7 @@ public:
 class FVulkanBuffer : public FRHIBuffer, FVulkanBufferBase
 {
 public:
-	FVulkanBuffer(const FRHIBufferDesc& InDesc);
+	FVulkanBuffer(uint32 InSize, uint32 InStride, EBufferUsageFlags InUsage);
 	virtual ~FVulkanBuffer();
 	virtual const void* GetNativeHandle() const override { return Buffer; }
 

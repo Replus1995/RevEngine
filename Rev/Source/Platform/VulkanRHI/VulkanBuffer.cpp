@@ -90,10 +90,10 @@ FVulkanStageBuffer::~FVulkanStageBuffer()
 {
 }
 
-FVulkanBuffer::FVulkanBuffer(const FRHIBufferDesc& InDesc)
-	: FRHIBuffer(InDesc)
+FVulkanBuffer::FVulkanBuffer(uint32 InSize, uint32 InStride, EBufferUsageFlags InUsage)
+	: FRHIBuffer(InSize, InStride, InUsage)
 {
-	Allocate(InDesc.Size, TranslateUsageFlags(InDesc.Usage), GetAllocateFlags(InDesc.Usage));
+	Allocate(InSize, TranslateUsageFlags(InUsage), GetAllocateFlags(InUsage));
 }
 
 FVulkanBuffer::~FVulkanBuffer()
@@ -154,7 +154,7 @@ FVulkanUniformBuffer::~FVulkanUniformBuffer()
 
 void FVulkanUniformBuffer::UpdateSubData(const void* Data, uint32 Size, uint32 Offset)
 {
-	REV_CORE_ASSERT(Size + Offset <= BufferSize);
+	REV_CORE_ASSERT(Size + Offset <= Size);
 
 	void* pMappedData = nullptr;
 	vmaMapMemory(FVulkanDynamicRHI::GetAllocator(), mAllocation, &pMappedData);
@@ -168,9 +168,9 @@ void FVulkanUniformBuffer::UpdateSubData(const void* Data, uint32 Size, uint32 O
 
 
 //DynamicRHI
-Ref<FRHIBuffer> FVulkanDynamicRHI::RHICreateBuffer(const FRHIBufferDesc& InDesc)
+Ref<FRHIBuffer> FVulkanDynamicRHI::RHICreateBuffer(uint32 InSize, uint32 InStride, EBufferUsageFlags InUsage)
 {
-	return CreateRef<FVulkanBuffer>(InDesc);
+	return CreateRef<FVulkanBuffer>(InSize, InStride, InUsage);
 }
 
 Ref<FRHIUniformBuffer> FVulkanDynamicRHI::RHICreateUniformBuffer(uint32 InSize)

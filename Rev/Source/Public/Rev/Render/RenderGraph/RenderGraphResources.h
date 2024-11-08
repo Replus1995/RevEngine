@@ -49,4 +49,16 @@ protected:
 	bool bTransient;
 };
 
+
+class REV_API FRGTexture : public FRGViewableResource
+{
+
+};
+
+class REV_API FRGBuffer : public FRGViewableResource
+{
+
+};
+
+
 }

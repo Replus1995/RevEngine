@@ -171,7 +171,7 @@ Ref<FRHIBuffer> FStaticMeshVertexBuffer::CreateBufferFromData(const FBuffer& InD
 	if(InData.Empty())
 		return nullptr;
 
-	Ref<FRHIBuffer> OutBuffer = GDynamicRHI->RHICreateBuffer({ InSize, InStride, EBufferUsageFlags::VertexBuffer });
+	Ref<FRHIBuffer> OutBuffer = GDynamicRHI->RHICreateBuffer(InSize, InStride, EBufferUsageFlags::VertexBuffer);
 	FRenderCore::GetMainContext()->RHIUpdateBufferData(OutBuffer.get(), InData.Data(), InSize);
 	return OutBuffer;
 }
@@ -207,7 +207,7 @@ void FStaticMeshIndexBuffer::InitRHI()
 	uint32 Stride = b32Bit ? sizeof(uint32) : sizeof(uint16);
 	if (IndexData.Size() >= NumIndices * Stride)
 	{
-		IndexBuffer.IndexBufferRHI = GDynamicRHI->RHICreateBuffer({ NumIndices * Stride, Stride, EBufferUsageFlags::Static | EBufferUsageFlags::IndexBuffer });
+		IndexBuffer.IndexBufferRHI = GDynamicRHI->RHICreateBuffer(NumIndices * Stride, Stride, EBufferUsageFlags::Static | EBufferUsageFlags::IndexBuffer);
 		FRenderCore::GetMainContext()->RHIUpdateBufferData(IndexBuffer.IndexBufferRHI.get(), IndexData.Data(), NumIndices * Stride);
 	}
 }
