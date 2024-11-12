@@ -1,6 +1,5 @@
 #pragma once
 #include "Rev/Core/Base.h"
-#include "Rev/Core/FileSystem.h"
 #include "Rev/Render/RenderCore.h"
 #include "Rev/Render/RHI/RHIShader.h"
 #include "Rev/Render/RHI/RHIShaderCompile.h"
@@ -26,7 +25,7 @@ public:
 
     void ClearShadersCache();
 private:
-    Ref<FRHIShader> LoadOrCompileShader(const FPath& InPath, const FRHIShaderCompileOptions& InOptions, EShaderStage InStage = SS_Unknown);
+    Ref<FRHIShader> LoadOrCompileShader(const char* InPath, const FRHIShaderCompileOptions& InOptions, EShaderStage InStage = SS_Unknown);
     Ref<FRHIShader> CreateShader(const FRHIShaderCreateDesc& InDesc, EShaderStage InStage = SS_Unknown);
 
 private:

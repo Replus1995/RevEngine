@@ -236,13 +236,6 @@ enum EColorWriteMask : uint8
 	CWM_RGBA = CWM_RGB | CWM_Alpha
 };
 
-enum EPipelineBindPoint : uint8
-{
-	PBP_Graphics,
-	PBP_Compute,
-	PBP_RayTracing
-};
-
 //RenderPass
 
 enum EAttachmentLoadOp : uint8
@@ -257,6 +250,18 @@ enum EAttachmentStoreOp : uint8
 	ASO_Store = 0,
 	ASO_DontCare
 };
+
+//Utils
+enum class ERHIPipeline : uint8
+{
+	None		= 0,
+	Graphics	= 1 << 0,
+	Compute		= 1 << 1,
+	RayTracing	= 1 << 2,
+	All			= Graphics | Compute | RayTracing,
+	Num			= 3
+};
+ENUM_CLASS_FLAGS(ERHIPipeline)
 
 struct FRHIDeviceCapacity
 {

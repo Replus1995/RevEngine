@@ -1,6 +1,5 @@
 #pragma once
 #include "Rev/Core/Base.h"
-#include "Rev/Core/Deleter.h"
 #include <vulkan/vulkan.h>
 #include "Core/VulkanDescriptor.h"
 

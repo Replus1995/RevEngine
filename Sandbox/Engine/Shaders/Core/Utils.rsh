@@ -8,18 +8,12 @@ float2x2 MatrixFromCols(in float2 Col0, in float2 Col1)
 
 float3x3 MatrixFromCols(in float3 Col0, in float3 Col1, in float3 Col2)
 {
-    //return transpose(float3x3(Col0, Col1, Col2));
-    return float3x3(Col0, Col1, Col2);
+    return transpose(float3x3(Col0, Col1, Col2));
 }
 
 float4x4 MatrixFromCols(in float4 Col0, in float4 Col1, in float4 Col2, in float4 Col3)
 {
     return transpose(float4x4(Col0, Col1, Col2, Col3));
-}
-
-float3x3 ToMatrix3(in float4x4 InMat)
-{
-    return MatrixFromCols(InMat[0], InMat[1], InMat[2]);
 }
 
 float4x4 MatrixInverse(float4x4 m) {

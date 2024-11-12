@@ -1,7 +1,6 @@
 #pragma once
 #include <tiny_gltf.h>
 #include "Rev/Core/Buffer.h"
-#include "Rev/Core/FileSystem.h"
 #include "Rev/Asset/TextureStorage.h"
 #include "Rev/Asset/MaterialStorage.h"
 #include "Rev/Asset/AssetLibrary.h"
@@ -25,7 +24,7 @@ public:
 	static std::vector<Ref<FStaticMesh>> ImportStaticMesh(const tinygltf::Mesh& InMesh, const tinygltf::Model& InModel, const std::vector<Ref<FMaterial>>& InMaterials);
 	static Ref<FTextureStorage> ImportTexture(const tinygltf::Texture& InTexture, const tinygltf::Model& InModel);
 	static Ref<FMaterial> ImportMaterial(const tinygltf::Material& InMaterial, const tinygltf::Model& InModel, const std::vector<Ref<FTextureStorage>>& InTextures);
-	static FModelImportResult ImportModel(const FPath& InPath, bool DumpInfo = false);
+	static FModelImportResult ImportModel(const char* InPath, bool IsGLB, bool DumpInfo = false);
 };
 
 

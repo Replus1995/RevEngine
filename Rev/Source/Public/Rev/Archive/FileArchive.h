@@ -1,6 +1,5 @@
 #pragma once
 #include "Rev/Core/Base.h"
-#include "Rev/Core/File.h"
 #include "Rev/Archive/Archive.h"
 
 namespace Rev
@@ -15,7 +14,7 @@ enum class EFileArchiveKind
 class FFileArchive : public FArchive
 {
 public:
-	FFileArchive(const FPath& InPath, EFileArchiveKind InKind);
+	FFileArchive(const char* InPath, EFileArchiveKind InKind);
 	virtual ~FFileArchive();
 
 	virtual bool IsLoading() const override;
@@ -23,7 +22,7 @@ public:
 
 private:
 	EFileArchiveKind mKind;
-	FFile mFile;
+	class IFile* mFile;
 };
 
 }

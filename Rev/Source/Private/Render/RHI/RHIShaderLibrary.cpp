@@ -61,12 +61,12 @@ Ref<FRHIShaderProgram> FRHIShaderLibrary::CreateGraphicsProgram(const std::strin
 	return nullptr;
 }
 
-Ref<FRHIShader> FRHIShaderLibrary::LoadOrCompileShader(const FPath& InPath, const FRHIShaderCompileOptions& InOptions, EShaderStage InStage)
+Ref<FRHIShader> FRHIShaderLibrary::LoadOrCompileShader(const char* InPath, const FRHIShaderCompileOptions& InOptions, EShaderStage InStage)
 {
 	auto CompiledData = FShadercFactory::LoadOrCompileShader(InPath, InOptions, InStage);
 	if (CompiledData.Empty())
 	{
-		REV_CORE_WARN("No shader complied for {0}", InPath.ToString().c_str());
+		REV_CORE_WARN("No shader complied for {0}", InPath);
 		return {};
 	}
 
@@ -95,7 +95,7 @@ Ref<FRHIShader> FRHIShaderLibrary::CreateShader(const FRHIShaderCreateDesc& InDe
 	}
 	if(Result == nullptr)
 	{
-		Result = LoadOrCompileShader(InDesc.Name + std::string(sRHIShaderExtension), InDesc.Options, InStage);
+		Result = LoadOrCompileShader((InDesc.Name + std::string(sRHIShaderExtension)).c_str(), InDesc.Options, InStage);
 	}
 	return Result;
 }

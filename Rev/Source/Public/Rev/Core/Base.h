@@ -1,6 +1,7 @@
 #pragma once
 #include "Rev/Core/CoreDefines.h"
 #include "Rev/Core/CoreTypes.h"
+#include "Rev/Core/Assert.h"
 #include <string>
 #include <sstream>
 #include <vector>
@@ -63,9 +64,3 @@ void EnumRemoveFlags(Enum& Flags, Enum FlagsToRemove)
 	inline constexpr Enum  operator~ (Enum  E)             { return (Enum)~(__underlying_type(Enum))E; }
 
 
-
-
-
-//#ifndef GLM_ENABLE_EXPERIMENTAL
-//	#define GLM_ENABLE_EXPERIMENTAL
-//#endif // !GLM_ENABLE_EXPERIMENTAL

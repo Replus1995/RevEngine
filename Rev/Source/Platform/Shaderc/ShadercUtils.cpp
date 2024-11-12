@@ -3,6 +3,7 @@
 #include "Rev/Core/Assert.h"
 #include "Rev/Core/Clock.h"
 #include "Rev/Archive/FileArchive.h"
+#include "Rev/HAL/FIleManager.h"
 
 #include <vector>
 #include <filesystem>
@@ -130,11 +131,11 @@ const char* FShadercUtils::ShaderStageToString(EShaderStage InStage)
 	return nullptr;
 }
 
-FShadercSource FShadercUtils::LoadShaderSource(const FPath& InPath)
+FShadercSource FShadercUtils::LoadShaderSource(const char* InPath)
 {
 	FShadercSource Result;
 	Result.FilePath = InPath;
-	Result.FileContent = FFileSystem::LoadBinaryFile(InPath);
+	IFileManager::Get().LoadBinaryFile(InPath, Result.FileContent);
 	/*if(Result.FileContent.Empty())
 		return Result;
 
@@ -166,7 +167,7 @@ bool FShadercUtils::LoadShaderCompiledData(const std::filesystem::path& ShaderCa
 	{
 		Clock timer;
 		{
-			FFileArchive Ar(ShaderCachePath.generic_string(), EFileArchiveKind::Read);
+			FFileArchive Ar(ShaderCachePath.generic_string().c_str(), EFileArchiveKind::Read);
 			Ar << OutCompiledData;
 		}
 		if (!OutCompiledData.Binary.Empty())
@@ -190,7 +191,7 @@ bool FShadercUtils::SaveShaderCompiledData(const std::filesystem::path& ShaderCa
 		fs::create_directories(CachedDir);
 
 	{
-		FFileArchive Ar(ShaderCachePath.generic_string(), EFileArchiveKind::Write);
+		FFileArchive Ar(ShaderCachePath.generic_string().c_str(), EFileArchiveKind::Write);
 		Ar << InCompiledData;
 	}
 

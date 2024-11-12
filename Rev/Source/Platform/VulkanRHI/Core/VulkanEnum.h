@@ -27,7 +27,6 @@ public:
     static VkCullModeFlags Translate(ECullMode InMode);
     static VkAttachmentLoadOp Translate(EAttachmentLoadOp InOp);
     static VkAttachmentStoreOp Translate(EAttachmentStoreOp InOp);
-    static VkPipelineBindPoint Translate(EPipelineBindPoint InBindPoint);
 
     //Buffer
     static VkFormat Translate(EVertexElmentType InType);

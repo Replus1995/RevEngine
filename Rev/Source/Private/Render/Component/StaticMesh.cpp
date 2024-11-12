@@ -192,6 +192,27 @@ Math::FVector4 FStaticMeshBuilder::ComputeTanget(uint32 A, uint32 B, uint32 C) c
 	Math::FVector2 tba = StaticMesh->VertexBuffer.GetTexCoord(B) - StaticMesh->VertexBuffer.GetTexCoord(A);
 	Math::FVector2 tca = StaticMesh->VertexBuffer.GetTexCoord(C) - StaticMesh->VertexBuffer.GetTexCoord(A);
 
+	/*float r = 1.0F / (tba.X * tca.Y - tca.X * tba.Y);
+	Math::FVector3 tangent(
+		(tca.Y * ba.X - tba.Y * ca.X) * r,
+		(tca.Y * ba.Y - tba.Y * ca.Y) * r,
+		(tca.Y * ba.Z - tba.Y * ca.Z) * r);
+	Math::FVector3 bitangent(
+		(tba.X * ca.X - tca.X * ba.X) * r,
+		(tba.X * ca.Y - tca.X * ba.Y) * r,
+		(tba.X * ca.Z - tca.X * ba.Z) * r);
+
+	Math::FVector3 normal = Math::FVector3::Cross(ba, ca);
+	Math::FVector3 biCross = Math::FVector3::Cross(tangent, normal);
+
+	float handedness = 1.0f;
+	if (Math::FVector3::Dot(biCross, bitangent) < 0.0f)
+	{
+		handedness = -1.0f;
+	}
+
+	return Math::FVector4(tangent.X, tangent.Y, tangent.Z, handedness);*/
+
 	Math::FMatrix2 texMatrix = Math::FMatrix2(tba, tca);
 	texMatrix.Invert();
 
@@ -234,7 +255,7 @@ void FStaticMeshBuilder::ComputeTangents()
 	}
 	for (uint32 i = 0; i < StaticMesh->VertexBuffer.GetNumVertices(); i++)
 	{
-		float handedness = Tangents[i].W > 0.0f ? 1.0f : -1.0f;
+		float handedness = Tangents[i].W >= 0.0f ? 1.0f : -1.0f;
 		Tangents[i].W = 0.0f;
 		Tangents[i].Normalize();
 		Tangents[i].W = handedness;

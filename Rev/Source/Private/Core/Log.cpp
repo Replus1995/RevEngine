@@ -3,17 +3,19 @@
 
 namespace Rev
 {
-	std::shared_ptr<spdlog::logger> Log::sCoreLogger{ nullptr };
-	std::shared_ptr<spdlog::logger> Log::sClientLogger{ nullptr };
 
-	void Log::Init()
-	{
-		spdlog::set_pattern("%^[%T] %n: %v%$");
-		sCoreLogger = spdlog::stdout_color_mt("REV");
-		sCoreLogger->set_level(spdlog::level::trace);
+std::shared_ptr<spdlog::logger> FLogger::sCoreLogger{ nullptr };
+std::shared_ptr<spdlog::logger> FLogger::sClientLogger{ nullptr };
 
-		sClientLogger = spdlog::stdout_color_mt("APP");
-		sClientLogger->set_level(spdlog::level::trace);
+void FLogger::Init()
+{
+	spdlog::set_pattern("%^[%T] %n: %v%$");
+	sCoreLogger = spdlog::stdout_color_mt("REV");
+	sCoreLogger->set_level(spdlog::level::trace);
 
-	}
+	sClientLogger = spdlog::stdout_color_mt("APP");
+	sClientLogger->set_level(spdlog::level::trace);
+
+}
+
 }

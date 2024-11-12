@@ -33,8 +33,13 @@ public:
 	bool IsExternal() const { return bExternal; }
 	bool IsExtracted() const { return bExtracted; }
 
+
+
 protected:
-	FRGViewableResource(const char* InName, ERGViewableResourceType InType);
+	FRGViewableResource(const char* InName, ERGViewableResourceType InType)
+		: FRGResource(InName)
+		, Type(InType)
+	{}
 
 	/** Whether this is an externally registered resource. */
 	bool bExternal;
@@ -50,14 +55,52 @@ protected:
 };
 
 
-class REV_API FRGTexture : public FRGViewableResource
+class REV_API FRGTexture final : public FRGViewableResource
 {
+public:
 
+	const FRGTextureDesc Desc;
+	const ERGTextureFlags Flags;
+
+	FORCEINLINE FRHITexture* GetRHI() const
+	{
+		return static_cast<FRHITexture*>(FRGResource::GetRHI());
+	}
+
+private:
+	FRGTexture(const char* InName, const FRGTextureDesc& InDesc, ERGTextureFlags InFlags)
+		: FRGViewableResource(InName, ERGViewableResourceType::Texture)
+		, Desc(InDesc)
+		, Flags(InFlags)
+	{}
+
+	friend FRGBuilder;
+	friend FRGAllocator;
+	friend FRGTextureRegistry;
 };
 
-class REV_API FRGBuffer : public FRGViewableResource
+class REV_API FRGBuffer final : public FRGViewableResource
 {
+public:
+	
+	const FRGBufferDesc Desc;
+	const ERGBufferFlags Flags;
 
+	FORCEINLINE FRHIBuffer* GetRHI() const
+	{
+		return static_cast<FRHIBuffer*>(FRGResource::GetRHI());
+	}
+
+private:
+	FRGBuffer(const char* InName, const FRGBufferDesc& InDesc, ERGBufferFlags InFlags)
+		: FRGViewableResource(InName, ERGViewableResourceType::Buffer)
+		, Desc(InDesc)
+		, Flags(InFlags)
+	{}
+
+	friend FRGBuilder;
+	friend FRGAllocator;
+	friend FRGBufferRegistry;
 };
 
 

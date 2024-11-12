@@ -2,8 +2,7 @@
 #include "Rev/Core/Assert.h"
 #include "Rev/Core/Clock.h"
 #include "Rev/Core/Log.h"
-#include "Rev/Render/RHI/RHITexture.h"
-#include "Rev/Render/RHI/RHIBuffer.h"
+#include "Rev/HAL/FIleManager.h"
 #include "Rev/Render/RHI/RHIShaderLibrary.h"
 #include <filesystem>
 
@@ -160,7 +159,7 @@ public:
 		const char* requested_source,
 		shaderc_include_type type,
 		const char* requesting_source,
-		size_t include_depth
+		size_t include_depthShaderIncluder
 	) override;
 	void ReleaseInclude(shaderc_include_result* data) override;
 
@@ -178,12 +177,14 @@ shaderc_include_result* ShaderIncluder::GetInclude(
 	size_t include_depth
 )
 {
-	std::string HeaderPath(requested_source);
-	FBuffer HeaderContent = FFileSystem::LoadBinaryFile(FPath(HeaderPath));
+	//std::string HeaderPath(requested_source);
+	//FBuffer HeaderContent = FFileSystem::LoadBinaryFile(FPath(HeaderPath));
+	FBuffer HeaderContent;
+	IFileManager::Get().LoadBinaryFile(requested_source, HeaderContent);
 	REV_CORE_ASSERT(!HeaderContent.Empty(), "ShaderIncluder::GetInclude header file load failed.");
 
 	auto Container = new HeaderContainer;
-	Container->Name = std::move(HeaderPath);
+	Container->Name = requested_source;
 	Container->Content = std::move(HeaderContent);
 
 	auto Result = new shaderc_include_result;
@@ -355,7 +356,6 @@ void FShadercFactory::ReflectShaderInfo(FShadercCompiledData& Data)
 void FShadercFactory::CompileShaders(const FShadercSource& InSource, const FRHIShaderCompileOptions& InOptions, FShadercCompiledData& OutData)
 {
 	Clock timer;
-	std::string NativeFilePath = InSource.FilePath.ToNative();
 	shaderc::Compiler compiler;
 	shaderc::CompileOptions options;
 	InitCompileOptions(options);
@@ -370,7 +370,7 @@ void FShadercFactory::CompileShaders(const FShadercSource& InSource, const FRHIS
 			REV_CORE_ASSERT(false);
 		}*/
 
-		shaderc::SpvCompilationResult CompileResult = compiler.CompileGlslToSpv(InSource.FileContent.DataAs<char>(), InSource.FileContent.Size(), kind, NativeFilePath.c_str(), options);
+		shaderc::SpvCompilationResult CompileResult = compiler.CompileGlslToSpv(InSource.FileContent.DataAs<char>(), InSource.FileContent.Size(), kind, InSource.FilePath.c_str(), options);
 		if (CompileResult.GetCompilationStatus() != shaderc_compilation_status_success)
 		{
 			REV_CORE_ERROR(CompileResult.GetErrorMessage());
@@ -384,10 +384,10 @@ void FShadercFactory::CompileShaders(const FShadercSource& InSource, const FRHIS
 	REV_CORE_INFO("Shader '{0}' compile took {1} ms", OutData.Name.c_str(), timer.ElapsedMillis());
 }
 
-FShadercCompiledData FShadercFactory::LoadOrCompileShader(const FPath& InPath, const FRHIShaderCompileOptions& InOptions, EShaderStage InStage)
+FShadercCompiledData FShadercFactory::LoadOrCompileShader(const char* InPath, const FRHIShaderCompileOptions& InOptions, EShaderStage InStage)
 {
 	FShadercCompiledData Result;
-	Result.Name = InPath.ToString(false);
+	Result.Name = InPath;
 
 	std::string OptionHashStr = std::to_string(InOptions.GetHash());
 	fs::path ShaderCachePath(FShadercUtils::GetCacheDirectory() + Result.Name + "_" + OptionHashStr + FShadercUtils::GetCacheExtension());

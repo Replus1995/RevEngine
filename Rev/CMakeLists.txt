@@ -53,7 +53,6 @@ if(WIN32)
     PRIVATE
         physfs-static
         glfw
-        Glad
         vulkan-1
         shaderc_shared
         spirv-cross-core

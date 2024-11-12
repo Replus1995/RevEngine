@@ -6,8 +6,9 @@
 
 namespace Rev
 {
-class FRenderer;
 class FScene;
+class FRenderer;
+class FRHICommandList;
 class FCameraProxy
 {
 public:

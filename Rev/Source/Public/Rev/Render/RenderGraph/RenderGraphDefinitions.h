@@ -27,6 +27,16 @@ enum class ERGBufferFlags : uint8
 };
 ENUM_CLASS_FLAGS(ERGBufferFlags)
 
+enum class ERGPassFlags : uint8
+{
+	None = 0,
+	Raster = 1 << 0,
+	Compute = 1 << 1,
+	Copy = 1 << 2,
+};
+ENUM_CLASS_FLAGS(ERGPassFlags)
+
+
 struct FRGTextureDesc : public FRHITextureDesc
 {
 	static FRGTextureDesc Create2D(
@@ -156,6 +166,19 @@ struct FRGBufferDesc
 	EBufferUsageFlags Usage = EBufferUsageFlags::None;
 };
 
+class REV_API FRGName final
+{
+public:
+	FRGName() = default;
+	explicit FRGName(const char* InName) : Name(InName) {}
+
+	const std::string& GetName() const { return Name; }
+	const char* GetCharName() const { return Name.c_str(); }
+private:
+	std::string Name;
+};
+
+
 class FRGResource;
 using FRGResourceRef = FRGResource*;
 
@@ -171,7 +194,10 @@ using FRGUniformBufferRef = FRGUniformBuffer*;
 class FRGPass;
 using FRGPassRef = FRGPass*;
 
-
-
+class FRGBuilder;
+class FRGAllocator;
+class FRGTextureRegistry;
+class FRGBufferRegistry;
+class FRGPassRegistry;
 
 }

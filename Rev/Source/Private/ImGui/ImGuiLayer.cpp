@@ -13,7 +13,6 @@
 
 //temp
 #include <GLFW/glfw3.h>
-#include <glad/gl.h>
 #include <VulkanRHI/VulkanDynamicRHI.h>
 #include <VulkanRHI/VulkanContext.h>
 

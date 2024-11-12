@@ -145,20 +145,6 @@ VkAttachmentStoreOp FVulkanEnum::Translate(EAttachmentStoreOp InOp)
     return VkAttachmentStoreOp(InOp);
 }
 
-VkPipelineBindPoint FVulkanEnum::Translate(EPipelineBindPoint InBindPoint)
-{
-    switch (InBindPoint)
-    {
-    default:
-    case Rev::PBP_Graphics:
-        return VK_PIPELINE_BIND_POINT_GRAPHICS;
-    case Rev::PBP_Compute:
-        return VK_PIPELINE_BIND_POINT_COMPUTE;
-    case Rev::PBP_RayTracing:
-        return VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR;
-    }
-}
-
 VkFormat FVulkanEnum::Translate(EVertexElmentType InType)
 {
     switch (InType)
