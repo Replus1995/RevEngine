@@ -8,7 +8,7 @@
 namespace Rev
 {
 
-void FSceneProxy::Prepare(FRHICommandList& RHICmdList, const Ref<FScene>& Scene)
+void FSceneProxy::Prepare(const Ref<FScene>& Scene)
 {
 	if(!Scene) return;
 
@@ -16,8 +16,6 @@ void FSceneProxy::Prepare(FRHICommandList& RHICmdList, const Ref<FScene>& Scene)
 	mStaticMeshProxy.Prepare(Scene);
 	mLightProxy.Prepare(Scene);
 	mSkyProxy.Prepare(Scene);
-
-	mSceneParams.ViewExtent = { 0, 0, RHICmdList.GetContext()->RHIGetFrameWidth(), RHICmdList.GetContext()->RHIGetFrameHeight() };
 }
 
 void FSceneProxy::SyncResource(FRHICommandList& RHICmdList)
@@ -32,6 +30,7 @@ void FSceneProxy::SyncResource(FRHICommandList& RHICmdList)
 	mSkyProxy.SyncResource(RHICmdList);
 
 	{
+		mSceneParams.ViewExtent = { 0, 0, RHICmdList.GetContext()->RHIGetFrameWidth(), RHICmdList.GetContext()->RHIGetFrameHeight() };
 		mSceneParams.ViewPos = mCameraProxy.GetViewPos();
 		mSceneParams.ViewMat = mCameraProxy.GetViewMat();
 		mSceneParams.ProjMat = mCameraProxy.GetProjMat();
@@ -62,16 +61,6 @@ void FSceneProxy::DrawSceneOpaque(FRHICommandList& RHICmdList)
 void FSceneProxy::DrawSkybox(FRHICommandList& RHICmdList)
 {
 	mSkyProxy.DrawSkybox(RHICmdList);
-}
-
-uint32 FSceneProxy::GetFrameWidth() const
-{
-	return mSceneParams.ViewExtent.Width;
-}
-
-uint32 FSceneProxy::GetFrameHeight() const
-{
-	return mSceneParams.ViewExtent.Height;
 }
 
 }

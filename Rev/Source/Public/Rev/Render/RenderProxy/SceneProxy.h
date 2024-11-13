@@ -18,15 +18,12 @@ public:
 	~FSceneProxy() = default;
 
 
-	void Prepare(FRHICommandList& RHICmdList, const Ref<FScene>& Scene);
+	void Prepare(const Ref<FScene>& Scene);
 	void SyncResource(FRHICommandList& RHICmdList);
 	void Cleanup();
 
 	void DrawSceneOpaque(FRHICommandList& RHICmdList);
 	void DrawSkybox(FRHICommandList& RHICmdList);
-
-	uint32 GetFrameWidth() const;
-	uint32 GetFrameHeight() const;
 
 protected:
 	FSceneUniform mSceneParams;
