@@ -119,7 +119,7 @@ void FVulkanRenderPass::Init()
 		ColorDesc.loadOp = FVulkanEnum::Translate(ColorEntry.LoadOp);
 		ColorDesc.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 		ColorDesc.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-		ColorDesc.initialLayout = ColorEntry.LoadOp == ALO_DontCare ? VK_IMAGE_LAYOUT_UNDEFINED : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+		ColorDesc.initialLayout = ColorEntry.LoadOp == RTL_DontCare ? VK_IMAGE_LAYOUT_UNDEFINED : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 		ColorDesc.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
 		if (ColorDesc.samples == VK_SAMPLE_COUNT_1_BIT)
@@ -147,7 +147,7 @@ void FVulkanRenderPass::Init()
 			ResolveDesc.storeOp = FVulkanEnum::Translate(ColorEntry.StoreOp);
 			ResolveDesc.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 			ResolveDesc.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-			ResolveDesc.initialLayout = ColorEntry.LoadOp == ALO_DontCare ? VK_IMAGE_LAYOUT_UNDEFINED : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+			ResolveDesc.initialLayout = ColorEntry.LoadOp == RTL_DontCare ? VK_IMAGE_LAYOUT_UNDEFINED : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 			ResolveDesc.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 			mClearValues[NumAttachmentDesc] = ResolveTarget->GetClearValue();
 			AttachmentIndices.ColorResolves[i] = NumAttachmentDesc;
@@ -170,7 +170,7 @@ void FVulkanRenderPass::Init()
 		DepthStencilDesc.samples = DepthStencilTarget->GetSamplerCount();
 		DepthStencilDesc.loadOp = FVulkanEnum::Translate(DepthStencilEntry.DepthLoadOp);
 		DepthStencilDesc.stencilLoadOp = bHasStencil ? FVulkanEnum::Translate(DepthStencilEntry.StencilLoadOp) : VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-		DepthStencilDesc.initialLayout = DepthStencilEntry.DepthLoadOp == ALO_DontCare ? VK_IMAGE_LAYOUT_UNDEFINED : VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+		DepthStencilDesc.initialLayout = DepthStencilEntry.DepthLoadOp == RTL_DontCare ? VK_IMAGE_LAYOUT_UNDEFINED : VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 		DepthStencilDesc.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 		
 		if (DepthStencilDesc.samples == VK_SAMPLE_COUNT_1_BIT)
@@ -200,7 +200,7 @@ void FVulkanRenderPass::Init()
 			ResolveDesc.storeOp = FVulkanEnum::Translate(DepthStencilEntry.DepthStoreOp);
 			ResolveDesc.stencilLoadOp = bHasStencil ? FVulkanEnum::Translate(DepthStencilEntry.StencilLoadOp) : VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 			ResolveDesc.stencilStoreOp = bHasStencil ? FVulkanEnum::Translate(DepthStencilEntry.StencilStoreOp) : VK_ATTACHMENT_STORE_OP_DONT_CARE;
-			ResolveDesc.initialLayout = DepthStencilEntry.DepthLoadOp == ALO_DontCare ? VK_IMAGE_LAYOUT_UNDEFINED : VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+			ResolveDesc.initialLayout = DepthStencilEntry.DepthLoadOp == RTL_DontCare ? VK_IMAGE_LAYOUT_UNDEFINED : VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 			ResolveDesc.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 			mClearValues[NumAttachmentDesc] = ResolveTarget->GetClearValue();
 			AttachmentIndices.DepthStencilResolve = NumAttachmentDesc;

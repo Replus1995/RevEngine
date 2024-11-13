@@ -39,7 +39,8 @@ public:
 
 	void* Alloc(size_t AllocSize, size_t Alignment);
 
-	bool IsEmpty() const { return TopChunk == nullptr; }
+	FORCEINLINE bool IsEmpty() const { return TopChunk == nullptr; }
+	FORCEINLINE void Flush() { FreeChunks(nullptr); }
 
 	struct FTaggedChunk
 	{

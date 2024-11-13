@@ -171,11 +171,22 @@ class REV_API FRGName final
 public:
 	FRGName() = default;
 	explicit FRGName(const char* InName) : Name(InName) {}
+	FRGName(const FRGName& Other) : Name(Other.Name) {}
+	FRGName(FRGName&& Other) noexcept : Name(std::move(Other.Name)) {}
 
 	const std::string& GetName() const { return Name; }
 	const char* GetCharName() const { return Name.c_str(); }
 private:
 	std::string Name;
+};
+
+struct FRGParameterBase
+{
+	FRGParameterBase() = default;
+	virtual ~FRGParameterBase() = default;
+
+
+
 };
 
 
@@ -199,5 +210,6 @@ class FRGAllocator;
 class FRGTextureRegistry;
 class FRGBufferRegistry;
 class FRGPassRegistry;
+class FRGParameterStruct;
 
 }

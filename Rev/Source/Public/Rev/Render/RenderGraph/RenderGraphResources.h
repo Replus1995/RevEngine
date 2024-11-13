@@ -104,4 +104,38 @@ private:
 };
 
 
+struct FRGColorTargetBinding
+{
+	FRGColorTargetBinding() = default;
+	FRGColorTargetBinding(const FRGColorTargetBinding&) = default;
+
+	FRGColorTargetBinding(FRGTexture* InTexture, ERenderTargetLoadAction InLoadAction, uint8 InMipIndex = 0, int16 InArraySlice = -1)
+		: Texture(InTexture)
+		, LoadAction(InLoadAction)
+		, MipIndex(InMipIndex)
+		, ArraySlice(InArraySlice)
+	{
+	}
+
+	FRGColorTargetBinding(FRGTexture* InTexture, FRGTexture* InResolveTexture, ERenderTargetLoadAction InLoadAction, uint8 InMipIndex = 0, int16 InArraySlice = -1)
+		: Texture(InTexture)
+		, ResolveTexture(InResolveTexture)
+		, LoadAction(InLoadAction)
+		, MipIndex(InMipIndex)
+		, ArraySlice(InArraySlice)
+	{
+	}
+
+	FRGTexture* Texture = nullptr;
+	FRGTexture* ResolveTexture = nullptr;
+	ERenderTargetLoadAction LoadAction = RTL_DontCare;
+	uint8 MipIndex = 0;
+	int16 ArraySlice = -1;
+};
+
+struct alignas(16) FRGRenderTargetBindings
+{
+
+};
+
 }

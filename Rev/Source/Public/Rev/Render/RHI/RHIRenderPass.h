@@ -13,8 +13,8 @@ struct FRHIRenderPassDesc
 		FRHITexture* ResolveTarget = nullptr;
 		int32 ArraySlice = -1;
 		uint8 MipIndex = 0;
-		EAttachmentLoadOp LoadOp = ALO_DontCare;
-		EAttachmentStoreOp StoreOp = ASO_DontCare;
+		ERenderTargetLoadAction LoadOp = RTL_DontCare;
+		ERenderTargetStoreAction StoreOp = RTS_DontCare;
 	};
 	FColorEntry ColorRenderTargets[RTA_MaxColorAttachments];
 	uint32 NumColorRenderTargets = 0;
@@ -23,10 +23,10 @@ struct FRHIRenderPassDesc
 	{
 		FRHITexture* DepthStencilTarget = nullptr;
 		FRHITexture* ResolveTarget = nullptr;
-		EAttachmentLoadOp DepthLoadOp = ALO_DontCare;
-		EAttachmentStoreOp DepthStoreOp = ASO_DontCare;
-		EAttachmentLoadOp StencilLoadOp = ALO_DontCare;
-		EAttachmentStoreOp StencilStoreOp = ASO_DontCare;
+		ERenderTargetLoadAction DepthLoadOp = RTL_DontCare;
+		ERenderTargetStoreAction DepthStoreOp = RTS_DontCare;
+		ERenderTargetLoadAction StencilLoadOp = RTL_DontCare;
+		ERenderTargetStoreAction StencilStoreOp = RTS_DontCare;
 	};
 	FDepthStencilEntry DepthStencilRenderTarget;
 	//SubpassHint

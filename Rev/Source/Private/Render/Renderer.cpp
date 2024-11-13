@@ -105,9 +105,9 @@ void FRenderer::BuildFrameGraph()
 				auto& DepthTexMS = resources.get<FGTexture>(data.DepthTexMS);
 
 				FRHIRenderPassDesc DescBasePass;
-				DescBasePass.ColorRenderTargets[0] = { ColorTexMS.TextureRHI.get(), ColorTex.TextureRHI.get(), -1, 0, ALO_Clear, ASO_Store };
+				DescBasePass.ColorRenderTargets[0] = { ColorTexMS.TextureRHI.get(), ColorTex.TextureRHI.get(), -1, 0, RTL_Clear, RTS_Store };
 				DescBasePass.NumColorRenderTargets = 1;
-				DescBasePass.DepthStencilRenderTarget = { DepthTexMS.TextureRHI.get(), DepthTex.TextureRHI.get(), ALO_Clear, ASO_Store, ALO_DontCare, ASO_DontCare };
+				DescBasePass.DepthStencilRenderTarget = { DepthTexMS.TextureRHI.get(), DepthTex.TextureRHI.get(), RTL_Clear, RTS_Store, RTL_DontCare, RTS_DontCare };
 
 				data.BasePass = GDynamicRHI->RHICreateRenderPass(DescBasePass);
 			}
@@ -166,9 +166,9 @@ void FRenderer::BuildFrameGraph()
 			if (!data.SkyPass)
 			{
 				FRHIRenderPassDesc SkyPassDesc;
-				SkyPassDesc.ColorRenderTargets[0] = { ColorTex.TextureRHI.get(), nullptr, -1, 0, ALO_Load, ASO_Store };
+				SkyPassDesc.ColorRenderTargets[0] = { ColorTex.TextureRHI.get(), nullptr, -1, 0, RTL_Load, RTS_Store };
 				SkyPassDesc.NumColorRenderTargets = 1;
-				SkyPassDesc.DepthStencilRenderTarget = { DepthTex.TextureRHI.get(), nullptr, ALO_Load, ASO_DontCare, ALO_DontCare, ASO_DontCare };
+				SkyPassDesc.DepthStencilRenderTarget = { DepthTex.TextureRHI.get(), nullptr, RTL_Load, RTS_DontCare, RTL_DontCare, RTS_DontCare };
 
 				data.SkyPass = GDynamicRHI->RHICreateRenderPass(SkyPassDesc);
 			}

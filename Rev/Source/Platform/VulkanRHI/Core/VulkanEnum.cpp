@@ -135,12 +135,12 @@ VkCullModeFlags FVulkanEnum::Translate(ECullMode InMode)
     }
 }
 
-VkAttachmentLoadOp FVulkanEnum::Translate(EAttachmentLoadOp InOp)
+VkAttachmentLoadOp FVulkanEnum::Translate(ERenderTargetLoadAction InOp)
 {
     return VkAttachmentLoadOp(InOp);
 }
 
-VkAttachmentStoreOp FVulkanEnum::Translate(EAttachmentStoreOp InOp)
+VkAttachmentStoreOp FVulkanEnum::Translate(ERenderTargetStoreAction InOp)
 {
     return VkAttachmentStoreOp(InOp);
 }

@@ -238,17 +238,17 @@ enum EColorWriteMask : uint8
 
 //RenderPass
 
-enum EAttachmentLoadOp : uint8
+enum ERenderTargetLoadAction : uint8
 {
-	ALO_Load = 0,
-	ALO_Clear,
-	ALO_DontCare
+	RTL_Load = 0,
+	RTL_Clear,
+	RTL_DontCare
 };
 
-enum EAttachmentStoreOp : uint8
+enum ERenderTargetStoreAction : uint8
 {
-	ASO_Store = 0,
-	ASO_DontCare
+	RTS_Store = 0,
+	RTS_DontCare
 };
 
 //Utils
@@ -267,5 +267,30 @@ struct FRHIDeviceCapacity
 {
 	uint8 MaxNumSamples = 1;
 };
+
+class FRHICommandList;
+class FRHIRenderPass;
+class FRHITexture;
+class FRHIBuffer;
+class FRHIUniformBuffer;
+class FRHIShader;
+
+class FRHISamplerState;
+class FRHIRasterizerState;
+class FRHIDepthStencilState;
+class FRHIColorBlendState;
+class FRHIVertexInputState;
+
+using FRHIRenderPassRef		= Ref<FRHIRenderPass>;
+using FRHITextureRef		= Ref<FRHITexture>;
+using FRHIBufferRef			= Ref<FRHIBuffer>;
+using FRHIUniformBufferRef	= Ref<FRHIUniformBuffer>;
+using FRHIShaderRef			= Ref<FRHIShader>;
+
+using FRHISamplerStateRef		= Ref<FRHISamplerState>;
+using FRHIRasterizerStateRef	= Ref<FRHIRasterizerState>;
+using FRHIDepthStencilStateRef	= Ref<FRHIDepthStencilState>;
+using FRHIColorBlendStateRef	= Ref<FRHIColorBlendState>;
+using FRHIVertexInputStateRef	= Ref<FRHIVertexInputState>;
 
 }
