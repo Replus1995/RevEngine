@@ -1,1 +1,32 @@
 #include "Engine/Shaders/Core/Base.rsh"
+cbuffer SceneUB : register(b0)
+{
+	FSceneUniform uScene;
+};
+
+SAMPLERCUBE(sLinearScreenTex, 1);
+struct PSInput
+{
+    float4 Position : SV_POSITION;
+};
+
+struct PSOutput
+{
+    float4 Color : SV_Target;
+};
+
+float2 GetScreenCoord(in float4 InPixelCoord)
+{
+    return float2(InPixelCoord.x / uScene.ViewExtent.Width, InPixelCoord.y / uScene.ViewExtent.Height);
+}
+
+PSOutput main(const PSInput Input)
+{
+    float2 ScreenCoord = GetScreenCoord(Input.Position);
+
+    PSOutput Result;
+    Result.Color.rgb = sLinearScreenTex.Sample(ScreenCoord).rgb;
+    Result.Color.rgb = pow(Result.Color.rgb, float3(1.0/2.2));
+    Result.Color.a = 1.0f;
+    return Result;
+}

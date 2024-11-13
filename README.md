@@ -9,17 +9,29 @@ A tiny 3d engine for learning graphics apis & algorithms
 - **Archive** : A simple archive class to do serialize & deserialize
 - **Asset** : Asset related classes & functions
 - **GLFW** : GLFW window class
-- **OpenGL** : OpenGL rhi implement (to be deprecated)
 - **Shaderc** : Classes & functions to compile GLSL into SPRIV
 - **VulkanRHI** : Vulkan rhi implement
 
 # Status
+- **In Use**
+  - Vulkan Graphics Pipeline
+  - Shaderc hlsl shader compiler
+  - ECS scene management
+  - Virtual File Manager based on PhysicsFS
+  - MSAA
 - **In Progress**
-  - Vulkan RHI
-  - Hash string (FName)
+  - Render Graph
 - **Todo List**
-  - Use hlsl instead of glsl
-  - Render graph
+  - Vulkan Compute Pipeline
+  - ShadowMap
+  - Deferred Rendering
+  - GI
+  - Post Process
+  - Ray Tracing
+  - Material Template
+  - Animation
+  - Particle
+  - Physics
 
 
 # Reference
@@ -29,10 +41,12 @@ A tiny 3d engine for learning graphics apis & algorithms
   - BGFX
 - **Math**
   - [glm](https://github.com/g-truc/glm)
-- **Opengl**
-  - [Learn OpenGL](https://learnopengl.com/)
 - **Vulkan**
   - [Vulkan Tutorial](https://vulkan-tutorial.com/)
   - [Vulkan Guide](https://vkguide.dev/)
+- **FrameGraph**
+  - [skaarj1989/FrameGraph](https://github.com/skaarj1989/FrameGraph)
+- **FileSystem**
+  - [PhysicsFS](https://icculus.org/physfs/)
 
 ***
