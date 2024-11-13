@@ -10,7 +10,7 @@
 namespace Rev
 {
 
-template<class TApp, ENABLE_CHECK(TIsBaseOf<Application, TApp>)>
+template<class TApp, ENABLE_CHECK(std::is_base_of<Application, TApp>)>
 int RunApp(int argc, char** argv)
 {
 	FLogger::Init();

@@ -214,7 +214,7 @@ void FRenderer::BuildFrameGraph()
 	};
 
 	mFG->addCallbackPass<BlitPassData>(
-		"Blit pass", 
+		"Blit Pass", 
 		[&](FrameGraph::Builder& builder, BlitPassData& data) {
 			data.ColorTex = builder.read(SkyData.ColorTex);
 			data.BackTex = builder.write(backbufferId);
