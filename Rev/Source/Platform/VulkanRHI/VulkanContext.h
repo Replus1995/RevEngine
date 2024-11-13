@@ -42,6 +42,9 @@ public:
 	virtual void RHISetVSync(bool bEnable) override;
 	virtual void RHISetViewport(uint32 InX, uint32 InY, uint32 InWidth, uint32 InHeight) override;
 	virtual void RHIClearBackTexture(const Math::FLinearColor& InColor) override;
+	virtual uint32 RHIGetFrameWidth() override;
+	virtual uint32 RHIGetFrameHeight() override;
+	virtual FRHITexture* RHIGetBackTexture() override;
 
 //Data transfer
 	virtual void RHIUpdateTexture(FRHITexture* InTexture, const void* InContent, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex) override;
@@ -96,7 +99,6 @@ private:
 	FVulkanFrameData mFrameData[REV_VK_FRAME_OVERLAP];
 
 	//dynamic state
-	VkExtent2D mDrawExtent = {0, 0};
 	VkViewport mViewport;
 	VkRect2D mScissor;
 	

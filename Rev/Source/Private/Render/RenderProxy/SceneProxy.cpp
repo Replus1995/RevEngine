@@ -1,16 +1,14 @@
 #include "Rev/Render/RenderProxy/SceneProxy.h" 
 #include "Rev/Render/RHI/DynamicRHI.h"
+#include "Rev/Render/RHI/RHIContext.h"
 #include "Rev/Render/RHI/RHICommandList.h"
 #include "Rev/Render/RHI/RHIBuffer.h"
 #include "Rev/Render/UniformLayout.h"
 
-#include "Rev/Core/Application.h"
-#include "Rev/Core/Window.h"
-
 namespace Rev
 {
 
-void FSceneProxy::Prepare(const Ref<FScene>& Scene)
+void FSceneProxy::Prepare(FRHICommandList& RHICmdList, const Ref<FScene>& Scene)
 {
 	if(!Scene) return;
 
@@ -19,8 +17,7 @@ void FSceneProxy::Prepare(const Ref<FScene>& Scene)
 	mLightProxy.Prepare(Scene);
 	mSkyProxy.Prepare(Scene);
 
-	auto pWindow = Application::GetApp().GetWindow();
-	mSceneParams.ViewExtent = { 0, 0, pWindow->GetWidth(), pWindow->GetHeight() };
+	mSceneParams.ViewExtent = { 0, 0, RHICmdList.GetContext()->RHIGetFrameWidth(), RHICmdList.GetContext()->RHIGetFrameHeight() };
 }
 
 void FSceneProxy::SyncResource(FRHICommandList& RHICmdList)
@@ -35,7 +32,6 @@ void FSceneProxy::SyncResource(FRHICommandList& RHICmdList)
 	mSkyProxy.SyncResource(RHICmdList);
 
 	{
-		
 		mSceneParams.ViewPos = mCameraProxy.GetViewPos();
 		mSceneParams.ViewMat = mCameraProxy.GetViewMat();
 		mSceneParams.ProjMat = mCameraProxy.GetProjMat();

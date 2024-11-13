@@ -18,7 +18,7 @@ public:
 	~FSceneProxy() = default;
 
 
-	void Prepare(const Ref<FScene>& Scene);
+	void Prepare(FRHICommandList& RHICmdList, const Ref<FScene>& Scene);
 	void SyncResource(FRHICommandList& RHICmdList);
 	void Cleanup();
 

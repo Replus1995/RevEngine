@@ -65,16 +65,16 @@ void SceneLayer::OnEvent(Event& event)
 
 void SceneLayer::OnDraw(FRHICommandList& RHICmdList)
 {
-	mSceneProxy->Prepare(mScene);
+	mSceneProxy->Prepare(RHICmdList, mScene);
 
 	//uint32 WinWidth = Application::GetApp().GetWindow()->GetWidth();
 	//uint32 WinHeight = Application::GetApp().GetWindow()->GetHeight();
 	RHICmdList.GetContext()->RHISetViewport(0, 0, mSceneProxy->GetFrameWidth(), mSceneProxy->GetFrameHeight());
 
 
-	mRenderer->BeginFrame();
+	mRenderer->BeginFrame(RHICmdList);
 	mRenderer->DrawFrame(RHICmdList);
-	mRenderer->EndFrame();
+	mRenderer->EndFrame(RHICmdList);
 
 
 	//RenderCmd::BeginFrame(true);

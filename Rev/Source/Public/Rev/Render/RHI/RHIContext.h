@@ -34,6 +34,9 @@ public:
 	virtual void RHISetVSync(bool bEnable) = 0;
 	virtual void RHISetViewport(uint32 InX, uint32 InY, uint32 InWidth, uint32 InHeight) = 0;
 	virtual void RHIClearBackTexture(const Math::FLinearColor& InColor) = 0;
+	virtual uint32 RHIGetFrameWidth() = 0;
+	virtual uint32 RHIGetFrameHeight() = 0;
+	virtual FRHITexture* RHIGetBackTexture() = 0;
 
 	virtual void RHIBeginRenderPass(FRHIRenderPass* InRenderPass) = 0;
 	virtual void RHIEndRenderPass() = 0;

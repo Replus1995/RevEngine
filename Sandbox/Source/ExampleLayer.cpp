@@ -21,8 +21,6 @@ ExampleLayer::ExampleLayer()
 	//Load shader
 
 	IFileManager::Get().Mount("/Game", (std::filesystem::current_path() / "Game").generic_string().c_str());
-	bool Eres = IFileManager::Get().IsExist("/Game/Assets/Models/DamagedHelmet.glb");
-
 
 	//Create Sandbox Scene
 	mScene = CreateRef<Rev::FScene>();

@@ -13,9 +13,9 @@ public:
 	FRenderer(FSceneProxy* InSceneProxy);
 	virtual ~FRenderer();
 
-	virtual void BeginFrame();
+	virtual void BeginFrame(FRHICommandList& RHICmdList);
 	virtual void DrawFrame(FRHICommandList& RHICmdList);
-	virtual void EndFrame();
+	virtual void EndFrame(FRHICommandList& RHICmdList);
 
 private:
 	void BuildFrameGraph();

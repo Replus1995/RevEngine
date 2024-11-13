@@ -68,9 +68,6 @@ void FVulkanContext::BeginFrame(bool bClearBackBuffer)
 
 	mSwapchain.NextFrame(kWaitTime, FrameData.SwapchainSemaphore, nullptr);
 
-	mDrawExtent.width = mSwapchain.GetExtent().width;
-	mDrawExtent.height = mSwapchain.GetExtent().height;
-
 	FrameData.DescriptorPool.ResetPool(FVulkanDynamicRHI::GetDevice());
 
 	VkCommandBuffer CmdBuffer = FrameData.CmdBuffer;
@@ -191,6 +188,21 @@ void FVulkanContext::RHIClearBackTexture(const Math::FLinearColor& InColor)
 
 	auto SwapchainTexture = GetSwapchainTexture();
 	FVulkanUtils::ImmediateClearImage(this, SwapchainTexture->GetImage(), SwapchainTexture->GetAspectFlags(), ClearValue, 0, 1, 0, 1);
+}
+
+uint32 FVulkanContext::RHIGetFrameWidth()
+{
+	return mSwapchain.GetExtent().width;
+}
+
+uint32 FVulkanContext::RHIGetFrameHeight()
+{
+	return mSwapchain.GetExtent().height;
+}
+
+FRHITexture* FVulkanContext::RHIGetBackTexture()
+{
+	return mSwapchain.GetCurrentTexture();
 }
 
 void FVulkanContext::RHIUpdateTexture(FRHITexture* InTexture, const void* InContent, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex)

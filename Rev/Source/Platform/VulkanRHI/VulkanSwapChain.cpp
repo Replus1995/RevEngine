@@ -16,14 +16,16 @@ namespace Rev
 void FVulkanSwapchain::CreateSwapchain(VkPresentModeKHR InPresentMode)
 {
     const FVulkanSurfaceSupport& SurfaceSupport = FVulkanDynamicRHI::GetSurfaceSupport();
+    VkSurfaceCapabilitiesKHR SurfaceCapabilities;
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(FVulkanDynamicRHI::GetPhysicalDevice(), FVulkanDynamicRHI::GetSurface(), &SurfaceCapabilities);
 
     VkSurfaceFormatKHR SurfaceFormat = ChooseSurfaceFormat(SurfaceSupport.Formats);
     VkPresentModeKHR PresentMode = ChoosePresentMode(SurfaceSupport.PresentModes, InPresentMode);
-    VkExtent2D Extent = ChooseExtent(SurfaceSupport.Capabilities);
+    VkExtent2D Extent = ChooseExtent(SurfaceCapabilities);
 
-    uint32 MinImageCount = SurfaceSupport.Capabilities.minImageCount + 1;
-    if (SurfaceSupport.Capabilities.maxImageCount > 0 && MinImageCount > SurfaceSupport.Capabilities.maxImageCount) {
-        MinImageCount = SurfaceSupport.Capabilities.maxImageCount;
+    uint32 MinImageCount = SurfaceCapabilities.minImageCount + 1;
+    if (SurfaceCapabilities.maxImageCount > 0 && MinImageCount > SurfaceCapabilities.maxImageCount) {
+        MinImageCount = SurfaceCapabilities.maxImageCount;
     }
 
     VkSwapchainCreateInfoKHR SwapChainCreateInfo{};
@@ -54,7 +56,7 @@ void FVulkanSwapchain::CreateSwapchain(VkPresentModeKHR InPresentMode)
 
     }
     
-    SwapChainCreateInfo.preTransform = SurfaceSupport.Capabilities.currentTransform;
+    SwapChainCreateInfo.preTransform = SurfaceCapabilities.currentTransform;
     SwapChainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
     SwapChainCreateInfo.presentMode = PresentMode;
     SwapChainCreateInfo.clipped = VK_TRUE;
@@ -126,10 +128,12 @@ VkPresentModeKHR FVulkanSwapchain::ChoosePresentMode(const std::vector<VkPresent
 
 VkExtent2D FVulkanSwapchain::ChooseExtent(const VkSurfaceCapabilitiesKHR& InCapabilities)
 {
-    if (InCapabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
+    if (InCapabilities.currentExtent.width != std::numeric_limits<uint32_t>::max())
+    {
         return InCapabilities.currentExtent;
     }
-    else {
+    else 
+    {
         Window* pWnd = Application::GetApp().GetWindow();
         REV_CORE_ASSERT(pWnd, "[FVkSwapChain] Invalid window!");
 

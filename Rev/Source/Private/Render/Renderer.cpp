@@ -21,7 +21,7 @@ FRenderer::~FRenderer()
 {
 }
 
-void FRenderer::BeginFrame()
+void FRenderer::BeginFrame(FRHICommandList& RHICmdList)
 {
 	//prepare resource
 
@@ -156,7 +156,7 @@ void FRenderer::DrawFrame(FRHICommandList& RHICmdList)
 
 }
 
-void FRenderer::EndFrame()
+void FRenderer::EndFrame(FRHICommandList& RHICmdList)
 {
 }
 
