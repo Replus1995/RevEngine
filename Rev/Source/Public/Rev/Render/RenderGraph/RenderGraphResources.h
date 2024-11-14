@@ -103,7 +103,6 @@ private:
 	friend FRGBufferRegistry;
 };
 
-
 struct FRGColorTargetBinding
 {
 	FRGColorTargetBinding() = default;
@@ -126,6 +125,16 @@ struct FRGColorTargetBinding
 	{
 	}
 
+	bool IsValid() const
+	{
+		return Texture != nullptr;
+	}
+
+	bool NeedReslove() const
+	{
+		return Texture != nullptr && ResolveTexture != nullptr;
+	}
+
 	FRGTexture* Texture = nullptr;
 	FRGTexture* ResolveTexture = nullptr;
 	ERenderTargetLoadAction LoadAction = RTL_DontCare;
@@ -133,8 +142,45 @@ struct FRGColorTargetBinding
 	int16 ArraySlice = -1;
 };
 
+struct FRGDepthStencilTargetBinding
+{
+	FRGDepthStencilTargetBinding() = default;
+	FRGDepthStencilTargetBinding(const FRGDepthStencilTargetBinding&) = default;
+
+	FRGDepthStencilTargetBinding(FRGTexture* InTexture, ERenderTargetLoadAction InDepthLoadAction, ERenderTargetLoadAction InStencilLoadAction = RTL_DontCare)
+		: Texture(InTexture)
+		, DepthLoadAction(InDepthLoadAction)
+		, StencilLoadAction(InStencilLoadAction)
+	{
+	}
+
+	bool IsValid() const
+	{
+		return Texture != nullptr;
+	}
+
+	bool NeedReslove() const
+	{
+		return Texture != nullptr && ResolveTexture != nullptr;
+	}
+
+	FRGTexture* Texture = nullptr;
+	FRGTexture* ResolveTexture = nullptr;
+	ERenderTargetLoadAction DepthLoadAction = RTL_DontCare;
+	ERenderTargetLoadAction StencilLoadAction = RTL_DontCare;
+};
+
 struct alignas(16) FRGRenderTargetBindings
 {
+	std::array<FRGColorTargetBinding, RTA_MaxColorAttachments> Colors;
+	FRGDepthStencilTargetBinding DepthStencil;
+
+	uint32 GetNumActive() const
+	{
+		uint32 Count = 0;
+		for (; Colors[Count].IsValid(); ++Count) {}
+		return Count;
+	}
 
 };
 

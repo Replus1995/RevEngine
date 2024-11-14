@@ -202,4 +202,29 @@ class FRGBufferRegistry;
 class FRGPassRegistry;
 class FRGParameterStruct;
 
+struct FRGColorTargetBinding;
+struct FRGDepthStencilTargetBinding;
+struct FRGRenderTargetBindings;
+
+template <typename InObjectType, typename InIndexType>
+class TRGHandle
+{
+public:
+	using ObjectType = InObjectType;
+	using IndexType = InIndexType;
+
+	TRGHandle() = default;
+	explicit TRDGHandle(int32 InIndex)
+	{
+		REV_CORE_ASSERT(InIndex >= 0 && InIndex <= kNullIndex)
+		Index = (IndexType)InIndex;
+	}
+
+private:
+	static const IndexType kNullIndex = std::numeric_limits<InIndexType>::max();
+	IndexType Index = 
+
+};
+
+
 }
