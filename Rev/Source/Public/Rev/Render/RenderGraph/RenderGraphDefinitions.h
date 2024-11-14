@@ -220,11 +220,117 @@ public:
 		Index = (IndexType)InIndex;
 	}
 
+	IndexType GetIndex() const { return Index; }
+	bool IsNull() const { return Index == kNullIndex; }
+	bool IsValid() const { return Index != kNullIndex; }
+
 private:
 	static const IndexType kNullIndex = std::numeric_limits<InIndexType>::max();
-	IndexType Index = 
-
+	IndexType Index = kNullIndex;
 };
 
+enum class ERGHandleDestructPolicy
+{
+	Registry,
+	Allocator,
+	Never,
+};
+
+
+template<typename InHandleType, ERGHandleDestructPolicy DestructPolicy = ERGHandleDestructPolicy::Registry>
+class TRGHandleRegistry
+{
+public:
+	using HandleType = InHandleType;
+	using ObjectType = typename HandleType::ObjectType;
+	using IndexType = typename HandleType::IndexType;
+
+	TRGHandleRegistry() = default;
+	TRGHandleRegistry(const TRGHandleRegistry&) = delete;
+	~TRGHandleRegistry()
+	{
+
+	}
+
+	FORCEINLINE HandleType Begin()
+	{
+		return HandleType(0)
+	}
+
+	FORCEINLINE HandleType End()
+	{
+		return HandleType(ObjectArray.size())
+	}
+
+	FORCEINLINE HandleType Last()
+	{
+		return HandleType(ObjectArray.size() - 1)
+	}
+
+	void Add(ObjectType* Object)
+	{
+		ObjectArray.emplace_back(Object);
+		Object->Handle = Last();
+	}
+
+	void Clear()
+	{
+		if (DestructPolicy == ERGHandleDestructPolicy::Registry)
+		{
+			for (uint32 index = ObjectArray.size() - 1; index >= 0; index--)
+			{
+				ObjectArray[index]->~ObjectType();
+			}
+		}
+		ObjectArray.clear();
+	}
+
+	template<typename DerivedType = ObjectType, typename... TArgs>
+	DerivedType* Allocate(FRGAllocator& Allocator, TArgs&&... Args)
+	{
+		static_assert(std::derived_from<DerivedType, ObjectType>::value, "Registy try to allocate an invalid type");
+		DerivedType* Object;
+		if (DestructPolicy == ERGHandleDestructPolicy::Allocator)
+		{
+			Object = Allocator.Alloc<DerivedType>(std::forward<TArgs&&>(Args)...);
+		}
+		else
+		{
+			Object = Allocator.AllocNoDestruct<DerivedType>(std::forward<TArgs&&>(Args)...);
+		}
+		Add(Object);
+		return Object;
+	}
+
+	template<typename FunctionType>
+	void ForEach(FunctionType Function)
+	{
+		for (ObjectType* Object : ObjectArray)
+		{
+			Function(Object);
+		}
+	}
+
+	template<typename FunctionType>
+	void ForEach(FunctionType Function) const
+	{
+		for (const ObjectType* Object : ObjectArray)
+		{
+			Function(Object);
+		}
+	}
+
+private:
+	std::vector<ObjectType*> ObjectArray;
+};
+
+using FRGTextureHandle = TRGHandle<FRGTexture, uint16>;
+using FRGTextureRegistry = TRGHandleRegistry<FRGTextureHandle>;
+
+using FRGBufferHandle = TRGHandle<FRGBuffer, uint16>;
+using FRGBufferRegistry = TRGHandleRegistry<FRGBufferHandle>;
+
+using FRGPassHandle = TRGHandle<FRGPass, uint16>;
+using FRGPassRegistry = TRGHandleRegistry<FRGPassHandle>;
 
 }

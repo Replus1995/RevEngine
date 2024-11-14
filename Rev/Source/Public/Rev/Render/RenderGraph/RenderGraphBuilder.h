@@ -4,6 +4,7 @@
 #include "Rev/Render/RenderGraph/RenderGraphDefinitions.h"
 #include "Rev/Render/RenderGraph/RenderGraphAllocator.h"
 #include "Rev/Render/RenderGraph/RenderGraphResources.h"
+#include "Rev/Render/RenderGraph/RenderGraphPass.h"
 
 namespace Rev
 {
@@ -58,6 +59,9 @@ public:
 
 private:
 	const FRGName BuilderName;
+	FRGTextureRegistry TextureRegistry;
+	FRGBufferRegistry BufferRegistry;
+	FRGPassRegistry PassRegistry;
 
 	//Transient Resource Allocator
 };

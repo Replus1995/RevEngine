@@ -52,6 +52,8 @@ protected:
 
 	/** Whether this resource is allocated through the transient resource allocator. */
 	bool bTransient;
+
+	uint16 ReferenceCount = 0;
 };
 
 
@@ -73,6 +75,8 @@ private:
 		, Desc(InDesc)
 		, Flags(InFlags)
 	{}
+
+	FRGTextureHandle Handle;
 
 	friend FRGBuilder;
 	friend FRGAllocator;
@@ -97,6 +101,8 @@ private:
 		, Desc(InDesc)
 		, Flags(InFlags)
 	{}
+
+	FRGBufferHandle Handle;
 
 	friend FRGBuilder;
 	friend FRGAllocator;

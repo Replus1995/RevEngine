@@ -25,6 +25,19 @@ public:
 		return &TrackedAlloc->Alloc;
 	}
 
+	template <typename T>
+	FORCEINLINE T* AllocUninitialized(uint64 Count = 1)
+	{
+		return reinterpret_cast<T*>(Alloc(sizeof(T) * Count, alignof(T)));
+	}
+
+	//Dangerous
+	template <typename T, typename... TArgs>
+	FORCEINLINE T* AllocNoDestruct()
+	{
+		return new (Alloc(sizeof(T), alignof(T))) T(std::forward<TArgs&&>(Args)...);
+	}
+
 private:
 	FRGAllocator() = default;
 	FRGAllocator(FRGAllocator&&) = default;
@@ -67,5 +80,7 @@ public:
 protected:
 	FRGAllocator& Allocator;
 };
+
+//TODO: Custom Array Allocator
 
 }

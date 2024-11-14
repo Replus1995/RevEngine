@@ -55,6 +55,9 @@ protected:
 	const ERGPassFlags Flags;
 	ERHIPipeline Pipeline;
 	FRHIRenderPassRef RenderPassRHI;
+	FRGPassHandle Handle;
+
+	friend FRGPassRegistry;
 };
 
 
