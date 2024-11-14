@@ -180,16 +180,6 @@ private:
 	std::string Name;
 };
 
-struct FRGParameterBase
-{
-	FRGParameterBase() = default;
-	virtual ~FRGParameterBase() = default;
-
-
-
-};
-
-
 class FRGResource;
 using FRGResourceRef = FRGResource*;
 
