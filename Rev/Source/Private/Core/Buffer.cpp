@@ -50,9 +50,13 @@ FBuffer FBuffer::Copy(FBuffer other)
 
 void FBuffer::Allocate(uint64 size)
 {
-	Release();
-	mData = new uint8[size];
-	mSize = size;
+	if (mSize != size)
+	{
+		Release();
+		mData = new uint8[size];
+		mSize = size;
+	}
+	memset(mData, 0, mSize);
 }
 
 void FBuffer::Release()
@@ -92,7 +96,7 @@ FBufferView::FBufferView(const FBuffer& InBuffer, uint64 InOffset, uint64 InSize
 	, mOffset(InOffset)
 	, mSize(InSize)
 {
-	RE_CORE_ASSERT(mOffset + mSize <= InBuffer.Size());
+	REV_CORE_ASSERT(mOffset + mSize <= InBuffer.Size());
 }
 
 FBufferView::~FBufferView()

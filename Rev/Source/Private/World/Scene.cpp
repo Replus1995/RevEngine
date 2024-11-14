@@ -71,6 +71,15 @@ void FScene::DestroyEntity(FEntity entity)
 	mRegistry.destroy(entity);
 }
 
+void FScene::DestroyAllEntities()
+{
+	for (auto& [Id, Entity] : mEntityMap)
+	{
+		mRegistry.destroy(Entity);
+	}
+	mEntityMap.clear();
+}
+
 FEntity FScene::DuplicateEntity(FEntity entity)
 {
 	std::string name = entity.GetName();

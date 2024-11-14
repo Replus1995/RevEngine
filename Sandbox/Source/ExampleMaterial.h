@@ -1,32 +1,31 @@
 #pragma once
 #include <Rev/Render/Material/Material.h>
-#include <Rev/Render/Material/MaterialUniform.h>
 #include <Rev/Math/Maths.h>
 #include <Rev/Render/RHI/RHIShaderLibrary.h>
 
-class ExampleMaterial : public Rev::Material
+class ExampleMaterial : public Rev::FMaterial
 {
 public:
-    ExampleMaterial() : Rev::Material() {}
+    ExampleMaterial() {}
     virtual ~ExampleMaterial() {}
 
     void SetColor(const Rev::Math::FVector4& color)
     {
-        uColor = color;
+        //uColor = color;
     }
 
     virtual void Compile() override
     {
-        mProgram = Rev::FRHIShaderLibrary::GetInstance().CreateGraphicsProgram("ExampleProgram", "/Game/Shaders/ExampleVS", "/Game/Shaders/ExampleFS");
+        ShaderProgram = Rev::FRHIShaderLibrary::Get()->CreateGraphicsProgram("ExampleProgram", "/Game/Shaders/ExampleVS", "/Game/Shaders/ExamplePS");
     }
 
-    virtual void PreDraw() override
+    virtual void PreDraw(Rev::FRHICommandList& RHICmdList) override
     {
-        Rev::Material::PreDraw();
-        uColor.Upload(mProgram);
+        Rev::FMaterial::PreDraw(RHICmdList);
+        //uColor.Upload(mProgram);
     }
 
 
 protected:
-    Rev::TMaterialUniform<Rev::Math::FLinearColor> uColor = { "Color", Rev::Math::FLinearColor(1) };
+    //Rev::TMaterialUniform<Rev::Math::FLinearColor> uColor = { "Color", Rev::Math::FLinearColor(1) };
 };

@@ -11,7 +11,7 @@ FFileArchive::FFileArchive(const FPath& InPath, EFileArchiveKind InKind)
 	mFile.Open(InPath, FOp);
 	if (!mFile.IsOpened())
 	{
-		RE_CORE_WARN("FileArchive open failed: {0}", InPath.ToString().c_str());
+		REV_CORE_WARN("FileArchive open failed: {0}", InPath.ToString().c_str());
 	}
 }
 

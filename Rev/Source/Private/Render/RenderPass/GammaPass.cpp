@@ -1,25 +1,23 @@
 #include "Rev/Render/RenderPass/GammaPass.h"
-#include "Rev/Render/RHI/RHIResourceFactory.h"
 #include "Rev/Render/RHI/RHIShaderLibrary.h"
-#include "Rev/Render/RenderCmd.h"
 #include "Rev/Render/RenderUtils.h"
 #include "Rev/Render/Material/Material.h"
 
 namespace Rev
 {
 
-class GammaCorrectMaterial : public Material
+class GammaCorrectMaterial : public FMaterial
 {
 public:
 	GammaCorrectMaterial()
 	{
-		mDomain = MD_PostProcess;
+		Domain = MD_PostProcess;
 	}
 	virtual ~GammaCorrectMaterial() = default;
 
 	virtual void Compile() override
 	{
-		mProgram = FRHIShaderLibrary::GetInstance().CreateGraphicsProgram(
+		ShaderProgram = FRHIShaderLibrary::Get()->CreateGraphicsProgram(
 			"GammaCorrectProgram",
 			{ "/Engine/Shaders/PostVS" },
 			{ "/Engine/Shaders/GammaCorrectFS" }
@@ -49,10 +47,9 @@ void FGammaCorrectPass::BeginPass()
 
 void FGammaCorrectPass::RunPass()
 {
-	ClearRenderTarget();
-	mMaterial->PreDraw();
+	/*mMaterial->PreDraw();
 	RenderUtils::DrawScreenQuad();
-	mMaterial->PostDraw();
+	mMaterial->PostDraw();*/
 }
 
 

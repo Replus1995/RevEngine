@@ -3,8 +3,10 @@
 #include "Rev/Core/Buffer.h"
 #include "Rev/Core/FileSystem.h"
 #include "Rev/Render/RenderCore.h"
+#include "Rev/Render/PixelFormat.h"
 #include "Rev/Render/RHI/RHIShader.h"
 #include "Rev/Render/RHI/RHIShaderCompile.h"
+#include "Rev/Render/RHI/RHITexture.h"
 #include <map>
 #include <filesystem>
 
@@ -15,7 +17,7 @@ struct FShadercSource
 {
 	FPath FilePath;
 	FBuffer FileContent;
-	ERHIShaderStage Stage = ERHIShaderStage::Unknown;
+	EShaderStage Stage = SS_Unknown;
 
 	FShadercSource() = default;
 	FShadercSource(FShadercSource&& Other) noexcept
@@ -29,8 +31,10 @@ struct FShadercSource
 struct FShadercCompiledData
 {
 	std::string Name;
-	ERHIShaderStage Stage = ERHIShaderStage::Unknown;
+	EShaderStage Stage = SS_Unknown;
 	FBuffer Binary;
+	std::vector<FRHIShaderUniform> Uniforms;
+	std::vector<FRHIShaderAttribute> Attributes; //only for vertex shader input
 
 	bool Empty() const
 	{
@@ -53,13 +57,12 @@ public:
 	static void CreateCacheDirectory();
 	static const char* GetCacheExtension();
 
-	static ERHIShaderStage StringToShaderStage(std::string_view InStr);
-	static const char* ShaderStageToString(ERHIShaderStage InStage);
+	static EShaderStage StringToShaderStage(std::string_view InStr);
+	static const char* ShaderStageToString(EShaderStage InStage);
 
 	static FShadercSource LoadShaderSource(const FPath& InPath);
 	static bool LoadShaderCompiledData(const std::filesystem::path& ShaderCachePath, FShadercCompiledData& OutCompiledData);
 	static bool SaveShaderCompiledData(const std::filesystem::path& ShaderCachePath, FShadercCompiledData& InCompiledData);
-	static void DumpShaderInfo(const FShadercCompiledData& InData);
 };
 
 }

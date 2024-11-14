@@ -1,0 +1,25 @@
+#include "Engine/Shaders/Core/Base.rsh"
+
+cbuffer SceneUB : register(b0)
+{
+	FSceneUniform uScene;
+};
+
+struct VSInput
+{
+    float4 aPosition : POSITION0;
+};
+
+struct VSOutput
+{
+    float4 vPosition : SV_POSITION;
+    float3 vWorldPos : TEXCOORD0;
+};
+
+VSOutput main(VSInput Input)
+{
+    VSOutput Result;
+    Result.vWorldPos = mul(uScene.InvProjViewMat, Input.aPosition).xyz;
+    Result.vPosition = Input.aPosition;
+    return Result;
+}

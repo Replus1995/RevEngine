@@ -20,7 +20,7 @@ void FFileSystem::MountDir(const std::string& VirtualDir, const std::string& Nat
 	auto res = GetDirMap().emplace(VirtualDir, NativeDir);
 	if (!res.second)
 	{
-		RE_CORE_ERROR("VirtualDir \"{0}\" has already been mounted as \"{1}\"", VirtualDir.c_str(), res.first->second.c_str());
+		REV_CORE_ERROR("VirtualDir \"{0}\" has already been mounted as \"{1}\"", VirtualDir.c_str(), res.first->second.c_str());
 	}
 }
 
@@ -47,7 +47,7 @@ FBuffer FFileSystem::LoadBinaryFile(const std::string& InNativePath)
 	}
 	else
 	{
-		RE_CORE_ERROR("[FFileSystem] Open file failded '{0}'", InNativePath.c_str());
+		REV_CORE_ERROR("[FFileSystem] Open file failded '{0}'", InNativePath.c_str());
 	}
 	return OutBuffer;
 }
@@ -70,7 +70,7 @@ bool FFileSystem::SaveBinaryFile(const std::string& InNativePath, const FBuffer&
 	}
 	else
 	{
-		RE_CORE_ERROR("[FFileSystem] Open file failded '{0}'", InNativePath.c_str());
+		REV_CORE_ERROR("[FFileSystem] Open file failded '{0}'", InNativePath.c_str());
 	}
 	return false;
 }
@@ -98,7 +98,7 @@ std::string FFileSystem::LoadStringFile(const FPath& InPath)
 	}
 	else
 	{
-		RE_CORE_ERROR("[FFileSystem] Open file failded '{0}'", InPath.ToString().c_str());
+		REV_CORE_ERROR("[FFileSystem] Open file failded '{0}'", InPath.ToString().c_str());
 	}
 	return Result;
 }
@@ -116,7 +116,7 @@ bool FFileSystem::SaveStringFile(const FPath& InPath, const std::string& InStrin
 	}
 	else
 	{
-		RE_CORE_ERROR("[FFileSystem] Open file failded '{0}'", InPath.ToString().c_str());
+		REV_CORE_ERROR("[FFileSystem] Open file failded '{0}'", InPath.ToString().c_str());
 	}
 	return false;
 }

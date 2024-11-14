@@ -1,10 +1,12 @@
 #pragma once
 #include "Rev/Core/Base.h"
+#include "Rev/Math/Maths.h"
 #include "Rev/Render/UniformDefine.h"
 #include "Rev/Render/Component/Camera.h"
 
 namespace Rev
 {
+class FRenderer;
 class FScene;
 class FCameraProxy
 {
@@ -13,11 +15,17 @@ public:
 	~FCameraProxy();
 
 	void Prepare(const Ref<FScene>& Scene);
-	void SyncResource() const;
-	void FreeResource();
+	void SyncResource(FRHICommandList& RHICmdList);
+
+	const Math::FVector3& GetViewPos() const { return mViewPos; }
+	const Math::FMatrix4& GetViewMat() const { return mViewMatrix; }
+	const Math::FMatrix4& GetProjMat() const { return mProjMatrix; }
+	Math::FMatrix4 GetViewProjMat() const { return mProjMatrix * mViewMatrix; }
 
 private:
-	TUniform<FCameraUniform, UL::BCamera> uCamera;
+	Math::FVector3 mViewPos;
+	Math::FMatrix4 mViewMatrix;
+	Math::FMatrix4 mProjMatrix;
 };
 
 }

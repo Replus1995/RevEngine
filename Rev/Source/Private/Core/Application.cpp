@@ -4,9 +4,11 @@
 #include "Rev/Core/Clock.h"
 #include "Rev/Core/Input.h"
 #include "Rev/Render/RenderCore.h"
-#include "Rev/Render/RenderCmd.h"
 #include "Rev/Render/RenderUtils.h"
+#include "Rev/Render/RHI/RHIContext.h"
+#include "Rev/Render/RHI/RHICommandList.h"
 #include "Rev/Asset/AssetLibrary.h"
+
 
 namespace Rev
 {
@@ -19,51 +21,86 @@ namespace Rev
 	Application* Application::sInstance = nullptr;
 	Application::Application()
 	{
-		RE_CORE_ASSERT(!sInstance, "Application already exists!");
+		REV_CORE_ASSERT(!sInstance, "Application already exists!");
 		sInstance = this;
 
-		sRenderAPI = ERenderAPI::OpenGL;
+		sRenderAPI = ERenderAPI::Vulkan;
 
 		Input::InitState();
 
 		mWindow = std::unique_ptr<Window>(Window::Create());
 		mWindow->SetEventCallback(RE_BIND_EVENT_FN(Application::OnEvent, this));
 
-		RenderCmd::Init();
-		RenderUtils::Init();
+		FRenderCore::Init(ERenderAPI::Vulkan);
+		FRenderUtils::Init();
 		FAssetLibrary::Init();
 	}
 
 	Application::~Application()
 	{
+		FRenderCore::GetMainContext()->Flush();
+
+		mLayerStack.PopAll();
 		FAssetLibrary::Shutdown();
-		RenderUtils::Shutdown();
-		RenderCmd::Shutdown();
+		FRenderUtils::Shutdown();
+		FRenderCore::Cleanup();
 	}
 
 	void Application::Run()
 	{
-		Clock timer;
+		Clock Timer;
 
 		while (mRunning)
 		{
-			float time = timer.Elapsed();
-			float dt = time - mLastFrameTime;
-			mLastFrameTime = time;
-
+			int64 CurTime = Timer.ElapsedMicros();
+			int64 DeltaTime = 0;
+			bool bShouldUpdate = false;
+			if (mLastFrameTime == 0)
+			{
+				mLastFrameTime = CurTime;
+				bShouldUpdate = true;
+			}
+			else
+			{
+				DeltaTime = CurTime - mLastFrameTime;
+				if (DeltaTime >= mFrameInterval)
+				{
+					mLastFrameTime = CurTime;
+					bShouldUpdate = true;
+				}
+			}
+			
 			//RenderCmd::SetClearColor(glm::vec4{ .3f, .3f, .8f, 1.0f });
 			//RenderCmd::Clear();
+			if (bShouldUpdate)
+			{
+				float DeltaTimeSecond = DeltaTime * 0.001f * 0.001f;
+				for (Layer* layer : mLayerStack)
+					layer->OnUpdate(DeltaTimeSecond);
+				mWindow->OnUpdate();
 
-			for (Layer* layer : mLayerStack)
-				layer->OnUpdate(dt);
+				if (!mMinimized)
+				{
+					FRenderCore::GetMainContext()->BeginFrame(true);
+					FRHICommandList RHICmdList(FRenderCore::GetMainContext());
+					for (Layer* layer : mLayerStack)
+						layer->OnDraw(RHICmdList);
+					FRenderCore::GetMainContext()->EndFrame();
+					FRenderCore::GetMainContext()->PresentFrame();
+				}
+			}
 
-			mWindow->OnUpdate();
 		}
 	}
 
 	void Application::Close()
 	{
 		mRunning = false;
+	}
+
+	void Application::SetFpsLimit(uint32 InFps)
+	{
+		mFrameInterval = InFps > 0 ? 1000000 / InFps : 0;
 	}
 
 	void Application::OnEvent(Event& e)

@@ -17,6 +17,7 @@ namespace Rev
 		void OnDetach() override;
 		void OnUpdate(float dt) override;
 		void OnEvent(Event& event) override;
+		void OnDraw(FRHICommandList& RHICmdList) override;
 
 	private:
 		bool OnKeyPressed(KeyPressedEvent& e);
@@ -28,6 +29,6 @@ namespace Rev
 		bool OnMouseMoved(MouseMovedEvent& e);
 		bool OnWindowResize(WindowResizeEvent& e);
 
-
+		void* mPlatformData = nullptr;
 	};
 }

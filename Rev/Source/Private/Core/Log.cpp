@@ -9,7 +9,7 @@ namespace Rev
 	void Log::Init()
 	{
 		spdlog::set_pattern("%^[%T] %n: %v%$");
-		sCoreLogger = spdlog::stdout_color_mt("PINE");
+		sCoreLogger = spdlog::stdout_color_mt("REV");
 		sCoreLogger->set_level(spdlog::level::trace);
 
 		sClientLogger = spdlog::stdout_color_mt("APP");

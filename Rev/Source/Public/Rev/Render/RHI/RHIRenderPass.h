@@ -1,82 +1,47 @@
 #pragma once
 #include "Rev/Core/Base.h"
-#include "Rev/Render/RHI/RHIRenderTarget.h"
-#include "Rev/Render/RHI/RHIPipeline.h"
+#include "Rev/Render/RHI/RHIDefinitions.h"
 
 namespace Rev
 {
-
-struct FSubPassAttachmentRef
+class FRHITexture;
+struct FRHIRenderPassDesc
 {
-	ERenderTargetAttachment Attachment = RTA_EmptyAttachment;
-	//Layout
+	struct FColorEntry
+	{
+		FRHITexture* ColorTarget = nullptr;
+		FRHITexture* ResolveTarget = nullptr;
+		int32 ArraySlice = -1;
+		uint8 MipIndex = 0;
+		EAttachmentLoadOp LoadOp = ALO_DontCare;
+		EAttachmentStoreOp StoreOp = ASO_DontCare;
+	};
+	FColorEntry ColorRenderTargets[RTA_MaxColorAttachments];
+	uint32 NumColorRenderTargets = 0;
+
+	struct FDepthStencilEntry
+	{
+		FRHITexture* DepthStencilTarget = nullptr;
+		FRHITexture* ResolveTarget = nullptr;
+		EAttachmentLoadOp DepthLoadOp = ALO_DontCare;
+		EAttachmentStoreOp DepthStoreOp = ASO_DontCare;
+		EAttachmentLoadOp StencilLoadOp = ALO_DontCare;
+		EAttachmentStoreOp StencilStoreOp = ASO_DontCare;
+	};
+	FDepthStencilEntry DepthStencilRenderTarget;
+	//SubpassHint
 };
 
-
-struct FSubPassDesc
+class FRHIRenderPass : public FRHIResource
 {
 public:
-	EPipelineBindPoint PipelineBindPoint;
-	uint32 InputAttachmentCount;
-	FSubPassAttachmentRef InputAttachments[RTA_MaxColorAttachments + 1];
-	uint32 ColorAttachmentCount;
-	FSubPassAttachmentRef ColorAttachments[RTA_MaxColorAttachments];
-	//FSubPassAttachmentRef ResolveAttachments[RTA_MaxColorAttachments]; //for msaa
-	FSubPassAttachmentRef DepthStencilAttachment;
-	//preserved ?
-};
+	FRHIRenderPass(const FRHIRenderPassDesc& InDesc) : PassDesc(InDesc) {}
+	virtual ~FRHIRenderPass() = default;
+	virtual void MarkFramebufferDirty() = 0;
+	const FRHIRenderPassDesc& GetDesc() const { return PassDesc; }
 
-struct FSubPassDependencyDesc
-{
-public:
-	uint32 SrcIndex;
-	uint32 DstIndex;
-	//SrcStageMask
-	//DstStageMask
-	//SrcAccessMask
-	//DstAccessMask
-};
-
-enum EAttachmentLoadOp : uint8
-{
-	ALO_Load = 0,
-	ALO_Clear,
-	ALO_DontCare,
-	ALO_NoneExt
-};
-
-enum EAttachmentStoreOp : uint8
-{
-	ASO_Store = 0,
-	ASO_DontCare,
-	ASO_NoneExt
-};
-
-struct FRenderPassAttachmentDesc
-{
-public:
-	EPixelFormat Format;
-	EAttachmentLoadOp LoadOp;
-	EAttachmentStoreOp StoreOp;
-	EAttachmentLoadOp StencilLoadOp;
-	EAttachmentStoreOp StencilStoreOp;
-};
-
-
-struct FRenderPassDesc
-{
-public:
-	uint32 AttachmentCount = 0;
-	FRenderPassAttachmentDesc Attachments[RTA_MaxColorAttachments + 1];
-	std::vector<FSubPassDesc> SubPasses;
-	std::vector<FSubPassDependencyDesc> Dependencies;
-};
-
-class FRHIRenderPass
-{
-public:
-	FRHIRenderPass();
-	virtual ~FRHIRenderPass();
+protected:
+	FRHIRenderPassDesc PassDesc;
 
 };
 

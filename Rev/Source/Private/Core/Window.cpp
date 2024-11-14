@@ -6,7 +6,7 @@ namespace Rev
 
 Scope<Window> Window::Create(const WindowProps& props)
 {
-	return CreateScope<GLFWWindow>(props);
+	return CreateScope<FGLFWWindow>(props);
 }
 
 }

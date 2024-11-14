@@ -9,17 +9,17 @@ SHARED
     ${REV_SRC_FILES}
 )
 
-set_target_properties(Rev PROPERTIES UNITY_BUILD TRUE)
+set_target_properties(Rev PROPERTIES UNITY_BUILD ON)
 
 target_compile_definitions(Rev
 PUBLIC
-    $<$<CONFIG:Debug>:RE_DEBUG>
-    $<$<CONFIG:Release>:RE_RELEASE>
+    $<$<CONFIG:Debug>:REV_DEBUG>
+    $<$<CONFIG:Release>:REV_RELEASE>
     _SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING
     NOMINMAX #spdlog
     _SCL_SECURE_NO_WARNINGS #spdlog
 PRIVATE
-    RE_BUILD_DLL
+    REV_BUILD_DLL
     GLFW_INCLUDE_NONE
 )
 
@@ -29,12 +29,10 @@ PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/Public
     ${VENDOR_ROOT}/spdlog/include
     ${VENDOR_ROOT}/entt/single_include
-    ${VENDOR_ROOT}/glm
 PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/Private
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/Platform
     $ENV{VULKAN_SDK}/Include
-    ${VENDOR_ROOT}/jsonhpp
     ${VENDOR_ROOT}/stb
     ${VENDOR_ROOT}/tinygltf
 )
@@ -48,19 +46,24 @@ PRIVATE
 if(WIN32)
     target_compile_definitions(Rev
     PUBLIC
-        RE_PLATFORM_WINDOWS
+        REV_PLATFORM_WINDOWS
     )
 
     target_link_libraries(Rev
     PRIVATE
         physfs-static
-        glfw3
+        glfw
         Glad
         vulkan-1
         shaderc_shared
         spirv-cross-core
         spirv-cross-glsl
+        spirv-cross-hlsl
+        spirv-cross-reflect
+        GPUOpen::VulkanMemoryAllocator
         imgui
+        cityhash
+        FrameGraph
     )
 endif()
 

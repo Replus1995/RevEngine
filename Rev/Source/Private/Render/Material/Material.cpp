@@ -1,32 +1,26 @@
 #include "Rev/Render/Material/Material.h"
-#include "Rev/Render/Material/MaterialUniform.h"
-#include "Rev/Render/RenderCmd.h"
+#include "Rev/Render/RHI/RHIContext.h"
+#include "Rev/Render/RHI/RHICommandList.h"
 
 namespace Rev
 {
 
-std::string MaterialUniform::GetProgramName(const std::string& name)
-{
-	static constexpr std::string_view sProgramNamePrefix = "u_";
-	return std::string(sProgramNamePrefix) + name;
-}
-
-Material::Material()
+FMaterial::FMaterial()
 {
 }
 
-Material::~Material()
+FMaterial::~FMaterial()
 {
 }
 
-void Material::PreDraw()
+void FMaterial::PreDraw(FRHICommandList& RHICmdList)
 {
-	RenderCmd::BindProgram(mProgram);
+	RHICmdList.GetContext()->RHIBindProgram(ShaderProgram.get());
 }
 
-void Material::PostDraw()
+void FMaterial::PostDraw(FRHICommandList& RHICmdList)
 {
-	//RenderCmd::BindProgram(nullptr);
+	RHICmdList.GetContext()->RHIBindProgram(nullptr);
 }
 
 }

@@ -1,5 +1,7 @@
 #include "STBImage.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image.h>
 #include <stb_image_write.h>
 
@@ -83,28 +85,27 @@ EPixelFormat FSTBImage2D::GetDesiredFormat(int InChannels, int InPixelDepth)
 		case 16: return PF_R16;
 		default: break;
 		}
+		break;
 	}
 	case 2:
 	{
-		break;
-	}
-	case 3:
-	{
 		switch (InPixelDepth)
 		{
-		case 8: return PF_RGB8;
+		case 8: return PF_R8G8;
+		case 16: return PF_R16G16;
 		default: break;
 		}
 		break;
 	}
+	case 3:
 	case 4:
 	{
 		switch (InPixelDepth)
 		{
 		case 8: return PF_R8G8B8A8;
+		case 16: return PF_R8G8B8A8;
 		default: break;
 		}
-		break;
 		break;
 	}
 	default:
@@ -119,21 +120,25 @@ FSTBImage2D FSTBImage::ImportImage2D(const FPath& InPath)
 	std::string NativePath = InPath.ToNative();
 	const char* NativePathC = NativePath.c_str();
 	bool b16Bit = stbi_is_16_bit(NativePathC);
+	
 	//bool bHDR = stbi_is_hdr(NativePathC);
 
 	int ImgWidth = 0, ImgHeight = 0, ImgChannels = 0;
+	stbi_info(NativePathC, &ImgWidth, &ImgHeight, &ImgChannels);
+	int ReqChannels = ImgChannels == 3 ? 4 : ImgChannels;
+
 	if (b16Bit)
 	{
-		if (uint16* data = stbi_load_16(NativePathC, &ImgWidth, &ImgHeight, &ImgChannels, 0); data)
+		if (uint16* data = stbi_load_16(NativePathC, &ImgWidth, &ImgHeight, &ImgChannels, ReqChannels); data)
 		{
-			return FSTBImage2D((uint8*)data, ImgWidth, ImgHeight, ImgChannels, 16);
+			return FSTBImage2D((uint8*)data, ImgWidth, ImgHeight, ReqChannels, 16);
 		}
 	}
 	else
 	{
-		if (uint8* data = stbi_load(NativePathC, &ImgWidth, &ImgHeight, &ImgChannels, 0); data)
+		if (uint8* data = stbi_load(NativePathC, &ImgWidth, &ImgHeight, &ImgChannels, ReqChannels); data)
 		{
-			return FSTBImage2D(data, ImgWidth, ImgHeight, ImgChannels, 8);
+			return FSTBImage2D(data, ImgWidth, ImgHeight, ReqChannels, 8);
 		}
 	}
 

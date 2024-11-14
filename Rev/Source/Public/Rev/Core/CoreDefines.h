@@ -1,6 +1,6 @@
 #pragma once
-#ifdef RE_PLATFORM_WINDOWS
-#ifdef RE_BUILD_DLL
+#ifdef REV_PLATFORM_WINDOWS
+#ifdef REV_BUILD_DLL
 #define REV_API __declspec(dllexport)
 #else
 #define REV_API __declspec(dllimport)
@@ -9,15 +9,15 @@
 #error Rev only supprt windows!
 #endif
 
-#ifdef RE_DEBUG
-#if defined(RE_PLATFORM_WINDOWS)
-#define RE_DEBUGBREAK() __debugbreak()
+#ifdef REV_DEBUG
+#if defined(REV_PLATFORM_WINDOWS)
+#define REV_DEBUGBREAK() __debugbreak()
 #else
 #error "Platform doesn't support debugbreak yet!"
 #endif
-#define RE_ENABLE_ASSERTS
+#define REV_ENABLE_ASSERTS
 #else
-#define RE_DEBUGBREAK()
+#define REV_DEBUGBREAK()
 #endif
 
 #ifndef FORCEINLINE
@@ -49,5 +49,9 @@
 #endif
 
 #define BIT(x) (1 << x)
-#define RE_EXPAND_MACRO(x) x
-#define RE_STRINGIFY_MACRO(x) #x
+#define REV_EXPAND_MACRO(x) x
+#define REV_STRINGIFY_MACRO(x) #x
+#define ARRAY_LENGTH(Array) sizeof(Array) / sizeof(Array[0])
+
+#define SAFE_DELETE(Pointer) { delete Pointer; Pointer = nullptr; }
+#define SAFE_DELETE_ARRAY(Array) { delete Array; Array = nullptr; }

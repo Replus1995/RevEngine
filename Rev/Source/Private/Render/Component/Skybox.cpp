@@ -1,5 +1,5 @@
 #include "Rev/Render/Component/Skybox.h"
-#include "Rev/Render/Texture/Texture.h"
+#include "Rev/Render/Resource/TextureResource.h"
 #include "Rev/Render/RHI/RHITexture.h"
 #include "Rev/Core/Assert.h"
 
@@ -14,14 +14,14 @@ Skybox::~Skybox()
 {
 }
 
-const Ref<Texture>& Skybox::GetEnvironmentTexture() const
+const Ref<FTexture>& Skybox::GetEnvironmentTexture() const
 {
 	return mEnvTex;
 }
 
-void Skybox::SetEnvironmentTexture(const Ref<Texture>& InTexture)
+void Skybox::SetEnvironmentTexture(const Ref<FTexture>& InTexture)
 {
-	RE_CORE_ASSERT(InTexture && InTexture->GetResource()->GetDesc().Dimension == ETextureDimension::TextureCube)
+	REV_CORE_ASSERT(InTexture && InTexture->GetTextureRHI()->GetDesc().Dimension == ETextureDimension::TextureCube)
 	mEnvTex = InTexture;
 }
 

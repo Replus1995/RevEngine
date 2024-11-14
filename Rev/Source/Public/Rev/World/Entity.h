@@ -2,6 +2,7 @@
 #include "Rev/Core/UUID.h"
 #include "Rev/Core/Assert.h"
 #include "Rev/World/Component/AllComponents.h"
+#include "Rev/World/Scene.h"
 
 #include <entt/entt.hpp>
 
@@ -18,7 +19,7 @@ public:
 	template<typename T, typename... Args>
 	T& AddComponent(Args&&... args)
 	{
-		RE_CORE_ASSERT(!HasComponent<T>(), "Entity already has component!");
+		REV_CORE_ASSERT(!HasComponent<T>(), "Entity already has component!");
 		T& component = mScene->mRegistry.emplace<T>(mHandle, std::forward<Args>(args)...);
 		return component;
 	}
@@ -30,17 +31,31 @@ public:
 		return component;
 	}
 
-	template<typename... T>
-	auto& GetComponent()
+	template<typename T>
+	T& GetComponent()
 	{
-		RE_CORE_ASSERT(HasComponent<T...>(), "Entity does not have component!");
+		REV_CORE_ASSERT(HasComponent<T>(), "Entity does not have component!");
+		return mScene->mRegistry.get<T>(mHandle);
+	}
+
+	template<typename T>
+	const T& GetComponent() const
+	{
+		REV_CORE_ASSERT(HasComponent<T>(), "Entity does not have component!");
+		return mScene->mRegistry.get<T>(mHandle);
+	}
+	
+	template<typename... T>
+	auto GetComponents()
+	{
+		REV_CORE_ASSERT(HasComponent<T...>(), "Entity does not have component!");
 		return mScene->mRegistry.get<T...>(mHandle);
 	}
 
 	template<typename... T>
-	const auto& GetComponent() const
+	auto GetComponents() const
 	{
-		RE_CORE_ASSERT(HasComponent<T...>(), "Entity does not have component!");
+		REV_CORE_ASSERT(HasComponent<T...>(), "Entity does not have component!");
 		return mScene->mRegistry.get<T...>(mHandle);
 	}
 
@@ -53,7 +68,7 @@ public:
 	template<typename T>
 	void RemoveComponent()
 	{
-		RE_CORE_ASSERT(HasComponent<T>(), "Entity does not have component!");
+		REV_CORE_ASSERT(HasComponent<T>(), "Entity does not have component!");
 		mScene->mRegistry.remove<T>(mHandle);
 	}
 

@@ -2,65 +2,33 @@
 #include "Rev/Core/Base.h"
 #include <memory>
 
+#define REV_MAX_TEXCOORDS 4
+
+#define REV_MAX_DIRECTIONAL_LIGHTS 4
+#define REV_MAX_POINT_LIGHTS 16
+#define REV_MAX_SPOT_LIGHTS 16
+
 namespace Rev
 {
 
 enum class ERenderAPI : uint8
 {
     None = 0,
-    OpenGL = 1,
-    Vulkan = 2
+    Vulkan = 1
 };
 REV_API ERenderAPI GetRenderAPI();
 
-enum EDrawMode : uint8
-{
-	DM_Unknown = 0,
-	DM_Points,
-	DM_Line,
-	DM_LineLoop,
-	DM_LineStrip,
-	DM_Triangles,
-	DM_TriangleStrip,
-	DM_TriangleFan
-};
+extern REV_API bool GIsRHIInitialized;
 
-enum EBlendMode : uint8
+class IRHIContext;
+class REV_API FRenderCore
 {
-	BM_Diabled = 0,
-    BM_Opaque = 1,
-    BM_Transparent,
-    BM_Masked
-};
+public:
+    static void Init(ERenderAPI InAPI);
+    static void Cleanup();
 
-enum EShadingModel : uint8
-{
-    SM_Default = 0,
-    SM_Unlit
-};
-
-enum ECullFaceMode : uint8
-{
-	CFM_Disabled = 0,
-	CFM_Back,
-	CFM_Front,
-	CFM_BackAndFront
-};
-
-enum EDepthTestMode : uint8
-{
-	DTM_Never = 0,
-	DTM_Less,
-	DTM_Equal,
-	DTM_Greater,
-	DTM_NotEqual,
-	DTM_LessEqual,
-	DTM_GreaterEqual,
-	DTM_Always
+    static ERenderAPI GetRenderAPI();
+    static IRHIContext* GetMainContext();
 };
 
 }
-
-#define REV_MAX_DIRECTIONAL_LIGHTS 4
-#define REV_MAX_POINT_LIGHTS 16
-#define REV_MAX_SPOT_LIGHTS 16

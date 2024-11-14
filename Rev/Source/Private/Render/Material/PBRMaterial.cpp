@@ -1,72 +1,82 @@
 #include "Rev/Render/Material/PBRMaterial.h"
 #include "Rev/Render/RHI/RHIShaderLibrary.h"
-#include "Rev/Render/RHI/RHITexture.h"
+#include "Rev/Render/RHI/DynamicRHI.h"
+#include "Rev/Render/RHI/RHICommandList.h"
+#include "Rev/Render/RHI/RHIBuffer.h"
+#include "Rev/Render/RHI/RHIContext.h"
 #include "Rev/Render/UniformLayout.h"
-#include "Rev/Render/RenderCmd.h"
-#include "Rev/Asset/AssetLibrary.h"
-
+#include "Rev/Render/RenderUtils.h"
+#include "Rev/Render/Resource/TextureResource.h"
 
 
 namespace Rev
 {
 
-PBRMaterial::PBRMaterial()
+FPBRMaterial::FPBRMaterial()
 {
 
 }
 
-PBRMaterial::~PBRMaterial()
+FPBRMaterial::~FPBRMaterial()
 {
 }
 
-void PBRMaterial::Compile()
+void FPBRMaterial::Compile()
 {
 	FRHIShaderCompileOptions FragCompileOps;
-	if(BaseColorTexture)
-		FragCompileOps.AddMacro(SCM_USE_BASECOLOR_TEX);
-	if (MetallicRoughnessTexture)
-		FragCompileOps.AddMacro(SCM_USE_METALLICROUGHNESS_TEX);
-	if (NormalTexture)
-		FragCompileOps.AddMacro(SCM_USE_NORMAL_TEX);
-	if (OcclusionTexture)
-		FragCompileOps.AddMacro(SCM_USE_OCCLUSION_TEX);
-	if (EmissiveTexture)
-		FragCompileOps.AddMacro(SCM_USE_EMISSIVE_TEX);
 
-
-	mProgram = FRHIShaderLibrary::GetInstance().CreateGraphicsProgram(
-		"PbrProgram",
+	ShaderProgram = FRHIShaderLibrary::Get()->CreateGraphicsProgram("PbrProgram",
 		{ "/Engine/Shaders/CommonVS" },
-		{ "/Engine/Shaders/PBR/ForwardFS", FragCompileOps }
+		{ "/Engine/Shaders/ForwardPbrPS", FragCompileOps }
 	);
 }
 
-void PBRMaterial::PreDraw()
+void FPBRMaterial::PreDraw(FRHICommandList& RHICmdList)
 {
-	SurfaceMaterial::PreDraw(); //BindProgram
-	if(!mProgram)
+	FMaterial::PreDraw(RHICmdList); //BindProgram
+	if(!ShaderProgram)
 		return;
 
-	mProgram->SetUniform(UL::LBaseColorFactor, BaseColorFactor);
+	if (!MaterialUB)
+		MaterialUB = GDynamicRHI->RHICreateUniformBuffer(sizeof(FPBRMaterialUniform));
+
+	MaterialUB->UpdateSubData(&PBRMaterialParams, sizeof(FPBRMaterialUniform));
+	RHICmdList.GetContext()->RHIBindUniformBuffer(UL::BMaterial, MaterialUB.get());
+
+	/*mProgram->SetUniform(UL::LBaseColorFactor, BaseColorFactor);
 	mProgram->SetUniform(UL::LMetallic, Metallic);
 	mProgram->SetUniform(UL::LRoughness, Roughness);
 	mProgram->SetUniform(UL::LNormalScale, NormalScale);
 	mProgram->SetUniform(UL::LOcclusionStrength, OcclusionStrength);
-	mProgram->SetUniform(UL::LEmissiveFactor, EmissiveFactor);
+	mProgram->SetUniform(UL::LEmissiveFactor, EmissiveFactor);*/
 
 	//FAssetLibrary::GetDefaultWhiteTexture()->GetResource()->Bind(0);
 	//FAssetLibrary::GetDefaultNormalTexture()->GetResource()->Bind(1);
 	
 	if (BaseColorTexture)
-		RenderCmd::BindTexture(BaseColorTexture->GetResource(), UL::SBaseColorTex);
+		RHICmdList.GetContext()->RHIBindTexture(UL::SBaseColorTex, BaseColorTexture->GetTextureRHI(), BaseColorTexture->GetSamplerStateRHI());
+	else
+		RHICmdList.GetContext()->RHIBindTexture(UL::SBaseColorTex, GWhiteTexture->GetTextureRHI(), GWhiteTexture->GetSamplerStateRHI());
+
 	if (MetallicRoughnessTexture)
-		RenderCmd::BindTexture(MetallicRoughnessTexture->GetResource(), UL::SMetallicRoughnessTex);
+		RHICmdList.GetContext()->RHIBindTexture(UL::SMetallicRoughnessTex, MetallicRoughnessTexture->GetTextureRHI(), MetallicRoughnessTexture->GetSamplerStateRHI());
+	else
+		RHICmdList.GetContext()->RHIBindTexture(UL::SMetallicRoughnessTex, GWhiteTexture->GetTextureRHI(), GWhiteTexture->GetSamplerStateRHI());
+
 	if (NormalTexture)
-		RenderCmd::BindTexture(NormalTexture->GetResource(), UL::SNormalTex);
+		RHICmdList.GetContext()->RHIBindTexture(UL::SNormalTex, NormalTexture->GetTextureRHI(), NormalTexture->GetSamplerStateRHI());
+	else
+		RHICmdList.GetContext()->RHIBindTexture(UL::SNormalTex, GNormalTexture->GetTextureRHI(), GNormalTexture->GetSamplerStateRHI());
+
 	if (OcclusionTexture)
-		RenderCmd::BindTexture(OcclusionTexture->GetResource(), UL::SOcclusionTex);
+		RHICmdList.GetContext()->RHIBindTexture(UL::SOcclusionTex, OcclusionTexture->GetTextureRHI(), OcclusionTexture->GetSamplerStateRHI());
+	else
+		RHICmdList.GetContext()->RHIBindTexture(UL::SOcclusionTex, GWhiteTexture->TextureRHI.get(), GWhiteTexture->SamplerStateRHI.get());
+
 	if (EmissiveTexture)
-		RenderCmd::BindTexture(EmissiveTexture->GetResource(), UL::SEmissiveTex);
+		RHICmdList.GetContext()->RHIBindTexture(UL::SEmissiveTex, EmissiveTexture->GetTextureRHI(), EmissiveTexture->GetSamplerStateRHI());
+	else
+		RHICmdList.GetContext()->RHIBindTexture(UL::SEmissiveTex, GBlackTexture->TextureRHI.get(), GBlackTexture->SamplerStateRHI.get());
 }
 
 }

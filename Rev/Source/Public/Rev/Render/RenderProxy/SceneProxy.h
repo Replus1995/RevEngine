@@ -1,7 +1,6 @@
 #pragma once
 #include "Rev/Core/Base.h"
 #include "Rev/Render/UniformDefine.h"
-#include "Rev/Render/RHI/RHIBuffer.h"
 #include "Rev/Render/Material/Material.h"
 #include "Rev/Render/RenderProxy/CameraProxy.h"
 #include "Rev/Render/RenderProxy/StaticMeshProxy.h"
@@ -10,6 +9,7 @@
 
 namespace Rev
 {
+class FRHIUniformBuffer;
 class FScene;
 class FSceneProxy
 {
@@ -18,19 +18,23 @@ public:
 	~FSceneProxy() = default;
 
 
-	void Prepare(const Ref<FScene>& scene);
-	void SyncResource() const;
-	void FreeResource();
+	void Prepare(const Ref<FScene>& Scene);
+	void SyncResource(FRHICommandList& RHICmdList);
 	void Cleanup();
 
-	void DrawScene() const;
+	void DrawSceneOpaque(FRHICommandList& RHICmdList);
+	void DrawSkybox(FRHICommandList& RHICmdList);
+
+	uint32 GetFrameWidth() const;
+	uint32 GetFrameHeight() const;
 
 protected:
-	TUniform<FSceneUniform, UL::BScene> uScene;
+	FSceneUniform mSceneParams;
+	Ref<FRHIUniformBuffer> mSceneUB;
 
 	FCameraProxy mCameraProxy;
 	FStaticMeshProxy mStaticMeshProxy;
-	FDirectionalLightProxy mDirectionalLightProxy;
+	FLightProxy mLightProxy;
 	FSkyProxy mSkyProxy;
 
 };

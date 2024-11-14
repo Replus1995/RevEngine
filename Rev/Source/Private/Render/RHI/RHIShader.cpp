@@ -4,25 +4,45 @@
 
 namespace Rev
 {
-
-const Ref<FRHIShader>& FRHIGraphicsShaders::operator[](ERHIShaderStage Stage) const
+Ref<FRHIShader>& FRHIGraphicsShaders::operator[](uint8 StageIndex)
 {
-	switch (Stage)
+	switch (StageIndex)
 	{
-	case Rev::ERHIShaderStage::Vertex:
+	case SS_Vertex:
 		return VertexShader;
-	case Rev::ERHIShaderStage::TessControl:
+	case SS_Hull:
 		return HullShader;
-	case Rev::ERHIShaderStage::TessEval:
+	case SS_Domain:
 		return DomainShader;
-	case Rev::ERHIShaderStage::Fragment:
+	case SS_Pixel:
 		return PixelShader;
-	case Rev::ERHIShaderStage::Geometry:
+	case SS_Geometry:
 		return GeometryShader;
 	default:
 		break;
 	}
-	RE_CORE_ASSERT(false, "GraphicsShaders index out of range");
+	REV_CORE_ASSERT(false, "GraphicsShaders index out of range");
+	return VertexShader;
+}
+
+const Ref<FRHIShader>& FRHIGraphicsShaders::operator[](uint8 StageIndex) const
+{
+	switch (StageIndex)
+	{
+	case SS_Vertex:
+		return VertexShader;
+	case SS_Hull:
+		return HullShader;
+	case SS_Domain:
+		return DomainShader;
+	case SS_Pixel:
+		return PixelShader;
+	case SS_Geometry:
+		return GeometryShader;
+	default:
+		break;
+	}
+	REV_CORE_ASSERT(false, "GraphicsShaders index out of range");
 	return VertexShader;
 }
 

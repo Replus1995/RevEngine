@@ -1,7 +1,6 @@
 #pragma once
 #include "Rev/Core/Base.h"
 #include "Rev/Core/UUID.h"
-#include "Rev/World/Entity.h"
 #include "Rev/World/System/System.h"
 
 #include <entt/entt.hpp>
@@ -37,6 +36,7 @@ public:
 	FEntity CreateEntity(const std::string& name = std::string());
 	FEntity CreateEntityWithUUID(UUID uuid, const std::string& name = std::string());
 	void DestroyEntity(FEntity entity);
+	void DestroyAllEntities();
 	FEntity DuplicateEntity(FEntity entity);
 
 	FEntity FindEntityByName(std::string_view name);

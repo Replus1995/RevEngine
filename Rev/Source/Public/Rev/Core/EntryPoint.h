@@ -5,7 +5,7 @@
 #include "Rev/Core/Application.h"
 #include <type_traits>
 
-#ifdef RE_PLATFORM_WINDOWS
+#ifdef REV_PLATFORM_WINDOWS
 
 namespace Rev
 {
@@ -13,7 +13,7 @@ namespace Rev
 	int RunApp(int argc, char** argv)
 	{
 		Log::Init();
-		RE_CORE_WARN("Initialized Log!");
+		REV_CORE_WARN("Initialized Log!");
 		FFileSystem::Init(argv[0]);
 
 		Application* app = new TApp();

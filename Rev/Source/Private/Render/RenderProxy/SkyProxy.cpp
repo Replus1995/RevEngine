@@ -1,47 +1,47 @@
 #include "Rev/Render/RenderProxy/SkyProxy.h"
 #include "Rev/Render/UniformLayout.h"
-#include "Rev/Render/RenderCmd.h"
 #include "Rev/Render/RenderUtils.h"
-#include "Rev/Render/Texture/Texture.h"
+#include "Rev/Render/Resource/RenderResource.h"
+#include "Rev/Render/Resource/TextureResource.h"
 #include "Rev/Render/Material/Material.h"
 #include "Rev/Render/RHI/RHIShaderLibrary.h"
-#include "Rev/World/Scene.h"
+#include "Rev/Render/RHI/RHICommandList.h"
+#include "Rev/Render/RHI/RHIContext.h"
+#include "Rev/World/Entity.h"
 
 
 namespace Rev
 {
 
 
-class SkyboxMaterial : public Material
+class SkyboxMaterial : public FMaterial
 {
 public:
 	SkyboxMaterial()
 	{
-		mDomain = MD_PostProcess;
+		Domain = MD_PostProcess;
 	}
 	virtual ~SkyboxMaterial() = default;
 
 	virtual void Compile() override
 	{
-		mProgram = FRHIShaderLibrary::GetInstance().CreateGraphicsProgram(
+		ShaderProgram = FRHIShaderLibrary::Get()->CreateGraphicsProgram(
 			"SkyboxProgram",
-			{ "/Engine/Shaders/Skybox/SkyboxVS" },
-			{ "/Engine/Shaders/Skybox/SkyboxFS" }
+			{ "/Engine/Shaders/SkyboxVS" },
+			{ "/Engine/Shaders/SkyboxPS" }
 		);
 	}
 
-	virtual void PreDraw() override
+	virtual void PreDraw(FRHICommandList& RHICmdList) override
 	{
-		RenderCmd::EnableDepthWrite(false);
-		RenderCmd::SetDepthTestMode(DTM_LessEqual);
-		Material::PreDraw();
+		//RenderCmd::EnableDepthWrite(false);
+		//RenderCmd::SetDepthTestMode(DTM_LessEqual);
+		FMaterial::PreDraw(RHICmdList);
 	}
 
-	virtual void PostDraw() override
+	virtual void PostDraw(FRHICommandList& RHICmdList) override
 	{
-		Material::PostDraw();
-		RenderCmd::SetDepthTestMode(DTM_Less);
-		RenderCmd::EnableDepthWrite(true);
+		FMaterial::PostDraw(RHICmdList);
 	}
 };
 
@@ -69,27 +69,27 @@ void FSkyProxy::Cleanup()
 	mSkybox = {};
 }
 
-void FSkyProxy::SyncResource() const
+void FSkyProxy::SyncResource(FRHICommandList& RHICmdList) const
 {
-	if (auto& EnvTex = mSkybox.GetEnvironmentTexture(); EnvTex)
-	{
-		RenderCmd::BindTexture(EnvTex->GetResource(), UL::SEnviornmentTex);
-	}
 	if (!mSkyboxMat)
 	{
 		FSkyProxy* pThis = const_cast<FSkyProxy*>(this);
 		pThis->mSkyboxMat = CreateRef<SkyboxMaterial>();
 		pThis->mSkyboxMat->Compile();
 	}
+	if (auto& EnvTex = mSkybox.GetEnvironmentTexture(); EnvTex)
+	{
+		RHICmdList.GetContext()->RHIBindTexture(UL::SEnviornmentTex, EnvTex->GetTextureRHI(), EnvTex->GetSamplerStateRHI());
+	}
 }
 
-void FSkyProxy::DrawSkybox() const
+void FSkyProxy::DrawSkybox(FRHICommandList& RHICmdList) const
 {
 	if (auto& EnvTex = mSkybox.GetEnvironmentTexture(); EnvTex)
 	{
-		mSkyboxMat->PreDraw();
-		RenderUtils::DrawScreenQuad();
-		mSkyboxMat->PostDraw();
+		mSkyboxMat->PreDraw(RHICmdList);
+		FRenderUtils::PostProcessDraw(RHICmdList);
+		mSkyboxMat->PostDraw(RHICmdList);
 	}
 }
 

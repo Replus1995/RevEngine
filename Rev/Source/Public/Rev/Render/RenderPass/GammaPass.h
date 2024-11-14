@@ -4,7 +4,7 @@
 
 namespace Rev
 {
-class Material;
+class FMaterial;
 class FGammaCorrectPass : public FRenderPass
 {
 public:
@@ -14,7 +14,7 @@ public:
 	virtual void RunPass() override;
 
 protected:
-	Ref<Material> mMaterial;
+	Ref<FMaterial> mMaterial;
 
 };
 

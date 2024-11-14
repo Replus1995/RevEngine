@@ -4,8 +4,9 @@
 
 namespace Rev
 {
-class Material;
+class FMaterial;
 class FScene;
+class FRHICommandList;
 class FSkyProxy
 {
 public:
@@ -14,13 +15,13 @@ public:
 
 	void Prepare(const Ref<FScene>& Scene);
 	void Cleanup();
-	void SyncResource() const;
+	void SyncResource(FRHICommandList& RHICmdList) const;
 
-	void DrawSkybox() const;
+	void DrawSkybox(FRHICommandList& RHICmdList) const;
 
 private:
 	Skybox mSkybox;
-	Ref<Material> mSkyboxMat;
+	Ref<FMaterial> mSkyboxMat;
 };
 
 }

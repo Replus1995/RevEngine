@@ -1,24 +1,32 @@
 #pragma once
 #include "Rev/Render/Renderer/Renderer.h"
-#include "Rev/Render/RenderPass/SurfacePass.h"
 #include "Rev/Render/RenderPass/GammaPass.h"
+#include "Rev/Render/RHI/RHIRenderPass.h"
 
 namespace Rev
 {
-
+class FRHITexture;
+class FRHIRenderPass;
 class FForwardRenderer : public FRenderer
 {
 public:
-	FForwardRenderer(const Ref<FRenderContext>& InContext);
+	FForwardRenderer(FSceneProxy* InSceneProxy);
 	virtual ~FForwardRenderer();
 
 	virtual void BeginFrame() override;
-	virtual void DrawFrame() override;
+	virtual void DrawFrame(FRHICommandList& RHICmdList) override;
 	virtual void EndFrame() override;
 
 private:
-	Ref<class FRHIRenderTarget> mLinearScreenTarget = nullptr;
-	FForwardSurfacePass mForwardSurfacePass;
+	uint32 FrameWidth = 0;
+	uint32 FrameHeight = 0;
+	Ref<FRHIRenderPass> mBasePass = nullptr;
+	Ref<FRHITexture> mBaseColorTex = nullptr;
+	Ref<FRHITexture> mBaseColorResolveTex = nullptr;
+	Ref<FRHITexture> mBaseDepthTex = nullptr;
+	Ref<FRHITexture> mBaseDepthResolveTex = nullptr;
+	Ref<FRHIRenderPass> mSkyPass = nullptr;
+
 	FGammaCorrectPass mGammaCorrectPass;
 };
 

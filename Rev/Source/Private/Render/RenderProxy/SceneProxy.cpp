@@ -1,8 +1,8 @@
 #include "Rev/Render/RenderProxy/SceneProxy.h" 
-#include "Rev/Render/RenderCmd.h"
-#include "Rev/Render/RHI/RHIResourceFactory.h"
+#include "Rev/Render/RHI/DynamicRHI.h"
+#include "Rev/Render/RHI/RHICommandList.h"
+#include "Rev/Render/RHI/RHIBuffer.h"
 #include "Rev/Render/UniformLayout.h"
-#include "Rev/Render/Texture/Texture.h"
 
 #include "Rev/Core/Application.h"
 #include "Rev/Core/Window.h"
@@ -10,28 +10,45 @@
 namespace Rev
 {
 
-void FSceneProxy::Prepare(const Ref<FScene>& scene)
+void FSceneProxy::Prepare(const Ref<FScene>& Scene)
 {
-	if(!scene) return;
+	if(!Scene) return;
 
-	{
-		//Update Scene Uniform;
-		auto pWindow = Application::GetApp().GetWindow();
-		uScene.Data.ScreenWidth = pWindow->GetWidth();
-		uScene.Data.ScreenHeight = pWindow->GetHeight();
-	}
-	mCameraProxy.Prepare(scene);
-	mStaticMeshProxy.Prepare(scene);
-	mDirectionalLightProxy.Prepare(scene);
-	mSkyProxy.Prepare(scene);
+	mCameraProxy.Prepare(Scene);
+	mStaticMeshProxy.Prepare(Scene);
+	mLightProxy.Prepare(Scene);
+	mSkyProxy.Prepare(Scene);
+
+	auto pWindow = Application::GetApp().GetWindow();
+	mSceneParams.ViewExtent = { 0, 0, pWindow->GetWidth(), pWindow->GetHeight() };
 }
 
-void FSceneProxy::FreeResource()
+void FSceneProxy::SyncResource(FRHICommandList& RHICmdList)
 {
-	uScene.FreeResource();
-	mCameraProxy.FreeResource();
-	mStaticMeshProxy.FreeResource();
-	mDirectionalLightProxy.FreeResource();
+	if(!mSceneUB)
+		mSceneUB = GDynamicRHI->RHICreateUniformBuffer(sizeof(FSceneUniform));
+
+	//Should run on render thread
+	//Update uniform buffer
+	mCameraProxy.SyncResource(RHICmdList);
+	mLightProxy.SyncResource(RHICmdList);
+	mSkyProxy.SyncResource(RHICmdList);
+
+	{
+		
+		mSceneParams.ViewPos = mCameraProxy.GetViewPos();
+		mSceneParams.ViewMat = mCameraProxy.GetViewMat();
+		mSceneParams.ProjMat = mCameraProxy.GetProjMat();
+		mSceneParams.ViewProjMat = mCameraProxy.GetViewProjMat();
+		mSceneParams.InvViewMat = mSceneParams.ViewMat.Inverse();
+		mSceneParams.InvProjMat = mSceneParams.ProjMat.Inverse();
+		mSceneParams.InvViewProjMat = mSceneParams.ViewProjMat.Inverse();
+
+		mSceneUB->UpdateSubData(&mSceneParams, sizeof(FSceneUniform));
+
+		RHICmdList.GetContext()->RHIBindUniformBuffer(UL::BScene, mSceneUB.get());
+	}
+
 }
 
 void FSceneProxy::Cleanup()
@@ -40,20 +57,25 @@ void FSceneProxy::Cleanup()
 	mSkyProxy.Cleanup();
 }
 
-void FSceneProxy::DrawScene() const
+void FSceneProxy::DrawSceneOpaque(FRHICommandList& RHICmdList)
 {
-	mStaticMeshProxy.DrawMeshes(BM_Opaque);
-	mSkyProxy.DrawSkybox();
+	mStaticMeshProxy.DrawMeshesOpaque(RHICmdList);
+	
 }
 
-void FSceneProxy::SyncResource() const
+void FSceneProxy::DrawSkybox(FRHICommandList& RHICmdList)
 {
-	//Should run on render thread
-	//Update uniform buffer
-	uScene.Upload();
-	mCameraProxy.SyncResource();
-	mDirectionalLightProxy.SyncResource();
-	mSkyProxy.SyncResource();
+	mSkyProxy.DrawSkybox(RHICmdList);
+}
+
+uint32 FSceneProxy::GetFrameWidth() const
+{
+	return mSceneParams.ViewExtent.Width;
+}
+
+uint32 FSceneProxy::GetFrameHeight() const
+{
+	return mSceneParams.ViewExtent.Height;
 }
 
 }

@@ -1,0 +1,16 @@
+struct PSInput
+{
+    float4 vPosition : SV_POSITION;
+};
+
+struct PSOutput
+{
+    float4 oColor : SV_Target;
+};
+
+PSOutput main(const PSInput Input)
+{
+    PSOutput Result;
+    Result.oColor = float4(1.0, 1.0, 1.0, 1.0);
+    return Result;
+}

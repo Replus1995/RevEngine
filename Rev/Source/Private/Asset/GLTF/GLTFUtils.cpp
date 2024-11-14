@@ -1,13 +1,12 @@
 #include "GLTFUtils.h"
 #include "Rev/Core/Assert.h"
+#include "Rev/Render/Component/StaticMesh.h"
 #include <filesystem>
 
 #include "GLTFDebug.h"
 
 #define TINYGLTF_USE_CPP14
 #define TINYGLTF_IMPLEMENTATION
-#define STB_IMAGE_IMPLEMENTATION
-#define STB_IMAGE_WRITE_IMPLEMENTATION
 #define STBI_MSC_SECURE_CRT
 #include <tiny_gltf.h>
 
@@ -37,7 +36,7 @@ FBuffer UnpackTightBuffer(const uint8* InDataMem, const tinygltf::BufferView& In
 
 FBuffer LoadBufferData(const tinygltf::Accessor& InAccessor, const tinygltf::Model& InModel, size_t DstStride)
 {
-	RE_CORE_ASSERT(InAccessor.bufferView >= 0 && InAccessor.bufferView < InModel.bufferViews.size());
+	REV_CORE_ASSERT(InAccessor.bufferView >= 0 && InAccessor.bufferView < InModel.bufferViews.size());
 	const tinygltf::BufferView& RefBufferView = InModel.bufferViews[InAccessor.bufferView];
 	const tinygltf::Buffer& RefBuffer = InModel.buffers[RefBufferView.buffer];
 	const uint8* DataMem = RefBuffer.data.data() + RefBufferView.byteOffset + InAccessor.byteOffset;
@@ -62,54 +61,246 @@ FBuffer LoadBufferData(const tinygltf::Accessor& InAccessor, const tinygltf::Mod
 	return LoadBufferData(InAccessor, InModel, DstStride);
 }
 
+FBuffer LoadTexCoordData(const tinygltf::Accessor& InAccessor, const tinygltf::Model& InModel)
+{
+	REV_CORE_ASSERT(InAccessor.bufferView >= 0 && InAccessor.bufferView < InModel.bufferViews.size());
+	const tinygltf::BufferView& BufferView = InModel.bufferViews[InAccessor.bufferView];
+	const tinygltf::Buffer& Buffer = InModel.buffers[BufferView.buffer];
+	const uint8* DataMem = Buffer.data.data() + BufferView.byteOffset + InAccessor.byteOffset;
+	const uint32 Count = InAccessor.count;
+	uint32 Stride = BufferView.byteStride;
+	if (Stride == 0)
+	{
+		switch (InAccessor.componentType)
+		{
+		case TINYGLTF_COMPONENT_TYPE_FLOAT:
+			Stride = sizeof(float) * 2;
+			break;
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
+			Stride = sizeof(uint8) * 2;
+			break;
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
+			Stride = sizeof(uint16) * 2;
+			break;
+		default:
+			break;
+		}
+	}
+	REV_CORE_ASSERT(Stride != 0);
+
+	FBuffer OutBuffer;
+	OutBuffer.Allocate<Math::FVector2>(Count);
+	for (uint32 i = 0; i < Count; i++)
+	{
+		Math::FVector2& UV = OutBuffer.DataAs<Math::FVector2>()[i];
+		switch (InAccessor.componentType)
+		{
+		case TINYGLTF_COMPONENT_TYPE_FLOAT:
+		{
+			float* Src = (float*)(DataMem + Stride * i);
+			UV.X = Src[0];
+			UV.Y = Src[1];
+ 		}
+		break;
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
+		{
+			uint8* Src = (uint8*)(DataMem + Stride * i);
+			UV.X = float(Src[0]) / 255.0f;
+			UV.Y = float(Src[1]) / 255.0f;
+		}
+		break;
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
+		{
+			uint16* Src = (uint16*)(DataMem + Stride * i);
+			UV.X = float(Src[0]) / 65535.0f;
+			UV.Y = float(Src[1]) / 65535.0f;
+		}
+		break;
+		default:
+			break;
+		}
+	}
+	return OutBuffer;
+}
+
+FBuffer LoadColorData(const tinygltf::Accessor& InAccessor, const tinygltf::Model& InModel)
+{
+	REV_CORE_ASSERT(InAccessor.bufferView >= 0 && InAccessor.bufferView < InModel.bufferViews.size());
+	const tinygltf::BufferView& BufferView = InModel.bufferViews[InAccessor.bufferView];
+	const tinygltf::Buffer& Buffer = InModel.buffers[BufferView.buffer];
+	const uint8* DataMem = Buffer.data.data() + BufferView.byteOffset + InAccessor.byteOffset;
+	const uint32 Count = InAccessor.count;
+	uint32 Stride = BufferView.byteStride;
+	if (Stride == 0)
+	{
+		const uint32 NumComps = InAccessor.type == TINYGLTF_TYPE_VEC4 ? 4 : 3;
+		switch (InAccessor.componentType)
+		{
+		case TINYGLTF_COMPONENT_TYPE_FLOAT:
+			Stride = sizeof(float) * NumComps;
+			break;
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
+			Stride = sizeof(uint8) * NumComps;
+			break;
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
+			Stride = sizeof(uint16) * NumComps;
+			break;
+		default:
+			break;
+		}
+	}
+	REV_CORE_ASSERT(Stride != 0);
+
+	FBuffer OutBuffer;
+	OutBuffer.Allocate<Math::FColor>(Count);
+	for (uint32 i = 0; i < Count; i++)
+	{
+		Math::FLinearColor LinearColor;
+		switch (InAccessor.componentType)
+		{
+		case TINYGLTF_COMPONENT_TYPE_FLOAT:
+		{
+			float* Src = (float*)(DataMem + Stride * i);
+			LinearColor.R = Src[0];
+			LinearColor.G = Src[1];
+			LinearColor.B = Src[2];
+			if (InAccessor.type == TINYGLTF_TYPE_VEC4)
+				LinearColor.A = Src[3];
+		}
+		break;
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
+		{
+			uint8* Src = (uint8*)(DataMem + Stride * i);
+			LinearColor.R = float(Src[0]) / 255.0f;
+			LinearColor.G = float(Src[1]) / 255.0f;
+			LinearColor.B = float(Src[2]) / 255.0f;
+			if (InAccessor.type == TINYGLTF_TYPE_VEC4)
+				LinearColor.A = float(Src[3]) / 255.0f;
+		}
+		break;
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
+		{
+			uint16* Src = (uint16*)(DataMem + Stride * i);
+			LinearColor.R = float(Src[0]) / 65535.0f;
+			LinearColor.G = float(Src[1]) / 65535.0f;
+			LinearColor.B = float(Src[2]) / 65535.0f;
+			if (InAccessor.type == TINYGLTF_TYPE_VEC4)
+				LinearColor.A = float(Src[3]) / 65535.0f;
+		}
+		break;
+		default:
+			break;
+		}
+
+		Math::FColor& Color = OutBuffer.DataAs<Math::FColor>()[i];
+		Color = Math::FLinearColor::ToSRGB(LinearColor);
+	}
+	return OutBuffer;
+}
+
+template<typename IndexType>
+FBuffer LoadIndexData(const tinygltf::Accessor& InAccessor, const tinygltf::Model& InModel)
+{
+	REV_CORE_ASSERT(InAccessor.bufferView >= 0 && InAccessor.bufferView < InModel.bufferViews.size());
+	const tinygltf::BufferView& BufferView = InModel.bufferViews[InAccessor.bufferView];
+	const tinygltf::Buffer& Buffer = InModel.buffers[BufferView.buffer];
+	const uint8* DataMem = Buffer.data.data() + BufferView.byteOffset + InAccessor.byteOffset;
+	const uint32 Count = InAccessor.count;
+	uint32 Stride = BufferView.byteStride;
+	if (Stride == 0)
+	{
+		switch (InAccessor.componentType)
+		{
+		case TINYGLTF_COMPONENT_TYPE_BYTE:
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
+			Stride = sizeof(uint8);
+			break;
+		case TINYGLTF_COMPONENT_TYPE_SHORT:
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
+			Stride = sizeof(uint16);
+			break;
+		case TINYGLTF_COMPONENT_TYPE_INT:
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
+			Stride = sizeof(uint32);
+			break;
+		default:
+			break;
+		}
+	}
+	REV_CORE_ASSERT(Stride != 0);
+
+	FBuffer OutBuffer;
+	OutBuffer.Allocate<IndexType>(Count);
+	for (uint32 i = 0; i < Count; i++)
+	{
+		IndexType& IndexValue = OutBuffer.DataAs<IndexType>()[i];
+		switch (InAccessor.componentType)
+		{
+		case TINYGLTF_COMPONENT_TYPE_BYTE:
+			IndexValue = *(int8*)(DataMem + Stride * i);
+			break;
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
+			IndexValue = *(uint8*)(DataMem + Stride * i);
+			break;
+		case TINYGLTF_COMPONENT_TYPE_SHORT:
+			IndexValue = *(int16*)(DataMem + Stride * i);
+			break;
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
+			IndexValue = *(uint16*)(DataMem + Stride * i);
+			break;
+		case TINYGLTF_COMPONENT_TYPE_INT:
+			IndexValue = *(int32*)(DataMem + Stride * i);
+			break;
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
+			IndexValue = *(uint32*)(DataMem + Stride * i);
+			break;
+		default:
+			break;
+		}
+	}
+	return OutBuffer;
+}
+
 }
 
 
-uint32 FGLTFUtils::GetComponentSize(int InComponentType)
+uint32 FGLTFUtils::GetIndexStride(int InComponentType)
 {
 	switch (InComponentType)
 	{
 	case TINYGLTF_COMPONENT_TYPE_BYTE:
-		return sizeof(int8);
 	case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
-		return sizeof(uint8);
 	case TINYGLTF_COMPONENT_TYPE_SHORT:
-		return sizeof(int16);
 	case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
 		return sizeof(uint16);
 	case TINYGLTF_COMPONENT_TYPE_INT:
-		return sizeof(int32);
 	case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
 		return sizeof(uint32);
-	case TINYGLTF_COMPONENT_TYPE_FLOAT:
-		return sizeof(float);
-	case TINYGLTF_COMPONENT_TYPE_DOUBLE:
-		return sizeof(double);
 	default:
 		return 0;
 	}
 }
 
-EDrawMode FGLTFUtils::TranslateDrawMode(int InDrawMode)
+EPrimitiveTopology FGLTFUtils::TranslatePrimitiveTopology(int InPrimitiveTopology)
 {
-	switch (InDrawMode)
+	switch (InPrimitiveTopology)
 	{
 	case TINYGLTF_MODE_POINTS:
-		return DM_Points;
+		return PT_Points;
 	case TINYGLTF_MODE_LINE:
-		return DM_Line;
+		return PT_Lines;
 	case TINYGLTF_MODE_LINE_LOOP:
-		return DM_LineLoop;
+		return PT_Lines;
 	case TINYGLTF_MODE_LINE_STRIP:
-		return DM_LineStrip;
+		return PT_LineStrip;
 	case TINYGLTF_MODE_TRIANGLES:
-		return DM_Triangles;
+		return PT_Triangles;
 	case TINYGLTF_MODE_TRIANGLE_STRIP:
-		return DM_TriangleStrip;
+		return PT_TriangleStrip;
 	case TINYGLTF_MODE_TRIANGLE_FAN:
-		return DM_TriangleFan;
+		return PT_TriangleFan;
 	default:
-		return DM_Triangles;
+		return PT_Triangles;
 	}
 }
 
@@ -132,19 +323,18 @@ EPixelFormat FGLTFUtils::TranslateImageFormat(const tinygltf::Image& InImage)
 	}
 	case 2:
 	{
-		break;
-	}
-	case 3:
-	{
 		switch (InImage.pixel_type)
 		{
 		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
-			return PF_RGB8;
+			return PF_R8G8;
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
+			return PF_R16G16;
 		default:
 			break;
 		}
 		break;
 	}
+	case 3:
 	case 4:
 	{
 		switch (InImage.pixel_type)
@@ -152,7 +342,7 @@ EPixelFormat FGLTFUtils::TranslateImageFormat(const tinygltf::Image& InImage)
 		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
 			return PF_R8G8B8A8;
 		case TINYGLTF_COMPONENT_TYPE_FLOAT:
-			return PF_R32G32B32A32F;
+			return PF_R32G32B32A32_FLOAT;
 		default:
 			break;
 		}
@@ -162,13 +352,13 @@ EPixelFormat FGLTFUtils::TranslateImageFormat(const tinygltf::Image& InImage)
 		break;
 	}
 
-	RE_CORE_WARN("[GLTF] Unsupported image format.");
+	REV_CORE_WARN("[GLTF] Unsupported image format.");
 	return PF_Unknown;
 }
 
-FSamplerDesc FGLTFUtils::TranslateSampler(const tinygltf::Sampler& InSampler)
+FRHISamplerStateDesc FGLTFUtils::TranslateSampler(const tinygltf::Sampler& InSampler)
 {
-	FSamplerDesc Result;
+	FRHISamplerStateDesc Result;
 
 	switch (InSampler.minFilter)
 	{
@@ -223,7 +413,7 @@ FSamplerDesc FGLTFUtils::TranslateSampler(const tinygltf::Sampler& InSampler)
 
 Math::FLinearColor FGLTFUtils::TranslateColor(const std::vector<double>& InColor)
 {
-	RE_CORE_ASSERT(InColor.size() == 4);
+	REV_CORE_ASSERT(InColor.size() == 4);
 	Math::FLinearColor Result(0, 0, 0, 1);
 	for (size_t i = 0; i < InColor.size(); i++)
 	{
@@ -234,7 +424,7 @@ Math::FLinearColor FGLTFUtils::TranslateColor(const std::vector<double>& InColor
 
 Math::FVector3 FGLTFUtils::TranslateVector3(const std::vector<double>& InVector3)
 {
-	RE_CORE_ASSERT(InVector3.size() == 3);
+	REV_CORE_ASSERT(InVector3.size() == 3);
 	Math::FVector3 Result(0, 0, 0);
 	for (size_t i = 0; i < InVector3.size(); i++)
 	{
@@ -243,88 +433,114 @@ Math::FVector3 FGLTFUtils::TranslateVector3(const std::vector<double>& InVector3
 	return Result;
 }
 
-Ref<FMeshPrimitiveStorage> FGLTFUtils::ImportMeshPrimitive(const tinygltf::Primitive& InPrimitive, const tinygltf::Model& InModel)
+Ref<FStaticMesh> FGLTFUtils::ImportMeshPrimitive(const tinygltf::Primitive& InPrimitive, const tinygltf::Model& InModel, const std::vector<Ref<FMaterial>>& InMaterials)
 {
-	Ref<FMeshPrimitiveStorage> OutStorage = CreateRef<FMeshPrimitiveStorage>();
-	OutStorage->MaterialIndex = InPrimitive.material;
-	OutStorage->DrawMode = TranslateDrawMode(InPrimitive.mode);
+	uint32 MaterialIndex = InPrimitive.material;
+	bool bGenNormals = true;
+	bool bGenTangents = true;
+	FStaticMeshBuilder MeshBuilder;
+
+	struct {
+		uint32 NumVertices = 0;
+		uint32 NumTexCoord = 0;
+		FBuffer PositionData;
+		FBuffer NormalData;
+		FBuffer TangentData;
+		FBuffer TexCoordData[2];
+		FBuffer ColorData;
+
+		uint32 NumIndices = 0;
+		bool b32Bit = false;
+		FBuffer IndexData;
+
+	} Storage;
 
 	for (auto& [attrName, attrIndex] : InPrimitive.attributes)
 	{
-		RE_CORE_ASSERT(attrIndex >= 0 && attrIndex < InModel.accessors.size());
+		REV_CORE_ASSERT(attrIndex >= 0 && attrIndex < InModel.accessors.size());
 		const tinygltf::Accessor& RefAccessor = InModel.accessors[attrIndex];
 		if (attrName.compare("POSITION") == 0)
 		{
-			RE_CORE_ASSERT(RefAccessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT);
-			RE_CORE_ASSERT(RefAccessor.type == TINYGLTF_TYPE_VEC3);
-			OutStorage->PositonData = LoadBufferData<float, 3>(RefAccessor, InModel);
-		}
-		else if (attrName.compare("COLOR") == 0)
-		{
-			RE_CORE_ASSERT(RefAccessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT);
-			RE_CORE_ASSERT(RefAccessor.type == TINYGLTF_TYPE_VEC4);
-			OutStorage->ColorData = LoadBufferData<float, 4>(RefAccessor, InModel);
-		}
-		else if (attrName.compare("TEXCOORD_0") == 0)
-		{
-			RE_CORE_ASSERT(RefAccessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT);
-			RE_CORE_ASSERT(RefAccessor.type == TINYGLTF_TYPE_VEC2);
-			OutStorage->TexCoordData = LoadBufferData<float, 2>(RefAccessor, InModel);
+			REV_CORE_ASSERT(RefAccessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT);
+			REV_CORE_ASSERT(RefAccessor.type == TINYGLTF_TYPE_VEC3);
+			Storage.PositionData = LoadBufferData<float, 3>(RefAccessor, InModel);
+			Storage.NumVertices = Storage.PositionData.Size() / sizeof(Math::FVector3);
 		}
 		else if (attrName.compare("NORMAL") == 0)
 		{
-			RE_CORE_ASSERT(RefAccessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT);
-			RE_CORE_ASSERT(RefAccessor.type == TINYGLTF_TYPE_VEC3);
-			OutStorage->NormalData = LoadBufferData<float, 3>(RefAccessor, InModel);
+			REV_CORE_ASSERT(RefAccessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT);
+			REV_CORE_ASSERT(RefAccessor.type == TINYGLTF_TYPE_VEC3);
+			Storage.NormalData = LoadBufferData<float, 3>(RefAccessor, InModel);
+			bGenNormals = false;
 		}
 		else if (attrName.compare("TANGENT") == 0)
 		{
-			RE_CORE_ASSERT(RefAccessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT);
-			RE_CORE_ASSERT(RefAccessor.type == TINYGLTF_TYPE_VEC4);
-			OutStorage->TangentData = LoadBufferData<float, 3>(RefAccessor, InModel);
+			REV_CORE_ASSERT(RefAccessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT);
+			REV_CORE_ASSERT(RefAccessor.type == TINYGLTF_TYPE_VEC4);
+			Storage.TangentData = LoadBufferData<float, 3>(RefAccessor, InModel);
+			bGenTangents = false;
+		}
+		else if (attrName.compare("TEXCOORD_0") == 0)
+		{
+			REV_CORE_ASSERT(RefAccessor.type == TINYGLTF_TYPE_VEC2);
+			Storage.TexCoordData[0] = LoadTexCoordData(RefAccessor, InModel);
+			Storage.NumTexCoord++;
+		}
+		else if (attrName.compare("TEXCOORD_1") == 0)
+		{
+			REV_CORE_ASSERT(RefAccessor.type == TINYGLTF_TYPE_VEC2);
+			Storage.TexCoordData[1] = LoadTexCoordData(RefAccessor, InModel);
+			Storage.NumTexCoord++;
+		}
+		else if (attrName.compare("COLOR_0") == 0)
+		{
+			REV_CORE_ASSERT(RefAccessor.type == TINYGLTF_TYPE_VEC3 || RefAccessor.type == TINYGLTF_TYPE_VEC4);
+			Storage.ColorData = LoadColorData(RefAccessor, InModel);
 		}
 	}
-	OutStorage->VertexCount = OutStorage->PositonData.Size() / 3 / sizeof(float);
+
+	MeshBuilder.InitVertices(Storage.NumVertices, Storage.NumTexCoord, 
+		std::move(Storage.PositionData), 
+		std::move(Storage.NormalData),
+		std::move(Storage.TangentData),
+		Storage.TexCoordData,
+		std::move(Storage.ColorData));
 
 	{
 		//Load Index Data
-		RE_CORE_ASSERT(InPrimitive.indices >= 0 && InPrimitive.indices < InModel.accessors.size());
+		REV_CORE_ASSERT(InPrimitive.indices >= 0 && InPrimitive.indices < InModel.accessors.size());
 		const tinygltf::Accessor&  RefAccessor = InModel.accessors[InPrimitive.indices];
-		RE_CORE_ASSERT(RefAccessor.type == TINYGLTF_TYPE_SCALAR);
-		OutStorage->IndexCount = RefAccessor.count;
-		OutStorage->IndexStride = GetComponentSize(RefAccessor.componentType);
-		OutStorage->IndexData = LoadBufferData(RefAccessor, InModel, OutStorage->IndexStride);
-	}
+		REV_CORE_ASSERT(RefAccessor.type == TINYGLTF_TYPE_SCALAR);
 
-	return OutStorage;
+		uint32 IndexStride = GetIndexStride(RefAccessor.componentType);
+		Storage.b32Bit = IndexStride == 4;
+		if (Storage.b32Bit)
+		{
+			Storage.IndexData = LoadIndexData<uint32>(RefAccessor, InModel);
+		}
+		else
+		{
+			Storage.IndexData = LoadIndexData<uint16>(RefAccessor, InModel);
+		}
+		Storage.NumIndices = Storage.IndexData.Size() / IndexStride;
+		MeshBuilder.InitIndices(Storage.NumIndices, Storage.b32Bit, std::move(Storage.IndexData));
+	}
+	MeshBuilder.SetMaterials({ InMaterials[MaterialIndex] });
+
+	return MeshBuilder.Build(bGenNormals, bGenTangents);
 }
 
-Ref<FStaticMeshStorage> FGLTFUtils::ImportStaticMesh(const tinygltf::Mesh& InMesh, const tinygltf::Model& InModel, const std::vector<Ref<FSurfaceMaterialStorage>>& InMaterials)
+std::vector<Ref<FStaticMesh>> FGLTFUtils::ImportStaticMesh(const tinygltf::Mesh& InMesh, const tinygltf::Model& InModel, const std::vector<Ref<FMaterial>>& InMaterials)
 {
 	std::map<int, int> MaterialIndexMap;
-
-	Ref<FStaticMeshStorage> OutStorage = CreateRef<FStaticMeshStorage>();
-	OutStorage->Name = InMesh.name;
+	std::vector<Ref<FStaticMesh>> OutMeshes;
+	OutMeshes.reserve(InMesh.primitives.size());
+	//OutStorage->Name = InMesh.name;
 	for (size_t i = 0; i < InMesh.primitives.size(); i++) {
-		Ref<FMeshPrimitiveStorage> PrimitiveStorage = ImportMeshPrimitive(InMesh.primitives[i], InModel);
-		if (PrimitiveStorage)
-		{
-			if (MaterialIndexMap.count(PrimitiveStorage->MaterialIndex) == 0)
-			{
-				Ref<FSurfaceMaterialStorage> Mat = PrimitiveStorage->MaterialIndex < 0 ? CreateRef<FPBRMaterialStorage>() : InMaterials[PrimitiveStorage->MaterialIndex];
-				int MappedIndex = OutStorage->Materials.size();
-				PrimitiveStorage->MaterialIndex = MappedIndex;
-				MaterialIndexMap.emplace(PrimitiveStorage->MaterialIndex, MappedIndex);
-				OutStorage->Materials.emplace_back(std::move(Mat));
-			}
-			else
-			{
-				PrimitiveStorage->MaterialIndex = MaterialIndexMap[PrimitiveStorage->MaterialIndex];
-			}
-			OutStorage->Primitives.emplace_back(std::move(PrimitiveStorage));
-		}
+		Ref<FStaticMesh> StaticMesh = ImportMeshPrimitive(InMesh.primitives[i], InModel, InMaterials);
+		OutMeshes.push_back(StaticMesh);
 	}
-	return OutStorage;
+	return OutMeshes;
 }
 
 Ref<FTextureStorage> FGLTFUtils::ImportTexture(const tinygltf::Texture& InTexture, const tinygltf::Model& InModel)
@@ -332,74 +548,60 @@ Ref<FTextureStorage> FGLTFUtils::ImportTexture(const tinygltf::Texture& InTextur
 	const tinygltf::Image& InImage = InModel.images[InTexture.source];
 	const tinygltf::Sampler& InSampler = InModel.samplers[InTexture.sampler];
 
-	Ref<FTextureStorage> Result = CreateRef<FTextureStorage>();
-	if (InTexture.name.empty())
+	Ref<FTextureStorage> Storage = CreateRef<FTextureStorage>();
+	Storage->TextureDesc = FRHITextureDesc::Create2D(InImage.width, InImage.height, TranslateImageFormat(InImage));
+	Storage->SamplerDesc = TranslateSampler(InSampler);
 	{
-		if (InImage.name.empty())
-		{
-			std::filesystem::path uri(InImage.uri);
-			Result->Name = uri.filename().generic_u8string();
-		}
-		else
-		{
-			Result->Name = InImage.name;
-		}
-	}
-	else
-	{
-		Result->Name = InTexture.name;
-	}
-	Result->TextureDesc = FTextureDesc::Make2D(InImage.width, InImage.height, TranslateImageFormat(InImage), false, Math::FLinearColor(0, 0, 0, 1));
-	Result->SamplerDesc = TranslateSampler(InSampler);
-	{
-		Result->ImageData.Resize(1, 1);
-		FBuffer& ImageBuffer = Result->ImageData.At(0, 0);
+		REV_CORE_ASSERT(InImage.component != 3);
+
+		Storage->ImageData.Resize(1, 1);
+		FBuffer& ImageBuffer = Storage->ImageData.At(0, 0);
 		//Decoded data
 		ImageBuffer.Allocate(InImage.image.size());
 		memcpy(ImageBuffer.Data(), InImage.image.data(), InImage.image.size());
 	}
 	//TODO: Decode image data from buffer
 	
-	return Result;
+	return Storage;
 }
 
-Ref<FSurfaceMaterialStorage> FGLTFUtils::ImportMaterial(const tinygltf::Material& InMaterial, const tinygltf::Model& InModel, const std::vector<Ref<FTextureStorage>>& InTextures)
+Ref<FMaterial> FGLTFUtils::ImportMaterial(const tinygltf::Material& InMaterial, const tinygltf::Model& InModel, const std::vector<Ref<FTextureStorage>>& InTextures)
 {
 	auto& pbrInfo = InMaterial.pbrMetallicRoughness;
-	Ref<FPBRMaterialStorage> Result = CreateRef<FPBRMaterialStorage>();
-	Result->Name = InMaterial.name;
+	FPBRMaterialStorage Storage;
+	//Storage.Name = InMaterial.name;
 	
 	{
 		//Alpha Mode
 		if (InMaterial.alphaMode == "OPAQUE")
 		{
-			Result->BlendMode = BM_Opaque;
+			Storage.BlendMode = MBM_Opaque;
 		}
 		else if (InMaterial.alphaMode == "BLEND")
 		{
-			Result->BlendMode = BM_Transparent;
+			Storage.BlendMode = MBM_Transparent;
 		}
 		else if (InMaterial.alphaMode == "MASK")
 		{
-			Result->BlendMode = BM_Masked;
+			Storage.BlendMode = MBM_Masked;
 		}
 	}
 
-	Result->MaskClip = InMaterial.alphaCutoff;
-	Result->TwoSided = InMaterial.doubleSided;
-	Result->BaseColorFactor = TranslateColor(pbrInfo.baseColorFactor);
-	Result->BaseColorTexture = pbrInfo.baseColorTexture.index >= 0 ? InTextures[pbrInfo.baseColorTexture.index] : nullptr;
-	Result->Metallic = pbrInfo.metallicFactor;
-	Result->Roughness = pbrInfo.roughnessFactor;
-	Result->MetallicRoughnessTexture = pbrInfo.metallicRoughnessTexture.index >= 0 ? InTextures[pbrInfo.metallicRoughnessTexture.index] : nullptr;
-	Result->NormalScale = InMaterial.normalTexture.scale;
-	Result->NormalTexture = InMaterial.normalTexture.index >= 0 ? InTextures[InMaterial.normalTexture.index] : nullptr;
-	Result->OcclusionStrength = InMaterial.occlusionTexture.strength;
-	Result->OcclusionTexture = InMaterial.occlusionTexture.index >= 0 ? InTextures[InMaterial.occlusionTexture.index] : nullptr;
-	Result->EmissiveFactor = TranslateVector3(InMaterial.emissiveFactor);
-	Result->EmissiveTexture = InMaterial.emissiveTexture.index >= 0 ? InTextures[InMaterial.emissiveTexture.index] : nullptr;
+	Storage.MaskClip = InMaterial.alphaCutoff;
+	Storage.TwoSided = InMaterial.doubleSided;
+	Storage.BaseColorFactor = TranslateColor(pbrInfo.baseColorFactor);
+	Storage.BaseColorTexture = pbrInfo.baseColorTexture.index >= 0 ? InTextures[pbrInfo.baseColorTexture.index]->CreateTexture(true) : nullptr;
+	Storage.Metallic = pbrInfo.metallicFactor;
+	Storage.Roughness = pbrInfo.roughnessFactor;
+	Storage.MetallicRoughnessTexture = pbrInfo.metallicRoughnessTexture.index >= 0 ? InTextures[pbrInfo.metallicRoughnessTexture.index]->CreateTexture(false) : nullptr;
+	Storage.NormalScale = InMaterial.normalTexture.scale;
+	Storage.NormalTexture = InMaterial.normalTexture.index >= 0 ? InTextures[InMaterial.normalTexture.index]->CreateTexture(false) : nullptr;
+	Storage.OcclusionStrength = InMaterial.occlusionTexture.strength;
+	Storage.OcclusionTexture = InMaterial.occlusionTexture.index >= 0 ? InTextures[InMaterial.occlusionTexture.index]->CreateTexture(false) : nullptr;
+	Storage.EmissiveFactor = TranslateVector3(InMaterial.emissiveFactor);
+	Storage.EmissiveTexture = InMaterial.emissiveTexture.index >= 0 ? InTextures[InMaterial.emissiveTexture.index]->CreateTexture(true) : nullptr;
 
-	return Result;
+	return Storage.CreateMaterial();
 }
 
 FModelImportResult FGLTFUtils::ImportModel(const FPath& InPath, bool DumpInfo)
@@ -413,26 +615,26 @@ FModelImportResult FGLTFUtils::ImportModel(const FPath& InPath, bool DumpInfo)
 	bool ret = false;
 	if (InPath.Extension().compare(".glb") == 0) {
 	
-	    RE_CORE_INFO("Reading binary glTF {0}", NativePath);
+	    REV_CORE_INFO("Reading binary glTF {0}", NativePath);
 	    // assume binary glTF.
 	    ret = ctx.LoadBinaryFromFile(&InModel, &err, &warn, NativePath.c_str());
 	}
 	else {
-	    RE_CORE_INFO("Reading ASCII glTF {0}", NativePath);
+	    REV_CORE_INFO("Reading ASCII glTF {0}", NativePath);
 	    // assume ascii glTF.
 	    ret = ctx.LoadASCIIFromFile(&InModel, &err, &warn, NativePath.c_str());
 	}
 	
 	if (!warn.empty()) {
-	    RE_CORE_WARN("glTF load warning: {}", warn);
+	    REV_CORE_WARN("glTF load warning: {}", warn);
 	}
 	
 	if (!err.empty()) {
-	    RE_CORE_ERROR("glTF load error: {}", err);
+	    REV_CORE_ERROR("glTF load error: {}", err);
 	}
 	
 	if (!ret) {
-	    RE_CORE_ERROR("glTF load failed: {}", NativePath);
+	    REV_CORE_ERROR("glTF load failed: {}", NativePath);
 		return {};
 	}
 	
@@ -442,23 +644,24 @@ FModelImportResult FGLTFUtils::ImportModel(const FPath& InPath, bool DumpInfo)
 	}
 
 	FModelImportResult Result;
+	std::vector<Ref<FTextureStorage>> TextureStorageVec;
 
 	for (size_t i = 0; i < InModel.textures.size(); i++)
 	{
 		Ref<FTextureStorage> TextureStorage = ImportTexture(InModel.textures[i], InModel);
-		Result.Textures.emplace_back(std::move(TextureStorage));
+		TextureStorageVec.emplace_back(std::move(TextureStorage));
 	}
 
 	for (size_t i = 0; i < InModel.materials.size(); i++)
 	{
-		Ref<FSurfaceMaterialStorage> MaterialStorage = ImportMaterial(InModel.materials[i], InModel, Result.Textures);
-		Result.Materials.emplace_back(std::move(MaterialStorage));
+		Ref<FMaterial> Material = ImportMaterial(InModel.materials[i], InModel, TextureStorageVec);
+		Result.Materials.emplace_back(std::move(Material));
 	}
 
 	for (size_t i = 0; i < InModel.meshes.size(); i++)
 	{
-		Ref<FStaticMeshStorage> StaticMeshStorage = ImportStaticMesh(InModel.meshes[i], InModel, Result.Materials);
-		Result.StaticMeshes.emplace_back(std::move(StaticMeshStorage));
+		std::vector<Ref<FStaticMesh>> StaticMeshes = ImportStaticMesh(InModel.meshes[i], InModel, Result.Materials);
+		Result.StaticMeshes = std::move(StaticMeshes);
 
 		//TODO: Import skeleton mesh
 	}

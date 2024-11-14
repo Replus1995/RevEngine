@@ -21,7 +21,7 @@ void PlayerCameraSystem::OnUpdate(float dt)
 {
 	if (mCamEntity)
 	{
-		const auto& [transformComp, cameraComp] = mCamEntity.GetComponent<TransformComponent, CameraComponent>();
+		const auto& [transformComp, cameraComp] = mCamEntity.GetComponents<TransformComponent, CameraComponent>();
 		mCamController->OnUpdate(dt, cameraComp.Camera, transformComp.Transform);
 	}
 }
@@ -30,30 +30,30 @@ void PlayerCameraSystem::OnDestroy()
 {
 }
 
-void PlayerCameraSystem::FillCameraUniform(FCameraUniform& OutUniform) const
+void PlayerCameraSystem::FillCameraData(Math::FVector3& ViewPos, Math::FMatrix4& ViewMatrix, Math::FMatrix4& ProjMatrix)
 {
 	if (mCamEntity)
 	{
-		const auto& [transformComp, cameraComp] = mCamEntity.GetComponent<TransformComponent, CameraComponent>();
+		auto Comps = mCamEntity.GetComponents<TransformComponent, CameraComponent>();
+		auto& [transformComp, cameraComp] = Comps;
 		if (cameraComp.AutoAspectRatio)
 		{
 			auto window = Application::GetApp().GetWindow();
 			float asp = float(window->GetWidth()) / float(window->GetHeight());
 			cameraComp.Camera.SetAspectRatio(asp);
 		}
-		OutUniform.ProjMatrix = cameraComp.Camera.GetProjectionMatrix();
-		OutUniform.ViewMatrix = transformComp.GetMatrix().Inverse();
-		OutUniform.Position = Math::FVector4(transformComp.Location(), 1.0f);
+		ProjMatrix = cameraComp.Camera.GetProjectionMatrix();
+		ViewMatrix = transformComp.GetMatrix().Inverse();
+		ViewPos = transformComp.Location();
 	}
 	else
 	{
 		auto window = Application::GetApp().GetWindow();
 		float asp = float(window->GetWidth()) / float(window->GetHeight());
-		OutUniform.ProjMatrix = Math::FMatrix4::Perspective(Math::Radians(45.0f), asp, 0.01f, 1000.0f);
-		OutUniform.ViewMatrix = Math::FMatrix4(1.0f);
-		OutUniform.Position = Math::FVector4(0, 0, 0, 1);
+		ProjMatrix = Math::FMatrix4::Perspective(Math::Radians(45.0f), asp, 0.01f, 1000.0f);
+		ViewMatrix = Math::FMatrix4(1.0f);
+		ViewPos = Math::FVector3(0, 0, 0);
 	}
-	OutUniform.InvProjViewMatrix = (OutUniform.ProjMatrix * OutUniform.ViewMatrix).Inverse();
 }
 
 bool PlayerCameraSystem::SetPlayerCamera(FEntity e)

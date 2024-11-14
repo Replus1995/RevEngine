@@ -3,7 +3,6 @@
 #include <Rev/World/Scene.h>
 #include <Rev/World/Component/AllComponents.h>
 #include <Rev/World/System/PlayerCameraSystem.h>
-#include <Rev/Render/Mesh/StaticMesh.h>
 #include <Rev/Render/Material/PBRMaterial.h>
 #include <Rev/Render/RHI/RHIShaderLibrary.h>
 #include <Rev/Core/FileSystem.h>
@@ -22,12 +21,12 @@ ExampleLayer::ExampleLayer()
 	//Load shader
 
 	//FFileSystem::MountDir("/SandBox", std::filesystem::current_path().generic_u8string());
-	FFileSystem::MountDir("/Game", (std::filesystem::current_path() / "Game").generic_u8string());
-
-	FPath TestPath("/Game/Assets/Shaders/Common.vs.glsl");
+	FFileSystem::MountDir("/Game", (std::filesystem::current_path() / "Game").generic_string());
 
 	//Create Sandbox Scene
 	mScene = CreateRef<Rev::FScene>();
+
+	//FAssetLibrary::GetDefaultSurfaceMaterial();
 
 	/*{
 		auto pBoxMat = CreateRef<ExampleMaterial>();
@@ -46,11 +45,9 @@ ExampleLayer::ExampleLayer()
 		auto importRes = FAssetLibrary::ImportModel(FPath("/Game/Assets/Models/DamagedHelmet.glb"));
 		if (!importRes.StaticMeshes.empty())
 		{
-			auto meshStorage = importRes.StaticMeshes[0];
-
 			auto meshEntity = mScene->CreateEntity();
 			auto& meshComp = meshEntity.AddComponent<StaticMeshComponent>();
-			meshComp.StaticMesh = meshStorage->CreateStaticMesh();
+			meshComp.StaticMesh = importRes.StaticMeshes[0];
 			auto & transformComp = meshEntity.GetComponent<TransformComponent>();
 			transformComp.SetLocation(Math::FVector3(0, 0.6, -5));
 			transformComp.SetScale(Math::FVector3(0.5, 0.5, 0.5));
@@ -60,9 +57,11 @@ ExampleLayer::ExampleLayer()
 	}
 
 	{
-		auto pPlaneMat = CreateRef<PBRMaterial>();
+		auto pPlaneMat = CreateRef<FPBRMaterial>();
 		pPlaneMat->Compile();
-		pPlaneMat->BaseColorFactor = (Math::FLinearColor(.8, .8, .8, 1));
+		//pPlaneMat->PBRMaterialParams.BaseColorFactor = (Math::FLinearColor(.8, .8, .8, 1));
+		pPlaneMat->PBRMaterialParams.Metallic = 0.3f;
+		pPlaneMat->PBRMaterialParams.Roughness = 0.8f;
 
 		auto meshEntity = mScene->CreateEntity();
 		auto& meshComp = meshEntity.AddComponent<StaticMeshComponent>();
@@ -74,10 +73,10 @@ ExampleLayer::ExampleLayer()
 	}
 
 	{
-
 		auto lightEntity = mScene->CreateEntity();
 		auto& dirLightComp = lightEntity.AddComponent<DirectionalLightComponent>();
 		dirLightComp.Light.SetColorByTemperature(6500.0f);
+		dirLightComp.Light.SetIntensity(8.0f);
 		auto& transformComp = lightEntity.GetComponent<TransformComponent>();
 		transformComp.SetLocation(Math::FVector3(0, 0, 0));
 		transformComp.SetRotation(Math::FRotator(0, 0, 45.0f));
@@ -107,7 +106,8 @@ ExampleLayer::ExampleLayer()
 			"/Game/Assets/Textures/Skybox/top.jpg",
 			"/Game/Assets/Textures/Skybox/bottom.jpg",
 			"/Game/Assets/Textures/Skybox/front.jpg",
-			"/Game/Assets/Textures/Skybox/back.jpg");
+			"/Game/Assets/Textures/Skybox/back.jpg",
+			true);
 		auto CubeTex = CubeTexStorage.CreateTexture();
 		if (CubeTex)
 		{ 
@@ -121,5 +121,4 @@ ExampleLayer::ExampleLayer()
 
 ExampleLayer::~ExampleLayer()
 {
-	
 }

@@ -16,9 +16,9 @@ namespace Rev
 
 		REV_API void Run();
 		REV_API void Close();
+		REV_API void SetFpsLimit(uint32 InFps);
 
 		REV_API void OnEvent(Event& e);
-
 		REV_API void PushLayer(Layer* layer);
 		REV_API void PushOverlay(Layer* overlay);
 
@@ -34,7 +34,9 @@ namespace Rev
 		bool mRunning = true;
 		bool mMinimized = false;
 		LayerStack mLayerStack;
-		float mLastFrameTime = 0.0f;
+
+		int64 mLastFrameTime = 0;
+		int64 mFrameInterval = 0;
 
 	private:
 		static Application* sInstance;

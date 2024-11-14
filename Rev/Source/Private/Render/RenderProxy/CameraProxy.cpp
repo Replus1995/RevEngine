@@ -1,6 +1,7 @@
 #include "Rev/Render/RenderProxy/CameraProxy.h"
 #include "Rev/World/Scene.h"
 #include "Rev/World/System/PlayerCameraSystem.h"
+#include "Rev/Render/Renderer/Renderer.h"
 
 namespace Rev
 {
@@ -18,18 +19,12 @@ void FCameraProxy::Prepare(const Ref<FScene>& Scene)
 	PlayerCameraSystem* pSystem = Scene->GetSystem<PlayerCameraSystem>();
 	if (pSystem)
 	{
-		pSystem->FillCameraUniform(uCamera.Data);
+		pSystem->FillCameraData(mViewPos, mViewMatrix, mProjMatrix);
 	}
 }
 
-void FCameraProxy::SyncResource() const
+void FCameraProxy::SyncResource(FRHICommandList& RHICmdList)
 {
-	uCamera.Upload();
-}
-
-void FCameraProxy::FreeResource()
-{
-	uCamera.FreeResource();
 }
 
 }

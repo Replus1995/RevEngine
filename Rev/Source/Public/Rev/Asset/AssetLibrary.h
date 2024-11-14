@@ -1,7 +1,8 @@
 #pragma once
 #include "Rev/Core/Base.h"
 #include "Rev/Core/FileSystem.h"
-#include "Rev/Asset/MeshStorage.h"
+#include "Rev/Asset/TextureStorage.h"
+#include "Rev/Asset/MaterialStorage.h"
 
 namespace Rev
 {
@@ -16,25 +17,30 @@ enum class EBasicGeometry : uint8
 	//...
 };
 
-class Texture;
-class Material;
-class SurfaceMaterial;
-class StaticMesh;
+class FTexture;
+class FMaterial;
+class FStaticMesh;
+struct FModelImportResult
+{
+	std::vector<Ref<FMaterial>> Materials;
+	std::vector<Ref<FStaticMesh>> StaticMeshes;
+	//SkeletalMeshes
+};
+
+
 class REV_API FAssetLibrary
 {
 public:
-	static const Ref<Texture>& GetDefaultWhiteTexture2D();
-	static const Ref<Texture>& GetDefaultBlackTexture2D();
-	static const Ref<Texture>& GetDefaultNormalTexture2D();
-	static const Ref<SurfaceMaterial>& GetDefaultSurfaceMaterial();
-	static Ref<StaticMesh> CreateBasicGeometry(EBasicGeometry InKind, const Ref<SurfaceMaterial>& InMaterial = nullptr);
+	static const Ref<FMaterial>& GetDefaultSurfaceMaterial();
+	static Ref<FStaticMesh> CreateBasicGeometry(EBasicGeometry InKind, const Ref<FMaterial>& InMaterial = nullptr);
 
 
 	static FTextureStorage ImportTexture(const FPath& InPath);
 	static FTextureStorage ImportTextureCube(
 		const FPath& InPathPX, const FPath& InPathNX,
 		const FPath& InPathPY, const FPath& InPathNY,
-		const FPath& InPathPZ, const FPath& InPathNZ
+		const FPath& InPathPZ, const FPath& InPathNZ,
+		bool bSRGB = false
 		);
 
 	static FModelImportResult ImportModel(const FPath& InPath);

@@ -1,13 +1,14 @@
 #pragma once
 #include "Rev/Core/Base.h"
 #include "Rev/Core/Buffer.h"
-#include "Rev/Render/RHI/RHISampler.h"
+#include "Rev/Render/RHI/RHIState.h"
 #include "Rev/Render/RHI/RHITexture.h"
-#include "Rev/Render/Texture/Texture.h"
 #include <vector>
 
 namespace Rev
 {
+
+class FTexture;
 
 struct FImageStorage
 {
@@ -36,14 +37,13 @@ public:
 	FTextureStorage(const FTextureStorage& Other) = delete;
 	FTextureStorage(FTextureStorage&& Other) noexcept;
 
-	std::string Name;
-	FSamplerDesc SamplerDesc;
-	FTextureDesc TextureDesc;
+	FRHISamplerStateDesc SamplerDesc;
+	FRHITextureDesc TextureDesc;
 	FImageStorage ImageData;
 
-	REV_API Ref<Texture> CreateTexture(bool bForceSRGB = false);
+	REV_API Ref<FTexture> CreateTexture(bool bForceSRGB = false);
 private:
-	Ref<Texture> mCache = nullptr;
+	Ref<FTexture> mCache = nullptr;
 };
 
 }

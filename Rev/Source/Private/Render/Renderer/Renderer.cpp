@@ -4,10 +4,14 @@
 namespace Rev
 {
 
-FRenderer::FRenderer(const Ref<FRenderContext>& InContext)
-	: mContext(InContext)
+
+FRenderer::FRenderer(FSceneProxy* InSceneProxy)
+	: mSceneProxy(InSceneProxy)
 {
-	RE_CORE_ASSERT(mContext != nullptr);
+}
+
+FRenderer::~FRenderer()
+{
 }
 
 }

@@ -9,18 +9,17 @@ A tiny 3d engine for learning graphics apis & algorithms
 - **Archive** : A simple archive class to do serialize & deserialize
 - **Asset** : Asset related classes & functions
 - **GLFW** : GLFW window class
-- **OpenGL** : OpenGL rhi implement
+- **OpenGL** : OpenGL rhi implement (to be deprecated)
 - **Shaderc** : Classes & functions to compile GLSL into SPRIV
+- **VulkanRHI** : Vulkan rhi implement
 
 # Status
-- **Done**
-  - Forward PBR shader
-  - GLTF import based on tiny-gltf
-  - Environment map
+- **In Progress**
+  - Vulkan RHI
+  - Hash string (FName)
 - **Todo List**
-  - Shadowmap
-  - Animation
-  - UI
+  - Use hlsl instead of glsl
+  - Render graph
 
 
 # Reference
@@ -32,5 +31,8 @@ A tiny 3d engine for learning graphics apis & algorithms
   - [glm](https://github.com/g-truc/glm)
 - **Opengl**
   - [Learn OpenGL](https://learnopengl.com/)
+- **Vulkan**
+  - [Vulkan Tutorial](https://vulkan-tutorial.com/)
+  - [Vulkan Guide](https://vkguide.dev/)
 
 ***

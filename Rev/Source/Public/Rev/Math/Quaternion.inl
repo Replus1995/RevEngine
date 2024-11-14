@@ -282,7 +282,7 @@ template<typename T>
 inline TQuaternion<T> TQuaternion<T>::Slerp(const TQuaternion<T>& InQuatA, const TQuaternion<T>& InQuatB, float By)
 {
 	By = Clamp(By, 0.0F, 1.0F);
-	float cBy = std::cos(By * PI());
+	float cBy = std::cos(By * PI<T>());
 	float dot = DotProduct(InQuatA, InQuatB);
 	if (dot < 0.0f)
 	{

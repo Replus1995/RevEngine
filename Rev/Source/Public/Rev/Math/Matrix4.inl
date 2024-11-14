@@ -335,10 +335,12 @@ inline TMatrix4<T> TMatrix4<T>::FromQuat(const TQuaternion<T>& InQuat)
 template<typename T>
 inline TMatrix4<T> TMatrix4<T>::FromScale(const TVector3<T>& InScale)
 {
+	constexpr float MinScale = 1.192092896e-07F;
+
 	TMatrix4<T> Result;
-	Result[0][0] = InScale.X;
-	Result[1][1] = InScale.Y;
-	Result[2][2] = InScale.Z;
+	Result[0][0] = InScale.X < MinScale ? MinScale : InScale.X;
+	Result[1][1] = InScale.Y < MinScale ? MinScale : InScale.Y;
+	Result[2][2] = InScale.Z < MinScale ? MinScale : InScale.Z;
 	Result[3][3] = 1.0F;
 	return Result;
 }

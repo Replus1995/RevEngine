@@ -1,13 +1,27 @@
-#version 460 core
-#pragma shader_stage(vertex)
-#extension GL_ARB_separate_shader_objects : enable
-#extension GL_GOOGLE_include_directive : enable
+#include "Engine/Shaders/Core/Base.rsh"
 
-#include "/Engine/Shaders/Include/Global.rsh"
-
-layout(location = 0) in vec3 a_Position;
-
-void main()
+struct VSInput
 {
-	gl_Position = ub_Camera.ProjMat * ub_Camera.ViewMat * ub_Model.ModelMat * vec4(a_Position, 1.0);
+    float4 aPosition : POSITION0;
+};
+
+struct VSOutput
+{
+    float4 vPosition : SV_POSITION;
+};
+cbuffer SceneUB : register(b0, space0)
+{
+	FSceneUniform uScene;
+};
+
+cbuffer StaticMeshUB : register(b1, space0)
+{
+	FStaticMeshUniform uStaticMesh;
+};
+
+VSOutput main(VSInput Input)
+{
+    VSOutput Result;
+    Result.vPosition = mul(uScene.ViewProjMat, mul(uStaticMesh.ModelMat, Input.aPosition));
+    return Result;
 }

@@ -1,15 +1,16 @@
 #pragma once
 #include "Rev/Core/Base.h"
 #include "Rev/Render/Material/Material.h"
-#include "Rev/Render/Mesh/StaticMesh.h"
+#include "Rev/Render/Component/StaticMesh.h"
 #include "Rev/Render/RHI/RHIBuffer.h"
-#include "Rev/Render/RHI/RHIResourceFactory.h"
+#include "Rev/Render/RHI/DynamicRHI.h"
+#include "Rev/Render/RHI/RHIContext.h"
 
 namespace Rev
 {
 
 
-static constexpr float sBoxVertices[] = {
+static constexpr float sBoxPositions[] = {
     -0.5, -0.5, -0.5,
     -0.5, +0.5, -0.5,
     +0.5, +0.5, -0.5,
@@ -20,7 +21,7 @@ static constexpr float sBoxVertices[] = {
     +0.5, -0.5, +0.5
 };
 
-static constexpr uint32 sBoxIndices[] = {
+static constexpr uint16 sBoxIndices[] = {
     4, 7, 5,
     6, 5, 7,
     7, 4, 3,
@@ -38,34 +39,15 @@ static constexpr uint32 sBoxIndices[] = {
 class FBoxGeometry
 {
 public:
-    static Ref<StaticMesh> Create(const Ref<SurfaceMaterial>& InMat)
+    static Ref<FStaticMesh> Create(const Ref<FMaterial>& InMat)
     {
-        std::vector<Ref<SurfaceMaterial>> boxMatArr = { InMat };
-        std::vector<FMeshPrimitive> boxPrimArr;
-        {
-            constexpr uint32 boxVerticesSize = sizeof(sBoxVertices);
-            Ref<FRHIVertexBuffer> boxVertices = FRHIResourceFactory::CreateVertexBuffer(sBoxVertices, boxVerticesSize);
-            boxVertices->SetLayout({
-                {"Position", EVertexElementType::Float3,  0}
-                //{EShaderDataType::Float3, "a_Normal"},
-                //{EShaderDataType::Float2, "a_TexCoord"}
-                });
+        FStaticMeshBuilder BoxBuilder;
+        BoxBuilder.Init(8, 1, 36, false);
+        BoxBuilder.FillPositions(sBoxPositions, ARRAY_LENGTH(sBoxPositions));
+        BoxBuilder.FillIndices(sBoxIndices, ARRAY_LENGTH(sBoxIndices));
+        BoxBuilder.SetMaterials({ InMat });
 
-            constexpr uint32 boxIndicesCount = sizeof(sBoxIndices) / sizeof(uint32);
-            Ref<FRHIIndexBuffer> boxIndices = FRHIResourceFactory::CreateIndexBuffer(sBoxIndices, sizeof(uint32), boxIndicesCount);
-
-            FMeshPrimitive boxMeshPrim;
-            boxMeshPrim.VertexData = FRHIResourceFactory::CreateVertexArray();
-            boxMeshPrim.VertexData->AddVertexBuffer(boxVertices);
-            boxMeshPrim.VertexData->SetIndexBuffer(boxIndices);
-
-            boxPrimArr.emplace_back(std::move(boxMeshPrim));
-        }
-
-        Ref<StaticMesh> OutMesh = CreateRef<StaticMesh>();
-        OutMesh->SetMaterials(std::move(boxMatArr));
-        OutMesh->SetPrimitives(std::move(boxPrimArr));
-        return OutMesh;
+        return BoxBuilder.Build(false, false);
     }
 };
 

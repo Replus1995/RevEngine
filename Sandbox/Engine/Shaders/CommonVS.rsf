@@ -1,45 +1,56 @@
-#version 460 core
-#pragma shader_stage(vertex)
-#extension GL_ARB_separate_shader_objects : enable
-#extension GL_GOOGLE_include_directive : enable
+#include "Engine/Shaders/Core/Base.rsh"
 
-#include "/Engine/Shaders/Include/Global.rsh"
-
-layout(location = 0) in vec3 a_Position;
-layout(location = 1) in vec3 a_Normal;
-layout(location = 2) in vec4 a_Tangent;
-layout(location = 3) in vec2 a_TexCoord0;
-layout(location = 4) in vec4 a_Color;
-
-layout(location = 0) uniform mat4 u_ModelMat;
-
-layout(location = 0) out Vertex
+cbuffer SceneUB : register(b0)
 {
-    vec3 WorldPos;
-    vec3 Normal;
-    vec3 Tangent;
-    vec3 Bitangent;
-    vec4 Color;
-    vec2 TexCoord0;
-} OUT;
+	FSceneUniform uScene;
+};
 
-void main(void)
+cbuffer StaticMeshUB : register(b1)
 {
-    OUT.Color = a_Color;
-    OUT.TexCoord0 = a_TexCoord0;
+	FStaticMeshUniform uStaticMesh;
+};
 
-    mat3 NormalMat = mat3(ub_Model.ModelMat);
-    vec3 wNormal = normalize(NormalMat * a_Normal);
-    vec3 wTangent = normalize(NormalMat * a_Tangent.xyz);
+struct VSInput
+{
+    float4 aPosition : POSITION0;
+    uint aColor : COLOR0;
+    float4 aNormal : NORMAL;
+    float4 aTangent : TANGENT;
+    float4 aTexCoord0 : TEXCOORD0;
+    //float4 aTexCoord1 : TEXCOORD1;
+};
 
-    OUT.Normal = wNormal;
-    OUT.Tangent = wTangent;
-    OUT.Bitangent = normalize(cross(wNormal, wTangent) * a_Tangent.w);
-    //OUT.BiNormal = normalize(cross(wTangent, wNormal) * a_Tangent.w);
+struct VSOutput
+{
+    float4 vPosition : SV_POSITION;
+    uint vColor : COLOR0;
+    float2 vTexCoord0 : TEXCOORD0;
+    float3 vWorldPos : TEXCOORD1;
+    float3 vNormal : NORMAL;
+    float3 vTangent : TANGENT;
+    float3 vBitangent : BINORMAL;
+};
 
-    vec4 wPositon = (ub_Model.ModelMat * vec4(a_Position, 1.0));
-    OUT.WorldPos = wPositon.xyz;
+VSOutput main(VSInput Input)
+{
+    VSOutput Result;
+    Result.vColor = Input.aColor;
+    Result.vTexCoord0 = Input.aTexCoord0;
 
-    gl_Position = ub_Camera.ProjMat * ub_Camera.ViewMat * wPositon;
+    float3x3 NormalMat = ToMatrix3(uStaticMesh.ModelMat);
+    //float3 wNormal = normalize(mul(uStaticMesh.ModelMat, Input.aNormal).xyz);
+    //float3 wTangent = normalize(mul(uStaticMesh.ModelMat, Input.aTangent).xyz);
+    float3 wNormal = normalize(mul(NormalMat, Input.aNormal.xyz));
+    float3 wTangent = normalize(mul(NormalMat, Input.aTangent.xyz));
+    //float3 wNormal = Input.aNormal.xyz;
+    //float3 wTangent = Input.aTangent.xyz;
 
+    Result.vNormal = wNormal;
+    Result.vTangent = wTangent;
+    Result.vBitangent = normalize(cross(wNormal, wTangent) * Input.aTangent.w);
+
+    float4 wPosition =  mul(uStaticMesh.ModelMat, Input.aPosition);
+    Result.vWorldPos = wPosition.xyz;
+    Result.vPosition = mul(uScene.ViewProjMat, wPosition);
+    return Result;
 }

@@ -6,6 +6,13 @@ message("========Begin Vendor========")
 #Glad
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/Glad ${CMAKE_CURRENT_BINARY_DIR}/Glad)
 group_target(Glad "vendor")
+#glfw
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "Disable glfw build docs")
+set(GLFW_INSTALL OFF CACHE BOOL "Disable glfw install")
+set(GLFW_LIBRARY_TYPE "STATIC")
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/glfw ${CMAKE_CURRENT_BINARY_DIR}/glfw)
+group_target(glfw "vendor/GLFW3")
+group_target(update_mappings "vendor/GLFW3")
 #imgui
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/imgui ${CMAKE_CURRENT_BINARY_DIR}/imgui)
 group_target(imgui "vendor")
@@ -25,10 +32,26 @@ set(PHYSFS_DISABLE_INSTALL TRUE CACHE BOOL "Disable physfs installl")
 set(PHYSFS_BUILD_DOCS OFF CACHE BOOL "Disable physfs build docs")
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/physfs ${CMAKE_CURRENT_BINARY_DIR}/physfs)
 group_target(physfs-static "vendor")
+#cityhash
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/cityhash ${CMAKE_CURRENT_BINARY_DIR}/cityhash)
+group_target(cityhash "vendor")
+
+#skaarj1989/FrameGraph
+set(FG_BUILD_TEST OFF CACHE BOOL "Disable FrameGraph uint test")
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/FrameGraph ${CMAKE_CURRENT_BINARY_DIR}/FrameGraph)
+group_target(FrameGraph "vendor")
 #========Compile From Source========#
 
+#========Header Only========#
+#glm
+set(GLM_BUILD_LIBRARY OFF CACHE BOOL "Disable glm build library")
+set(GLM_BUILD_TESTS OFF CACHE BOOL "Disable glm build tests")
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/glm)
+#VMA
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/VMA)
+#========Header Only========#
+
 #========PreCompiled========#
-include(${CMAKE_CURRENT_LIST_DIR}/GLFW/glfw3.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/OpenMesh/OpenMesh.cmake)
 #========PreCompiled========#
 

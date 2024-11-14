@@ -15,7 +15,7 @@ public:
 	virtual void OnUpdate(float dt) override;
 	virtual void OnDestroy() override;
 
-	void FillCameraUniform(FCameraUniform& OutUniform) const;
+	void FillCameraData(Math::FVector3& ViewPos, Math::FMatrix4& ViewMatrix, Math::FMatrix4& ProjMatrix);
 	bool SetPlayerCamera(FEntity e);
 	void SetPlayerCameraController(const Ref<CameraController>& c);
 	

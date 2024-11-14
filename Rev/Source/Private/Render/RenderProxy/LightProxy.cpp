@@ -1,20 +1,24 @@
 #include "Rev/Render/RenderProxy/LightProxy.h"
 #include "Rev/Render/RenderCore.h"
 #include "Rev/Math/Maths.h"
-#include "Rev/World/Scene.h"
+#include "Rev/World/Entity.h"
+#include "Rev/Render/UniformLayout.h"
+#include "Rev/Render/RHI/DynamicRHI.h"
+#include "Rev/Render/RHI/RHICommandList.h"
+#include "Rev/Render/RHI/RHIBuffer.h"
 
 namespace Rev
 {
 
-FDirectionalLightProxy::FDirectionalLightProxy()
+FLightProxy::FLightProxy()
 {
 }
 
-FDirectionalLightProxy::~FDirectionalLightProxy()
+FLightProxy::~FLightProxy()
 {
 }
 
-void FDirectionalLightProxy::Prepare(const Ref<FScene>& Scene)
+void FLightProxy::Prepare(const Ref<FScene>& Scene)
 {
 	uint32 LightCount = 0;
 	auto EntityView = Scene->EntityView<DirectionalLightComponent, TransformComponent>();
@@ -24,26 +28,24 @@ void FDirectionalLightProxy::Prepare(const Ref<FScene>& Scene)
 			break;
 		if (LightComp.Light.GetIntensity() <= 0)
 			continue;
-		auto& Info = uLight.Data.Lights[LightCount];
-		Info.Direction = TransComp.Transform.Up() * -1.0f;
-		Info.Color = LightComp.Light.GetColor();
-		Info.Intensity = LightComp.Light.GetIntensity();
-		Info.ShadowIndex = -1; //temp
-		Info.ShadowCount = 0; //temp
+		auto& Light = mDirectionalLightParams.Lights[LightCount];
+		Light.Direction = TransComp.Transform.Up() * -1.0f;
+		Light.Color = LightComp.Light.GetColor();
+		Light.Intensity = LightComp.Light.GetIntensity();
+		Light.ShadowIndex = -1; //temp
+		Light.ShadowCount = 0; //temp
 		LightCount++;
 	}
-	uLight.Data.Count = LightCount;
+	mDirectionalLightParams.Count = LightCount;
 }
 
-void FDirectionalLightProxy::SyncResource() const
+void FLightProxy::SyncResource(FRHICommandList& RHICmdList)
 {
-	uLight.Upload(16 + uLight.Data.Count * sizeof(FDirectionalLightUniform::Info));
-	//uLight.Upload();
-}
+	if (!mLightUB)
+		mLightUB = GDynamicRHI->RHICreateUniformBuffer(sizeof(FDirectionalLightUniform));
 
-void FDirectionalLightProxy::FreeResource()
-{
-	uLight.FreeResource();
+	mLightUB->UpdateSubData(&mDirectionalLightParams, sizeof(FDirectionalLightUniform));
+	RHICmdList.GetContext()->RHIBindUniformBuffer(UL::BLight, mLightUB.get());
 }
 
 }
