@@ -17,11 +17,22 @@ FRGTextureRef FRGBuilder::RegisterExternalTexture(const Ref<FRHITexture>& Extern
 	return FRGTextureRef();
 }
 
-template<typename ParameterStructType>
-inline FRGPassRef FRGBuilder::AddPass(FRGName&& InName, const ParameterStructType* ParameterStruct, ERGPassFlags Flags, PrepareLambdaFunc<ParameterStructType>&& PrepareLambda, ExecuteLambdaFunc<ParameterStructType>&& ExecuteLambda)
+FRGBufferRef FRGBuilder::RegisterExternalBuffer(const Ref<FRHIBuffer>& ExternalBuffer, ERGBufferFlags InFlags)
 {
-	return FRGPassRef();
+	return FRGBufferRef();
 }
+
+FRGTextureRef FRGBuilder::CreateTexture(const FRGTextureDesc& InDesc, const char* InName, ERGTextureFlags InFlags)
+{
+	return FRGTextureRef();
+}
+
+FRGBufferRef FRGBuilder::CreateBuffer(const FRGBufferDesc& InDesc, const char* InName, ERGBufferFlags InFlags)
+{
+	return FRGBufferRef();
+}
+
+
 
 }
 
