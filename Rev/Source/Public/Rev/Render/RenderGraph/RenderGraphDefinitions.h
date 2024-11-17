@@ -1,7 +1,9 @@
 #pragma once
+#include "Rev/Core/Base.h"
 #include "Rev/Render/RHI/RHIDefinitions.h"
 #include "Rev/Render/RHI/RHITexture.h"
 #include "Rev/Render/RHI/RHIBuffer.h"
+#include "Rev/Render/RenderGraph/RenderGraphAllocator.h"
 
 namespace Rev
 {
@@ -196,10 +198,6 @@ class FRGPass;
 using FRGPassRef = FRGPass*;
 
 class FRGBuilder;
-class FRGAllocator;
-class FRGTextureRegistry;
-class FRGBufferRegistry;
-class FRGPassRegistry;
 class FRGParameterStruct;
 
 struct FRGColorTargetBinding;
@@ -214,11 +212,12 @@ public:
 	using IndexType = InIndexType;
 
 	TRGHandle() = default;
-	explicit TRDGHandle(int32 InIndex)
+	explicit TRGHandle(int32 InIndex)
 	{
 		REV_CORE_ASSERT(InIndex >= 0 && InIndex <= kNullIndex)
 		Index = (IndexType)InIndex;
 	}
+	TRGHandle(TRGHandle&&) = default;
 
 	IndexType GetIndex() const { return Index; }
 	bool IsNull() const { return Index == kNullIndex; }
@@ -254,17 +253,17 @@ public:
 
 	FORCEINLINE HandleType Begin()
 	{
-		return HandleType(0)
+		return HandleType(0);
 	}
 
 	FORCEINLINE HandleType End()
 	{
-		return HandleType(ObjectArray.size())
+		return HandleType(ObjectArray.size());
 	}
 
 	FORCEINLINE HandleType Last()
 	{
-		return HandleType(ObjectArray.size() - 1)
+		return HandleType(ObjectArray.size() - 1);
 	}
 
 	void Add(ObjectType* Object)

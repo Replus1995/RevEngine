@@ -33,7 +33,7 @@ public:
 
 	//Dangerous
 	template <typename T, typename... TArgs>
-	FORCEINLINE T* AllocNoDestruct()
+	FORCEINLINE T* AllocNoDestruct(TArgs&&... Args)
 	{
 		return new (Alloc(sizeof(T), alignof(T))) T(std::forward<TArgs&&>(Args)...);
 	}

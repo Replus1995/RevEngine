@@ -80,29 +80,29 @@ void FRenderer::BuildFrameGraph()
 		[&](FrameGraph::Builder& builder, BasePassData& data) {
 
 			FRHITextureDesc DescColor = FRHITextureDesc::Create2D(FrameWidth, FrameHeight, PF_R8G8B8A8).SetClearColor(Math::FLinearColor(0, 0, 0, 1)).SetFlags(ETextureCreateFlags::ColorTarget);
-			data.ColorTex = builder.create<FGTexture>("SceneColor", DescColor);
+			data.ColorTex = builder.create<FGraphTexture>("SceneColor", DescColor);
 			data.ColorTex = builder.write(data.ColorTex);
 
 			FRHITextureDesc DescDepth = FRHITextureDesc::Create2D(FrameWidth, FrameHeight, PF_DepthStencil).SetClearColor(FRHITextureClearColor(1.0, 0)).SetFlags(ETextureCreateFlags::DepthStencilTarget);
-			data.DepthTex = builder.create<FGTexture>("SceneDepth", DescDepth);
+			data.DepthTex = builder.create<FGraphTexture>("SceneDepth", DescDepth);
 			data.DepthTex = builder.write(data.DepthTex);
 
 			FRHITextureDesc DescColorMS = FRHITextureDesc::Create2D(FrameWidth, FrameHeight, PF_R8G8B8A8).SetClearColor(Math::FLinearColor(0, 0, 0, 1)).SetFlags(ETextureCreateFlags::ColorTarget).SetNumSamples(GRenderOptions.GetNumSamples());;
-			data.ColorTexMS = builder.create<FGTexture>("SceneColorMS", DescColorMS);
+			data.ColorTexMS = builder.create<FGraphTexture>("SceneColorMS", DescColorMS);
 			data.ColorTexMS = builder.write(data.ColorTexMS);
 
 			FRHITextureDesc DescDepthMS = FRHITextureDesc::Create2D(FrameWidth, FrameHeight, PF_DepthStencil).SetClearColor(FRHITextureClearColor(1.0, 0)).SetFlags(ETextureCreateFlags::DepthStencilTarget).SetNumSamples(GRenderOptions.GetNumSamples());;
-			data.DepthTexMS = builder.create<FGTexture>("SceneDepthMS", DescDepthMS);
+			data.DepthTexMS = builder.create<FGraphTexture>("SceneDepthMS", DescDepthMS);
 			data.DepthTexMS = builder.write(data.DepthTexMS);
 		},
 		[=](const BasePassData& data, FrameGraphPassResources& resources, void* ctx) {
 
 			if (!data.BasePass)
 			{
-				auto& ColorTex = resources.get<FGTexture>(data.ColorTex);
-				auto& DepthTex = resources.get<FGTexture>(data.DepthTex);
-				auto& ColorTexMS = resources.get<FGTexture>(data.ColorTexMS);
-				auto& DepthTexMS = resources.get<FGTexture>(data.DepthTexMS);
+				auto& ColorTex = resources.get<FGraphTexture>(data.ColorTex);
+				auto& DepthTex = resources.get<FGraphTexture>(data.DepthTex);
+				auto& ColorTexMS = resources.get<FGraphTexture>(data.ColorTexMS);
+				auto& DepthTexMS = resources.get<FGraphTexture>(data.DepthTexMS);
 
 				FRHIRenderPassDesc DescBasePass;
 				DescBasePass.ColorRenderTargets[0] = { ColorTexMS.TextureRHI.get(), ColorTex.TextureRHI.get(), -1, 0, RTL_Clear, RTS_Store };
@@ -160,8 +160,8 @@ void FRenderer::BuildFrameGraph()
 		},
 		[=](const SkyPassData& data, FrameGraphPassResources& resources, void* ctx) {
 
-			auto& ColorTex = resources.get<FGTexture>(data.ColorTex);
-			auto& DepthTex = resources.get<FGTexture>(data.DepthTex);
+			auto& ColorTex = resources.get<FGraphTexture>(data.ColorTex);
+			auto& DepthTex = resources.get<FGraphTexture>(data.DepthTex);
 
 			if (!data.SkyPass)
 			{
@@ -206,7 +206,7 @@ void FRenderer::BuildFrameGraph()
 
 	const auto& SkyData = mFGB->get<SkyPassData>();
 
-	auto backbufferId = mFG->import("Backbuffer", {}, FGTexture());
+	auto backbufferId = mFG->import("Backbuffer", {}, FGraphTexture());
 
 	struct BlitPassData {
 		FrameGraphResource ColorTex;
@@ -221,7 +221,7 @@ void FRenderer::BuildFrameGraph()
 		}, 
 		[=](const BlitPassData& data, FrameGraphPassResources& resources, void* ctx) {
 
-			auto& ColorTex = resources.get<FGTexture>(data.ColorTex);
+			auto& ColorTex = resources.get<FGraphTexture>(data.ColorTex);
 			auto& RHICmdList = *static_cast<FRHICommandList*>(ctx);
 			RHICmdList.GetContext()->RHIBlitToBackTexture(ColorTex.TextureRHI.get());
 		}

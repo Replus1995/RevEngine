@@ -1,6 +1,7 @@
 #pragma once
 #include "Rev/Core/Base.h"
 #include "Rev/Render/RHI/RHIDefinitions.h"
+#include "Rev/Render/RHI/RHIResource.h"
 
 namespace Rev
 {

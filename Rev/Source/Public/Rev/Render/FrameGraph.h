@@ -8,12 +8,12 @@
 namespace Rev
 {
 
-struct FGTexture
+struct FGraphTexture
 {
 	using Desc = FRHITextureDesc;
 
-    FGTexture() = default;
-    FGTexture(FGTexture&&) noexcept = default;
+    FGraphTexture() = default;
+    FGraphTexture(FGraphTexture&&) noexcept = default;
 
     void create(const Desc& InDesc, void*) {
         if(!TextureRHI)
@@ -32,12 +32,12 @@ struct FGTexture
 
 };
 
-struct FGPass
+struct FGraphPass
 {
     using Desc = FRHIRenderPassDesc;
 
-    FGPass() = default;
-    FGPass(FGPass&&) noexcept = default;
+    FGraphPass() = default;
+    FGraphPass(FGraphPass&&) noexcept = default;
 
     void create(const Desc& InDesc, void*) {
         RenderPassRHI = GDynamicRHI->RHICreateRenderPass(InDesc);
