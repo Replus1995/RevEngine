@@ -34,6 +34,7 @@ private:
 	Scope<FrameGraph> mFG;
 	Scope<FrameGraphBlackboard> mFGB;
 	bool bDirtyFG = true;
+	FFrameGraph mGraph;
 };
 
 }
