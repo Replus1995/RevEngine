@@ -23,8 +23,8 @@ FFGSkyPass::FFGSkyPass(FFrameGraph& InGraph, const FFGViewData& InViewData)
 			InData.ColorTex = InBuilder.Write(BasePassData.ColorTex);
 			InData.DepthTex = InBuilder.Read(BasePassData.DepthTex);
 
-			InData.SetColorTarget(0, InData.ColorTex, KInvalidHandle, RTL_Load);
-			InData.SetDepthStencilTarget(InData.DepthTex, KInvalidHandle, RTL_Load, RTL_DontCare, RTS_DontCare, RTS_DontCare);
+			InData.SetColorTarget(0, InData.ColorTex, KFGInvalidHandle, RTL_Load);
+			InData.SetDepthStencilTarget(InData.DepthTex, KFGInvalidHandle, RTL_Load, RTL_DontCare, RTS_DontCare, RTS_DontCare);
 		},
 		[=](const FFGSkyPass::Data& InData, FFGPassResources& InResources, FFGContextData& InContextData) {
 

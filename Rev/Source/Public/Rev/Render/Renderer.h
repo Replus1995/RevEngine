@@ -24,15 +24,7 @@ private:
 	FSceneProxy* mSceneProxy = nullptr;
 	uint32 FrameWidth = 0;
 	uint32 FrameHeight = 0;
-	//Ref<FRHIRenderPass> mBasePass = nullptr;
-	//Ref<FRHITexture> mBaseColorTex = nullptr;
-	//Ref<FRHITexture> mBaseColorResolveTex = nullptr;
-	//Ref<FRHITexture> mBaseDepthTex = nullptr;
-	//Ref<FRHITexture> mBaseDepthResolveTex = nullptr;
-	//Ref<FRHIRenderPass> mSkyPass = nullptr;
 
-	//Scope<FrameGraph> mFG;
-	//Scope<FrameGraphBlackboard> mFGB;
 	bool bDirtyFG = true;
 	FFrameGraph mGraph;
 };

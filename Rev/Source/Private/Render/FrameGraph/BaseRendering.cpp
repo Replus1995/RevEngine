@@ -19,19 +19,19 @@ FFGBasePass::FFGBasePass(FFrameGraph& InGraph, const FFGViewData& InViewData)
 	FRHITextureDesc DescDepth = FRHITextureDesc::Create2D(InViewData.Width, InViewData.Height, PF_DepthStencil).SetClearColor(FRHITextureClearColor(1.0, 0)).SetFlags(ETextureCreateFlags::DepthStencilTarget);
 	FRHITextureDesc DescColorMS = FRHITextureDesc::Create2D(InViewData.Width, InViewData.Height, PF_R8G8B8A8).SetClearColor(Math::FLinearColor(0, 0, 0, 1)).SetFlags(ETextureCreateFlags::ColorTarget).SetNumSamples(GRenderOptions.GetNumSamples());;
 	FRHITextureDesc DescDepthMS = FRHITextureDesc::Create2D(InViewData.Width, InViewData.Height, PF_DepthStencil).SetClearColor(FRHITextureClearColor(1.0, 0)).SetFlags(ETextureCreateFlags::DepthStencilTarget).SetNumSamples(GRenderOptions.GetNumSamples());;
-	/*FFGHandle ColorTex = InGraph.Import<FFGTexture>("Scene Color", DescColor, FFGTexture(DescColor));
-	FFGHandle ColorTexMS = InGraph.Import<FFGTexture>("Scene Color MS", DescDepth, FFGTexture(DescDepth));
-	FFGHandle DepthTex = InGraph.Import<FFGTexture>("Scene Depth", DescColorMS, FFGTexture(DescColorMS));
-	FFGHandle DepthTexMS = InGraph.Import<FFGTexture>("Scene Depth MS", DescDepthMS, FFGTexture(DescDepthMS));*/
+	FFGHandle ColorTex = InGraph.Import<FFGTexture>("Scene Color", DescColor, FFGTexture(DescColor));
+	FFGHandle ColorTexMS = InGraph.Import<FFGTexture>("Scene Color MS", DescColorMS, FFGTexture(DescColorMS));
+	FFGHandle DepthTex = InGraph.Import<FFGTexture>("Scene Depth", DescDepth, FFGTexture(DescDepth));
+	FFGHandle DepthTexMS = InGraph.Import<FFGTexture>("Scene Depth MS", DescDepthMS, FFGTexture(DescDepthMS));
 
 	InGraph.AddPass<FFGBasePass::Data>(
 		"Base Pass",
 		[&](FFGBuilder& InBuilder, FFGBasePass::Data& InData) {
 
-			FFGHandle ColorTex = InBuilder.Create<FFGTexture>("Scene Color", DescColor);
+			/*FFGHandle ColorTex = InBuilder.Create<FFGTexture>("Scene Color", DescColor);
 			FFGHandle ColorTexMS = InBuilder.Create<FFGTexture>("Scene Color MS", DescColorMS);
 			FFGHandle DepthTex = InBuilder.Create<FFGTexture>("Scene Depth", DescDepth);
-			FFGHandle DepthTexMS = InBuilder.Create<FFGTexture>("Scene Depth MS", DescDepthMS);
+			FFGHandle DepthTexMS = InBuilder.Create<FFGTexture>("Scene Depth MS", DescDepthMS);*/
 
 
 			InData.ColorTex = InBuilder.Write(ColorTex);
@@ -73,12 +73,16 @@ FFGBasePass::FFGBasePass(FFrameGraph& InGraph, const FFGViewData& InViewData)
 FFGBlitPass::FFGBlitPass(FFrameGraph& InGraph, const FFGViewData& InViewData)
 {
 	FFGHandle BackTex = InGraph.Import("Backbuffer", FFGTextureExternal::Desc{}, FFGTextureExternal());
-	const FFGSkyPass::Data& SkyPassData = InGraph.GetPassData<FFGSkyPass::Data>();
+	//const FFGSkyPass::Data& SkyPassData = InGraph.GetPassData<FFGSkyPass::Data>();
+
+	FFGPassData* LastPassData = InGraph.GetLastPassData();
+	if(!LastPassData || LastPassData->GetColorTexture(0) == KFGInvalidHandle)
+		return;
 
 	InGraph.AddPass<FFGBlitPass::Data>(
 		"Blit Pass",
 		[&](FFGBuilder& InBuilder, FFGBlitPass::Data& InData) {
-			InData.ColorTex = InBuilder.Read(SkyPassData.ColorTex);
+			InData.ColorTex = InBuilder.Read(LastPassData->GetColorTexture(0));
 			InData.BackTex = InBuilder.Write(BackTex);
 		},
 		[=](const FFGBlitPass::Data& InData, FFGPassResources& InResources, FFGContextData& InContextData) {

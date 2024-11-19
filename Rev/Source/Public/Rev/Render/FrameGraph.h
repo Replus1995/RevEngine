@@ -11,7 +11,7 @@ namespace Rev
 {
 
 using FFGHandle = int32;
-const FFGHandle KInvalidHandle = -1;
+const FFGHandle KFGInvalidHandle = -1;
 
 class FFGTexture
 {
@@ -72,8 +72,8 @@ struct FFGRenderTargets
 {
     struct ColorEntry
     {
-        FFGHandle Texture = KInvalidHandle;
-        FFGHandle ResolveTexture = KInvalidHandle;
+        FFGHandle Texture = KFGInvalidHandle;
+        FFGHandle ResolveTexture = KFGInvalidHandle;
         ERenderTargetLoadAction LoadAction = RTL_DontCare;
         ERenderTargetStoreAction StoreAction = RTS_DontCare;
         uint8 MipIndex = 0;
@@ -81,14 +81,14 @@ struct FFGRenderTargets
 
         bool IsValid() const
         {
-            return Texture != KInvalidHandle;
+            return Texture != KFGInvalidHandle;
         }
     };
 
     struct DepthStencilEntry
     {
-        FFGHandle Texture = KInvalidHandle;
-        FFGHandle ResolveTexture = KInvalidHandle;
+        FFGHandle Texture = KFGInvalidHandle;
+        FFGHandle ResolveTexture = KFGInvalidHandle;
         ERenderTargetLoadAction DepthLoadAction = RTL_DontCare;
         ERenderTargetStoreAction DepthStoreAction = RTS_DontCare;
         ERenderTargetLoadAction StencilLoadAction = RTL_DontCare;
@@ -96,7 +96,7 @@ struct FFGRenderTargets
 
         bool IsValid() const
         {
-            return Texture != KInvalidHandle;
+            return Texture != KFGInvalidHandle;
         }
     };
 
@@ -145,6 +145,9 @@ struct FFGPassData
     bool IsRenderPass() const { return bIsRenderPass; }
 
     FRHIRenderPass* GetRenderPassRHI() const { return RenderPassRHI.get(); }
+    const FFGRenderTargets& GetRenderTargets() const { return RenderTargets;  } 
+    const FFGHandle GetColorTexture(uint8 Index) const;
+    const FFGHandle GetDepthStencilTexture() const;
 
 protected:
     FFGRenderTargets RenderTargets;
@@ -281,26 +284,26 @@ public:
                 REV_CORE_ASSERT(PassData !=  nullptr);
 
                 if (PassData->IsRenderPass())
-                {
                     PassData->InitRHI(Resources);
 
                     ContextData->RHICmdList.GetContext()->RHIBeginDebugLabel(InName, Math::FLinearColor(0.6f, 0.8f, 0.6f));
+
+                if (PassData->IsRenderPass())
                     ContextData->RHICmdList.GetContext()->RHIBeginRenderPass(PassData->GetRenderPassRHI());
-                }
 
                 Execute(Data, Resources, *ContextData);
 
                 if (PassData->IsRenderPass())
-                {
                     ContextData->RHICmdList.GetContext()->RHIEndRenderPass();
-                    ContextData->RHICmdList.GetContext()->RHIEndDebugLabel();
-                }
+                
+                ContextData->RHICmdList.GetContext()->RHIEndDebugLabel();
             };
 
         auto& FGPass = Graph->addCallbackPass<PassDataType>(InName, std::move(SetupFuncImpl), std::move(ExecuteFuncImpl));
         if (bAddToBlackboard)
         {
             Blackboard->add<PassDataType>() = FGPass;
+            LastPassData = Blackboard->try_get<PassDataType>();
         }
     }
 
@@ -359,12 +362,18 @@ public:
         return Blackboard->has<PassDataType>();
     }
 
+    FFGPassData* GetLastPassData() const
+    {
+        return LastPassData;
+    }
+
 
     friend std::ostream& operator<<(std::ostream&, const Rev::FFrameGraph&);
 
 private:
     Scope<FrameGraph> Graph;
     Scope<FrameGraphBlackboard> Blackboard;
+    FFGPassData* LastPassData;
 };
 
 

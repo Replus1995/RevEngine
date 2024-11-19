@@ -26,7 +26,7 @@ void FFGPassData::InitRHI(FFGPassResources& Resources)
     for (uint32 i = 0; i < Desc.NumColorRenderTargets; i++)
     {
         FRHITexture* Texture = Resources.Get<FFGTexture>(RenderTargets.ColorTargets[i].Texture).GetTextureRHI();
-        FRHITexture* TextureResolve = RenderTargets.ColorTargets[i].ResolveTexture != KInvalidHandle ? Resources.Get<FFGTexture>(RenderTargets.ColorTargets[i].ResolveTexture).GetTextureRHI() : nullptr;
+        FRHITexture* TextureResolve = RenderTargets.ColorTargets[i].ResolveTexture != KFGInvalidHandle ? Resources.Get<FFGTexture>(RenderTargets.ColorTargets[i].ResolveTexture).GetTextureRHI() : nullptr;
 
         Desc.ColorRenderTargets[i] = {
             Texture,
@@ -41,7 +41,7 @@ void FFGPassData::InitRHI(FFGPassResources& Resources)
     if (RenderTargets.DepthStencilTarget.IsValid())
     {
         FRHITexture* Texture = Resources.Get<FFGTexture>(RenderTargets.DepthStencilTarget.Texture).GetTextureRHI();
-        FRHITexture* TextureResolve = RenderTargets.DepthStencilTarget.ResolveTexture != KInvalidHandle ? Resources.Get<FFGTexture>(RenderTargets.DepthStencilTarget.ResolveTexture).GetTextureRHI() : nullptr;
+        FRHITexture* TextureResolve = RenderTargets.DepthStencilTarget.ResolveTexture != KFGInvalidHandle ? Resources.Get<FFGTexture>(RenderTargets.DepthStencilTarget.ResolveTexture).GetTextureRHI() : nullptr;
 
         Desc.DepthStencilRenderTarget = {
             Texture,
@@ -54,6 +54,28 @@ void FFGPassData::InitRHI(FFGPassResources& Resources)
     }
 
     RenderPassRHI = GDynamicRHI->RHICreateRenderPass(Desc);
+}
+
+const FFGHandle FFGPassData::GetColorTexture(uint8 Index) const
+{
+    REV_CORE_ASSERT(Index < RTA_MaxColorAttachments);
+
+    if (RenderTargets.ColorTargets[Index].ResolveTexture != KFGInvalidHandle)
+    {
+        return RenderTargets.ColorTargets[Index].ResolveTexture;
+    }
+
+    return RenderTargets.ColorTargets[Index].Texture;
+}
+
+const FFGHandle FFGPassData::GetDepthStencilTexture() const
+{
+    if (RenderTargets.DepthStencilTarget.ResolveTexture != KFGInvalidHandle)
+    {
+        return RenderTargets.DepthStencilTarget.ResolveTexture;
+    }
+
+    return RenderTargets.DepthStencilTarget.Texture;
 }
 
 std::ostream& operator<<(std::ostream& OStream, const Rev::FFrameGraph& FG)
