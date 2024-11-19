@@ -76,6 +76,8 @@ void FRenderer::BuildFrameGraph()
 
 	mGraph.Compile();
 
+	std::ofstream{ "FrameGraph.dot" } << mGraph;
+
 	/*mFG = CreateScope<FrameGraph>();
 	mFGB = CreateScope<FrameGraphBlackboard>();
 

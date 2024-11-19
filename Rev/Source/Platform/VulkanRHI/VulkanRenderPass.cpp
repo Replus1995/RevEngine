@@ -29,8 +29,8 @@ void FVulkanRenderPass::MarkFramebufferDirty()
 
 void FVulkanRenderPass::PrepareForDraw()
 {
-	if(mNumAttachments == 0)
-		return;
+	REV_CORE_ASSERT(mNumAttachments > 0);
+
 	if(mFramebuffer && !bFramebufferDirty)
 		return;
 	bFramebufferDirty = false;

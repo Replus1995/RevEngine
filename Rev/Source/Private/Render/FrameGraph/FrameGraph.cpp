@@ -7,11 +7,13 @@ void FFGPassData::SetColorTarget(uint8 InIndex, FFGHandle InTexture, FFGHandle I
 {
     REV_CORE_ASSERT(InIndex < RTA_MaxColorAttachments);
     RenderTargets.ColorTargets[InIndex] = { InTexture, InTextureResolve, InLoadAction, InStoreAction, InMipIndex, InArraySlice };
+    bIsRenderPass = true;
 }
 
 void FFGPassData::SetDepthStencilTarget(FFGHandle InTexture, FFGHandle InTextureResolve, ERenderTargetLoadAction InDepthLoadAction, ERenderTargetLoadAction InStencilLoadAction, ERenderTargetStoreAction InDepthStoreAction, ERenderTargetStoreAction InStencilStoreAction)
 {
     RenderTargets.DepthStencilTarget = { InTexture, InTextureResolve, InDepthLoadAction, InDepthStoreAction, InStencilLoadAction, InStencilStoreAction };
+    bIsRenderPass = true;
 }
 
 void FFGPassData::InitRHI(FFGPassResources& Resources)
@@ -54,5 +56,9 @@ void FFGPassData::InitRHI(FFGPassResources& Resources)
     RenderPassRHI = GDynamicRHI->RHICreateRenderPass(Desc);
 }
 
+std::ostream& operator<<(std::ostream& OStream, const Rev::FFrameGraph& FG)
+{
+    return OStream << *FG.Graph;
 }
 
+}

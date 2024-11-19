@@ -31,8 +31,8 @@ private:
 	//Ref<FRHITexture> mBaseDepthResolveTex = nullptr;
 	//Ref<FRHIRenderPass> mSkyPass = nullptr;
 
-	Scope<FrameGraph> mFG;
-	Scope<FrameGraphBlackboard> mFGB;
+	//Scope<FrameGraph> mFG;
+	//Scope<FrameGraphBlackboard> mFGB;
 	bool bDirtyFG = true;
 	FFrameGraph mGraph;
 };

@@ -70,11 +70,10 @@ FFGBasePass::FFGBasePass(FFrameGraph& InGraph, const FFGViewData& InViewData)
 	);
 }
 
-
 FFGBlitPass::FFGBlitPass(FFrameGraph& InGraph, const FFGViewData& InViewData)
 {
 	FFGHandle BackTex = InGraph.Import("Backbuffer", FFGTextureExternal::Desc{}, FFGTextureExternal());
-	const auto& SkyPassData = InGraph.GetPassData<FFGSkyPass::Data>();
+	const FFGSkyPass::Data& SkyPassData = InGraph.GetPassData<FFGSkyPass::Data>();
 
 	InGraph.AddPass<FFGBlitPass::Data>(
 		"Blit Pass",

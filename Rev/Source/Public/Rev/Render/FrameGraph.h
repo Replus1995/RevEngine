@@ -125,6 +125,7 @@ struct FFGPassData
     {
         RenderTargets = Other.RenderTargets;
         RenderPassRHI = Other.RenderPassRHI;
+        return *this;
     }
 
     void SetColorTarget(uint8 InIndex, FFGHandle InTexture, FFGHandle InTextureResolve,
@@ -141,11 +142,14 @@ struct FFGPassData
 
     void InitRHI(class FFGPassResources& Resources);
 
+    bool IsRenderPass() const { return bIsRenderPass; }
+
     FRHIRenderPass* GetRenderPassRHI() const { return RenderPassRHI.get(); }
 
 protected:
     FFGRenderTargets RenderTargets;
     FRHIRenderPassRef RenderPassRHI = nullptr;
+    bool bIsRenderPass = false;
 };
 
 class FFGBuilder
@@ -276,15 +280,21 @@ public:
 
                 REV_CORE_ASSERT(PassData !=  nullptr);
 
-                PassData->InitRHI(Resources);
+                if (PassData->IsRenderPass())
+                {
+                    PassData->InitRHI(Resources);
 
-                ContextData->RHICmdList.GetContext()->RHIBeginDebugLabel(InName, Math::FLinearColor(0.6f, 0.8f, 0.6f));
-                ContextData->RHICmdList.GetContext()->RHIBeginRenderPass(PassData->GetRenderPassRHI());
+                    ContextData->RHICmdList.GetContext()->RHIBeginDebugLabel(InName, Math::FLinearColor(0.6f, 0.8f, 0.6f));
+                    ContextData->RHICmdList.GetContext()->RHIBeginRenderPass(PassData->GetRenderPassRHI());
+                }
 
                 Execute(Data, Resources, *ContextData);
 
-                ContextData->RHICmdList.GetContext()->RHIEndRenderPass();
-                ContextData->RHICmdList.GetContext()->RHIEndDebugLabel();
+                if (PassData->IsRenderPass())
+                {
+                    ContextData->RHICmdList.GetContext()->RHIEndRenderPass();
+                    ContextData->RHICmdList.GetContext()->RHIEndDebugLabel();
+                }
             };
 
         auto& FGPass = Graph->addCallbackPass<PassDataType>(InName, std::move(SetupFuncImpl), std::move(ExecuteFuncImpl));
@@ -349,6 +359,8 @@ public:
         return Blackboard->has<PassDataType>();
     }
 
+
+    friend std::ostream& operator<<(std::ostream&, const Rev::FFrameGraph&);
 
 private:
     Scope<FrameGraph> Graph;
