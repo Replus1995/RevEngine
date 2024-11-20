@@ -17,16 +17,16 @@ FVulkanTexture::FVulkanTexture(const FRHITextureDesc& InDesc)
     : FRHITexture(InDesc)
 {
 	if (FPixelFormatInfo::HasDepth(InDesc.Format))
-		mImageAspectFlags |= VK_IMAGE_ASPECT_DEPTH_BIT;
+		ImageAspectFlags |= VK_IMAGE_ASPECT_DEPTH_BIT;
 	if (FPixelFormatInfo::HasStencil(InDesc.Format))
-		mImageAspectFlags |= VK_IMAGE_ASPECT_STENCIL_BIT;
-	if (mImageAspectFlags == VK_IMAGE_ASPECT_NONE)
-		mImageAspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
+		ImageAspectFlags |= VK_IMAGE_ASPECT_STENCIL_BIT;
+	if (ImageAspectFlags == VK_IMAGE_ASPECT_NONE)
+		ImageAspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
 }
 
 VkClearValue FVulkanTexture::GetClearValue() const
 {
-	bool bColorImage = mImageAspectFlags & VK_IMAGE_ASPECT_COLOR_BIT;
+	bool bColorImage = ImageAspectFlags & VK_IMAGE_ASPECT_COLOR_BIT;
 	VkClearValue ClearValue;
 	if (bColorImage)
 	{
@@ -71,17 +71,22 @@ VkSampleCountFlagBits FVulkanTexture::GetSamplerCount() const
 	return (VkSampleCountFlagBits)TextureDesc.NumSamples;
 }
 
+VkFormat FVulkanTexture::GetPlatformFormat() const
+{
+	return PlatformFormat;
+}
+
 void FVulkanTexture::Release()
 {
 	REV_CORE_ASSERT(FVulkanDynamicRHI::GetDevice());
 	REV_CORE_ASSERT(FVulkanDynamicRHI::GetAllocator());
 
-	vkDestroyImageView(FVulkanDynamicRHI::GetDevice(), mImageView, nullptr);
-	vmaDestroyImage(FVulkanDynamicRHI::GetAllocator(), mImage, mAllocation);
-	mImage = VK_NULL_HANDLE;
-	mImageView = VK_NULL_HANDLE;
-	//mImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-	mAllocation = VK_NULL_HANDLE;
+	vkDestroyImageView(FVulkanDynamicRHI::GetDevice(), ImageView, nullptr);
+	vmaDestroyImage(FVulkanDynamicRHI::GetAllocator(), Image, Allocation);
+	Image = VK_NULL_HANDLE;
+	ImageView = VK_NULL_HANDLE;
+	//ImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	Allocation = VK_NULL_HANDLE;
 }
 
 VkExtent2D FVulkanTexture::CalculateMipSize2D(uint32 InMipLevel)
@@ -116,18 +121,18 @@ VkImageUsageFlags FVulkanTexture::TranslateImageUsageFlags(ETextureCreateFlags I
 
 void FVulkanTexture::DoTransition(VkCommandBuffer InCmdBuffer, VkImageLayout TargetLayout)
 {
-	if(mImageLayout == TargetLayout)
+	if(ImageLayout == TargetLayout)
 		return;
 
 	REV_CORE_ASSERT(InCmdBuffer);
-	FVulkanUtils::TransitionImage(InCmdBuffer, mImage, mImageLayout, TargetLayout, mImageAspectFlags);
-	mImageLayout = TargetLayout;
+	FVulkanUtils::TransitionImage(InCmdBuffer, Image, ImageLayout, TargetLayout, ImageAspectFlags);
+	ImageLayout = TargetLayout;
 }
 
 void FVulkanTexture::ClearContent(FVulkanContext* Context, uint8 InMipLevel, uint8 InMipCount, uint16 InArrayIndex, uint16 InArrayCount)
 {
 	REV_CORE_ASSERT(InMipLevel < TextureDesc.NumMips, "MipLevel out of range");
-	FVulkanUtils::ImmediateClearImage(Context, mImage, mImageAspectFlags, GetClearValue(), InMipLevel, InMipCount, InArrayIndex, InArrayCount);
+	FVulkanUtils::ImmediateClearImage(Context, Image, ImageAspectFlags, GetClearValue(), InMipLevel, InMipCount, InArrayIndex, InArrayCount);
 }
 
 void FVulkanTexture::Resize(uint32 InWidth, uint32 InHeight, uint32 InDepth)

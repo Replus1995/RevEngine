@@ -21,71 +21,72 @@ FVulkanRenderPass::~FVulkanRenderPass()
 	Release();
 }
 
-void FVulkanRenderPass::MarkFramebufferDirty()
-{
-	if (mNumAttachments > 0)
-		bFramebufferDirty = true;
-}
-
 void FVulkanRenderPass::PrepareForDraw()
 {
-	REV_CORE_ASSERT(mNumAttachments > 0);
+	REV_CORE_ASSERT(NumAttachments > 0);
 
-	if(mFramebuffer && !bFramebufferDirty)
+	if(Framebuffer)
 		return;
-	bFramebufferDirty = false;
-	if(mFramebuffer)
-		vkDestroyFramebuffer(FVulkanDynamicRHI::GetDevice(), mFramebuffer, nullptr);
+	/*if(mFramebuffer)
+		vkDestroyFramebuffer(FVulkanDynamicRHI::GetDevice(), mFramebuffer, nullptr);*/
 
-	bool bFirstColorTarget = true;
+	bool bFirstTarget = true;
 
-	VkImageView AttachmentViews[(RTA_MaxColorAttachments + 1) * 2];
+	memset(&FrameImageViews, 0, sizeof(FrameImageViews));
+
 	uint32 NumAttachmentViews = 0;
 	for (uint32 i = 0; i < PassDesc.NumColorRenderTargets; i++)
 	{
 		FVulkanTexture* ColorTarget = FVulkanTexture::Cast(PassDesc.ColorRenderTargets[i].ColorTarget);
-		AttachmentViews[NumAttachmentViews] = ColorTarget->GetImageView();
+		FrameImageViews[NumAttachmentViews] = CreateImageView(ColorTarget, PassDesc.ColorRenderTargets[i].ArraySlice, PassDesc.ColorRenderTargets[i].MipIndex);
 		NumAttachmentViews++;
 
 		if (PassDesc.ColorRenderTargets[i].ResolveTarget)
 		{
 			FVulkanTexture* ResolveTarget = FVulkanTexture::Cast(PassDesc.ColorRenderTargets[i].ResolveTarget);
-			AttachmentViews[NumAttachmentViews] = ResolveTarget->GetImageView();
+			FrameImageViews[NumAttachmentViews] = CreateImageView(ResolveTarget, PassDesc.ColorRenderTargets[i].ArraySlice, PassDesc.ColorRenderTargets[i].MipIndex);
 			NumAttachmentViews++;
 		}
 
 
-		if (bFirstColorTarget)
+		if (bFirstTarget)
 		{
-			mFrameWidth = ColorTarget->GetWidth();
-			mFrameHeight = ColorTarget->GetHeight();
-			bFirstColorTarget = false;
+			FrameWidth = ColorTarget->GetWidth();
+			FrameHeight = ColorTarget->GetHeight();
+			bFirstTarget = false;
 		}
 	}
 	if (PassDesc.DepthStencilRenderTarget.DepthStencilTarget)
 	{
 		FVulkanTexture* DepthStencilTarget = FVulkanTexture::Cast(PassDesc.DepthStencilRenderTarget.DepthStencilTarget);
-		AttachmentViews[NumAttachmentViews] = DepthStencilTarget->GetImageView();
+		FrameImageViews[NumAttachmentViews] = CreateImageView(DepthStencilTarget, -1, 0);
 		NumAttachmentViews++;
 
 		if (PassDesc.DepthStencilRenderTarget.ResolveTarget)
 		{
 			FVulkanTexture* ResolveTarget = FVulkanTexture::Cast(PassDesc.DepthStencilRenderTarget.ResolveTarget);
-			AttachmentViews[NumAttachmentViews] = ResolveTarget->GetImageView();
+			FrameImageViews[NumAttachmentViews] = CreateImageView(ResolveTarget, -1, 0);
 			NumAttachmentViews++;
+		}
+
+		if (bFirstTarget)
+		{
+			FrameWidth = DepthStencilTarget->GetWidth();
+			FrameHeight = DepthStencilTarget->GetHeight();
+			bFirstTarget = false;
 		}
 	}
 	
 	VkFramebufferCreateInfo FramebufferInfo{};
 	FramebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-	FramebufferInfo.renderPass = mRenderPass;
+	FramebufferInfo.renderPass = RenderPass;
 	FramebufferInfo.attachmentCount = NumAttachmentViews;
-	FramebufferInfo.pAttachments = AttachmentViews;
-	FramebufferInfo.width = mFrameWidth;
-	FramebufferInfo.height = mFrameHeight;
+	FramebufferInfo.pAttachments = FrameImageViews;
+	FramebufferInfo.width = FrameWidth;
+	FramebufferInfo.height = FrameHeight;
 	FramebufferInfo.layers = 1;
 
-	REV_VK_CHECK_THROW(vkCreateFramebuffer(FVulkanDynamicRHI::GetDevice(), &FramebufferInfo, nullptr, &mFramebuffer), "failed to create framebuffer!");
+	REV_VK_CHECK_THROW(vkCreateFramebuffer(FVulkanDynamicRHI::GetDevice(), &FramebufferInfo, nullptr, &Framebuffer), "failed to create framebuffer!");
 }
 
 void FVulkanRenderPass::Init()
@@ -320,20 +321,68 @@ void FVulkanRenderPass::Init()
 	RenderPassInfo.subpassCount = NumSubpass;
 	RenderPassInfo.pSubpasses = SubpassDescs;
 
-	REV_VK_CHECK_THROW(vkCreateRenderPass2(FVulkanDynamicRHI::GetDevice(), &RenderPassInfo, nullptr, &mRenderPass), "failed to create render pass!");
+	REV_VK_CHECK_THROW(vkCreateRenderPass2(FVulkanDynamicRHI::GetDevice(), &RenderPassInfo, nullptr, &RenderPass), "failed to create render pass!");
 
-	mNumAttachments = NumAttachmentDesc;
+	NumAttachments = NumAttachmentDesc;
 }
 
 void FVulkanRenderPass::Release()
 {
-	if (mFramebuffer)
+	for (uint8 i = 0; i < (RTA_MaxColorAttachments + 1) * 2; i++)
 	{
-		vkDestroyFramebuffer(FVulkanDynamicRHI::GetDevice(), mFramebuffer, nullptr);
+		if (FrameImageViews[i])
+		{
+			vkDestroyImageView(FVulkanDynamicRHI::GetDevice(), FrameImageViews[i], nullptr);
+		}
+		else
+		{
+			break;
+		}
 	}
-	vkDestroyRenderPass(FVulkanDynamicRHI::GetDevice(), mRenderPass, nullptr);
+
+	if (Framebuffer)
+	{
+		vkDestroyFramebuffer(FVulkanDynamicRHI::GetDevice(), Framebuffer, nullptr);
+	}
+	vkDestroyRenderPass(FVulkanDynamicRHI::GetDevice(), RenderPass, nullptr);
 }
 
+VkImageView FVulkanRenderPass::CreateImageView(FVulkanTexture* InTexture, int32 ArraySlice, uint8 MipIndex)
+{
+	REV_CORE_ASSERT(InTexture != nullptr);
+
+	VkImageViewCreateInfo ImageViewCreateInfo{};
+	ImageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+	ImageViewCreateInfo.image = InTexture->GetImage();
+	ImageViewCreateInfo.format = InTexture->GetPlatformFormat();
+	ImageViewCreateInfo.subresourceRange.aspectMask = InTexture->GetAspectFlags();
+
+	switch (InTexture->GetDesc().Dimension)
+	{
+	case ETextureDimension::Texture2D:
+		ImageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+		ImageViewCreateInfo.subresourceRange.baseMipLevel = MipIndex;
+		ImageViewCreateInfo.subresourceRange.levelCount = 1;
+		ImageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
+		ImageViewCreateInfo.subresourceRange.layerCount = 1;
+		break;
+	case ETextureDimension::Texture2DArray:
+		ImageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+		ImageViewCreateInfo.subresourceRange.baseMipLevel = MipIndex;
+		ImageViewCreateInfo.subresourceRange.levelCount = 1;
+		ImageViewCreateInfo.subresourceRange.baseArrayLayer = ArraySlice < 0 ? 0 : (uint32)ArraySlice;
+		ImageViewCreateInfo.subresourceRange.layerCount = ArraySlice < 0 ? InTexture->GetArraySize() : 1;
+		break;
+	default:
+		REV_CORE_ASSERT(false, "Unsupported render target format.")
+		break;
+	}
+
+	VkImageView ImageView;
+	REV_VK_CHECK(vkCreateImageView(FVulkanDynamicRHI::GetDevice(), &ImageViewCreateInfo, nullptr, &ImageView));
+
+	return ImageView;
+}
 
 //DynamicRHI
 Ref<FRHIRenderPass> FVulkanDynamicRHI::RHICreateRenderPass(const FRHIRenderPassDesc& InDesc)

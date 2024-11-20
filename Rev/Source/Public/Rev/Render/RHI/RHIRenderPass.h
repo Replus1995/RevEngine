@@ -38,7 +38,7 @@ class FRHIRenderPass : public FRHIResource
 public:
 	FRHIRenderPass(const FRHIRenderPassDesc& InDesc) : PassDesc(InDesc) {}
 	virtual ~FRHIRenderPass() = default;
-	virtual void MarkFramebufferDirty() = 0;
+
 	const FRHIRenderPassDesc& GetDesc() const { return PassDesc; }
 
 protected:
