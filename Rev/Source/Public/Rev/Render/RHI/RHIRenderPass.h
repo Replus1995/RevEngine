@@ -30,6 +30,9 @@ struct FRHIRenderPassDesc
 		ERenderTargetStoreAction StencilStoreAction = RTS_DontCare;
 	};
 	FDepthStencilEntry DepthStencilRenderTarget;
+
+	uint8 MultiViewCount = 0;
+
 	//SubpassHint
 };
 
@@ -43,7 +46,6 @@ public:
 
 protected:
 	FRHIRenderPassDesc PassDesc;
-
 };
 
 

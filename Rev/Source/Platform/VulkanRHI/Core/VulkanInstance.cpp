@@ -1,5 +1,5 @@
 #include "VulkanInstance.h"
-#include "VulkanDeviceFeatures.h"
+#include "VulkanDevice.h"
 #include "Rev/Core/Assert.h"
 #include "Rev/Core/Application.h"
 #include "Rev/Core/Window.h"
@@ -263,7 +263,7 @@ void FVulkanInstance::CreateLogicalDevice()
 	PopulateQueueCreateInfos(QueueCreateInfos, mQueueFamilies);
 
 	//physical device features
-	FVulkanPhysicalDeviceFeatures Features;
+	FVulkanPhysicalDeviceFeatures VulkanPhysicalDeviceFeatures(mInstance, mPhysicalDevice);
 
 	//extenisons
 	const std::vector<const char*> EnabledExtensions = GetDeviceRequiredExtensions();
@@ -279,7 +279,7 @@ void FVulkanInstance::CreateLogicalDevice()
 	DeviceCreateInfo.ppEnabledExtensionNames = EnabledExtensions.empty() ? nullptr : EnabledExtensions.data();
 	DeviceCreateInfo.enabledLayerCount = 0;
 	DeviceCreateInfo.ppEnabledLayerNames = nullptr;
-	DeviceCreateInfo.pNext = Features.Get();
+	DeviceCreateInfo.pNext = &VulkanPhysicalDeviceFeatures.Features;
 
 	if (vkCreateDevice(mPhysicalDevice, &DeviceCreateInfo, nullptr, &mDevice) != VK_SUCCESS) {
 		throw std::runtime_error("[FVkDevice] Failed to create logical device!");
@@ -295,8 +295,8 @@ void FVulkanInstance::QueryDeviceCapacity(FRHIDeviceCapacity& Capacity)
 {
 	REV_CORE_ASSERT(mPhysicalDevice != VK_NULL_HANDLE);
 
-	VkPhysicalDeviceProperties DeviceProperties;
-	vkGetPhysicalDeviceProperties(mPhysicalDevice, &DeviceProperties);
+	FVulkanPhysicalDeviceProperties VulkanPhysicalDeviceProperties(mInstance, mPhysicalDevice);
+	const auto& DeviceProperties = VulkanPhysicalDeviceProperties.Properties.properties;
 
 	VkSampleCountFlags SampleCount = DeviceProperties.limits.framebufferColorSampleCounts & DeviceProperties.limits.framebufferDepthSampleCounts;
 	if (SampleCount & VK_SAMPLE_COUNT_64_BIT)
@@ -439,7 +439,8 @@ const std::vector<const char*>& FVulkanInstance::GetDeviceRequiredExtensions()
 {
 	static std::vector<const char*> RequiredExtensions = {
 		VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-		VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME
+		VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME,
+		VK_KHR_MULTIVIEW_EXTENSION_NAME
 	};
 
 	return RequiredExtensions;

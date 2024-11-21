@@ -30,6 +30,8 @@ FFGSkyPass::FFGSkyPass(FFrameGraph& InGraph, const FFGViewData& InViewData)
 
 			auto& RHICmdList = InContextData.RHICmdList;
 
+			FFGUtils::RHIBeginPass(RHICmdList, &InData);
+
 			FRHIGraphicsPipelineStateDesc PipelineStateDesc;
 			PipelineStateDesc.VertexInputState = GTileVertexInputState.VertexInputStateRHI.get();
 
@@ -49,6 +51,8 @@ FFGSkyPass::FFGSkyPass(FFrameGraph& InGraph, const FFGViewData& InViewData)
 			RHICmdList.GetContext()->RHISetGraphicsPipelineState(PipelineStateDesc);
 
 			InContextData.SceneProxy->DrawSkybox(RHICmdList);
+
+			FFGUtils::RHIEndPass(RHICmdList, &InData);
 		}
 	);
 }

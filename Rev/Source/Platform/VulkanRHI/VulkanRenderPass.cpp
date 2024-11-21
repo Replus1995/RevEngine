@@ -220,6 +220,8 @@ void FVulkanRenderPass::Init()
 		VkAttachmentReference2 DepthStencilResolveAttachment;
 	};
 
+	uint32 MultiViewMask = GetMultiViewMask(PassDesc.MultiViewCount);
+
 	VkSubpassDescription2 SubpassDescs[REV_VK_MAX_SUBPASSES];
 	VkSubpassDescriptionDepthStencilResolve SubpassDescDepthStencilResolves[REV_VK_MAX_SUBPASSES];
 	FSubpassAttachmentRef AttachmentRefs[REV_VK_MAX_SUBPASSES];
@@ -298,6 +300,7 @@ void FVulkanRenderPass::Init()
 		SubpassDesc.pDepthStencilAttachment = bEnableDepthStencil ? &AttachmentRef.DepthStencilAttachment : nullptr;
 		SubpassDesc.inputAttachmentCount = 0;
 		SubpassDesc.pInputAttachments = nullptr;
+		SubpassDesc.viewMask = MultiViewMask;
 
 		if (bEnableDepthStencilResolve)
 		{
@@ -320,6 +323,12 @@ void FVulkanRenderPass::Init()
 	RenderPassInfo.pAttachments = AttachmentDescs;
 	RenderPassInfo.subpassCount = NumSubpass;
 	RenderPassInfo.pSubpasses = SubpassDescs;
+
+	if (MultiViewMask > 0)
+	{
+		RenderPassInfo.correlatedViewMaskCount = 1;
+		RenderPassInfo.pCorrelatedViewMasks = &MultiViewMask;
+	}
 
 	REV_VK_CHECK_THROW(vkCreateRenderPass2(FVulkanDynamicRHI::GetDevice(), &RenderPassInfo, nullptr, &RenderPass), "failed to create render pass!");
 
@@ -382,6 +391,19 @@ VkImageView FVulkanRenderPass::CreateImageView(FVulkanTexture* InTexture, int32 
 	REV_VK_CHECK(vkCreateImageView(FVulkanDynamicRHI::GetDevice(), &ImageViewCreateInfo, nullptr, &ImageView));
 
 	return ImageView;
+}
+
+uint32 FVulkanRenderPass::GetMultiViewMask(uint8 MultiViewCount)
+{
+	if(MultiViewCount == 0)
+		return 0;
+
+	uint32 MultiViewMask = 0;
+	for (uint8 i = 0; i < MultiViewCount; i++)
+	{
+		MultiViewMask &= 1u << i;
+	}
+	return MultiViewMask;
 }
 
 //DynamicRHI

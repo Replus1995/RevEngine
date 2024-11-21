@@ -25,11 +25,10 @@ struct alignas(16) FStaticMeshUniform
 	Math::FMatrix4 ModelMat;
 };
 
-struct FShadowUniform
+struct alignas(16) FShadowViewUniform
 {
-	Math::FMatrix4 LightProjMats[6];
-	Math::FMatrix4 LightViewMats[6];
-	Math::FVector4 LightParams; //X = ViewCount
+	Math::FMatrix4 LightProjMats[REV_MAX_SHADOW_VIEWS];
+	Math::FMatrix4 LightViewMats[REV_MAX_SHADOW_VIEWS];
 };
 
 struct FDirectionalLightUniform
@@ -70,5 +69,7 @@ struct FPointLightUniform
 		float Padding;
 	} Lights[REV_MAX_POINT_LIGHTS];
 };
+
+S
 
 }

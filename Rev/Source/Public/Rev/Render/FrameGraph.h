@@ -37,7 +37,7 @@ public:
     }
     void destroy(const Desc&, void*)
     {
-        //TextureRHI.reset();
+        TextureRHI.reset();
     }
     void preRead(const Desc&, uint32_t, void*) const {}
     void preWrite() const {}
@@ -54,7 +54,7 @@ public:
     struct Desc {
 
     };
-    FFGTextureExternal() : TextureRHI(nullptr) {}
+    FFGTextureExternal() = default;
     FFGTextureExternal(FRHITexture* InTextureRHI) : TextureRHI(InTextureRHI) {}
     FFGTextureExternal(FFGTextureExternal&&) noexcept = default;
 
@@ -140,10 +140,14 @@ struct FFGPassData
         ERenderTargetStoreAction InDepthStoreAction = RTS_Store ,
         ERenderTargetStoreAction InStencilStoreAction = RTS_Store);
 
+    void SetMultiView(uint8 InMultiViewCount)
+    {
+        MultiViewCount = InMultiViewCount;
+    }
+
     void InitRHI(class FFGPassResources& Resources);
 
     bool IsRenderPass() const { return bIsRenderPass; }
-
     FRHIRenderPass* GetRenderPassRHI() const { return RenderPassRHI.get(); }
     const FFGRenderTargets& GetRenderTargets() const { return RenderTargets;  } 
     const FFGHandle GetColorTexture(uint8 Index) const;
@@ -152,7 +156,10 @@ struct FFGPassData
 protected:
     FFGRenderTargets RenderTargets;
     FRHIRenderPassRef RenderPassRHI = nullptr;
+    uint8 MultiViewCount = 0;
     bool bIsRenderPass = false;
+
+    friend class FFGUtils;
 };
 
 class FFGBuilder
@@ -286,15 +293,9 @@ public:
                 if (PassData->IsRenderPass())
                     PassData->InitRHI(Resources);
 
-                    ContextData->RHICmdList.GetContext()->RHIBeginDebugLabel(InName, Math::FLinearColor(0.6f, 0.8f, 0.6f));
-
-                if (PassData->IsRenderPass())
-                    ContextData->RHICmdList.GetContext()->RHIBeginRenderPass(PassData->GetRenderPassRHI());
+                ContextData->RHICmdList.GetContext()->RHIBeginDebugLabel(InName, Math::FLinearColor(0.6f, 0.8f, 0.6f));
 
                 Execute(Data, Resources, *ContextData);
-
-                if (PassData->IsRenderPass())
-                    ContextData->RHICmdList.GetContext()->RHIEndRenderPass();
                 
                 ContextData->RHICmdList.GetContext()->RHIEndDebugLabel();
             };
@@ -376,5 +377,11 @@ private:
     FFGPassData* LastPassData;
 };
 
+class FFGUtils
+{
+public:
+    static void RHIBeginPass(FRHICommandList& RHICmdList, const FFGPassData* PassData);
+    static void RHIEndPass(FRHICommandList& RHICmdList, const FFGPassData* PassData);
+};
 
 }

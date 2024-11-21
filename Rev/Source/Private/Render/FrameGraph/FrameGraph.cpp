@@ -52,6 +52,7 @@ void FFGPassData::InitRHI(FFGPassResources& Resources)
             RenderTargets.DepthStencilTarget.StencilStoreAction
         };
     }
+    Desc.MultiViewCount = MultiViewCount;
 
     RenderPassRHI = GDynamicRHI->RHICreateRenderPass(Desc);
 }
@@ -81,6 +82,18 @@ const FFGHandle FFGPassData::GetDepthStencilTexture() const
 std::ostream& operator<<(std::ostream& OStream, const Rev::FFrameGraph& FG)
 {
     return OStream << *FG.Graph;
+}
+
+void FFGUtils::RHIBeginPass(FRHICommandList& RHICmdList, const FFGPassData* PassData)
+{
+    if (PassData->IsRenderPass())
+        RHICmdList.GetContext()->RHIBeginRenderPass(PassData->GetRenderPassRHI());
+}
+
+void FFGUtils::RHIEndPass(FRHICommandList& RHICmdList, const FFGPassData* PassData)
+{
+    if (PassData->IsRenderPass())
+        RHICmdList.GetContext()->RHIEndRenderPass();
 }
 
 }

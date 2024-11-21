@@ -1,6 +1,7 @@
 #pragma once
 #include "Rev/Render/RHI/RHIRenderPass.h"
 #include <vulkan/vulkan.h>
+#include <map>
 
 namespace Rev
 {
@@ -23,6 +24,7 @@ private:
 	void Init();
 	void Release();
 	VkImageView CreateImageView(class FVulkanTexture* InTexture, int32 ArraySlice, uint8 MipIndex);
+	uint32 GetMultiViewMask(uint8 MultiViewCount);
 
 private:
 	VkRenderPass RenderPass = VK_NULL_HANDLE;

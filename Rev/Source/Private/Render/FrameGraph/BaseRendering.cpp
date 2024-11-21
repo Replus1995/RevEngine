@@ -46,6 +46,8 @@ FFGBasePass::FFGBasePass(FFrameGraph& InGraph, const FFGViewData& InViewData)
 
 			auto& RHICmdList = InContextData.RHICmdList;
 
+			FFGUtils::RHIBeginPass(RHICmdList, &InData);
+
 			FRHIGraphicsPipelineStateDesc PipelineStateDesc;
 			PipelineStateDesc.VertexInputState = GStaticMeshVertexInputState.VertexInputStateRHI.get();
 			PipelineStateDesc.NumSamples = GRenderOptions.GetNumSamples();
@@ -66,6 +68,8 @@ FFGBasePass::FFGBasePass(FFrameGraph& InGraph, const FFGViewData& InViewData)
 			RHICmdList.GetContext()->RHISetGraphicsPipelineState(PipelineStateDesc);
 
 			InContextData.SceneProxy->DrawSceneOpaque(RHICmdList);
+
+			FFGUtils::RHIEndPass(RHICmdList, &InData);
 		}
 	);
 }
