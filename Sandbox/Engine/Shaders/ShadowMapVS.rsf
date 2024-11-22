@@ -1,0 +1,40 @@
+#include "Engine/Shaders/Core/Base.rsh"
+
+struct FShadowViewUniform
+{
+	float4x4 LightProjMats[REV_MAX_SHADOW_VIEWS];
+    float4x4 LightViewMats[REV_MAX_SHADOW_VIEWS];
+};
+
+cbuffer ShadowViewUB : register(b0)
+{
+	FShadowViewUniform uShadowView;
+};
+
+cbuffer StaticMeshUB : register(b1)
+{
+	FStaticMeshUniform uStaticMesh;
+};
+
+struct VSInput
+{
+    float4 Position : POSITION0;
+    uint Color : COLOR0;
+    float4 Normal : NORMAL;
+    float4 Tangent : TANGENT;
+    float4 TexCoord0 : TEXCOORD0;
+};
+
+struct VSOutput
+{
+    float4 Position : SV_POSITION;
+};
+
+VSOutput main(VSInput Input, uint ViewIndex : SV_ViewID)
+{
+    VSOutput Result;
+
+    float4 WorldPos =  mul(uStaticMesh.ModelMat, Input.Position);
+    Result.Position = mul(uShadowView.LightProjMats[ViewIndex], mul(uShadowView.LightViewMats[ViewIndex], WorldPos));
+    return Result;
+}

@@ -366,6 +366,9 @@ VkImageView FVulkanRenderPass::CreateImageView(FVulkanTexture* InTexture, int32 
 	ImageViewCreateInfo.format = InTexture->GetPlatformFormat();
 	ImageViewCreateInfo.subresourceRange.aspectMask = InTexture->GetAspectFlags();
 
+	uint32 TargetLayers = PassDesc.MultiViewCount > 0 ? PassDesc.MultiViewCount : 1;
+	uint32 RmainedLayers = ArraySlice < 0 ? InTexture->GetArraySize() : InTexture->GetArraySize() - ArraySlice;
+
 	switch (InTexture->GetDesc().Dimension)
 	{
 	case ETextureDimension::Texture2D:
@@ -380,7 +383,7 @@ VkImageView FVulkanRenderPass::CreateImageView(FVulkanTexture* InTexture, int32 
 		ImageViewCreateInfo.subresourceRange.baseMipLevel = MipIndex;
 		ImageViewCreateInfo.subresourceRange.levelCount = 1;
 		ImageViewCreateInfo.subresourceRange.baseArrayLayer = ArraySlice < 0 ? 0 : (uint32)ArraySlice;
-		ImageViewCreateInfo.subresourceRange.layerCount = ArraySlice < 0 ? InTexture->GetArraySize() : 1;
+		ImageViewCreateInfo.subresourceRange.layerCount = ArraySlice < 0 ? InTexture->GetArraySize() : Math::Min<uint32>(TargetLayers, RmainedLayers);
 		break;
 	default:
 		REV_CORE_ASSERT(false, "Unsupported render target format.")

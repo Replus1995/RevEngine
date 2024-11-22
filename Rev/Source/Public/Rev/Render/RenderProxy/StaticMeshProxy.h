@@ -1,12 +1,15 @@
 #pragma once
 #include "Rev/Core/Base.h"
-#include "Rev/Math/Maths.h"
-#include "Rev/Render/RenderCore.h"
-#include "Rev/Render/UniformDefine.h"
 #include "Rev/Render/Component/StaticMesh.h"
 
 namespace Rev
 {
+
+struct alignas(16) FStaticMeshUniform
+{
+	Math::FMatrix4 ModelMat;
+};
+
 class FScene;
 struct FStaticMeshRenderData
 {
@@ -26,7 +29,7 @@ public:
 	void FreeResource();
 
 	void DrawMeshesDepth(FRHICommandList& RHICmdList);
-	void DrawMeshesOpaque(FRHICommandList& RHICmdList);
+	void DrawMeshesOpaque(FRHICommandList& RHICmdList, bool bUseMeshMaterial = true);
 
 private:
 	void PrepareMeshDraw(FRHICommandList& RHICmdList, const FStaticMeshRenderData& InData);

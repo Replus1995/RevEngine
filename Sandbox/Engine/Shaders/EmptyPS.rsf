@@ -1,0 +1,18 @@
+#include "Engine/Shaders/Core/Base.rsh"
+
+struct PSInput
+{
+    float4 Position : SV_POSITION;
+};
+
+struct PSOutput
+{
+    float4 Color : SV_Target;
+};
+
+PSOutput main(const PSInput Input)
+{
+    PSOutput Result;
+    Result.Color = float4(0,0,0,1);
+    return Result;
+}

@@ -1,7 +1,6 @@
 #pragma once
 #include "Rev/Core/Base.h"
-#include "Rev/Render/UniformDefine.h"
-#include "Rev/Render/Material/Material.h"
+#include "Rev/Utils/Rect2D.h"
 #include "Rev/Render/RenderProxy/CameraProxy.h"
 #include "Rev/Render/RenderProxy/StaticMeshProxy.h"
 #include "Rev/Render/RenderProxy/LightProxy.h"
@@ -9,6 +8,19 @@
 
 namespace Rev
 {
+
+struct alignas(16) FSceneUniform
+{
+	FRect2D ViewExtent;
+	Math::FVector4 ViewPos;
+	Math::FMatrix4 ViewMat;
+	Math::FMatrix4 ProjMat;
+	Math::FMatrix4 ViewProjMat;
+	Math::FMatrix4 InvViewMat;
+	Math::FMatrix4 InvProjMat;
+	Math::FMatrix4 InvViewProjMat;
+};
+
 class FRHIUniformBuffer;
 class FScene;
 class FSceneProxy

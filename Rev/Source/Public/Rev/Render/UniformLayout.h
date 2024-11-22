@@ -27,7 +27,7 @@ constexpr IndexType BStaticMesh = 1;
 constexpr IndexType BLight = 2;
 constexpr IndexType BMaterial = 3;
 
-constexpr IndexType BShadow = 4;
+constexpr IndexType BShadowView = 0;
 
 }
 }
