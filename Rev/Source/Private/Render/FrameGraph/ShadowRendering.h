@@ -4,16 +4,15 @@
 namespace Rev
 {
 
-class FFGSkyPass
+class FFGShadowPass
 {
 public:
 	struct Data : public FFGPassData
 	{
-		FFGHandle ColorTex;
 		FFGHandle DepthTex;
 	};
 
-	FFGSkyPass(FFrameGraph& InGraph, const FFGSetupData& InViewData);
+	FFGShadowPass(FFrameGraph& InGraph, const FFGSetupData& InSetupData);
 };
 
 }

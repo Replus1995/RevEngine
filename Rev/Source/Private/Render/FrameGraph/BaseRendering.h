@@ -15,7 +15,7 @@ public:
 		FFGHandle DepthTexMS;
 	};
 
-	FFGBasePass(FFrameGraph& InGraph, const FFGViewData& InViewData);
+	FFGBasePass(FFrameGraph& InGraph, const FFGSetupData& InViewData);
 };
 
 
@@ -28,7 +28,7 @@ public:
 		FFGHandle BackTex;
 	};
 
-	FFGBlitPass(FFrameGraph& InGraph, const FFGViewData& InViewData);
+	FFGBlitPass(FFrameGraph& InGraph, const FFGSetupData& InViewData);
 };
 
 }

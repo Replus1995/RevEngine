@@ -51,7 +51,7 @@ void FRenderer::DrawFrame(FRHICommandList& RHICmdList)
 {
 	mSceneProxy->SyncResource(RHICmdList);
 
-	FFGContextData ContextData(RHICmdList, mSceneProxy);
+	FFGExecuteData ContextData(RHICmdList, mSceneProxy);
 	mGraph.Execute(ContextData);
 }
 
@@ -64,7 +64,7 @@ void FRenderer::BuildFrameGraph()
 
 	mGraph.Reset();
 
-	FFGViewData ViewData = { FrameWidth,  FrameHeight };
+	FFGSetupData ViewData = { FrameWidth,  FrameHeight };
 	FFGBasePass BasePass(mGraph, ViewData);
 	FFGSkyPass SkyPass(mGraph, ViewData);
 	FFGBlitPass BlitPass(mGraph, ViewData);

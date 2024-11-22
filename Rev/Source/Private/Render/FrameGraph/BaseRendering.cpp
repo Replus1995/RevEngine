@@ -13,7 +13,7 @@
 namespace Rev
 {
 
-FFGBasePass::FFGBasePass(FFrameGraph& InGraph, const FFGViewData& InViewData)
+FFGBasePass::FFGBasePass(FFrameGraph& InGraph, const FFGSetupData& InViewData)
 {
 	FRHITextureDesc DescColor = FRHITextureDesc::Create2D(InViewData.Width, InViewData.Height, PF_R8G8B8A8).SetClearColor(Math::FLinearColor(0, 0, 0, 1)).SetFlags(ETextureCreateFlags::ColorTarget);
 	FRHITextureDesc DescDepth = FRHITextureDesc::Create2D(InViewData.Width, InViewData.Height, PF_DepthStencil).SetClearColor(FRHITextureClearColor(1.0, 0)).SetFlags(ETextureCreateFlags::DepthStencilTarget);
@@ -42,7 +42,7 @@ FFGBasePass::FFGBasePass(FFrameGraph& InGraph, const FFGViewData& InViewData)
 			InData.SetColorTarget(0, ColorTexMS, ColorTex, RTL_Clear);
 			InData.SetDepthStencilTarget(DepthTexMS, DepthTex, RTL_Clear, RTL_Clear);
 		},
-		[=](const FFGBasePass::Data& InData, FFGPassResources& InResources, FFGContextData& InContextData) {
+		[=](const FFGBasePass::Data& InData, FFGPassResources& InResources, FFGExecuteData& InContextData) {
 
 			auto& RHICmdList = InContextData.RHICmdList;
 
@@ -74,7 +74,7 @@ FFGBasePass::FFGBasePass(FFrameGraph& InGraph, const FFGViewData& InViewData)
 	);
 }
 
-FFGBlitPass::FFGBlitPass(FFrameGraph& InGraph, const FFGViewData& InViewData)
+FFGBlitPass::FFGBlitPass(FFrameGraph& InGraph, const FFGSetupData& InViewData)
 {
 	FFGHandle BackTex = InGraph.Import("Backbuffer", FFGTextureExternal::Desc{}, FFGTextureExternal());
 	//const FFGSkyPass::Data& SkyPassData = InGraph.GetPassData<FFGSkyPass::Data>();
@@ -89,7 +89,7 @@ FFGBlitPass::FFGBlitPass(FFrameGraph& InGraph, const FFGViewData& InViewData)
 			InData.ColorTex = InBuilder.Read(LastPassData->GetColorTexture(0));
 			InData.BackTex = InBuilder.Write(BackTex);
 		},
-		[=](const FFGBlitPass::Data& InData, FFGPassResources& InResources, FFGContextData& InContextData) {
+		[=](const FFGBlitPass::Data& InData, FFGPassResources& InResources, FFGExecuteData& InContextData) {
 
 			auto& RHICmdList = InContextData.RHICmdList;
 

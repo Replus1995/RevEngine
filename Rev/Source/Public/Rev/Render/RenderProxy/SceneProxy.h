@@ -37,6 +37,8 @@ public:
 	void DrawSceneOpaque(FRHICommandList& RHICmdList);
 	void DrawSkybox(FRHICommandList& RHICmdList);
 
+	FLightProxy* GetLightProxy() { return &mLightProxy; }
+
 protected:
 	FSceneUniform mSceneParams;
 	Ref<FRHIUniformBuffer> mSceneUB;

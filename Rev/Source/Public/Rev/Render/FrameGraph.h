@@ -220,9 +220,9 @@ private:
 };
 
 class FSceneProxy;
-struct FFGContextData
+struct FFGExecuteData
 {
-    FFGContextData(FRHICommandList& InRHICmdList, FSceneProxy* InSceneProxy)
+    FFGExecuteData(FRHICommandList& InRHICmdList, FSceneProxy* InSceneProxy)
         : RHICmdList(InRHICmdList)
         , SceneProxy(InSceneProxy)
     {
@@ -232,10 +232,11 @@ struct FFGContextData
     FSceneProxy* SceneProxy = nullptr;
 };
 
-struct FFGViewData
+struct FFGSetupData
 {
     uint32 Width = 0;
     uint32 Height = 0;
+    FSceneProxy* SceneProxy = nullptr;
 };
 
 class FFrameGraph
@@ -258,7 +259,7 @@ public:
         Graph->compile();
     }
 
-    void Execute(FFGContextData& ContextData)
+    void Execute(FFGExecuteData& ContextData)
     {
         Graph->execute(&ContextData);
     }
@@ -267,7 +268,7 @@ public:
     using SetupFuncType = std::function<void(FFGBuilder&, PassDataType&)>;
 
     template<typename PassDataType>
-    using ExecuteFuncType = std::function<void(const PassDataType&, FFGPassResources&, FFGContextData&)>;
+    using ExecuteFuncType = std::function<void(const PassDataType&, FFGPassResources&, FFGExecuteData&)>;
 
     template<typename PassDataType>
     void AddPass(const char* InName, SetupFuncType<PassDataType>&& InSetup, ExecuteFuncType<PassDataType>&& InExecute, bool bAddToBlackboard = true)
@@ -285,7 +286,7 @@ public:
             (const PassDataType& Data, FrameGraphPassResources& ResourcesImpl, void* Context)
             {
                 FFGPassResources Resources(ResourcesImpl);
-                FFGContextData* ContextData = static_cast<FFGContextData*>(Context);
+                FFGExecuteData* ContextData = static_cast<FFGExecuteData*>(Context);
                 FFGPassData* PassData = (FFGPassData*)(&Data);
 
                 REV_CORE_ASSERT(PassData !=  nullptr);

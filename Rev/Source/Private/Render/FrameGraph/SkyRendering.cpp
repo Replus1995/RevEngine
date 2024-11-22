@@ -13,7 +13,7 @@
 namespace Rev
 {
 
-FFGSkyPass::FFGSkyPass(FFrameGraph& InGraph, const FFGViewData& InViewData)
+FFGSkyPass::FFGSkyPass(FFrameGraph& InGraph, const FFGSetupData& InViewData)
 {
 	FFGBasePass::Data& BasePassData = InGraph.GetPassData<FFGBasePass::Data>();
 
@@ -26,7 +26,7 @@ FFGSkyPass::FFGSkyPass(FFrameGraph& InGraph, const FFGViewData& InViewData)
 			InData.SetColorTarget(0, InData.ColorTex, KFGInvalidHandle, RTL_Load);
 			InData.SetDepthStencilTarget(InData.DepthTex, KFGInvalidHandle, RTL_Load, RTL_DontCare, RTS_DontCare, RTS_DontCare);
 		},
-		[=](const FFGSkyPass::Data& InData, FFGPassResources& InResources, FFGContextData& InContextData) {
+		[=](const FFGSkyPass::Data& InData, FFGPassResources& InResources, FFGExecuteData& InContextData) {
 
 			auto& RHICmdList = InContextData.RHICmdList;
 
