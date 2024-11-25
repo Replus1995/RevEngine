@@ -92,6 +92,33 @@ class FVulkanUniformBuffer;
 class FVulkanTexture;
 class FVulkanSamplerState;
 
+struct FVulkanTextureSlot
+{
+	FVulkanTexture* Images[REV_MAX_UNIFORM_ARRAY_SIZE];
+	FVulkanSamplerState* SamplerState = nullptr;
+	uint32 NumImages = 0;
+
+	FVulkanTextureSlot() = default;
+
+	FVulkanTextureSlot(FVulkanTexture* InImage, FVulkanSamplerState* InSamplerState = nullptr)
+	{
+		Images[0] = InImage;
+		SamplerState = InSamplerState;
+		NumImages = 1;
+ 	}
+
+	FVulkanTextureSlot(FVulkanTexture** InImages, uint32 InNumImages)
+	{
+		REV_CORE_ASSERT(InNumImages <= REV_MAX_UNIFORM_ARRAY_SIZE);
+
+		for (uint32 i = 0; i < InNumImages; i++)
+		{
+			Images[i] = InImages[i];
+		}
+		NumImages = InNumImages;
+	}
+};
+
 struct FVulkanGraphicsFrameState
 {
 	FVulkanRenderPass* CurrentPass = nullptr;
@@ -102,7 +129,7 @@ struct FVulkanGraphicsFrameState
 	bool bVertexStreamsDirty = true;
 
 	std::map<uint16, FVulkanUniformBuffer*> UniformBuffers;
-	std::map<uint16, std::pair<FVulkanTexture*, FVulkanSamplerState*>> Textures;
+	std::map<uint16, FVulkanTextureSlot> Textures;
 
 	void Reset()
 	{
@@ -128,13 +155,13 @@ struct FVulkanGraphicsFrameState
 		return nullptr;
 	}
 
-	std::pair<FVulkanTexture*, FVulkanSamplerState*> FindTexture(uint16 BindingIdx) const
+	const FVulkanTextureSlot* FindTexture(uint16 BindingIdx) const
 	{
 		if (auto iter = Textures.find(BindingIdx); iter != Textures.end())
 		{
-			return iter->second;
+			return &iter->second;
 		}
-		return { nullptr, nullptr };
+		return nullptr;
 	}
 };
 

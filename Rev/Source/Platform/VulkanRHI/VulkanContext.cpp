@@ -461,7 +461,7 @@ VkDescriptorSet FVulkanContext::GetDescriptorSet(const FVulkanShaderProgram* InP
 
 
 	VkDescriptorBufferInfo BufferInfos[REV_VK_MAX_SHADER_UNIFORM_BUFFERS] = {};
-	VkDescriptorImageInfo ImageInfos[REV_VK_MAX_SHADER_UNIFORM_SAMPLERS] = {};
+	VkDescriptorImageInfo ImageInfos[REV_VK_MAX_SHADER_UNIFORM_IMAGES] = {};
 	VkWriteDescriptorSet Writes[REV_VK_MAX_DESCRIPTORSETS] = {};
 	uint32 WriteCount = 0;
 	uint32 BufferCount = 0;
@@ -499,43 +499,55 @@ VkDescriptorSet FVulkanContext::GetDescriptorSet(const FVulkanShaderProgram* InP
 		break;
 		case EShaderUniformType::Texture:
 		{
-			auto TextureAndSamplerState = mFrameState.FindTexture(BindingIdx);
-			FVulkanTexture* Texture = TextureAndSamplerState.first;
-			FVulkanSamplerState* SamplerState = TextureAndSamplerState.second;
-			if (Texture)
+			auto TextureSlotPtr = mFrameState.FindTexture(BindingIdx);
+			if (TextureSlotPtr)
 			{
-				ImageInfos[ImageCount].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-				ImageInfos[ImageCount].imageView = Texture->GetImageView();
-				ImageInfos[ImageCount].sampler = SamplerState ? SamplerState->Sampler : VK_NULL_HANDLE;
-				
-				Writes[WriteCount].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-				Writes[WriteCount].pNext = NULL;
-				Writes[WriteCount].dstSet = DescSet;
-				Writes[WriteCount].dstBinding = BindingIdx;
-				Writes[WriteCount].dstArrayElement = 0;
-				Writes[WriteCount].descriptorCount = 1;
-				Writes[WriteCount].descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-				Writes[WriteCount].pImageInfo = &ImageInfos[ImageCount];
-				Writes[WriteCount].pBufferInfo = NULL;
-				Writes[WriteCount].pTexelBufferView = NULL;
-				++WriteCount;
-
-				if (SamplerState)
+				const auto& TextureSlot = *TextureSlotPtr;
+				const VkDescriptorImageInfo* ImageInfo = nullptr;
+				for (size_t i = 0; i < TextureSlot.NumImages; i++)
 				{
+					ImageInfos[ImageCount].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+					ImageInfos[ImageCount].imageView = TextureSlot.Images[i]->GetImageView();
+					ImageInfos[ImageCount].sampler = TextureSlot.SamplerState ? TextureSlot.SamplerState->Sampler : VK_NULL_HANDLE;
+
+					if (!ImageInfo)
+					{
+						ImageInfo = &ImageInfos[ImageCount];
+					}
+
+					++ImageCount;
+				}
+
+				if (TextureSlot.NumImages > 0)
+				{
+
 					Writes[WriteCount].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 					Writes[WriteCount].pNext = NULL;
 					Writes[WriteCount].dstSet = DescSet;
-					Writes[WriteCount].dstBinding = Uniform.SamplerBinding;
+					Writes[WriteCount].dstBinding = BindingIdx;
 					Writes[WriteCount].dstArrayElement = 0;
-					Writes[WriteCount].descriptorCount = 1;
-					Writes[WriteCount].descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
-					Writes[WriteCount].pImageInfo = &ImageInfos[ImageCount];
+					Writes[WriteCount].descriptorCount = TextureSlot.NumImages;
+					Writes[WriteCount].descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+					Writes[WriteCount].pImageInfo = ImageInfo;
 					Writes[WriteCount].pBufferInfo = NULL;
 					Writes[WriteCount].pTexelBufferView = NULL;
 					++WriteCount;
-				}
 
-				++ImageCount;
+					if (TextureSlot.SamplerState)
+					{
+						Writes[WriteCount].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+						Writes[WriteCount].pNext = NULL;
+						Writes[WriteCount].dstSet = DescSet;
+						Writes[WriteCount].dstBinding = Uniform.SamplerBinding;
+						Writes[WriteCount].dstArrayElement = 0;
+						Writes[WriteCount].descriptorCount = 1;
+						Writes[WriteCount].descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
+						Writes[WriteCount].pImageInfo = ImageInfo;
+						Writes[WriteCount].pBufferInfo = NULL;
+						Writes[WriteCount].pTexelBufferView = NULL;
+						++WriteCount;
+					}
+				}
 			}
 		}
 		default:

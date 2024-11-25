@@ -31,13 +31,8 @@ SAMPLER2D(sNormal, 2);
 SAMPLER2D(sOcclusion, 3);
 SAMPLER2D(sEmissive, 4);
 
-uniform SamplerState ShadowSamplerState : register(s15);
-uniform Texture2DArray DirectionalShadows[4] : register(t20);
-//uniform Texture2DArray DirectionalShadow1 : register(t21);
-//uniform Texture2DArray DirectionalShadow2 : register(t22);
-//uniform Texture2DArray DirectionalShadow3 : register(t23);
-
-//static Texture2DArray DirectionalShadows[4] = {DirectionalShadow0, DirectionalShadow1, DirectionalShadow2, DirectionalShadow3};
+//uniform SamplerState ShadowSamplerState : register(s15);
+//uniform Texture2DArray DirectionalShadows[4] : register(t20);
 
 struct PSInput
 {
@@ -87,6 +82,7 @@ PSOutput main(const PSInput Input)
         float3 LightColor = ComputeLightPBR(BaseColor.rgb, Roughness, Metallic, Normal, ViewDir, LightDir, NdV, F0, Radiance);
         LightColor *= uDirectionalLight.Lights[i].Color.rgb;
         //TODO: Shadow
+        /*
         float ShadowFactor = 1.0f;
         if(uDirectionalLight.Lights[i].ShadowIndex >= 0)
         {
@@ -105,6 +101,7 @@ PSOutput main(const PSInput Input)
             }
         }
         LightColor *= ShadowFactor;
+        */
 
         //LightColor += (diffuseBRDF + specularBRDF) * Radiance * NdL;
         SumLightColor += LightColor;

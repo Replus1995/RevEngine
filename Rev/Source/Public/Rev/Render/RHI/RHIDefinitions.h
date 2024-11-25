@@ -1,7 +1,6 @@
 #pragma once
 #include "Rev/Core/Base.h"
-
-#define REV_MAX_VERTEX_ELEMENTS 16
+#include "Rev/Render/RenderCore.h"
 
 namespace Rev
 {
@@ -91,8 +90,8 @@ enum class EShaderUniformType : uint8
 {
 	Unknown,
 	Buffer,
-	Sampler,
 	Texture,
+	SamplerState,
 };
 
 enum EShaderStage : uint8

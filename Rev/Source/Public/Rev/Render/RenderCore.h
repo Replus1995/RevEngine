@@ -11,6 +11,9 @@
 #define REV_MAX_SHADOW_VIEWS 6
 #define REV_SHADOWMAP_SIZE 2048
 
+#define REV_MAX_VERTEX_ELEMENTS 16
+#define REV_MAX_UNIFORM_ARRAY_SIZE 16
+
 
 namespace Rev
 {

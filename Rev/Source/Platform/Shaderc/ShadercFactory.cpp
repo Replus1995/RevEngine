@@ -300,18 +300,20 @@ void FShadercFactory::ReflectShaderInfo(FShadercCompiledData& Data)
 	for (auto& Buffer : ResourceRefl.uniform_buffers)
 	{
 		const auto& BufferType = Refl.get_type(Buffer.base_type_id);
-		size_t BufferSize = Refl.get_declared_struct_size(BufferType);
-		size_t MemberCount = BufferType.member_types.size();
+		const auto& ArrayInfo = Refl.get_type(Buffer.type_id).array;
+		
 
 		FRHIShaderUniform Uniform;
 		Uniform.Name = Buffer.name;
 		Uniform.Type = EShaderUniformType::Buffer;
-		Uniform.Num = 1;
+		Uniform.Num = ArrayInfo.empty() ? 1 : ArrayInfo[0];
 		Uniform.Binding = Refl.get_decoration(Buffer.id, spv::Decoration::DecorationBinding);
 
 		Data.Uniforms.push_back(Uniform);
 
 #ifdef REV_DEBUG
+		size_t BufferSize = Refl.get_declared_struct_size(BufferType);
+		size_t MemberCount = BufferType.member_types.size();
 		REV_CORE_TRACE("  {0}: Binding = {1}, Size = {2}, Members = {3}", Uniform.Name.c_str(), Uniform.Binding - GShaderCompileConfig.BufferOffset, BufferSize, MemberCount);
 #endif
 	}
@@ -325,12 +327,13 @@ void FShadercFactory::ReflectShaderInfo(FShadercCompiledData& Data)
 	for (auto& Texture : ResourceRefl.separate_images)
 	{
 		uint32 TextureBinding = Refl.get_decoration(Texture.id, spv::Decoration::DecorationBinding);
-		auto TextureType = Refl.get_type(Texture.base_type_id).image;
+		const auto& TextureType = Refl.get_type(Texture.base_type_id).image;
+		const auto& ArrayInfo = Refl.get_type(Texture.type_id).array;
 
 		FRHIShaderUniform Uniform;
 		Uniform.Name = Texture.name;
 		Uniform.Type = EShaderUniformType::Texture;
-		Uniform.Num = 1;
+		Uniform.Num = ArrayInfo.empty() ? 1 : ArrayInfo[0];
 		Uniform.Binding = uint16(TextureBinding);
 
 		Uniform.TexFormat = sSpirvFormatMapping[uint32(TextureType.format)];
@@ -375,7 +378,7 @@ void FShadercFactory::ReflectShaderInfo(FShadercCompiledData& Data)
 
 		FRHIShaderUniform Uniform;
 		Uniform.Name = Sampler.name;
-		Uniform.Type = EShaderUniformType::Sampler;
+		Uniform.Type = EShaderUniformType::SamplerState;
 		Uniform.Num = 1;
 		Uniform.Binding = uint16(SamplerBinding);
 		Uniform.SamplerBinding = Refl.get_decoration(Sampler.id, spv::Decoration::DecorationBinding);
