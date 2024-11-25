@@ -37,7 +37,7 @@ void FLightProxy::Prepare(const Ref<FScene>& Scene)
 			uint32 NumShadowMapLayers = 1;
 
 			auto& Light = DirectionalLightParams.Lights[LightCount];
-			Light.Direction = TransComp.Transform.Up() * -1.0f;
+			Light.Direction = TransComp.Transform.Forward();
 			Light.Color = LightComp.Light.GetColor();
 			Light.Intensity = LightComp.Light.GetIntensity();
 
@@ -55,7 +55,8 @@ void FLightProxy::Prepare(const Ref<FScene>& Scene)
 				}
 			}
 
-			Light.ProjMats[0] = Math::FMatrix4::Othographic(-1000, 1000, -1000, 1000, -1000, 1000);
+			Light.ProjMats[0] = Math::FMatrix4::Othographic(-8, 8, -8, 8, -100, 100);
+			//Light.ProjMats[0] = Math::FMatrix4::Perspective(60, 1, 1, 10000);
 			Light.ViewMats[0] = TransComp.Transform.ToMatrix().Inverse();
 
 			LightCount++;

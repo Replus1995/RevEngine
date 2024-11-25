@@ -2,6 +2,7 @@
 #include "MathUtils.h"
 #include <cassert>
 #include <cmath>
+#include "Matrix4.h"
 
 namespace Rev
 {
@@ -381,10 +382,38 @@ inline TMatrix4<T> TMatrix4<T>::Othographic(float InLeft, float InRight, float I
 	TMatrix4<T> Result(1.0F);
 	Result[0][0] = 2.0F / (InRight - InLeft);
 	Result[1][1] = 2.0F / (InTop - InBottom);
-	Result[2][2] = 2.0F / (InFar - InNear);
 	Result[3][0] = -(InRight + InLeft) / (InRight - InLeft);
 	Result[3][1] = -(InTop + InBottom) / (InTop - InBottom);
-	Result[3][2] = -(InFar + InNear) / (InFar - InNear);
+
+	Result[2][2] = -1.0F / (InFar - InNear);
+	Result[3][2] = -InNear / (InFar - InNear);
+
+	//Result[2][2] = 2.0F / (InFar - InNear);
+	//Result[3][2] = -(InFar + InNear) / (InFar - InNear);
+
+	return Result;
+}
+
+template<typename T>
+inline TMatrix4<T> TMatrix4<T>::LookAt(const TVector3<T>& InEye, const TVector3<T>& InCenter, const TVector3<T>& InUp)
+{
+	TVector3<T> const f((InCenter - InEye).Normalized());
+	TVector3<T> const s(TVector3<T>::Cross(f, InUp).Normalized());
+	TVector3<T> const u(TVector3<T>::Cross(s, f));
+
+	TMatrix4<T> Result(1.0F);
+	Result[0][0] = s.x;
+	Result[1][0] = s.y;
+	Result[2][0] = s.z;
+	Result[0][1] = u.x;
+	Result[1][1] = u.y;
+	Result[2][1] = u.z;
+	Result[0][2] = -f.x;
+	Result[1][2] = -f.y;
+	Result[2][2] = -f.z;
+	Result[3][0] = -TVector3<T>::Dot(s, InEye);
+	Result[3][1] = -TVector3<T>::Dot(u, InEye);
+	Result[3][2] = TVector3<T>::Dot(f, InEye);
 	return Result;
 }
 

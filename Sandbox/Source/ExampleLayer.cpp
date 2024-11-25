@@ -80,7 +80,7 @@ ExampleLayer::ExampleLayer()
 		dirLightComp.Light.SetIntensity(3.0f);
 		auto& transformComp = lightEntity.GetComponent<TransformComponent>();
 		transformComp.SetLocation(Math::FVector3(0, 0, 0));
-		transformComp.SetRotation(Math::FRotator(0, 0, 45.0f));
+		transformComp.SetRotation(Math::FRotator(-45.0f, -90, 0));
 	}
 
 	{
@@ -91,6 +91,8 @@ ExampleLayer::ExampleLayer()
 		auto& transformComp = camEntity.GetComponent<TransformComponent>();
 		transformComp.SetLocation(Math::FVector3(0, 2, 0));
 		transformComp.SetRotation(Math::FRotator(-30.0f, 0, 0));
+		//camComp.Camera.SetOrthographic(10, -100, 100);
+
 
 		auto camSys = mScene->GetSystem<PlayerCameraSystem>();
 		if (camSys)

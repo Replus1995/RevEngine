@@ -55,6 +55,7 @@ public:
 
 	static TMatrix4<T> Perspective(float InFOV, float InAspectRatio, float InNear, float InFar);
 	static TMatrix4<T> Othographic(float InLeft, float InRight, float InBottom, float InTop, float InNear, float InFar);
+	static TMatrix4<T> LookAt(const TVector3<T>& InEye, const TVector3<T>& InCenter, const TVector3<T>& InUp);
 };
 
 using FMatrix4 = TMatrix4<float>;
