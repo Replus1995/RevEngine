@@ -55,7 +55,7 @@ void FLightProxy::Prepare(const Ref<FScene>& Scene)
 				}
 			}
 
-			Light.ProjMats[0] = Math::FMatrix4::Othographic(-8, 8, -8, 8, -100, 100);
+			Light.ProjMats[0] = Math::FMatrix4::Othographic(-10, 10, -10, 10, -10, 10);
 			//Light.ProjMats[0] = Math::FMatrix4::Perspective(60, 1, 1, 10000);
 			Light.ViewMats[0] = TransComp.Transform.ToMatrix().Inverse();
 

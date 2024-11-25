@@ -5,6 +5,7 @@
 #include "Rev/HAL/FIleManager.h"
 #include "Rev/Render/RHI/RHIShaderLibrary.h"
 #include <filesystem>
+#include <set>
 
 #include <shaderc/shaderc.hpp>
 #include <spirv_cross/spirv_glsl.hpp>
@@ -315,6 +316,8 @@ void FShadercFactory::ReflectShaderInfo(FShadercCompiledData& Data)
 #endif
 	}
 
+	std::set<int8> SkipSamplers;
+
 #ifdef REV_DEBUG
 	if (!ResourceRefl.separate_images.empty())
 		REV_CORE_TRACE("Textures:");
@@ -334,13 +337,14 @@ void FShadercFactory::ReflectShaderInfo(FShadercCompiledData& Data)
 		Uniform.TexDimension = TranslateTextureDimension(TextureType.dim, TextureType.arrayed);
 
 		size_t NameCompareLength = Texture.name.size() - sizeof("Texture");
-		bool isCompareSampler = false;
+		//bool isCompareSampler = false;
 		for (auto& Sampler : ResourceRefl.separate_samplers)
 		{
 			if (strncmp(Texture.name.data(), Sampler.name.data(), NameCompareLength) == 0)
 			{
 				Uniform.SamplerBinding = Refl.get_decoration(Sampler.id, spv::Decoration::DecorationBinding);
 				Uniform.bSamplerCompare = Refl.variable_is_depth_or_compare(Sampler.id);
+				SkipSamplers.insert(Uniform.SamplerBinding);
 				break;
 			}
 		}
@@ -348,8 +352,37 @@ void FShadercFactory::ReflectShaderInfo(FShadercCompiledData& Data)
 		Data.Uniforms.push_back(Uniform);
 
 #ifdef REV_DEBUG
-		REV_CORE_TRACE(" {0}: Binding = {1}, SamplerBinding = {2}", Uniform.Name.c_str(), Uniform.Binding - GShaderCompileConfig.TextureOffset, Uniform.SamplerBinding - GShaderCompileConfig.SamplerOffset);
+		if(Uniform.SamplerBinding >= 0)
+			REV_CORE_TRACE(" {0}: Binding = {1}, SamplerBinding = {2}", Uniform.Name.c_str(), Uniform.Binding - GShaderCompileConfig.TextureOffset, Uniform.SamplerBinding - GShaderCompileConfig.SamplerOffset);
+		else
+			REV_CORE_TRACE(" {0}: Binding = {1}", Uniform.Name.c_str(), Uniform.Binding - GShaderCompileConfig.TextureOffset);
 #endif
+	}
+
+	bool bFirstSampler = true;
+	for (auto& Sampler : ResourceRefl.separate_samplers)
+	{
+		int8 SamplerBinding = Refl.get_decoration(Sampler.id, spv::Decoration::DecorationBinding);
+		if(SkipSamplers.count(SamplerBinding) != 0)
+			continue;
+		if (bFirstSampler)
+		{
+			bFirstSampler = false;
+#ifdef REV_DEBUG
+			REV_CORE_TRACE("Samplers:");
+#endif
+		}
+
+		FRHIShaderUniform Uniform;
+		Uniform.Name = Sampler.name;
+		Uniform.Type = EShaderUniformType::Sampler;
+		Uniform.Num = 1;
+		Uniform.Binding = uint16(SamplerBinding);
+		Uniform.SamplerBinding = Refl.get_decoration(Sampler.id, spv::Decoration::DecorationBinding);
+		Uniform.bSamplerCompare = Refl.variable_is_depth_or_compare(Sampler.id);
+
+		Data.Uniforms.push_back(Uniform);
+		REV_CORE_TRACE(" {0}: Binding = {1}", Uniform.Name.c_str(), Uniform.Binding - GShaderCompileConfig.SamplerOffset);
 	}
 }
 
