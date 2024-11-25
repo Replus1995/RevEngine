@@ -49,6 +49,7 @@ void FRenderer::BeginFrame(FRHICommandList& RHICmdList)
 
 void FRenderer::DrawFrame(FRHICommandList& RHICmdList)
 {
+	mSceneProxy->DrawShadowMaps(RHICmdList);
 	mSceneProxy->SyncResource(RHICmdList);
 
 	FFGExecuteData ContextData(RHICmdList, mSceneProxy);

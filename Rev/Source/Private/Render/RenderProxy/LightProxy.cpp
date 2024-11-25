@@ -6,7 +6,9 @@
 #include "Rev/Render/RHI/DynamicRHI.h"
 #include "Rev/Render/RHI/RHICommandList.h"
 #include "Rev/Render/RHI/RHIBuffer.h"
+#include "Rev/Render/RHI/RHIPipeline.h"
 #include "Rev/Render/Material/ShadowMapMaterial.h"
+#include "Rev/Render/RenderUtils.h"
 
 namespace Rev
 {
@@ -39,21 +41,21 @@ void FLightProxy::Prepare(const Ref<FScene>& Scene)
 			Light.Color = LightComp.Light.GetColor();
 			Light.Intensity = LightComp.Light.GetIntensity();
 
+			//shadow
+			Light.ShadowMapIndex = LightCount;
+
 			if (Light.ShadowMapCount != NumShadowMapLayers)
 			{
 				Light.ShadowMapCount = NumShadowMapLayers;
-				if(NumShadowMapLayers == 0)
+				auto& ShadowData = DirectionalShadowData[LightCount];
+				ShadowData.Reset();
+				if (NumShadowMapLayers > 0)
 				{
-					DirectionalShadowData[LightCount].Texture.reset();
-				}
-				else
-				{
-					FRHITextureDesc ShadowMapDesc = FRHITextureDesc::Create2DArray(REV_SHADOWMAP_SIZE, REV_SHADOWMAP_SIZE, NumShadowMapLayers, PF_ShadowDepth).SetClearColor(FRHITextureClearColor(1.0, 0)).SetFlags(ETextureCreateFlags::DepthStencilTarget);
-					DirectionalShadowData[LightCount].Texture = GDynamicRHI->RHICreateTexture(ShadowMapDesc);
+					ShadowData.InitRHI(NumShadowMapLayers);
 				}
 			}
 
-			Light.ProjMats[0] = Math::FMatrix4::Othographic(-10, 10, -10, 10, -10, 10);
+			Light.ProjMats[0] = Math::FMatrix4::Othographic(-1000, 1000, -1000, 1000, -1000, 1000);
 			Light.ViewMats[0] = TransComp.Transform.ToMatrix().Inverse();
 
 			LightCount++;
@@ -61,8 +63,11 @@ void FLightProxy::Prepare(const Ref<FScene>& Scene)
 		DirectionalLightParams.Count = LightCount;
 	}
 
-	if(!ShadowMapMat)
+	if (!ShadowMapMat)
+	{
 		ShadowMapMat = CreateRef<FShadowMapMaterial>();
+		ShadowMapMat->Compile();
+	}
 	
 }
 
@@ -72,7 +77,7 @@ void FLightProxy::SyncResource(FRHICommandList& RHICmdList)
 		mLightUB = GDynamicRHI->RHICreateUniformBuffer(sizeof(FDirectionalLightUniform));
 
 	mLightUB->UpdateSubData(&DirectionalLightParams, sizeof(FDirectionalLightUniform));
-	RHICmdList.GetContext()->RHIBindUniformBuffer(UL::BLight, mLightUB.get());
+	RHICmdList.GetContext()->RHIBindUniformBuffer(UB::Light, mLightUB.get());
 
 	//Bind DirectionalLight shadow map
 }
@@ -85,23 +90,79 @@ FRHITexture* FLightProxy::GetDirectionalShadowMap(uint32 Index)
 	return DirectionalShadowData[Index].Texture.get();
 }
 
-void FLightProxy::BeginDrawDirectionalShadowMap(FRHICommandList& RHICmdList, uint32 Index)
+void FLightProxy::BeginDirectionalShadowPass(FRHICommandList& RHICmdList, uint32 Index)
 {
-	if(Index >= DirectionalLightParams.Count)
+	if (Index >= DirectionalLightParams.Count || LastShadowRenderData)
 		return;
 
-	if(!DirectionalShadowData[Index].Texture)
+	auto& ShadowData = DirectionalShadowData[Index];
+	if (!ShadowData.RenderPass)
 		return;
 
-	if (!DirectionalShadowData[Index].ViewUB)
-		DirectionalShadowData[Index].ViewUB = GDynamicRHI->RHICreateUniformBuffer(sizeof(FShadowViewUniform));
-	DirectionalShadowData[Index].ViewUB->UpdateSubData(&DirectionalLightParams.Lights[Index], sizeof(FShadowViewUniform));
+	ShadowData.ViewUniform->UpdateSubData(&DirectionalLightParams.Lights[Index], sizeof(FShadowViewUniform));
+	RHICmdList.GetContext()->RHIBindUniformBuffer(UB::ShadowView, ShadowData.ViewUniform.get());
+	RHICmdList.GetContext()->RHIBeginRenderPass(ShadowData.RenderPass.get());
 
-	RHICmdList.GetContext()->RHIBindUniformBuffer(UL::BShadowView, DirectionalShadowData[Index].ViewUB.get());
+	FRHIGraphicsPipelineStateDesc PipelineStateDesc;
+	PipelineStateDesc.VertexInputState = GStaticMeshVertexInputState.VertexInputStateRHI.get();
+
+	FRHIRasterizerStateDesc RasterizerStateDesc;
+	RasterizerStateDesc.CullMode = CM_Back;
+	PipelineStateDesc.RasterizerState = FRHIPipelineStateCache::Get()->GetOrCreateRasterizerState(RasterizerStateDesc);
+
+	FRHIDepthStencilStateDesc DepthStencilStateDesc;
+	DepthStencilStateDesc.bEnableDepthWrite = true;
+	DepthStencilStateDesc.DepthTestFunc = CF_Less;
+	PipelineStateDesc.DepthStencilState = FRHIPipelineStateCache::Get()->GetOrCreateDepthStencilState(DepthStencilStateDesc);
+
+	FRHIColorBlendStateDesc ColorBlendStateDesc;
+	ColorBlendStateDesc.Attachments[0].bEnableBlend = false;
+	PipelineStateDesc.ColorBlendState = FRHIPipelineStateCache::Get()->GetOrCreateColorBlendState(ColorBlendStateDesc);
+
+	RHICmdList.GetContext()->RHISetGraphicsPipelineState(PipelineStateDesc);
+
+
+	ShadowMapMat->PreDraw(RHICmdList);
+
+	LastShadowRenderData = &ShadowData;
 }
 
-void FLightProxy::EndDrawDirectionalShadowMap()
+void FLightProxy::EndShadowPass(FRHICommandList& RHICmdList)
 {
+	if(!LastShadowRenderData)
+		return;
+
+	ShadowMapMat->PostDraw(RHICmdList);
+
+	RHICmdList.GetContext()->RHIEndRenderPass();
+	LastShadowRenderData = nullptr;
+}
+
+void FShadowRenderData::InitRHI(uint32 ShadowMapLayers)
+{
+	if (!ViewUniform)
+		ViewUniform = GDynamicRHI->RHICreateUniformBuffer(sizeof(FShadowViewUniform));
+
+	if (!Texture)
+	{
+		FRHITextureDesc ShadowMapDesc = FRHITextureDesc::Create2DArray(REV_SHADOWMAP_SIZE, REV_SHADOWMAP_SIZE, ShadowMapLayers, PF_ShadowDepth).SetClearColor(FRHITextureClearColor(1.0, 0)).SetFlags(ETextureCreateFlags::DepthStencilTarget);
+		Texture = GDynamicRHI->RHICreateTexture(ShadowMapDesc);
+	}
+
+	if (!RenderPass)
+	{
+		FRHIRenderPassDesc ShadowPassDesc;
+		ShadowPassDesc.DepthStencilRenderTarget = { Texture.get(), nullptr, RTL_Clear, RTS_Store, RTL_DontCare, RTS_DontCare };
+		ShadowPassDesc.MultiViewCount = ShadowMapLayers;
+		RenderPass = GDynamicRHI->RHICreateRenderPass(ShadowPassDesc);
+	}
+
+}
+
+void FShadowRenderData::Reset()
+{
+	RenderPass.reset();
+	Texture.reset();
 }
 
 }

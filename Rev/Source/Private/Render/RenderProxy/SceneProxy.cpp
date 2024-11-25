@@ -41,7 +41,7 @@ void FSceneProxy::SyncResource(FRHICommandList& RHICmdList)
 
 		mSceneUB->UpdateSubData(&mSceneParams, sizeof(FSceneUniform));
 
-		RHICmdList.GetContext()->RHIBindUniformBuffer(UL::BScene, mSceneUB.get());
+		RHICmdList.GetContext()->RHIBindUniformBuffer(UB::Scene, mSceneUB.get());
 	}
 
 }
@@ -61,6 +61,22 @@ void FSceneProxy::DrawSceneOpaque(FRHICommandList& RHICmdList)
 void FSceneProxy::DrawSkybox(FRHICommandList& RHICmdList)
 {
 	mSkyProxy.DrawSkybox(RHICmdList);
+}
+
+void FSceneProxy::DrawShadowMaps(FRHICommandList& RHICmdList)
+{
+	RHICmdList.GetContext()->RHIBeginDebugLabel("ShadowMap Passes", Math::FLinearColor(0.6,0.6,0.6));
+
+	for (uint32 i = 0; i < mLightProxy.GetDirectionalLightCount(); i++)
+	{
+		mLightProxy.BeginDirectionalShadowPass(RHICmdList, i);
+
+		mStaticMeshProxy.DrawMeshesOpaque(RHICmdList, false);
+
+		mLightProxy.EndShadowPass(RHICmdList);
+	}
+
+	RHICmdList.GetContext()->RHIEndDebugLabel();
 }
 
 }

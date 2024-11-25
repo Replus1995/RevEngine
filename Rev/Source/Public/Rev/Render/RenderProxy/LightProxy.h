@@ -2,6 +2,7 @@
 #include "Rev/Core/Base.h"
 #include "Rev/Render/RenderCore.h"
 #include "Rev/Render/Component/Light.h"
+#include "Rev/Render/RHI/RHIDefinitions.h"
 
 namespace Rev
 {
@@ -20,6 +21,7 @@ struct FDirectionalLightUniform
 		Math::FVector4 Direction;
 		Math::FVector4 Color;
 		float Intensity = 0.0f;
+		int32 ShadowMapIndex = -1;
 		uint32 ShadowMapCount = 0;
 	}  Lights[REV_MAX_DIRECTIONAL_LIGHTS];
 	uint32 Count = 0;
@@ -54,8 +56,12 @@ struct FPointLightUniform
 
 struct FShadowRenderData
 {
+	FRHIRenderPassRef RenderPass = nullptr;
 	FRHITextureRef Texture = nullptr;
-	FRHIUniformBufferRef ViewUB = nullptr;
+	FRHIUniformBufferRef ViewUniform = nullptr;
+
+	void InitRHI(uint32 ShadowMapLayers);
+	void Reset();
 };
 
 class FScene;
@@ -72,8 +78,11 @@ public:
 
 	uint32 GetDirectionalLightCount() const { return DirectionalLightParams.Count; }
 	FRHITexture* GetDirectionalShadowMap(uint32 Index);
-	void BeginDrawDirectionalShadowMap(FRHICommandList& RHICmdList, uint32 Index);
-	void EndDrawDirectionalShadowMap();
+
+	void BeginDirectionalShadowPass(FRHICommandList& RHICmdList, uint32 Index);
+
+
+	void EndShadowPass(FRHICommandList& RHICmdList);
 
 
 private:
@@ -81,6 +90,7 @@ private:
 	FDirectionalLightUniform DirectionalLightParams;
 	FShadowRenderData DirectionalShadowData[REV_MAX_DIRECTIONAL_LIGHTS];
 
+	FShadowRenderData* LastShadowRenderData = nullptr;
 	Ref<class FShadowMapMaterial> ShadowMapMat = nullptr;
 };
 

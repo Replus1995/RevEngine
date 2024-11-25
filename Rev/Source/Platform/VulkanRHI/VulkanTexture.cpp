@@ -4,6 +4,7 @@
 
 #include "VulkanDynamicRHI.h"
 #include "VulkanTexture2D.h"
+#include "VulkanTexture2DArray.h"
 #include "VulkanTextureCube.h"
 
 namespace Rev
@@ -155,7 +156,7 @@ Ref<FRHITexture> FVulkanDynamicRHI::RHICreateTexture(const FRHITextureDesc& InDe
 	case ETextureDimension::Texture2D:
 		return CreateRef<FVulkanTexture2D>(InDesc);
 	case ETextureDimension::Texture2DArray:
-		//return CreateRef<FOpenGLTexture2DArray>(InDesc, InSamplerDesc);
+		return CreateRef<FVulkanTexture2DArray>(InDesc);
 	case ETextureDimension::TextureCube:
 		return CreateRef<FVulkanTextureCube>(InDesc);
 	case ETextureDimension::TextureCubeArray:

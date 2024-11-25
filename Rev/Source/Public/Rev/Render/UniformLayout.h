@@ -4,32 +4,37 @@
 
 namespace Rev
 {
-namespace UL
-{
-
 using IndexType = uint16;
 
+namespace TB
+{
 //Texture Binding
-constexpr IndexType SLinearScreenTex = 1;
 
-constexpr IndexType SPbrStart = 0;
-constexpr IndexType SBaseColorTex			= SPbrStart + 0;
-constexpr IndexType SMetallicRoughnessTex	= SPbrStart + 1;
-constexpr IndexType SNormalTex				= SPbrStart + 2;
-constexpr IndexType SOcclusionTex			= SPbrStart + 3;
-constexpr IndexType SEmissiveTex			= SPbrStart + 4;
+constexpr IndexType PbrTexBegin = 0;
+constexpr IndexType BaseColorTex			= PbrTexBegin + 0;
+constexpr IndexType MetallicRoughnessTex	= PbrTexBegin + 1;
+constexpr IndexType NormalTex				= PbrTexBegin + 2;
+constexpr IndexType OcclusionTex			= PbrTexBegin + 3;
+constexpr IndexType EmissiveTex				= PbrTexBegin + 4;
 
-constexpr IndexType SEnviornmentTex = 11;
+constexpr IndexType EnviornmentTex = 11;
 
-//Uniform Buffer Binding
-constexpr IndexType BScene = 0;
-constexpr IndexType BStaticMesh = 1;
-constexpr IndexType BLight = 2;
-constexpr IndexType BMaterial = 3;
-
-constexpr IndexType BShadowView = 0;
+constexpr IndexType DirectionalShadowMapBegin = 20;
 
 }
+
+namespace UB
+{
+//Uniform Buffer Binding
+constexpr IndexType Scene = 0;
+constexpr IndexType StaticMesh = 1;
+constexpr IndexType Light = 2;
+constexpr IndexType Material = 3;
+
+constexpr IndexType ShadowView = 0;
+
+}
+
 }
 
 
