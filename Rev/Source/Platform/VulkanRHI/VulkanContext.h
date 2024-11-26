@@ -62,6 +62,8 @@ public:
 
 	virtual void RHIBindUniformBuffer(uint16 InBinding, FRHIUniformBuffer* InBuffer) override;
 	virtual void RHIBindTexture(uint16 InBinding, FRHITexture* InTexture, FRHISamplerState* InSamplerState) override;
+	virtual void RHIBindTextures(uint16 InBinding, FRHITexture** InTextures, uint32 InNumTextures) override;
+	virtual void RHIBindSamplerState(uint16 InBinding, FRHISamplerState* InSamplerState) override;
 	virtual void RHIBindProgram(FRHIShaderProgram* InProgram) override;
 
 	virtual void RHISetGraphicsPipelineState(const FRHIGraphicsPipelineStateDesc& InState) override;

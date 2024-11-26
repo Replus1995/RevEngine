@@ -61,6 +61,9 @@ public:
 
 	virtual void RHIBindUniformBuffer(uint16 InBinding, FRHIUniformBuffer* InBuffer) = 0;
 	virtual void RHIBindTexture(uint16 InBinding, FRHITexture* InTexture, FRHISamplerState* InSamplerState = nullptr) = 0;
+	virtual void RHIBindTextures(uint16 InBinding, FRHITexture** InTextures, uint32 InNumTextures) = 0;
+	virtual void RHIBindSamplerState(uint16 InBinding, FRHISamplerState* InSamplerState) = 0;
+
 	virtual void RHIBindProgram(FRHIShaderProgram* InProgram) = 0;
 
 	virtual void RHISetGraphicsPipelineState(const FRHIGraphicsPipelineStateDesc& InState) = 0;

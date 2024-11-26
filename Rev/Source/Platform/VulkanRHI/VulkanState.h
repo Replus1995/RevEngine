@@ -104,7 +104,7 @@ struct FVulkanTextureSlot
 	{
 		Images[0] = InImage;
 		SamplerState = InSamplerState;
-		NumImages = 1;
+		NumImages = InImage ? 1 : 0;
  	}
 
 	FVulkanTextureSlot(FVulkanTexture** InImages, uint32 InNumImages)

@@ -346,6 +346,15 @@ void FVulkanContext::RHIBindTexture(uint16 InBinding, FRHITexture* InTexture, FR
 	mFrameState.Textures[InBinding + GShaderCompileConfig.TextureOffset] = { pTexture, pSamplerState };
 }
 
+void FVulkanContext::RHIBindTextures(uint16 InBinding, FRHITexture** InTextures, uint32 InNumTextures)
+{
+	if (!InTexture) return;
+
+	FVulkanTexture* pTexture = static_cast<FVulkanTexture*>(InTexture);
+	FVulkanSamplerState* pSamplerState = static_cast<FVulkanSamplerState*>(InSamplerState);
+	mFrameState.Textures[InBinding + GShaderCompileConfig.TextureOffset] = { pTexture, pSamplerState };
+}
+
 void FVulkanContext::RHIBindProgram(FRHIShaderProgram* InProgram)
 {
 	mFrameState.CurrentProgram = static_cast<FVulkanShaderProgram*>(InProgram);

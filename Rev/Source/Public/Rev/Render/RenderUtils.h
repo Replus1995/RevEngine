@@ -7,10 +7,11 @@
 
 namespace Rev
 {
-
-extern REV_API class FTexture* GWhiteTexture;
-extern REV_API class FTexture* GBlackTexture;
-extern REV_API class FTexture* GNormalTexture;
+class FTexture;
+extern REV_API FTexture* GWhiteTexture;
+extern REV_API FTexture* GBlackTexture;
+extern REV_API FTexture* GNormalTexture;
+extern REV_API FTexture* GShadowDepthTexture;
 
 class FNullVertexBuffer : public FVertexBuffer
 {

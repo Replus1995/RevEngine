@@ -32,6 +32,26 @@ public:
 	}
 };
 
+class FShadowDepthArrayTexture : public FTexture
+{
+public:
+	// FResource interface.
+	virtual void InitRHI() override
+	{
+		const FRHITextureClearColor ClearColor(1.0f, 0);
+		FRHITextureDesc TextureDesc = FRHITextureDesc::Create2DArray(1, 1, 1, PF_ShadowDepth).SetClearColor(ClearColor).SetFlags(ETextureCreateFlags::ShaderResource | ETextureCreateFlags::DepthStencilTarget);
+
+		TextureRHI = GDynamicRHI->RHICreateTexture(TextureDesc);
+
+		FRHISamplerStateDesc SamplerDesc(SF_Nearest, SW_Border, SW_Border, SW_Border);
+		SamplerDesc.BorderColor = 1;
+		SamplerDesc.CompareFunc = SCF_Less;
+		SamplerStateRHI = GDynamicRHI->RHICreateSamplerState(SamplerDesc);
+
+		FRenderCore::GetMainContext()->RHIClearTexture(TextureRHI.get());
+	}
+};
+
 //template <float X, float Y, float Z>
 //class FLinearTexture : public FTexture
 //{
@@ -52,6 +72,7 @@ public:
 FTexture* GWhiteTexture = new TGlobalResource<FColoredTexture<255, 255, 255, 255>>;
 FTexture* GBlackTexture = new TGlobalResource<FColoredTexture<0, 0, 0, 255>>;
 FTexture* GNormalTexture = new TGlobalResource<FColoredTexture<127, 127, 255, 255, false>>;
+FTexture* GShadowDepthTexture = new TGlobalResource<FShadowDepthArrayTexture>;
 
 TGlobalResource<FNullVertexBuffer> GNullVertexBuffer;
 TGlobalResource<F2DQuadIndexBuffer> G2DQuadIndexBuffer;
