@@ -7,6 +7,7 @@
 #include "Rev/Render/RenderUtils.h"
 #include "Rev/Render/RHI/RHIContext.h"
 #include "Rev/Render/RHI/RHICommandList.h"
+#include "Rev/HAL/FIleManager.h"
 #include "Rev/Asset/AssetLibrary.h"
 
 
@@ -23,6 +24,8 @@ namespace Rev
 	{
 		REV_CORE_ASSERT(!sInstance, "Application already exists!");
 		sInstance = this;
+
+		IFileManager::Init();
 
 		sRenderAPI = ERenderAPI::Vulkan;
 
@@ -44,6 +47,8 @@ namespace Rev
 		FAssetLibrary::Shutdown();
 		FRenderUtils::Shutdown();
 		FRenderCore::Cleanup();
+
+		IFileManager::Cleanup();
 	}
 
 	void Application::Run()

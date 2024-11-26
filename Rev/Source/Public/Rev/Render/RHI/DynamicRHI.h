@@ -22,7 +22,7 @@ public:
 
 	virtual Scope<IRHIContext> RHICreateContext() = 0;
 	//Buffer
-	virtual Ref<FRHIBuffer> RHICreateBuffer(const FRHIBufferDesc& InDesc) = 0;
+	virtual Ref<FRHIBuffer> RHICreateBuffer(uint32 InSize, uint32 InStride, EBufferUsageFlags InUsage) = 0;
 	virtual Ref<FRHIUniformBuffer> RHICreateUniformBuffer(uint32 InSize) = 0;
 
 	//Texture

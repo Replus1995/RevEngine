@@ -32,7 +32,7 @@ void FVulkanTextureCube::UpdateContent(FVulkanContext* Context, const void* InCo
     VkExtent2D MipSize = CalculateMipSize2D(InMipLevel);
     REV_CORE_ASSERT(InSize == MipSize.width * MipSize.height * GPixelFormats[TextureDesc.Format].BlockBytes, "Data size mismatch");
 
-    FVulkanUtils::ImmediateUploadImage(Context, mImage, mImageAspectFlags, { MipSize.width, MipSize.height, 1 }, InContent, InSize, InMipLevel, InArrayIndex);
+    FVulkanUtils::ImmediateUploadImage(Context, Image, ImageAspectFlags, { MipSize.width, MipSize.height, 1 }, InContent, InSize, InMipLevel, InArrayIndex);
 }
 
 void FVulkanTextureCube::Init()
@@ -69,21 +69,21 @@ void FVulkanTextureCube::Init()
     ImageAllocinfo.requiredFlags = VkMemoryPropertyFlags(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
     //allocate and create the image
-    REV_VK_CHECK(vmaCreateImage(FVulkanDynamicRHI::GetAllocator(), &ImageCreateInfo, &ImageAllocinfo, &mImage, &mAllocation, nullptr));
+    REV_VK_CHECK(vmaCreateImage(FVulkanDynamicRHI::GetAllocator(), &ImageCreateInfo, &ImageAllocinfo, &Image, &Allocation, nullptr));
 
     //build a image-view for the draw image to use for rendering
     VkImageViewCreateInfo ImageViewCreateInfo{}; // = FVkInit::ImageViewCreateInfo2D(mFormatInfo.Format, mImage, VK_IMAGE_ASPECT_COLOR_BIT);
     ImageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
     ImageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_CUBE;
-    ImageViewCreateInfo.image = mImage;
+    ImageViewCreateInfo.image = Image;
     ImageViewCreateInfo.format = ImageFormat;
-    ImageViewCreateInfo.subresourceRange.aspectMask = mImageAspectFlags;
+    ImageViewCreateInfo.subresourceRange.aspectMask = ImageAspectFlags;
     ImageViewCreateInfo.subresourceRange.baseMipLevel = 0;
     ImageViewCreateInfo.subresourceRange.levelCount = 1;
     ImageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
     ImageViewCreateInfo.subresourceRange.layerCount = 6;
 
-    REV_VK_CHECK(vkCreateImageView(FVulkanDynamicRHI::GetDevice(), &ImageViewCreateInfo, nullptr, &mImageView));
+    REV_VK_CHECK(vkCreateImageView(FVulkanDynamicRHI::GetDevice(), &ImageViewCreateInfo, nullptr, &ImageView));
 }
 
 }

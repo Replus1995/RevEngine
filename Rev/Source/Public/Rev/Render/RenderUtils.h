@@ -7,10 +7,11 @@
 
 namespace Rev
 {
-
-extern REV_API class FTexture* GWhiteTexture;
-extern REV_API class FTexture* GBlackTexture;
-extern REV_API class FTexture* GNormalTexture;
+class FTexture;
+extern REV_API FTexture* GWhiteTexture;
+extern REV_API FTexture* GBlackTexture;
+extern REV_API FTexture* GNormalTexture;
+extern REV_API FTexture* GShadowDepthTexture;
 
 class FNullVertexBuffer : public FVertexBuffer
 {
@@ -21,7 +22,7 @@ public:
 	virtual void InitRHI() override
 	{
 		// create a static vertex buffer
-		VertexBufferRHI = GDynamicRHI->RHICreateBuffer({ sizeof(uint32) * 4, 0, EBufferUsageFlags::Static | EBufferUsageFlags::VertexBuffer });
+		VertexBufferRHI = GDynamicRHI->RHICreateBuffer(sizeof(uint32) * 4, 0, EBufferUsageFlags::Static | EBufferUsageFlags::VertexBuffer);
 		static const uint32 Vertices[4] = { 0, 0, 0, 0 };
 		FRenderCore::GetMainContext()->RHIUpdateBufferData(VertexBufferRHI.get(), Vertices, sizeof(uint32) * 4);
 	}
@@ -38,7 +39,7 @@ public:
 	{
 		// create a static index buffer
 
-		IndexBufferRHI = GDynamicRHI->RHICreateBuffer({ sizeof(uint16) * 6, sizeof(uint16), EBufferUsageFlags::Static | EBufferUsageFlags::IndexBuffer });
+		IndexBufferRHI = GDynamicRHI->RHICreateBuffer(sizeof(uint16) * 6, sizeof(uint16), EBufferUsageFlags::Static | EBufferUsageFlags::IndexBuffer);
 		static const uint16 Indices[] = { 0, 1, 3, 0, 3, 2 };
 		FRenderCore::GetMainContext()->RHIUpdateBufferData(IndexBufferRHI.get(), Indices, sizeof(uint16) * 6);
 	}
@@ -54,7 +55,7 @@ public:
 	virtual void InitRHI() override
 	{
 		// create a static vertex buffer
-		VertexBufferRHI = GDynamicRHI->RHICreateBuffer({ sizeof(Math::FVector2) * 4, sizeof(Math::FVector2), EBufferUsageFlags::Static | EBufferUsageFlags::VertexBuffer });
+		VertexBufferRHI = GDynamicRHI->RHICreateBuffer(sizeof(Math::FVector2) * 4, sizeof(Math::FVector2), EBufferUsageFlags::Static | EBufferUsageFlags::VertexBuffer);
 		static const Math::FVector2 Vertices[4] =
 		{
 			Math::FVector2(-1,-1),

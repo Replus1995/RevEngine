@@ -19,7 +19,6 @@ enum EVulkanQueueKind : uint8
 
 struct FVulkanSurfaceSupport
 {
-	VkSurfaceCapabilitiesKHR Capabilities;
 	std::vector<VkSurfaceFormatKHR> Formats;
 	std::vector<VkPresentModeKHR> PresentModes;
 };
@@ -51,7 +50,6 @@ private:
 	static std::vector<const char*> GetEnabledExtensions();
 	static std::vector<const char*> GetEnabledLayers();
 
-	static bool PhysicalDeviceSuitable(VkPhysicalDevice InDevice, VkSurfaceKHR InSurface);
 	static bool CheckDeviceExtensionSupport(VkPhysicalDevice InDevice, const std::vector<const char*>& InExtensionNames);
 	static const std::vector<const char*>& GetDeviceRequiredExtensions();
 	static FVulkanSurfaceSupport QuerySurfaceSupport(VkPhysicalDevice InDevice, VkSurfaceKHR InSurface);

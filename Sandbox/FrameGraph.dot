@@ -1,0 +1,36 @@
+digraph FrameGraph {
+graph [style=invis, rankdir=TB ordering=out, splines=spline]
+node [shape=record, fontname=helvetica, fontsize=10, margin="0.2,0.03"]
+
+P0[label=<{ {<B>Base Pass</B>} | {&#x2605; Refs: 4<BR/> Index: 0} }> style="rounded,filled", fillcolor=orange]
+P1[label=<{ {<B>Sky Pass</B>} | {&#x2605; Refs: 1<BR/> Index: 1} }> style="rounded,filled", fillcolor=orange]
+P2[label=<{ {<B>Blit Pass</B>} | {&#x2605; Refs: 1<BR/> Index: 2} }> style="rounded,filled", fillcolor=orange]
+R0_1[label=<{ {<B>Scene Color</B><BR/><I>texture</I>} | {Index: 0<BR/>Refs : 1} }> style="rounded,filled", fillcolor=lightsteelblue]
+R1_1[label=<{ {<B>Scene Color MS</B><BR/><I>texture</I>} | {Index: 1<BR/>Refs : 1} }> style="rounded,filled", fillcolor=lightsteelblue]
+R2_1[label=<{ {<B>Scene Depth</B><BR/><I>texture</I>} | {Index: 2<BR/>Refs : 1} }> style="rounded,filled", fillcolor=lightsteelblue]
+R3_1[label=<{ {<B>Scene Depth MS</B><BR/><I>texture</I>} | {Index: 3<BR/>Refs : 1} }> style="rounded,filled", fillcolor=lightsteelblue]
+R0_2[label=<{ {<B>Scene Color</B>   <FONT>v2</FONT><BR/><I>texture</I>} | {Index: 0<BR/>Refs : 1} }> style="rounded,filled", fillcolor=lightsteelblue]
+R1_2[label=<{ {<B>Scene Color MS</B>   <FONT>v2</FONT><BR/><I>texture</I>} | {Index: 1<BR/>Refs : 0} }> style="rounded,filled", fillcolor=lightsteelblue]
+R2_2[label=<{ {<B>Scene Depth</B>   <FONT>v2</FONT><BR/><I>texture</I>} | {Index: 2<BR/>Refs : 1} }> style="rounded,filled", fillcolor=lightsteelblue]
+R3_2[label=<{ {<B>Scene Depth MS</B>   <FONT>v2</FONT><BR/><I>texture</I>} | {Index: 3<BR/>Refs : 0} }> style="rounded,filled", fillcolor=lightsteelblue]
+R0_3[label=<{ {<B>Scene Color</B>   <FONT>v3</FONT><BR/><I>texture</I>} | {Index: 0<BR/>Refs : 1} }> style="rounded,filled", fillcolor=lightsteelblue]
+R4_1[label=<{ {<B>Backbuffer</B><BR/><I>texture external</I>} | {Index: 4<BR/>Refs : 1} }> style="rounded,filled", fillcolor=lightsteelblue]
+R4_2[label=<{ {<B>Backbuffer</B>   <FONT>v2</FONT><BR/><I>texture external</I>} | {Index: 4<BR/>Refs : 0} }> style="rounded,filled", fillcolor=lightsteelblue]
+P0->{ R0_2 R1_2 R2_2 R3_2 } [color=orangered]
+P1->{ R0_3 } [color=orangered]
+P2->{ R4_2 } [color=orangered]
+R0_1->{ P0 } [color=yellowgreen]
+R1_1->{ P0 } [color=yellowgreen]
+R2_1->{ P0 } [color=yellowgreen]
+R3_1->{ P0 } [color=yellowgreen]
+R0_2->{ P1 } [color=yellowgreen]
+R2_2->{ P1 } [color=yellowgreen]
+R0_3->{ P2 } [color=yellowgreen]
+R4_1->{ P2 } [color=yellowgreen]
+
+subgraph cluster_imported_resources {
+graph [style=dotted, fontname=helvetica, label=< <B>Imported</B> >]
+R0_1 R1_1 R2_1 R3_1 R0_1 R1_1 R2_1 R3_1 R0_1 R4_1 R4_1 
+}
+}
+

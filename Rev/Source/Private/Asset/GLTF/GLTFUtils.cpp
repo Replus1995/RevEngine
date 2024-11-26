@@ -1,9 +1,10 @@
 #include "GLTFUtils.h"
 #include "Rev/Core/Assert.h"
 #include "Rev/Render/Component/StaticMesh.h"
-#include <filesystem>
+#include "Rev/HAL/FIleManager.h"
 
 #include "GLTFDebug.h"
+#include <filesystem>
 
 #define TINYGLTF_USE_CPP14
 #define TINYGLTF_IMPLEMENTATION
@@ -477,7 +478,7 @@ Ref<FStaticMesh> FGLTFUtils::ImportMeshPrimitive(const tinygltf::Primitive& InPr
 		{
 			REV_CORE_ASSERT(RefAccessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT);
 			REV_CORE_ASSERT(RefAccessor.type == TINYGLTF_TYPE_VEC4);
-			Storage.TangentData = LoadBufferData<float, 3>(RefAccessor, InModel);
+			Storage.TangentData = LoadBufferData<float, 4>(RefAccessor, InModel);
 			bGenTangents = false;
 		}
 		else if (attrName.compare("TEXCOORD_0") == 0)
@@ -604,25 +605,35 @@ Ref<FMaterial> FGLTFUtils::ImportMaterial(const tinygltf::Material& InMaterial, 
 	return Storage.CreateMaterial();
 }
 
-FModelImportResult FGLTFUtils::ImportModel(const FPath& InPath, bool DumpInfo)
+FModelImportResult FGLTFUtils::ImportModel(const char* InPath, bool IsGLB, bool DumpInfo)
 {
 	tinygltf::Model InModel;
 	tinygltf::TinyGLTF ctx;
 	std::string err;
 	std::string warn;
-	
-	std::string NativePath = InPath.ToNative();
+
+
 	bool ret = false;
-	if (InPath.Extension().compare(".glb") == 0) {
+	if (IsGLB) {
 	
-	    REV_CORE_INFO("Reading binary glTF {0}", NativePath);
+	    REV_CORE_INFO("Reading binary glTF {0}", InPath);
 	    // assume binary glTF.
-	    ret = ctx.LoadBinaryFromFile(&InModel, &err, &warn, NativePath.c_str());
+		FBuffer ModelMem;
+		IFileManager::Get().LoadBinaryFile(InPath, ModelMem);
+		ret = ctx.LoadBinaryFromMemory(&InModel, &err, &warn, ModelMem.Data(), ModelMem.Size());
 	}
 	else {
-	    REV_CORE_INFO("Reading ASCII glTF {0}", NativePath);
+	    REV_CORE_INFO("Reading ASCII glTF {0}", InPath);
 	    // assume ascii glTF.
-	    ret = ctx.LoadASCIIFromFile(&InModel, &err, &warn, NativePath.c_str());
+		std::string ModelStr;
+		IFileManager::Get().LoadStringFile(InPath, ModelStr);
+
+		auto GetBaseDirFunc = [](const std::string & filepath) -> std::string {
+			if (filepath.find_last_of("/\\") != std::string::npos)
+				return filepath.substr(0, filepath.find_last_of("/\\") + 1);
+			return "";
+		};
+	    ret = ctx.LoadASCIIFromString(&InModel, &err, &warn, ModelStr.c_str(), ModelStr.length(), GetBaseDirFunc(IFileManager::Get().GetNative(InPath)));
 	}
 	
 	if (!warn.empty()) {
@@ -634,7 +645,7 @@ FModelImportResult FGLTFUtils::ImportModel(const FPath& InPath, bool DumpInfo)
 	}
 	
 	if (!ret) {
-	    REV_CORE_ERROR("glTF load failed: {}", NativePath);
+	    REV_CORE_ERROR("glTF load failed: {}", InPath);
 		return {};
 	}
 	

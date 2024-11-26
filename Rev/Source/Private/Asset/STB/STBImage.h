@@ -36,7 +36,7 @@ private:
 	int mWidth;
 	int mHeight;
 	int mChannels;
-	int mPixelDepth; //8°¢16°¢32
+	int mPixelDepth; //8„ÄÅ16„ÄÅ32
 	EPixelFormat mFormat;
 };
 
@@ -44,7 +44,7 @@ private:
 class FSTBImage
 {
 public:
-	static FSTBImage2D ImportImage2D(const FPath& InPath);
+	static FSTBImage2D ImportImage2D(const char* InName);
 
 };
 

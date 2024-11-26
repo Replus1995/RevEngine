@@ -7,8 +7,12 @@
 #define REV_MAX_POINT_LIGHTS 16
 #define REV_MAX_SPOT_LIGHTS 16
 
+#define REV_MAX_SHADOW_VIEWS 6
+
 struct FDirectionalLight
 {
+    float4x4 ProjMats[REV_MAX_SHADOW_VIEWS];
+    float4x4 ViewMats[REV_MAX_SHADOW_VIEWS];
     float4 Direction;
     float4 Color;
     float Intensity;

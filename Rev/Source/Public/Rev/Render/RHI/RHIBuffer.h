@@ -7,65 +7,46 @@
 
 namespace Rev
 {
-
-struct FRHIBufferDesc
-{
-	uint32 Size = 0;
-	uint32 Stride = 0;
-	EBufferUsageFlags Usage = EBufferUsageFlags::None;
-
-	bool operator == (const FRHIBufferDesc& Other) const
-	{
-		bool bSame = Size == Other.Size &&
-			Stride == Other.Stride &&
-			Usage == Other.Usage;
-		return bSame;
-	}
-
-	bool operator != (const FRHIBufferDesc& Other) const
-	{
-		return !(*this == Other);
-	}
-};
-
 class REV_API FRHIBuffer : public FRHIResource
 {
 public:
-	FRHIBuffer(const FRHIBufferDesc& InDesc) : Desc(InDesc) {}
+	FRHIBuffer(uint32 InSize, uint32 InStride, EBufferUsageFlags InUsage) : Size(InSize), Stride(InStride), Usage(InUsage) {}
 	virtual ~FRHIBuffer() = default;
 
-	uint32 GetSize() const { return Desc.Size; }
-	uint32 GetStride() const { return Desc.Stride; }
-	EBufferUsageFlags GetUsage() const { return Desc.Usage; }
+	uint32 GetSize() const { return Size; }
+	uint32 GetStride() const { return Stride; }
+	EBufferUsageFlags GetUsage() const { return Usage; }
 private:
-	FRHIBufferDesc Desc;
+	uint32 Size = 0;
+	uint32 Stride = 0;
+	EBufferUsageFlags Usage = EBufferUsageFlags::None;
 };
 
 class REV_API FRHIUniformBuffer : public FRHIResource
 {
 public:
-	FRHIUniformBuffer(uint32 InSize) : BufferSize(InSize) {}
+	FRHIUniformBuffer(uint32 InSize) : Size(InSize) {}
 	virtual ~FRHIUniformBuffer() = default;
 	virtual void UpdateSubData(const void* Data, uint32 Size, uint32 Offset = 0) = 0;
 
-	uint32 GetSize() const { return BufferSize; }
+	uint32 GetSize() const { return Size; }
 
 protected:
-	uint32 BufferSize = 0;
+	uint32 Size = 0;
 };
 
 class REV_API FRHIDynamicUniformBuffer : public FRHIResource
 {
 public:
-	FRHIDynamicUniformBuffer(uint32 InSize) : BufferSize(InSize) {}
+	FRHIDynamicUniformBuffer(uint32 InSize) : Size(InSize) {}
 	virtual ~FRHIDynamicUniformBuffer() = default;
 	virtual void Resize(uint32 InSize) = 0;
 	virtual void UpdateSubData(const void* Data, uint32 Size, uint32 Offset = 0) = 0;
 
-	uint32 GetSize() const { return BufferSize; }
+	uint32 GetSize() const { return Size; }
 
 protected:
-	uint32 BufferSize = 0;
+	uint32 Size = 0;
 };
 
 }

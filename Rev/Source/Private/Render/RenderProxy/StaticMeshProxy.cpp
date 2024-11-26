@@ -78,7 +78,7 @@ void FStaticMeshProxy::DrawMeshesDepth(FRHICommandList& RHICmdList)
 	}
 }
 
-void FStaticMeshProxy::DrawMeshesOpaque(FRHICommandList& RHICmdList)
+void FStaticMeshProxy::DrawMeshesOpaque(FRHICommandList& RHICmdList, bool bUseMeshMaterial)
 {
 	for (auto& RenderData : mRenderDataArr)
 	{
@@ -92,14 +92,17 @@ void FStaticMeshProxy::DrawMeshesOpaque(FRHICommandList& RHICmdList)
 			auto Sections = RenderData.StaticMesh->GetSectionsForMaterial(i);
 			if (!Sections.empty())
 			{
-				pMat->PreDraw(RHICmdList);
+				if(bUseMeshMaterial)
+					pMat->PreDraw(RHICmdList);
+				
 				for (auto Section : Sections)
 				{
 					FRHIBuffer* IndexBufferRHI = RenderData.StaticMesh->GetIndexBuffer().GetIndexBufferRHI();
 					RHICmdList.GetContext()->RHIDrawPrimitiveIndexed(IndexBufferRHI, Section->NumTriangles, Section->StartIndex);
 				}
-				pMat->PostDraw(RHICmdList);
 
+				if(bUseMeshMaterial)
+					pMat->PostDraw(RHICmdList);
 			}
 		}
 	}
@@ -108,7 +111,7 @@ void FStaticMeshProxy::DrawMeshesOpaque(FRHICommandList& RHICmdList)
 
 void FStaticMeshProxy::PrepareMeshDraw(FRHICommandList& RHICmdList, const FStaticMeshRenderData& InData)
 {
-	RHICmdList.GetContext()->RHIBindUniformBuffer(UL::BStaticMesh, InData.MeshUB.get());
+	RHICmdList.GetContext()->RHIBindUniformBuffer(UB::StaticMesh, InData.MeshUB.get());
 	InData.StaticMesh->PrepareForDraw();
 	InData.StaticMesh->GetVertexBuffer().UpdateVertexStreams(RHICmdList);
 }

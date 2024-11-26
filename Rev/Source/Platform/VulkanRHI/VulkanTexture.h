@@ -12,15 +12,16 @@ class FVulkanTexture : public FRHITexture
 {
 public:
 	virtual ~FVulkanTexture();
-	virtual const void* GetNativeHandle() const override { return mImage; }
+	virtual const void* GetNativeHandle() const override { return Image; }
 
-	VkImage GetImage() const { return mImage; } //For easy to understand
-	VkImageView GetImageView() const { return mImageView; }
-	VkImageAspectFlags GetAspectFlags() const { return mImageAspectFlags; }
-	VkImageLayout GetImageLayout() const { return mImageLayout; }
+	VkImage GetImage() const { return Image; } //For easy to understand
+	VkImageView GetImageView() const { return ImageView; }
+	VkImageAspectFlags GetAspectFlags() const { return ImageAspectFlags; }
+	VkImageLayout GetImageLayout() const { return ImageLayout; }
 	VkClearValue GetClearValue() const;
 	VkExtent3D GetExtent() const;
 	VkSampleCountFlagBits GetSamplerCount() const;
+	VkFormat GetPlatformFormat() const;
 
 	static FVulkanTexture* Cast(FRHITexture* InTexture) { return static_cast<FVulkanTexture*>(InTexture); }
 
@@ -42,12 +43,12 @@ protected:
 
 
 protected:
-	VkImage mImage = VK_NULL_HANDLE;
-	VkImageView mImageView = VK_NULL_HANDLE;
-	VkImageAspectFlags mImageAspectFlags = VK_IMAGE_ASPECT_NONE;
-	VkImageLayout mImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-	VmaAllocation mAllocation = VK_NULL_HANDLE;
-	Ref<FVulkanSamplerState> mSampler = nullptr;
+	VkImage Image = VK_NULL_HANDLE;
+	VkImageView ImageView = VK_NULL_HANDLE;
+	VkImageAspectFlags ImageAspectFlags = VK_IMAGE_ASPECT_NONE;
+	VkImageLayout ImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	VmaAllocation Allocation = VK_NULL_HANDLE;
+	VkFormat PlatformFormat = VK_FORMAT_UNDEFINED;
 };
 
 }

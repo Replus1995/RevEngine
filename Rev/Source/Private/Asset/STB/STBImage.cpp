@@ -1,4 +1,5 @@
 #include "STBImage.h"
+#include "Rev/HAL/FIleManager.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
@@ -115,31 +116,33 @@ EPixelFormat FSTBImage2D::GetDesiredFormat(int InChannels, int InPixelDepth)
 }
 
 
-FSTBImage2D FSTBImage::ImportImage2D(const FPath& InPath)
+FSTBImage2D FSTBImage::ImportImage2D(const char* InName)
 {
-	std::string NativePath = InPath.ToNative();
-	const char* NativePathC = NativePath.c_str();
-	bool b16Bit = stbi_is_16_bit(NativePathC);
-	
-	//bool bHDR = stbi_is_hdr(NativePathC);
-
-	int ImgWidth = 0, ImgHeight = 0, ImgChannels = 0;
-	stbi_info(NativePathC, &ImgWidth, &ImgHeight, &ImgChannels);
-	int ReqChannels = ImgChannels == 3 ? 4 : ImgChannels;
-
-	if (b16Bit)
+	FBuffer ImageMem;
+	if (IFileManager::Get().LoadBinaryFile(InName, ImageMem))
 	{
-		if (uint16* data = stbi_load_16(NativePathC, &ImgWidth, &ImgHeight, &ImgChannels, ReqChannels); data)
+		bool b16Bit = stbi_is_16_bit_from_memory(ImageMem.Data(), ImageMem.Size());
+		//bool bHDR = stbi_is_hdr_from_memory(ImageMem.Data(), ImageMem.Size());
+
+		int ImgWidth = 0, ImgHeight = 0, ImgChannels = 0;
+		stbi_info_from_memory(ImageMem.Data(), ImageMem.Size(), &ImgWidth, &ImgHeight, &ImgChannels);
+		int ReqChannels = ImgChannels == 3 ? 4 : ImgChannels;
+
+		if (b16Bit)
 		{
-			return FSTBImage2D((uint8*)data, ImgWidth, ImgHeight, ReqChannels, 16);
+			if (uint16* data = stbi_load_16_from_memory(ImageMem.Data(), ImageMem.Size(), &ImgWidth, &ImgHeight, &ImgChannels, ReqChannels); data)
+			{
+				return FSTBImage2D((uint8*)data, ImgWidth, ImgHeight, ReqChannels, 16);
+			}
 		}
-	}
-	else
-	{
-		if (uint8* data = stbi_load(NativePathC, &ImgWidth, &ImgHeight, &ImgChannels, ReqChannels); data)
+		else
 		{
-			return FSTBImage2D(data, ImgWidth, ImgHeight, ReqChannels, 8);
+			if (uint8* data = stbi_load_from_memory(ImageMem.Data(), ImageMem.Size(), &ImgWidth, &ImgHeight, &ImgChannels, ReqChannels); data)
+			{
+				return FSTBImage2D(data, ImgWidth, ImgHeight, ReqChannels, 8);
+			}
 		}
+
 	}
 
 	return FSTBImage2D();

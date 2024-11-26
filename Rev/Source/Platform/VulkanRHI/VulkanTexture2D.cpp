@@ -35,7 +35,7 @@ void FVulkanTexture2D::UpdateContent(FVulkanContext* Context, const void* InCont
     VkExtent2D MipSize = CalculateMipSize2D(InMipLevel);
     REV_CORE_ASSERT(InSize == MipSize.width * MipSize.height * GPixelFormats[TextureDesc.Format].BlockBytes, "Data size mismatch");
 
-    FVulkanUtils::ImmediateUploadImage(Context, mImage, mImageAspectFlags, { MipSize.width, MipSize.height, 1 }, InContent, InSize, InMipLevel);
+    FVulkanUtils::ImmediateUploadImage(Context, Image, ImageAspectFlags, { MipSize.width, MipSize.height, 1 }, InContent, InSize, InMipLevel);
 }
 
 void FVulkanTexture2D::Init()
@@ -43,11 +43,11 @@ void FVulkanTexture2D::Init()
     REV_CORE_ASSERT(FVulkanDynamicRHI::GetDevice());
     REV_CORE_ASSERT(FVulkanDynamicRHI::GetAllocator());
 
-    VkFormat ImageFormat = (VkFormat)GPixelFormats[TextureDesc.Format].PlatformFormat;
+    PlatformFormat = (VkFormat)GPixelFormats[TextureDesc.Format].PlatformFormat;
     VkImageCreateFlags ImageFlags = 0;
     if (EnumHasAllFlags(TextureDesc.Flags, ETextureCreateFlags::SRGB))
     {
-        ImageFormat = FVulkanPixelFormat::GetPlatformFormatSRGB(ImageFormat);
+        PlatformFormat = FVulkanPixelFormat::GetPlatformFormatSRGB(PlatformFormat);
         ImageFlags |= VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT;
     }
 
@@ -56,7 +56,7 @@ void FVulkanTexture2D::Init()
     ImageCreateInfo.pNext = nullptr;
     ImageCreateInfo.flags = ImageFlags;
     ImageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
-    ImageCreateInfo.format = ImageFormat;
+    ImageCreateInfo.format = PlatformFormat;
     ImageCreateInfo.extent = GetExtent();
     ImageCreateInfo.mipLevels = TextureDesc.NumMips;
     ImageCreateInfo.arrayLayers = 1;
@@ -64,7 +64,7 @@ void FVulkanTexture2D::Init()
     ImageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
     ImageCreateInfo.usage = TranslateImageUsageFlags(TextureDesc.Flags);
     ImageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-    ImageCreateInfo.initialLayout = mImageLayout;
+    ImageCreateInfo.initialLayout = ImageLayout;
 
     //for the draw image, we want to allocate it from gpu local memory
     VmaAllocationCreateInfo ImageAllocinfo = {};
@@ -72,29 +72,29 @@ void FVulkanTexture2D::Init()
     ImageAllocinfo.requiredFlags = VkMemoryPropertyFlags(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
     //allocate and create the image
-    REV_VK_CHECK(vmaCreateImage(FVulkanDynamicRHI::GetAllocator(), &ImageCreateInfo, &ImageAllocinfo, &mImage, &mAllocation, nullptr));
+    REV_VK_CHECK(vmaCreateImage(FVulkanDynamicRHI::GetAllocator(), &ImageCreateInfo, &ImageAllocinfo, &Image, &Allocation, nullptr));
 
     //build a image-view for the draw image to use for rendering
     VkImageViewCreateInfo ImageViewCreateInfo{}; // = FVkInit::ImageViewCreateInfo2D(mFormatInfo.Format, mImage, VK_IMAGE_ASPECT_COLOR_BIT);
     ImageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
     ImageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-    ImageViewCreateInfo.image = mImage;
-    ImageViewCreateInfo.format = ImageFormat;
-    ImageViewCreateInfo.subresourceRange.aspectMask = mImageAspectFlags;
+    ImageViewCreateInfo.image = Image;
+    ImageViewCreateInfo.format = PlatformFormat;
+    ImageViewCreateInfo.subresourceRange.aspectMask = ImageAspectFlags;
     ImageViewCreateInfo.subresourceRange.baseMipLevel = 0;
     ImageViewCreateInfo.subresourceRange.levelCount = TextureDesc.NumMips;
     ImageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
     ImageViewCreateInfo.subresourceRange.layerCount = 1;
 
-    REV_VK_CHECK(vkCreateImageView(FVulkanDynamicRHI::GetDevice(), &ImageViewCreateInfo, nullptr, &mImageView));
+    REV_VK_CHECK(vkCreateImageView(FVulkanDynamicRHI::GetDevice(), &ImageViewCreateInfo, nullptr, &ImageView));
 }
 
 FVulkanTextureSwapchain::FVulkanTextureSwapchain(VkImage InSwapchainImage, VkFormat InFormat, uint16 InWidth, uint16 InHeight)
-    : FVulkanTexture(FRHITextureDesc::Create2D(InWidth, InHeight, PF_Unknown))
-    , mPlatformFormat(InFormat)
+    : FVulkanTexture(FRHITextureDesc::Create2D(InWidth, InHeight, PF_Unknown))  
 {
-    mImage = InSwapchainImage; 
-    mImageAspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
+    Image = InSwapchainImage;
+    PlatformFormat = InFormat;
+    ImageAspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
     Init();
 }
 
@@ -108,28 +108,28 @@ void FVulkanTextureSwapchain::Init()
     VkImageViewCreateInfo ImageViewCreateInfo{};
     ImageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
     ImageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-    ImageViewCreateInfo.image = mImage;
-    ImageViewCreateInfo.format = mPlatformFormat;
+    ImageViewCreateInfo.image = Image;
+    ImageViewCreateInfo.format = PlatformFormat;
     ImageViewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
     ImageViewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
     ImageViewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
     ImageViewCreateInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
-    ImageViewCreateInfo.subresourceRange.aspectMask = mImageAspectFlags;
+    ImageViewCreateInfo.subresourceRange.aspectMask = ImageAspectFlags;
     ImageViewCreateInfo.subresourceRange.baseMipLevel = 0;
     ImageViewCreateInfo.subresourceRange.levelCount = 1;
     ImageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
     ImageViewCreateInfo.subresourceRange.layerCount = 1;
 
-    REV_VK_CHECK(vkCreateImageView(FVulkanDynamicRHI::GetDevice(), &ImageViewCreateInfo, nullptr, &mImageView));
+    REV_VK_CHECK(vkCreateImageView(FVulkanDynamicRHI::GetDevice(), &ImageViewCreateInfo, nullptr, &ImageView));
 }
 
 void FVulkanTextureSwapchain::Release()
 {
     REV_CORE_ASSERT(FVulkanDynamicRHI::GetDevice());
 
-    vkDestroyImageView(FVulkanDynamicRHI::GetDevice(), mImageView, nullptr);
-    mImage = VK_NULL_HANDLE;
-    mImageView = VK_NULL_HANDLE;
+    vkDestroyImageView(FVulkanDynamicRHI::GetDevice(), ImageView, nullptr);
+    Image = VK_NULL_HANDLE;
+    ImageView = VK_NULL_HANDLE;
 }
 
 

@@ -1,7 +1,7 @@
 #include "Rev/Render/RenderProxy/CameraProxy.h"
-#include "Rev/World/Scene.h"
 #include "Rev/World/System/PlayerCameraSystem.h"
-#include "Rev/Render/Renderer/Renderer.h"
+#include "Rev/World/Scene.h"
+#include "Rev/Render/RHI/RHICommandList.h"
 
 namespace Rev
 {

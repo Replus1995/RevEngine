@@ -1,6 +1,7 @@
 #pragma once
 #include "Rev/Core/Base.h"
 #include "Rev/Render/RHI/RHIDefinitions.h"
+#include "Rev/Render/RHI/RHIResource.h"
 
 namespace Rev
 {
@@ -13,8 +14,8 @@ struct FRHIRenderPassDesc
 		FRHITexture* ResolveTarget = nullptr;
 		int32 ArraySlice = -1;
 		uint8 MipIndex = 0;
-		EAttachmentLoadOp LoadOp = ALO_DontCare;
-		EAttachmentStoreOp StoreOp = ASO_DontCare;
+		ERenderTargetLoadAction LoadAction = RTL_DontCare;
+		ERenderTargetStoreAction StoreAction = RTS_DontCare;
 	};
 	FColorEntry ColorRenderTargets[RTA_MaxColorAttachments];
 	uint32 NumColorRenderTargets = 0;
@@ -23,12 +24,15 @@ struct FRHIRenderPassDesc
 	{
 		FRHITexture* DepthStencilTarget = nullptr;
 		FRHITexture* ResolveTarget = nullptr;
-		EAttachmentLoadOp DepthLoadOp = ALO_DontCare;
-		EAttachmentStoreOp DepthStoreOp = ASO_DontCare;
-		EAttachmentLoadOp StencilLoadOp = ALO_DontCare;
-		EAttachmentStoreOp StencilStoreOp = ASO_DontCare;
+		ERenderTargetLoadAction DepthLoadAction = RTL_DontCare;
+		ERenderTargetStoreAction DepthStoreAction = RTS_DontCare;
+		ERenderTargetLoadAction StencilLoadAction = RTL_DontCare;
+		ERenderTargetStoreAction StencilStoreAction = RTS_DontCare;
 	};
 	FDepthStencilEntry DepthStencilRenderTarget;
+
+	uint8 MultiViewCount = 0;
+
 	//SubpassHint
 };
 
@@ -37,12 +41,11 @@ class FRHIRenderPass : public FRHIResource
 public:
 	FRHIRenderPass(const FRHIRenderPassDesc& InDesc) : PassDesc(InDesc) {}
 	virtual ~FRHIRenderPass() = default;
-	virtual void MarkFramebufferDirty() = 0;
+
 	const FRHIRenderPassDesc& GetDesc() const { return PassDesc; }
 
 protected:
 	FRHIRenderPassDesc PassDesc;
-
 };
 
 

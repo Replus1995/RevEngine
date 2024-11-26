@@ -27,9 +27,6 @@ public:
 private:
 	virtual void Init() override;
 	virtual void Release() override;
-
-private:
-	VkFormat mPlatformFormat = VK_FORMAT_UNDEFINED;
 };
 
 

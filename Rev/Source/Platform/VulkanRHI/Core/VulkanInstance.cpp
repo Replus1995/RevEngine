@@ -1,5 +1,5 @@
 #include "VulkanInstance.h"
-#include "VulkanDeviceFeatures.h"
+#include "VulkanDevice.h"
 #include "Rev/Core/Assert.h"
 #include "Rev/Core/Application.h"
 #include "Rev/Core/Window.h"
@@ -228,10 +228,19 @@ void FVulkanInstance::PickPhysicalDevice()
 	}
 	std::vector<VkPhysicalDevice> PhysicalDevices(PhysicalDeviceCount);
 	vkEnumeratePhysicalDevices(mInstance, &PhysicalDeviceCount, PhysicalDevices.data());
-	for (const auto& PhysicalDevice : PhysicalDevices) {
-		if (PhysicalDeviceSuitable(PhysicalDevice, mSurface)) {
-			mPhysicalDevice = PhysicalDevice;
-			break;
+	for (const auto& PhysicalDevice : PhysicalDevices)
+	{
+		if (CheckDeviceExtensionSupport(PhysicalDevice, GetDeviceRequiredExtensions())) 
+		{
+			FVkQueueFamilyIndices Indices = FindQueueFamilies(PhysicalDevice, mSurface);
+			FVulkanSurfaceSupport SurfaceSupport = QuerySurfaceSupport(PhysicalDevice, mSurface);
+			bool bSurfaceAdequate = !SurfaceSupport.Formats.empty() && !SurfaceSupport.PresentModes.empty();
+			if (Indices.IsComplete() && bSurfaceAdequate)
+			{
+				mSurfaceSupport = SurfaceSupport;
+				mPhysicalDevice = PhysicalDevice;
+				break;
+			}
 		}
 	}
 
@@ -244,7 +253,6 @@ void FVulkanInstance::PickPhysicalDevice()
 	{
 		mQueueFamilies[i] = Indices[i].value();
 	}
-	mSurfaceSupport = QuerySurfaceSupport(mPhysicalDevice, mSurface);
 }
 
 void FVulkanInstance::CreateLogicalDevice()
@@ -255,7 +263,7 @@ void FVulkanInstance::CreateLogicalDevice()
 	PopulateQueueCreateInfos(QueueCreateInfos, mQueueFamilies);
 
 	//physical device features
-	FVulkanPhysicalDeviceFeatures Features;
+	FVulkanPhysicalDeviceFeatures VulkanPhysicalDeviceFeatures(mInstance, mPhysicalDevice);
 
 	//extenisons
 	const std::vector<const char*> EnabledExtensions = GetDeviceRequiredExtensions();
@@ -271,7 +279,7 @@ void FVulkanInstance::CreateLogicalDevice()
 	DeviceCreateInfo.ppEnabledExtensionNames = EnabledExtensions.empty() ? nullptr : EnabledExtensions.data();
 	DeviceCreateInfo.enabledLayerCount = 0;
 	DeviceCreateInfo.ppEnabledLayerNames = nullptr;
-	DeviceCreateInfo.pNext = Features.Get();
+	DeviceCreateInfo.pNext = &VulkanPhysicalDeviceFeatures.Features;
 
 	if (vkCreateDevice(mPhysicalDevice, &DeviceCreateInfo, nullptr, &mDevice) != VK_SUCCESS) {
 		throw std::runtime_error("[FVkDevice] Failed to create logical device!");
@@ -287,8 +295,8 @@ void FVulkanInstance::QueryDeviceCapacity(FRHIDeviceCapacity& Capacity)
 {
 	REV_CORE_ASSERT(mPhysicalDevice != VK_NULL_HANDLE);
 
-	VkPhysicalDeviceProperties DeviceProperties;
-	vkGetPhysicalDeviceProperties(mPhysicalDevice, &DeviceProperties);
+	FVulkanPhysicalDeviceProperties VulkanPhysicalDeviceProperties(mInstance, mPhysicalDevice);
+	const auto& DeviceProperties = VulkanPhysicalDeviceProperties.Properties.properties;
 
 	VkSampleCountFlags SampleCount = DeviceProperties.limits.framebufferColorSampleCounts & DeviceProperties.limits.framebufferDepthSampleCounts;
 	if (SampleCount & VK_SAMPLE_COUNT_64_BIT)
@@ -413,22 +421,6 @@ std::vector<const char*> FVulkanInstance::GetEnabledLayers()
 	return RequiredLayers;
 }
 
-bool FVulkanInstance::PhysicalDeviceSuitable(VkPhysicalDevice InDevice, VkSurfaceKHR InSurface)
-{
-	auto& RequiredExtensionNames = GetDeviceRequiredExtensions();
-	bool bExtensionSupported = CheckDeviceExtensionSupport(InDevice, RequiredExtensionNames);
-
-	FVkQueueFamilyIndices Indices = FindQueueFamilies(InDevice, InSurface);
-
-	bool bSurfaceAdequate = false;
-	if (bExtensionSupported) {
-		FVulkanSurfaceSupport SurfaceSupport = QuerySurfaceSupport(InDevice, InSurface);
-		bSurfaceAdequate = !SurfaceSupport.Formats.empty() && !SurfaceSupport.PresentModes.empty();
-	}
-
-	return Indices.IsComplete() && bExtensionSupported && bSurfaceAdequate;
-}
-
 bool FVulkanInstance::CheckDeviceExtensionSupport(VkPhysicalDevice InDevice, const std::vector<const char*>& InExtensionNames)
 {
 	uint32 AvailableExtensionCount;
@@ -447,7 +439,8 @@ const std::vector<const char*>& FVulkanInstance::GetDeviceRequiredExtensions()
 {
 	static std::vector<const char*> RequiredExtensions = {
 		VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-		VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME
+		VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME,
+		VK_KHR_MULTIVIEW_EXTENSION_NAME
 	};
 
 	return RequiredExtensions;
@@ -455,9 +448,11 @@ const std::vector<const char*>& FVulkanInstance::GetDeviceRequiredExtensions()
 
 FVulkanSurfaceSupport FVulkanInstance::QuerySurfaceSupport(VkPhysicalDevice InDevice, VkSurfaceKHR InSurface)
 {
-	FVulkanSurfaceSupport Details;
 
-	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(InDevice, InSurface, &Details.Capabilities);
+	//VkSurfaceCapabilitiesKHR SurfaceCapabilities;
+	//vkGetPhysicalDeviceSurfaceCapabilitiesKHR(InDevice, InSurface, &SurfaceCapabilities);
+
+	FVulkanSurfaceSupport Details;
 
 	uint32 FormatCount = 0;
 	vkGetPhysicalDeviceSurfaceFormatsKHR(InDevice, InSurface, &FormatCount, nullptr);

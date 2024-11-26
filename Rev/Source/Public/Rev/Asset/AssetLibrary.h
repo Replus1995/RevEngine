@@ -1,6 +1,5 @@
 #pragma once
 #include "Rev/Core/Base.h"
-#include "Rev/Core/FileSystem.h"
 #include "Rev/Asset/TextureStorage.h"
 #include "Rev/Asset/MaterialStorage.h"
 
@@ -35,15 +34,15 @@ public:
 	static Ref<FStaticMesh> CreateBasicGeometry(EBasicGeometry InKind, const Ref<FMaterial>& InMaterial = nullptr);
 
 
-	static FTextureStorage ImportTexture(const FPath& InPath);
+	static FTextureStorage ImportTexture(const char* InPath);
 	static FTextureStorage ImportTextureCube(
-		const FPath& InPathPX, const FPath& InPathNX,
-		const FPath& InPathPY, const FPath& InPathNY,
-		const FPath& InPathPZ, const FPath& InPathNZ,
+		const char* InPathPX, const char* InPathNX,
+		const char* InPathPY, const char* InPathNY,
+		const char* InPathPZ, const char* InPathNZ,
 		bool bSRGB = false
 		);
 
-	static FModelImportResult ImportModel(const FPath& InPath);
+	static FModelImportResult ImportModel(const char* InPath);
 
 private:
 	friend class Application;

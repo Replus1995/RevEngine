@@ -88,8 +88,7 @@ struct FRHISamplerStateDesc
 		float InMinMipLevel = 0,
 		float InMaxMipLevel = FLT_MAX,
 		uint32 InBorderColor = 0,
-		/** Only supported in D3D11 */
-		ESamplerCompareFunction InCompareFunc = SCF_Never
+		ESamplerCompareFunction InCompareFunc = SCF_Never //For shadow sampler
 	)
 		: Filter(InFilter)
 		, WarpU(InWarpU)

@@ -1,11 +1,9 @@
 #include "Rev/Render/RenderProxy/SceneProxy.h" 
 #include "Rev/Render/RHI/DynamicRHI.h"
+#include "Rev/Render/RHI/RHIContext.h"
 #include "Rev/Render/RHI/RHICommandList.h"
 #include "Rev/Render/RHI/RHIBuffer.h"
 #include "Rev/Render/UniformLayout.h"
-
-#include "Rev/Core/Application.h"
-#include "Rev/Core/Window.h"
 
 namespace Rev
 {
@@ -18,9 +16,6 @@ void FSceneProxy::Prepare(const Ref<FScene>& Scene)
 	mStaticMeshProxy.Prepare(Scene);
 	mLightProxy.Prepare(Scene);
 	mSkyProxy.Prepare(Scene);
-
-	auto pWindow = Application::GetApp().GetWindow();
-	mSceneParams.ViewExtent = { 0, 0, pWindow->GetWidth(), pWindow->GetHeight() };
 }
 
 void FSceneProxy::SyncResource(FRHICommandList& RHICmdList)
@@ -35,7 +30,7 @@ void FSceneProxy::SyncResource(FRHICommandList& RHICmdList)
 	mSkyProxy.SyncResource(RHICmdList);
 
 	{
-		
+		mSceneParams.ViewExtent = { 0, 0, RHICmdList.GetContext()->RHIGetFrameWidth(), RHICmdList.GetContext()->RHIGetFrameHeight() };
 		mSceneParams.ViewPos = mCameraProxy.GetViewPos();
 		mSceneParams.ViewMat = mCameraProxy.GetViewMat();
 		mSceneParams.ProjMat = mCameraProxy.GetProjMat();
@@ -46,9 +41,10 @@ void FSceneProxy::SyncResource(FRHICommandList& RHICmdList)
 
 		mSceneUB->UpdateSubData(&mSceneParams, sizeof(FSceneUniform));
 
-		RHICmdList.GetContext()->RHIBindUniformBuffer(UL::BScene, mSceneUB.get());
+		RHICmdList.GetContext()->RHIBindUniformBuffer(UB::Scene, mSceneUB.get());
 	}
 
+	RHICmdList.GetContext()->RHISetViewport(0, 0, RHICmdList.GetContext()->RHIGetFrameWidth(), RHICmdList.GetContext()->RHIGetFrameHeight());
 }
 
 void FSceneProxy::Cleanup()
@@ -68,14 +64,21 @@ void FSceneProxy::DrawSkybox(FRHICommandList& RHICmdList)
 	mSkyProxy.DrawSkybox(RHICmdList);
 }
 
-uint32 FSceneProxy::GetFrameWidth() const
+void FSceneProxy::DrawShadowMaps(FRHICommandList& RHICmdList)
 {
-	return mSceneParams.ViewExtent.Width;
-}
+	RHICmdList.GetContext()->RHIBeginDebugLabel("ShadowMap Passes", Math::FLinearColor(0.6,0.6,0.6));
 
-uint32 FSceneProxy::GetFrameHeight() const
-{
-	return mSceneParams.ViewExtent.Height;
+	RHICmdList.GetContext()->RHISetViewport(0, 0, REV_SHADOWMAP_SIZE, REV_SHADOWMAP_SIZE);
+	for (uint32 i = 0; i < mLightProxy.GetDirectionalLightCount(); i++)
+	{
+		mLightProxy.BeginDirectionalShadowPass(RHICmdList, i);
+
+		mStaticMeshProxy.DrawMeshesOpaque(RHICmdList, false);
+
+		mLightProxy.EndShadowPass(RHICmdList);
+	}
+
+	RHICmdList.GetContext()->RHIEndDebugLabel();
 }
 
 }

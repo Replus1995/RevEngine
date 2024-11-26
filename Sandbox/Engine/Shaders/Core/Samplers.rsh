@@ -55,7 +55,6 @@ static SamplerState GTextureSampler
     AddressV = Wrap;
     AddressW = Wrap;
 };
-
 static SamplerComparisonState GShadowSampler
 {
     Filter = COMPARISON_MIN_MAG_LINEAR_MIP_POINT;

@@ -2,10 +2,10 @@
 #include "Rev/Core/Assert.h"
 #include "Rev/Core/Clock.h"
 #include "Rev/Core/Log.h"
-#include "Rev/Render/RHI/RHITexture.h"
-#include "Rev/Render/RHI/RHIBuffer.h"
+#include "Rev/HAL/FIleManager.h"
 #include "Rev/Render/RHI/RHIShaderLibrary.h"
 #include <filesystem>
+#include <set>
 
 #include <shaderc/shaderc.hpp>
 #include <spirv_cross/spirv_glsl.hpp>
@@ -160,7 +160,7 @@ public:
 		const char* requested_source,
 		shaderc_include_type type,
 		const char* requesting_source,
-		size_t include_depth
+		size_t include_depthShaderIncluder
 	) override;
 	void ReleaseInclude(shaderc_include_result* data) override;
 
@@ -178,12 +178,14 @@ shaderc_include_result* ShaderIncluder::GetInclude(
 	size_t include_depth
 )
 {
-	std::string HeaderPath(requested_source);
-	FBuffer HeaderContent = FFileSystem::LoadBinaryFile(FPath(HeaderPath));
+	//std::string HeaderPath(requested_source);
+	//FBuffer HeaderContent = FFileSystem::LoadBinaryFile(FPath(HeaderPath));
+	FBuffer HeaderContent;
+	IFileManager::Get().LoadBinaryFile(requested_source, HeaderContent);
 	REV_CORE_ASSERT(!HeaderContent.Empty(), "ShaderIncluder::GetInclude header file load failed.");
 
 	auto Container = new HeaderContainer;
-	Container->Name = std::move(HeaderPath);
+	Container->Name = requested_source;
 	Container->Content = std::move(HeaderContent);
 
 	auto Result = new shaderc_include_result;
@@ -298,21 +300,25 @@ void FShadercFactory::ReflectShaderInfo(FShadercCompiledData& Data)
 	for (auto& Buffer : ResourceRefl.uniform_buffers)
 	{
 		const auto& BufferType = Refl.get_type(Buffer.base_type_id);
-		size_t BufferSize = Refl.get_declared_struct_size(BufferType);
-		size_t MemberCount = BufferType.member_types.size();
+		const auto& ArrayInfo = Refl.get_type(Buffer.type_id).array;
+		
 
 		FRHIShaderUniform Uniform;
 		Uniform.Name = Buffer.name;
 		Uniform.Type = EShaderUniformType::Buffer;
-		Uniform.Num = 1;
+		Uniform.Num = ArrayInfo.empty() ? 1 : ArrayInfo[0];
 		Uniform.Binding = Refl.get_decoration(Buffer.id, spv::Decoration::DecorationBinding);
 
 		Data.Uniforms.push_back(Uniform);
 
 #ifdef REV_DEBUG
+		size_t BufferSize = Refl.get_declared_struct_size(BufferType);
+		size_t MemberCount = BufferType.member_types.size();
 		REV_CORE_TRACE("  {0}: Binding = {1}, Size = {2}, Members = {3}", Uniform.Name.c_str(), Uniform.Binding - GShaderCompileConfig.BufferOffset, BufferSize, MemberCount);
 #endif
 	}
+
+	std::set<int8> SkipSamplers;
 
 #ifdef REV_DEBUG
 	if (!ResourceRefl.separate_images.empty())
@@ -321,25 +327,27 @@ void FShadercFactory::ReflectShaderInfo(FShadercCompiledData& Data)
 	for (auto& Texture : ResourceRefl.separate_images)
 	{
 		uint32 TextureBinding = Refl.get_decoration(Texture.id, spv::Decoration::DecorationBinding);
-		auto TextureType = Refl.get_type(Texture.base_type_id).image;
+		const auto& TextureType = Refl.get_type(Texture.base_type_id).image;
+		const auto& ArrayInfo = Refl.get_type(Texture.type_id).array;
 
 		FRHIShaderUniform Uniform;
 		Uniform.Name = Texture.name;
 		Uniform.Type = EShaderUniformType::Texture;
-		Uniform.Num = 1;
+		Uniform.Num = ArrayInfo.empty() ? 1 : ArrayInfo[0];
 		Uniform.Binding = uint16(TextureBinding);
 
 		Uniform.TexFormat = sSpirvFormatMapping[uint32(TextureType.format)];
 		Uniform.TexDimension = TranslateTextureDimension(TextureType.dim, TextureType.arrayed);
 
 		size_t NameCompareLength = Texture.name.size() - sizeof("Texture");
-		bool isCompareSampler = false;
+		//bool isCompareSampler = false;
 		for (auto& Sampler : ResourceRefl.separate_samplers)
 		{
 			if (strncmp(Texture.name.data(), Sampler.name.data(), NameCompareLength) == 0)
 			{
 				Uniform.SamplerBinding = Refl.get_decoration(Sampler.id, spv::Decoration::DecorationBinding);
 				Uniform.bSamplerCompare = Refl.variable_is_depth_or_compare(Sampler.id);
+				SkipSamplers.insert(Uniform.SamplerBinding);
 				break;
 			}
 		}
@@ -347,15 +355,43 @@ void FShadercFactory::ReflectShaderInfo(FShadercCompiledData& Data)
 		Data.Uniforms.push_back(Uniform);
 
 #ifdef REV_DEBUG
-		REV_CORE_TRACE(" {0}: Binding = {1}, SamplerBinding = {2}", Uniform.Name.c_str(), Uniform.Binding - GShaderCompileConfig.TextureOffset, Uniform.SamplerBinding - GShaderCompileConfig.SamplerOffset);
+		if(Uniform.SamplerBinding >= 0)
+			REV_CORE_TRACE(" {0}: Binding = {1}, SamplerBinding = {2}", Uniform.Name.c_str(), Uniform.Binding - GShaderCompileConfig.TextureOffset, Uniform.SamplerBinding - GShaderCompileConfig.SamplerOffset);
+		else
+			REV_CORE_TRACE(" {0}: Binding = {1}", Uniform.Name.c_str(), Uniform.Binding - GShaderCompileConfig.TextureOffset);
 #endif
+	}
+
+	bool bFirstSampler = true;
+	for (auto& Sampler : ResourceRefl.separate_samplers)
+	{
+		int8 SamplerBinding = Refl.get_decoration(Sampler.id, spv::Decoration::DecorationBinding);
+		if(SkipSamplers.count(SamplerBinding) != 0)
+			continue;
+		if (bFirstSampler)
+		{
+			bFirstSampler = false;
+#ifdef REV_DEBUG
+			REV_CORE_TRACE("Samplers:");
+#endif
+		}
+
+		FRHIShaderUniform Uniform;
+		Uniform.Name = Sampler.name;
+		Uniform.Type = EShaderUniformType::SamplerState;
+		Uniform.Num = 1;
+		Uniform.Binding = uint16(SamplerBinding);
+		Uniform.SamplerBinding = Refl.get_decoration(Sampler.id, spv::Decoration::DecorationBinding);
+		Uniform.bSamplerCompare = Refl.variable_is_depth_or_compare(Sampler.id);
+
+		Data.Uniforms.push_back(Uniform);
+		REV_CORE_TRACE(" {0}: Binding = {1}", Uniform.Name.c_str(), Uniform.Binding - GShaderCompileConfig.SamplerOffset);
 	}
 }
 
 void FShadercFactory::CompileShaders(const FShadercSource& InSource, const FRHIShaderCompileOptions& InOptions, FShadercCompiledData& OutData)
 {
 	Clock timer;
-	std::string NativeFilePath = InSource.FilePath.ToNative();
 	shaderc::Compiler compiler;
 	shaderc::CompileOptions options;
 	InitCompileOptions(options);
@@ -370,7 +406,7 @@ void FShadercFactory::CompileShaders(const FShadercSource& InSource, const FRHIS
 			REV_CORE_ASSERT(false);
 		}*/
 
-		shaderc::SpvCompilationResult CompileResult = compiler.CompileGlslToSpv(InSource.FileContent.DataAs<char>(), InSource.FileContent.Size(), kind, NativeFilePath.c_str(), options);
+		shaderc::SpvCompilationResult CompileResult = compiler.CompileGlslToSpv(InSource.FileContent.DataAs<char>(), InSource.FileContent.Size(), kind, InSource.FilePath.c_str(), options);
 		if (CompileResult.GetCompilationStatus() != shaderc_compilation_status_success)
 		{
 			REV_CORE_ERROR(CompileResult.GetErrorMessage());
@@ -384,10 +420,10 @@ void FShadercFactory::CompileShaders(const FShadercSource& InSource, const FRHIS
 	REV_CORE_INFO("Shader '{0}' compile took {1} ms", OutData.Name.c_str(), timer.ElapsedMillis());
 }
 
-FShadercCompiledData FShadercFactory::LoadOrCompileShader(const FPath& InPath, const FRHIShaderCompileOptions& InOptions, EShaderStage InStage)
+FShadercCompiledData FShadercFactory::LoadOrCompileShader(const char* InPath, const FRHIShaderCompileOptions& InOptions, EShaderStage InStage)
 {
 	FShadercCompiledData Result;
-	Result.Name = InPath.ToString(false);
+	Result.Name = InPath;
 
 	std::string OptionHashStr = std::to_string(InOptions.GetHash());
 	fs::path ShaderCachePath(FShadercUtils::GetCacheDirectory() + Result.Name + "_" + OptionHashStr + FShadercUtils::GetCacheExtension());

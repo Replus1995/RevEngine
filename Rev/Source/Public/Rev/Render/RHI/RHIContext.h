@@ -34,6 +34,9 @@ public:
 	virtual void RHISetVSync(bool bEnable) = 0;
 	virtual void RHISetViewport(uint32 InX, uint32 InY, uint32 InWidth, uint32 InHeight) = 0;
 	virtual void RHIClearBackTexture(const Math::FLinearColor& InColor) = 0;
+	virtual uint32 RHIGetFrameWidth() = 0;
+	virtual uint32 RHIGetFrameHeight() = 0;
+	virtual FRHITexture* RHIGetBackTexture() = 0;
 
 	virtual void RHIBeginRenderPass(FRHIRenderPass* InRenderPass) = 0;
 	virtual void RHIEndRenderPass() = 0;
@@ -58,6 +61,9 @@ public:
 
 	virtual void RHIBindUniformBuffer(uint16 InBinding, FRHIUniformBuffer* InBuffer) = 0;
 	virtual void RHIBindTexture(uint16 InBinding, FRHITexture* InTexture, FRHISamplerState* InSamplerState = nullptr) = 0;
+	virtual void RHIBindTextures(uint16 InBinding, FRHITexture** InTextures, uint32 InNumTextures) = 0;
+	virtual void RHIBindSamplerState(uint16 InBinding, FRHISamplerState* InSamplerState) = 0;
+
 	virtual void RHIBindProgram(FRHIShaderProgram* InProgram) = 0;
 
 	virtual void RHISetGraphicsPipelineState(const FRHIGraphicsPipelineStateDesc& InState) = 0;

@@ -1,7 +1,6 @@
 #pragma once
 #include "Rev/Core/Base.h"
-
-#define REV_MAX_VERTEX_ELEMENTS 16
+#include "Rev/Render/RenderCore.h"
 
 namespace Rev
 {
@@ -91,8 +90,8 @@ enum class EShaderUniformType : uint8
 {
 	Unknown,
 	Buffer,
-	Sampler,
 	Texture,
+	SamplerState,
 };
 
 enum EShaderStage : uint8
@@ -120,6 +119,7 @@ enum class EBufferUsageFlags : uint32
 	KeepCPUAccess		= 1u << 4,
 	VertexBuffer		= 1u << 5,
 	IndexBuffer			= 1u << 6,
+	StorageBuffer		= 1u << 7,
 };
 ENUM_CLASS_FLAGS(EBufferUsageFlags);
 
@@ -235,31 +235,61 @@ enum EColorWriteMask : uint8
 	CWM_RGBA = CWM_RGB | CWM_Alpha
 };
 
-enum EPipelineBindPoint : uint8
-{
-	PBP_Graphics,
-	PBP_Compute,
-	PBP_RayTracing
-};
-
 //RenderPass
 
-enum EAttachmentLoadOp : uint8
+enum ERenderTargetLoadAction : uint8
 {
-	ALO_Load = 0,
-	ALO_Clear,
-	ALO_DontCare
+	RTL_Load = 0,
+	RTL_Clear,
+	RTL_DontCare
 };
 
-enum EAttachmentStoreOp : uint8
+enum ERenderTargetStoreAction : uint8
 {
-	ASO_Store = 0,
-	ASO_DontCare
+	RTS_Store = 0,
+	RTS_DontCare
 };
+
+//Utils
+enum class ERHIPipeline : uint8
+{
+	None		= 0,
+	Graphics	= 1 << 0,
+	Compute		= 1 << 1,
+	RayTracing	= 1 << 2,
+	All			= Graphics | Compute | RayTracing,
+	Num			= 3
+};
+ENUM_CLASS_FLAGS(ERHIPipeline)
 
 struct FRHIDeviceCapacity
 {
 	uint8 MaxNumSamples = 1;
 };
+
+class FRHICommandList;
+class FRHIRenderPass;
+class FRHITexture;
+class FRHIBuffer;
+class FRHIUniformBuffer;
+class FRHIShader;
+
+class FRHISamplerState;
+class FRHIRasterizerState;
+class FRHIDepthStencilState;
+class FRHIColorBlendState;
+class FRHIVertexInputState;
+
+using FRHIRenderPassRef		= Ref<FRHIRenderPass>;
+using FRHITextureRef		= Ref<FRHITexture>;
+using FRHIBufferRef			= Ref<FRHIBuffer>;
+using FRHIUniformBufferRef	= Ref<FRHIUniformBuffer>;
+using FRHIShaderRef			= Ref<FRHIShader>;
+
+using FRHISamplerStateRef		= Ref<FRHISamplerState>;
+using FRHIRasterizerStateRef	= Ref<FRHIRasterizerState>;
+using FRHIDepthStencilStateRef	= Ref<FRHIDepthStencilState>;
+using FRHIColorBlendStateRef	= Ref<FRHIColorBlendState>;
+using FRHIVertexInputStateRef	= Ref<FRHIVertexInputState>;
 
 }

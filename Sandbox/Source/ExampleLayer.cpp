@@ -5,9 +5,9 @@
 #include <Rev/World/System/PlayerCameraSystem.h>
 #include <Rev/Render/Material/PBRMaterial.h>
 #include <Rev/Render/RHI/RHIShaderLibrary.h>
-#include <Rev/Core/FileSystem.h>
 #include <Rev/Asset/AssetLibrary.h>
 #include <Rev/Asset/TextureStorage.h>
+#include <Rev/HAL/FIleManager.h>
 
 #include <filesystem>
 
@@ -20,29 +20,30 @@ ExampleLayer::ExampleLayer()
 {
 	//Load shader
 
-	//FFileSystem::MountDir("/SandBox", std::filesystem::current_path().generic_u8string());
-	FFileSystem::MountDir("/Game", (std::filesystem::current_path() / "Game").generic_string());
+	IFileManager::Get().Mount("/Game", (std::filesystem::current_path() / "Game").generic_string().c_str());
 
 	//Create Sandbox Scene
 	mScene = CreateRef<Rev::FScene>();
 
 	//FAssetLibrary::GetDefaultSurfaceMaterial();
 
-	/*{
-		auto pBoxMat = CreateRef<ExampleMaterial>();
-		pBoxMat->Compile();
-		pBoxMat->SetColor(Math::FLinearColor(.7, .9, .8, 1));
+	//{
+	//	auto pBoxMat = CreateRef<FPBRMaterial>();
+	//	pBoxMat->Compile();
+	//	//pBoxMat->SetColor(Math::FLinearColor(.7, .9, .8, 1));
+	//	pBoxMat->PBRMaterialParams.Metallic = 0.3f;
+	//	pBoxMat->PBRMaterialParams.Roughness = 0.8f;
 
-		auto meshEntity = mScene->CreateEntity();
-		auto& meshComp = meshEntity.AddComponent<StaticMeshComponent>();
-		meshComp.StaticMesh = FAssetLibrary::CreateBasicGeometry(EBasicGeometry::Box, pBoxMat);
-		auto& transformComp = meshEntity.GetComponent<TransformComponent>();
-		transformComp.SetLocation(Math::FVector3(0, 0.6, -5));
-	}*/
+	//	auto meshEntity = mScene->CreateEntity();
+	//	auto& meshComp = meshEntity.AddComponent<StaticMeshComponent>();
+	//	meshComp.StaticMesh = FAssetLibrary::CreateBasicGeometry(EBasicGeometry::Box, pBoxMat);
+	//	auto& transformComp = meshEntity.GetComponent<TransformComponent>();
+	//	transformComp.SetLocation(Math::FVector3(0, 0.6, -5));
+	//}
 
 	{
-		//auto importRes = FAssetLibrary::ImportMesh(FPath("/Game/Assets/Models/Cube/Cube.gltf"));
-		auto importRes = FAssetLibrary::ImportModel(FPath("/Game/Assets/Models/DamagedHelmet.glb"));
+		//auto importRes = FAssetLibrary::ImportModel("/Game/Assets/Models/Cube/Cube.gltf");
+		auto importRes = FAssetLibrary::ImportModel("/Game/Assets/Models/DamagedHelmet.glb");
 		if (!importRes.StaticMeshes.empty())
 		{
 			auto meshEntity = mScene->CreateEntity();
@@ -73,13 +74,29 @@ ExampleLayer::ExampleLayer()
 	}
 
 	{
+		auto pBoxMat = CreateRef<FPBRMaterial>();
+		pBoxMat->Compile();
+		pBoxMat->PBRMaterialParams.BaseColorFactor = (Math::FLinearColor(.8, .8, 1, 1));
+		pBoxMat->PBRMaterialParams.Metallic = 0.3f;
+		pBoxMat->PBRMaterialParams.Roughness = 0.8f;
+
+		auto meshEntity = mScene->CreateEntity();
+		auto& meshComp = meshEntity.AddComponent<StaticMeshComponent>();
+		meshComp.StaticMesh = FAssetLibrary::CreateBasicGeometry(EBasicGeometry::Box, pBoxMat);
+		auto& transformComp = meshEntity.GetComponent<TransformComponent>();
+		transformComp.SetLocation(Math::FVector3(0, 5, -5));
+		transformComp.SetRotation(Math::FRotator(-45.0f, -90, 0));
+		transformComp.SetScale(Math::FVector3(.5, .5, 2));
+	}
+
+	{
 		auto lightEntity = mScene->CreateEntity();
 		auto& dirLightComp = lightEntity.AddComponent<DirectionalLightComponent>();
 		dirLightComp.Light.SetColorByTemperature(6500.0f);
-		dirLightComp.Light.SetIntensity(8.0f);
+		dirLightComp.Light.SetIntensity(3.0f);
 		auto& transformComp = lightEntity.GetComponent<TransformComponent>();
 		transformComp.SetLocation(Math::FVector3(0, 0, 0));
-		transformComp.SetRotation(Math::FRotator(0, 0, 45.0f));
+		transformComp.SetRotation(Math::FRotator(-45.0f, -90, 0));
 	}
 
 	{
@@ -90,6 +107,8 @@ ExampleLayer::ExampleLayer()
 		auto& transformComp = camEntity.GetComponent<TransformComponent>();
 		transformComp.SetLocation(Math::FVector3(0, 2, 0));
 		transformComp.SetRotation(Math::FRotator(-30.0f, 0, 0));
+		//camComp.Camera.SetOrthographic(10, -100, 100);
+
 
 		auto camSys = mScene->GetSystem<PlayerCameraSystem>();
 		if (camSys)

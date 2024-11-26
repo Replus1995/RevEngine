@@ -5,7 +5,7 @@
 #include "Rev/Core/Application.h"
 #include "Rev/Core/Window.h"
 
-#include "Rev/Render/Renderer/ForwardRenderer.h"
+#include "Rev/Render/Renderer.h"
 
 
 namespace Rev
@@ -34,7 +34,7 @@ void SceneLayer::OnAttach()
 	{
 		mScene->OnRuntimeStart();
 	}
-	mRenderer = CreateRef<FForwardRenderer>(mSceneProxy.get());
+	mRenderer = CreateRef<FRenderer>(mSceneProxy.get());
 }
 
 void SceneLayer::OnDetach()
@@ -67,20 +67,9 @@ void SceneLayer::OnDraw(FRHICommandList& RHICmdList)
 {
 	mSceneProxy->Prepare(mScene);
 
-	//uint32 WinWidth = Application::GetApp().GetWindow()->GetWidth();
-	//uint32 WinHeight = Application::GetApp().GetWindow()->GetHeight();
-	RHICmdList.GetContext()->RHISetViewport(0, 0, mSceneProxy->GetFrameWidth(), mSceneProxy->GetFrameHeight());
-
-
-	mRenderer->BeginFrame();
+	mRenderer->BeginFrame(RHICmdList);
 	mRenderer->DrawFrame(RHICmdList);
-	mRenderer->EndFrame();
-
-
-	//RenderCmd::BeginFrame(true);
-	//RenderCmd::SetViewport(0, 0, WinWidth, WinHeight);
-	//RenderCmd::ClearBackBuffer();
-	//RenderCmd::EndFrame();
+	mRenderer->EndFrame(RHICmdList);
 
 	mSceneProxy->Cleanup();
 }

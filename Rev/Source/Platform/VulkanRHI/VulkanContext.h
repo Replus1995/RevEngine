@@ -1,6 +1,5 @@
 #pragma once
 #include "Rev/Render/RHI/RHIContext.h"
-#include "Rev/Core/Deleter.h"
 #include "Rev/Math/Maths.h"
 #include <vector>
 #include <map>
@@ -43,6 +42,9 @@ public:
 	virtual void RHISetVSync(bool bEnable) override;
 	virtual void RHISetViewport(uint32 InX, uint32 InY, uint32 InWidth, uint32 InHeight) override;
 	virtual void RHIClearBackTexture(const Math::FLinearColor& InColor) override;
+	virtual uint32 RHIGetFrameWidth() override;
+	virtual uint32 RHIGetFrameHeight() override;
+	virtual FRHITexture* RHIGetBackTexture() override;
 
 //Data transfer
 	virtual void RHIUpdateTexture(FRHITexture* InTexture, const void* InContent, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex) override;
@@ -60,6 +62,8 @@ public:
 
 	virtual void RHIBindUniformBuffer(uint16 InBinding, FRHIUniformBuffer* InBuffer) override;
 	virtual void RHIBindTexture(uint16 InBinding, FRHITexture* InTexture, FRHISamplerState* InSamplerState) override;
+	virtual void RHIBindTextures(uint16 InBinding, FRHITexture** InTextures, uint32 InNumTextures) override;
+	virtual void RHIBindSamplerState(uint16 InBinding, FRHISamplerState* InSamplerState) override;
 	virtual void RHIBindProgram(FRHIShaderProgram* InProgram) override;
 
 	virtual void RHISetGraphicsPipelineState(const FRHIGraphicsPipelineStateDesc& InState) override;
@@ -97,7 +101,6 @@ private:
 	FVulkanFrameData mFrameData[REV_VK_FRAME_OVERLAP];
 
 	//dynamic state
-	VkExtent2D mDrawExtent = {0, 0};
 	VkViewport mViewport;
 	VkRect2D mScissor;
 	

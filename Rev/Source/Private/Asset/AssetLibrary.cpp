@@ -1,6 +1,5 @@
 #include "Rev/Asset/AssetLibrary.h"
-#include "Rev/Core/FileSystem.h"
-#include "Rev/Core/Assert.h"
+#include "Rev/HAL/FIleManager.h"
 #include "Rev/Render/RHI/RHIShaderLibrary.h"
 #include "Rev/Render/RHI/DynamicRHI.h"
 #include "Rev/Render/RHI/RHIContext.h"
@@ -16,17 +15,16 @@
 #include "./GLTF/GLTFUtils.h"
 #include "./STB/STBImage.h"
 
+#include <filesystem>
+
 namespace Rev
 {
-
-
-
 
 static Ref<FMaterial> sDefaultSurfaceMaterial = nullptr;
 
 void FAssetLibrary::Init()
 {
-	FFileSystem::MountDir("/Engine", (std::filesystem::current_path() / "Engine").generic_string());
+	IFileManager::Get().Mount("/Engine", (std::filesystem::current_path() / "Engine").generic_string().c_str());
 }
 
 void FAssetLibrary::Shutdown()
@@ -66,7 +64,7 @@ Ref<FStaticMesh> FAssetLibrary::CreateBasicGeometry(EBasicGeometry InKind, const
 	return nullptr;
 }
 
-FTextureStorage FAssetLibrary::ImportTexture(const FPath& InPath)
+FTextureStorage FAssetLibrary::ImportTexture(const char* InPath)
 {
 	FTextureStorage Result;
 	if (FSTBImage2D image = FSTBImage::ImportImage2D(InPath); image.Valid())
@@ -81,7 +79,7 @@ FTextureStorage FAssetLibrary::ImportTexture(const FPath& InPath)
 	return Result;
 }
 
-FTextureStorage FAssetLibrary::ImportTextureCube(const FPath& InPathPX, const FPath& InPathNX, const FPath& InPathPY, const FPath& InPathNY, const FPath& InPathPZ, const FPath& InPathNZ, bool bSRG)
+FTextureStorage FAssetLibrary::ImportTextureCube(const char* InPathPX, const char* InPathNX, const char* InPathPY, const char* InPathNY, const char* InPathPZ, const char* InPathNZ, bool bSRG)
 {
 	FTextureStorage Result;
 	std::vector<FSTBImage2D> images(6);
@@ -119,11 +117,14 @@ FTextureStorage FAssetLibrary::ImportTextureCube(const FPath& InPathPX, const FP
 	return Result;
 }
 
-FModelImportResult FAssetLibrary::ImportModel(const FPath& InPath)
+FModelImportResult FAssetLibrary::ImportModel(const char* InPath)
 {
-	if (InPath.Extension() == ".gltf" || InPath.Extension() == ".glb")
+	std::filesystem::path ModelPath(InPath);
+	std::string ModelExt = ModelPath.extension().generic_string();
+
+	if (ModelExt == ".gltf" || ModelExt == ".glb")
 	{
-		return FGLTFUtils::ImportModel(InPath);
+		return FGLTFUtils::ImportModel(InPath, ModelExt == ".glb");
 	}
 
 	return FModelImportResult();

@@ -68,9 +68,6 @@ void FVulkanContext::BeginFrame(bool bClearBackBuffer)
 
 	mSwapchain.NextFrame(kWaitTime, FrameData.SwapchainSemaphore, nullptr);
 
-	mDrawExtent.width = mSwapchain.GetExtent().width;
-	mDrawExtent.height = mSwapchain.GetExtent().height;
-
 	FrameData.DescriptorPool.ResetPool(FVulkanDynamicRHI::GetDevice());
 
 	VkCommandBuffer CmdBuffer = FrameData.CmdBuffer;
@@ -191,6 +188,21 @@ void FVulkanContext::RHIClearBackTexture(const Math::FLinearColor& InColor)
 
 	auto SwapchainTexture = GetSwapchainTexture();
 	FVulkanUtils::ImmediateClearImage(this, SwapchainTexture->GetImage(), SwapchainTexture->GetAspectFlags(), ClearValue, 0, 1, 0, 1);
+}
+
+uint32 FVulkanContext::RHIGetFrameWidth()
+{
+	return mSwapchain.GetExtent().width;
+}
+
+uint32 FVulkanContext::RHIGetFrameHeight()
+{
+	return mSwapchain.GetExtent().height;
+}
+
+FRHITexture* FVulkanContext::RHIGetBackTexture()
+{
+	return mSwapchain.GetCurrentTexture();
 }
 
 void FVulkanContext::RHIUpdateTexture(FRHITexture* InTexture, const void* InContent, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex)
@@ -329,9 +341,37 @@ void FVulkanContext::RHIBindTexture(uint16 InBinding, FRHITexture* InTexture, FR
 {
 	if (!InTexture) return;
 
+	uint16 RealBinding = InBinding + GShaderCompileConfig.TextureOffset;
+
 	FVulkanTexture* pTexture = static_cast<FVulkanTexture*>(InTexture);
 	FVulkanSamplerState* pSamplerState = static_cast<FVulkanSamplerState*>(InSamplerState);
-	mFrameState.Textures[InBinding + GShaderCompileConfig.TextureOffset] = { pTexture, pSamplerState };
+	mFrameState.Textures[RealBinding] = FVulkanTextureSlot(pTexture, pSamplerState);
+}
+
+void FVulkanContext::RHIBindTextures(uint16 InBinding, FRHITexture** InTextures, uint32 InNumTextures)
+{
+	REV_CORE_ASSERT(InNumTextures < REV_MAX_UNIFORM_ARRAY_SIZE);
+
+	uint16 RealBinding = InBinding + GShaderCompileConfig.TextureOffset;
+
+	FVulkanTexture** pTextures = (FVulkanTexture**)InTextures;
+	mFrameState.Textures[RealBinding] = FVulkanTextureSlot(pTextures, InNumTextures);
+}
+
+void FVulkanContext::RHIBindSamplerState(uint16 InBinding, FRHISamplerState* InSamplerState)
+{
+	uint16 RealBinding = InBinding + GShaderCompileConfig.SamplerOffset;
+	FVulkanSamplerState* pSamplerState = static_cast<FVulkanSamplerState*>(InSamplerState);
+	mFrameState.Textures[RealBinding] = FVulkanTextureSlot(nullptr, pSamplerState);
+
+	/*if (auto Iter = mFrameState.Textures.find(RealBinding); Iter != mFrameState.Textures.end())
+	{
+		Iter->second.SamplerState = pSamplerState;
+	}
+	else
+	{
+		mFrameState.Textures[RealBinding] = FVulkanTextureSlot(nullptr, pSamplerState);
+	}*/
 }
 
 void FVulkanContext::RHIBindProgram(FRHIShaderProgram* InProgram)
@@ -449,7 +489,7 @@ VkDescriptorSet FVulkanContext::GetDescriptorSet(const FVulkanShaderProgram* InP
 
 
 	VkDescriptorBufferInfo BufferInfos[REV_VK_MAX_SHADER_UNIFORM_BUFFERS] = {};
-	VkDescriptorImageInfo ImageInfos[REV_VK_MAX_SHADER_UNIFORM_SAMPLERS] = {};
+	VkDescriptorImageInfo ImageInfos[REV_VK_MAX_SHADER_UNIFORM_IMAGES] = {};
 	VkWriteDescriptorSet Writes[REV_VK_MAX_DESCRIPTORSETS] = {};
 	uint32 WriteCount = 0;
 	uint32 BufferCount = 0;
@@ -487,28 +527,39 @@ VkDescriptorSet FVulkanContext::GetDescriptorSet(const FVulkanShaderProgram* InP
 		break;
 		case EShaderUniformType::Texture:
 		{
-			auto TextureAndSamplerState = mFrameState.FindTexture(BindingIdx);
-			FVulkanTexture* Texture = TextureAndSamplerState.first;
-			FVulkanSamplerState* SamplerState = TextureAndSamplerState.second;
-			if (Texture)
+			auto TextureSlotPtr = mFrameState.FindTexture(BindingIdx);
+			if (TextureSlotPtr && TextureSlotPtr->NumImages > 0)
 			{
-				ImageInfos[ImageCount].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-				ImageInfos[ImageCount].imageView = Texture->GetImageView();
-				ImageInfos[ImageCount].sampler = SamplerState ? SamplerState->Sampler : VK_NULL_HANDLE;
-				
+				const auto& TextureSlot = *TextureSlotPtr;
+				const VkDescriptorImageInfo* ImageInfo = nullptr;
+				for (size_t i = 0; i < TextureSlot.NumImages; i++)
+				{
+					ImageInfos[ImageCount].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+					ImageInfos[ImageCount].imageView = TextureSlot.Images[i]->GetImageView();
+					ImageInfos[ImageCount].sampler = TextureSlot.SamplerState ? TextureSlot.SamplerState->Sampler : VK_NULL_HANDLE;
+
+					if (!ImageInfo)
+					{
+						ImageInfo = &ImageInfos[ImageCount];
+					}
+
+					++ImageCount;
+				}
+
+
 				Writes[WriteCount].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 				Writes[WriteCount].pNext = NULL;
 				Writes[WriteCount].dstSet = DescSet;
 				Writes[WriteCount].dstBinding = BindingIdx;
 				Writes[WriteCount].dstArrayElement = 0;
-				Writes[WriteCount].descriptorCount = 1;
+				Writes[WriteCount].descriptorCount = TextureSlot.NumImages;
 				Writes[WriteCount].descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-				Writes[WriteCount].pImageInfo = &ImageInfos[ImageCount];
+				Writes[WriteCount].pImageInfo = ImageInfo;
 				Writes[WriteCount].pBufferInfo = NULL;
 				Writes[WriteCount].pTexelBufferView = NULL;
 				++WriteCount;
 
-				if (SamplerState)
+				if (TextureSlot.SamplerState)
 				{
 					Writes[WriteCount].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 					Writes[WriteCount].pNext = NULL;
@@ -517,15 +568,40 @@ VkDescriptorSet FVulkanContext::GetDescriptorSet(const FVulkanShaderProgram* InP
 					Writes[WriteCount].dstArrayElement = 0;
 					Writes[WriteCount].descriptorCount = 1;
 					Writes[WriteCount].descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
-					Writes[WriteCount].pImageInfo = &ImageInfos[ImageCount];
+					Writes[WriteCount].pImageInfo = ImageInfo;
 					Writes[WriteCount].pBufferInfo = NULL;
 					Writes[WriteCount].pTexelBufferView = NULL;
 					++WriteCount;
 				}
+			}
+		}
+		break;
+		case EShaderUniformType::SamplerState:
+		{
+			auto TextureSlotPtr = mFrameState.FindTexture(BindingIdx);
+			if (TextureSlotPtr && TextureSlotPtr->SamplerState)
+			{
+				const auto& TextureSlot = *TextureSlotPtr;
+				ImageInfos[ImageCount].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+				ImageInfos[ImageCount].imageView = VK_NULL_HANDLE;
+				ImageInfos[ImageCount].sampler = TextureSlot.SamplerState->Sampler;
+
+				Writes[WriteCount].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+				Writes[WriteCount].pNext = NULL;
+				Writes[WriteCount].dstSet = DescSet;
+				Writes[WriteCount].dstBinding = Uniform.SamplerBinding;
+				Writes[WriteCount].dstArrayElement = 0;
+				Writes[WriteCount].descriptorCount = 1;
+				Writes[WriteCount].descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
+				Writes[WriteCount].pImageInfo = &ImageInfos[ImageCount];
+				Writes[WriteCount].pBufferInfo = NULL;
+				Writes[WriteCount].pTexelBufferView = NULL;
+				++WriteCount;
 
 				++ImageCount;
 			}
 		}
+		break;
 		default:
 			break;
 		}

@@ -1,7 +1,6 @@
 #pragma once
 #include "Rev/Core/Base.h"
 #include "Rev/Core/Buffer.h"
-#include "Rev/Core/FileSystem.h"
 #include "Rev/Render/RenderCore.h"
 #include "Rev/Render/PixelFormat.h"
 #include "Rev/Render/RHI/RHIShader.h"
@@ -15,7 +14,7 @@ namespace Rev
 
 struct FShadercSource
 {
-	FPath FilePath;
+	std::string FilePath;
 	FBuffer FileContent;
 	EShaderStage Stage = SS_Unknown;
 
@@ -60,7 +59,7 @@ public:
 	static EShaderStage StringToShaderStage(std::string_view InStr);
 	static const char* ShaderStageToString(EShaderStage InStage);
 
-	static FShadercSource LoadShaderSource(const FPath& InPath);
+	static FShadercSource LoadShaderSource(const char* InPath);
 	static bool LoadShaderCompiledData(const std::filesystem::path& ShaderCachePath, FShadercCompiledData& OutCompiledData);
 	static bool SaveShaderCompiledData(const std::filesystem::path& ShaderCachePath, FShadercCompiledData& InCompiledData);
 };

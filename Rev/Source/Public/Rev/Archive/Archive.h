@@ -80,7 +80,7 @@ public:
 		return Ar;
 	}
 
-	template<typename TEnumType, ENABLE_CHECK(TIsEnum<TEnumType>)>
+	template<typename TEnumType, ENABLE_CHECK(std::is_enum<TEnumType>)>
 	FORCEINLINE friend FArchive& operator<<(FArchive& Ar, TEnumType& Value)
 	{
 		static_assert(std::is_enum_v<TEnumType>);

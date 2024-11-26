@@ -23,7 +23,7 @@ VSOutput main(VSInput Input)
     Pos.z = -1.0f;
 
     VSOutput Result;
-    Result.ViewDir = mul(transpose(ToMatrix3(uScene.ViewMat)), normalize(Pos));
+    Result.ViewDir = mul(transpose(float3x3(uScene.ViewMat)), normalize(Pos));
     Result.Position = float4(Input.Position.xy, 1.0, 1.0);
     return Result;
 }

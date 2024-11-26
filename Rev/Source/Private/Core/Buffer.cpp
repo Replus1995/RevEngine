@@ -50,18 +50,19 @@ FBuffer FBuffer::Copy(FBuffer other)
 
 void FBuffer::Allocate(uint64 size)
 {
-	if (mSize != size)
+	if (mSize == size)
+		return;
+	if (void* NewData = realloc(mData, size); NewData)
 	{
-		Release();
-		mData = new uint8[size];
+		mData = (uint8*)NewData;
 		mSize = size;
+		memset(mData, 0, mSize);
 	}
-	memset(mData, 0, mSize);
 }
 
 void FBuffer::Release()
 {
-	delete[] mData;
+	free(mData);
 	mData = nullptr;
 	mSize = 0;
 }
