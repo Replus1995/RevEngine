@@ -44,6 +44,7 @@ void FSceneProxy::SyncResource(FRHICommandList& RHICmdList)
 		RHICmdList.GetContext()->RHIBindUniformBuffer(UB::Scene, mSceneUB.get());
 	}
 
+	RHICmdList.GetContext()->RHISetViewport(0, 0, RHICmdList.GetContext()->RHIGetFrameWidth(), RHICmdList.GetContext()->RHIGetFrameHeight());
 }
 
 void FSceneProxy::Cleanup()
@@ -67,6 +68,7 @@ void FSceneProxy::DrawShadowMaps(FRHICommandList& RHICmdList)
 {
 	RHICmdList.GetContext()->RHIBeginDebugLabel("ShadowMap Passes", Math::FLinearColor(0.6,0.6,0.6));
 
+	RHICmdList.GetContext()->RHISetViewport(0, 0, REV_SHADOWMAP_SIZE, REV_SHADOWMAP_SIZE);
 	for (uint32 i = 0; i < mLightProxy.GetDirectionalLightCount(); i++)
 	{
 		mLightProxy.BeginDirectionalShadowPass(RHICmdList, i);

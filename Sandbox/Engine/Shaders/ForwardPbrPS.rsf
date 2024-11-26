@@ -82,7 +82,7 @@ PSOutput main(const PSInput Input)
         float3 LightColor = ComputeLightPBR(BaseColor.rgb, Roughness, Metallic, Normal, ViewDir, LightDir, NdV, F0, Radiance);
         LightColor *= uDirectionalLight.Lights[i].Color.rgb;
         //TODO: Shadow
-        
+
         float ShadowFactor = 1.0f;
         if(uDirectionalLight.Lights[i].ShadowIndex >= 0)
         {
@@ -92,14 +92,19 @@ PSOutput main(const PSInput Input)
                 float4x4 ShadowViewMat = uDirectionalLight.Lights[i].ViewMats[j];
                 float4 ShadowViewPos = mul(ShadowProjMat, mul(ShadowViewMat, float4(Input.vWorldPos, 1.0f)));
                 float3 ShadowProjCoords = ShadowViewPos.xyz / ShadowViewPos.w;
-                ShadowProjCoords = ShadowProjCoords * 0.5 + 0.5;
-                float ClosestDepth = DirectionalShadows[i].Sample(ShadowSamplerState, float3(ShadowProjCoords.xy, j)).r;
+
                 float CurrentDepth = ShadowProjCoords.z;
-                float Shadow = CurrentDepth > ClosestDepth ? 1.0 : 0.0;
+                
+                ShadowProjCoords.y *= -1; //Use opengl rh coord
+                ShadowProjCoords = ShadowProjCoords * 0.5 + 0.5;
+                float ClosestDepth = DirectionalShadows[i].Sample(ShadowSamplerState, float3(ShadowProjCoords.x, ShadowProjCoords.y, j)).r;
+                //float CurrentDepth = ShadowProjCoords.z;
+                float Bias = max(0.05 * (1.0 - dot(Normal, LightDir)), 0.005)
+                float Shadow = CurrentDepth - Bias > ClosestDepth ? 0.0 : 1.0;
                 ShadowFactor *= Shadow;
-                //float fShadow = DirectionalShadows[i].SampleCmpLevelZero(ShadowSampler, float3(0,0, j), 0);
             }
         }
+       
         LightColor *= ShadowFactor;
 
         //LightColor += (diffuseBRDF + specularBRDF) * Radiance * NdL;

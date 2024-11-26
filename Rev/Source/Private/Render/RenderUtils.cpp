@@ -45,7 +45,7 @@ public:
 
 		FRHISamplerStateDesc SamplerDesc(SF_Nearest, SW_Border, SW_Border, SW_Border);
 		SamplerDesc.BorderColor = 1;
-		SamplerDesc.CompareFunc = SCF_Less;
+		//SamplerDesc.CompareFunc = SCF_Less;
 		SamplerStateRHI = GDynamicRHI->RHICreateSamplerState(SamplerDesc);
 
 		FRenderCore::GetMainContext()->RHIClearTexture(TextureRHI.get());

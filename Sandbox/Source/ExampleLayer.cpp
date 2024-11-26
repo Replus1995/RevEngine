@@ -74,6 +74,22 @@ ExampleLayer::ExampleLayer()
 	}
 
 	{
+		auto pBoxMat = CreateRef<FPBRMaterial>();
+		pBoxMat->Compile();
+		pBoxMat->PBRMaterialParams.BaseColorFactor = (Math::FLinearColor(.8, .8, 1, 1));
+		pBoxMat->PBRMaterialParams.Metallic = 0.3f;
+		pBoxMat->PBRMaterialParams.Roughness = 0.8f;
+
+		auto meshEntity = mScene->CreateEntity();
+		auto& meshComp = meshEntity.AddComponent<StaticMeshComponent>();
+		meshComp.StaticMesh = FAssetLibrary::CreateBasicGeometry(EBasicGeometry::Box, pBoxMat);
+		auto& transformComp = meshEntity.GetComponent<TransformComponent>();
+		transformComp.SetLocation(Math::FVector3(0, 5, -5));
+		transformComp.SetRotation(Math::FRotator(-45.0f, -90, 0));
+		transformComp.SetScale(Math::FVector3(.5, .5, 2));
+	}
+
+	{
 		auto lightEntity = mScene->CreateEntity();
 		auto& dirLightComp = lightEntity.AddComponent<DirectionalLightComponent>();
 		dirLightComp.Light.SetColorByTemperature(6500.0f);
