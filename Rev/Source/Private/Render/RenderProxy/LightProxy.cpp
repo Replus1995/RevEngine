@@ -122,7 +122,7 @@ void FLightProxy::BeginDirectionalShadowPass(FRHICommandList& RHICmdList, uint32
 	PipelineStateDesc.VertexInputState = GStaticMeshVertexInputState.VertexInputStateRHI.get();
 
 	FRHIRasterizerStateDesc RasterizerStateDesc;
-	RasterizerStateDesc.CullMode = CM_Back;
+	RasterizerStateDesc.CullMode = CM_Front;
 	PipelineStateDesc.RasterizerState = FRHIPipelineStateCache::Get()->GetOrCreateRasterizerState(RasterizerStateDesc);
 
 	FRHIDepthStencilStateDesc DepthStencilStateDesc;

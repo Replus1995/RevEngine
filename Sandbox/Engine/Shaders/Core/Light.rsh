@@ -8,6 +8,7 @@
 #define REV_MAX_SPOT_LIGHTS 16
 
 #define REV_MAX_SHADOW_VIEWS 6
+#define REV_SHADOWMAP_SIZE 2048
 
 struct FDirectionalLight
 {
@@ -121,6 +122,39 @@ float3 ComputeLightPBR(
     float3 specularBRDF = (F * D * G) / max(EPSILON, 4.0 * NdL * NdV);
 
     return (diffuseBRDF + specularBRDF) * Radiance * NdL;
+}
+
+float ComputeShadow(
+    in float3 WorldPos, in float4x4 ShadowProjMat, in float4x4 ShadowViewMat,
+    in Texture2DArray ShadowMap, in SamplerComparisonState ShadowSampler, in uint ArraySlice, in float ShadowBias)
+{
+    float4 ShadowViewPos = mul(ShadowProjMat, mul(ShadowViewMat, float4(WorldPos, 1.0f)));
+    float3 ShadowProjCoords = ShadowViewPos.xyz / ShadowViewPos.w;
+
+    if(ShadowProjCoords.z > 1.0f)
+    {
+        return 0.0f;
+    }
+
+    ShadowProjCoords.y *= -1; //Use opengl rh coord
+    float2 ShadowUV = ShadowProjCoords.xy * 0.5 + 0.5;
+
+    //return ShadowMap.SampleCmpLevelZero(ShadowSampler, float3(ShadowUV, ArraySlice), ShadowProjCoords.z - ShadowBias);
+
+    //PCF
+    float ShadowFactor = 0.0f;
+    float2 TexelSize = 1.0f / float2(REV_SHADOWMAP_SIZE);
+    for(int x = -1; x <= 1; ++x)
+    {
+        for(int y = -1; y <= 1; ++y)
+        {
+            float2 ShadowUV_PCF = ShadowUV + float2(x, y) * TexelSize;
+            ShadowFactor += ShadowMap.SampleCmpLevelZero(ShadowSampler, float3(ShadowUV_PCF, ArraySlice), ShadowProjCoords.z - ShadowBias);
+        }
+    }
+    ShadowFactor /= 9.0f;
+
+    return ShadowFactor;
 }
 
 #endif
