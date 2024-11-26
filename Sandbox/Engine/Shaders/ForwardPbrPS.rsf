@@ -84,6 +84,7 @@ PSOutput main(const PSInput Input)
         //TODO: Shadow
 
         float ShadowBias = max(0.05 * (1.0 - dot(Normal, LightDir)), 0.005)
+        //float ShadowBias = 0.0005
         float ShadowFactor = 1.0f;
         for(uint j = 0; j < uDirectionalLight.Lights[i].ShadowCount; j++)
         {
@@ -111,8 +112,6 @@ PSOutput main(const PSInput Input)
             //ShadowFactor *= CurrentDepth - ShadowBias > ClosestDepth ? 0.0 : 1.0;
         }
         LightColor *= ShadowFactor;
-
-        //LightColor += (diffuseBRDF + specularBRDF) * Radiance * NdL;
         SumLightColor += LightColor;
     }
 

@@ -153,6 +153,92 @@ void FLightProxy::EndShadowPass(FRHICommandList& RHICmdList)
 	LastShadowRenderData = nullptr;
 }
 
+std::array<Math::FVector4, 8> FLightProxy::GetFrustumCornersWS(const Math::FMatrix4& ProjMat, const Math::FMatrix4& ViewMat)
+{
+	const Math::FMatrix4 InvViewProj = (ProjMat * ViewMat).Inverse();
+
+	uint8 CornerIndex = 0;
+	std::array<Math::FVector4, 8> Corners;
+	for (uint32 x = 0; x < 2; ++x)
+	{
+		for (uint32 y = 0; y < 2; ++y)
+		{
+			for (uint32 z = 0; z < 2; ++z)
+			{
+				const Math::FVector4 Point =
+					InvViewProj * Math::FVector4(
+						2.0f * x - 1.0f,
+						2.0f * y - 1.0f,
+						2.0f * z - 1.0f,
+						1.0f);
+				Corners[CornerIndex++] = (Point / Point.W);
+			}
+		}
+	}
+
+	return Corners;
+}
+
+Math::FMatrix4 FLightProxy::GetViewMatrixCSM(const std::array<Math::FVector4, 8>& InCorners, const Math::FVector3& InLightDir)
+{
+	Math::FVector3 Center = Math::FVector3(0, 0, 0);
+	for (const auto& Corner : InCorners)
+	{
+		Center += Math::FVector3(Corner);
+	}
+	Center /= InCorners.size();
+
+	const Math::FMatrix4 LightView = Math::FMatrix4::LookAt(
+		Center + InLightDir,
+		Center,
+		Math::FVector3(0.0f, 1.0f, 0.0f)
+	);
+
+	return LightView;
+}
+
+Math::FMatrix4 FLightProxy::GetProjMatrixCSM(const std::array<Math::FVector4, 8>& InCorners, const Math::FMatrix4& InLightViewMat)
+{
+	float minX = std::numeric_limits<float>::max();
+	float maxX = std::numeric_limits<float>::lowest();
+	float minY = std::numeric_limits<float>::max();
+	float maxY = std::numeric_limits<float>::lowest();
+	float minZ = std::numeric_limits<float>::max();
+	float maxZ = std::numeric_limits<float>::lowest();
+	for (const auto& v : InCorners)
+	{
+		const auto trf = InLightViewMat * v;
+		minX = std::min(minX, trf.X);
+		maxX = std::max(maxX, trf.X);
+		minY = std::min(minY, trf.Y);
+		maxY = std::max(maxY, trf.Y);
+		minZ = std::min(minZ, trf.Z);
+		maxZ = std::max(maxZ, trf.Z);
+	}
+
+	constexpr float zMult = 10.0f;
+	if (minZ < 0)
+	{
+		minZ *= zMult;
+	}
+	else
+	{
+		minZ /= zMult;
+	}
+	if (maxZ < 0)
+	{
+		maxZ /= zMult;
+	}
+	else
+	{
+		maxZ *= zMult;
+	}
+
+	const Math::FMatrix4 lightProjection = Math::FMatrix4::Othographic(minX, maxX, minY, maxY, minZ, maxZ);
+
+	return lightProjection;
+}
+
 void FShadowRenderData::InitRHI(uint32 ShadowMapLayers)
 {
 	if (!ViewUniform)

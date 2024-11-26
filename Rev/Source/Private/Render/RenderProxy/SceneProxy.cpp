@@ -13,6 +13,16 @@ void FSceneProxy::Prepare(const Ref<FScene>& Scene)
 	if(!Scene) return;
 
 	mCameraProxy.Prepare(Scene);
+	{
+		mSceneParams.ViewPos = mCameraProxy.GetViewPos();
+		mSceneParams.ViewMat = mCameraProxy.GetViewMat();
+		mSceneParams.ProjMat = mCameraProxy.GetProjMat();
+		mSceneParams.ViewProjMat = mCameraProxy.GetViewProjMat();
+		mSceneParams.InvViewMat = mSceneParams.ViewMat.Inverse();
+		mSceneParams.InvProjMat = mSceneParams.ProjMat.Inverse();
+		mSceneParams.InvViewProjMat = mSceneParams.ViewProjMat.Inverse();
+	}
+
 	mStaticMeshProxy.Prepare(Scene);
 	mLightProxy.Prepare(Scene);
 	mSkyProxy.Prepare(Scene);
@@ -31,13 +41,6 @@ void FSceneProxy::SyncResource(FRHICommandList& RHICmdList)
 
 	{
 		mSceneParams.ViewExtent = { 0, 0, RHICmdList.GetContext()->RHIGetFrameWidth(), RHICmdList.GetContext()->RHIGetFrameHeight() };
-		mSceneParams.ViewPos = mCameraProxy.GetViewPos();
-		mSceneParams.ViewMat = mCameraProxy.GetViewMat();
-		mSceneParams.ProjMat = mCameraProxy.GetProjMat();
-		mSceneParams.ViewProjMat = mCameraProxy.GetViewProjMat();
-		mSceneParams.InvViewMat = mSceneParams.ViewMat.Inverse();
-		mSceneParams.InvProjMat = mSceneParams.ProjMat.Inverse();
-		mSceneParams.InvViewProjMat = mSceneParams.ViewProjMat.Inverse();
 
 		mSceneUB->UpdateSubData(&mSceneParams, sizeof(FSceneUniform));
 

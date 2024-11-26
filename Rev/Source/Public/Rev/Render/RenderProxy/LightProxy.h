@@ -84,6 +84,10 @@ public:
 
 	void EndShadowPass(FRHICommandList& RHICmdList);
 
+private:
+	std::array<Math::FVector4, 8> GetFrustumCornersWS(const Math::FMatrix4& ProjMat, const Math::FMatrix4& ViewMat);
+	Math::FMatrix4 GetViewMatrixCSM(const std::array<Math::FVector4, 8>& InCorners, const Math::FVector3& InLightDir);
+	Math::FMatrix4 GetProjMatrixCSM(const std::array<Math::FVector4, 8>& InCorners, const Math::FMatrix4& InLightViewMat);
 
 private:
 	Ref<FRHIUniformBuffer> mLightUB;
