@@ -9,6 +9,7 @@
 #include "Rev/Render/RHI/RHIPipeline.h"
 #include "Rev/Render/Material/ShadowMapMaterial.h"
 #include "Rev/Render/RenderUtils.h"
+#include "Rev/Render/Resource/TextureResource.h"
 
 namespace Rev
 {
@@ -80,7 +81,20 @@ void FLightProxy::SyncResource(FRHICommandList& RHICmdList)
 	mLightUB->UpdateSubData(&DirectionalLightParams, sizeof(FDirectionalLightUniform));
 	RHICmdList.GetContext()->RHIBindUniformBuffer(UB::Light, mLightUB.get());
 
+	//Shadow SamplerState
+	RHICmdList.GetContext()->RHIBindSamplerState(15, GShadowDepthTexture->GetSamplerStateRHI());
+
 	//Bind DirectionalLight shadow map
+	FRHITexture* DirectionalShadowMaps[REV_MAX_DIRECTIONAL_LIGHTS];
+	for (uint8 i = 0; i < DirectionalLightParams.Count; i++)
+	{
+		DirectionalShadowMaps[i] = DirectionalShadowData[i].Texture.get();
+	}
+	for (uint8 i = DirectionalLightParams.Count; i < REV_MAX_DIRECTIONAL_LIGHTS; i++)
+	{
+		DirectionalShadowMaps[i] = GShadowDepthTexture->GetTextureRHI();
+	}
+	RHICmdList.GetContext()->RHIBindTextures(TB::DirectionalShadowMapBegin, DirectionalShadowMaps, 4);
 }
 
 FRHITexture* FLightProxy::GetDirectionalShadowMap(uint32 Index)

@@ -94,9 +94,9 @@ uint32 FVulkanShaderProgram::GenLayoutBindings(VkDescriptorSetLayoutBinding* Out
 			Binding = {};
 			Binding.stageFlags = Uniform.StageFlags;
 			Binding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+			Binding.descriptorCount = Uniform.Num;
 			Binding.binding = Uniform.Binding;
 			Binding.pImmutableSamplers = NULL;
-			Binding.descriptorCount = 1;
 		}
 		break;
 		case EShaderUniformType::Texture:
@@ -104,19 +104,30 @@ uint32 FVulkanShaderProgram::GenLayoutBindings(VkDescriptorSetLayoutBinding* Out
 			VkDescriptorSetLayoutBinding& Binding = OutBindings[BindingsCount++];
 			Binding.stageFlags = Uniform.StageFlags;
 			Binding.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+			Binding.descriptorCount = Uniform.Num;
 			Binding.binding = Uniform.Binding;
 			Binding.pImmutableSamplers = NULL;
-			Binding.descriptorCount = 1;
 
 			if (Uniform.SamplerBinding >= 0)
 			{
 				VkDescriptorSetLayoutBinding& Binding = OutBindings[BindingsCount++];
 				Binding.stageFlags = Uniform.StageFlags;
 				Binding.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
+				Binding.descriptorCount = 1;
 				Binding.binding = Uniform.SamplerBinding;
 				Binding.pImmutableSamplers = NULL;
-				Binding.descriptorCount = 1;
 			}
+		}
+		break;
+		case EShaderUniformType::SamplerState:
+		{
+			VkDescriptorSetLayoutBinding& Binding = OutBindings[BindingsCount++];
+			Binding = {};
+			Binding.stageFlags = Uniform.StageFlags;
+			Binding.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
+			Binding.descriptorCount = 1;
+			Binding.binding = Uniform.Binding;
+			Binding.pImmutableSamplers = NULL;
 		}
 		break;
 		default:
@@ -155,6 +166,7 @@ void FVulkanShaderProgram::UpdateProgramUniforms()
 				{
 				case EShaderUniformType::Buffer:
 				case EShaderUniformType::Texture:
+				case EShaderUniformType::SamplerState:
 					bUniformValid = true;
 					break;
 				default:

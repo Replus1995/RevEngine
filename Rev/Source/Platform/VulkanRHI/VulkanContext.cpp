@@ -360,17 +360,18 @@ void FVulkanContext::RHIBindTextures(uint16 InBinding, FRHITexture** InTextures,
 
 void FVulkanContext::RHIBindSamplerState(uint16 InBinding, FRHISamplerState* InSamplerState)
 {
-	uint16 RealBinding = InBinding + GShaderCompileConfig.TextureOffset;
+	uint16 RealBinding = InBinding + GShaderCompileConfig.SamplerOffset;
 	FVulkanSamplerState* pSamplerState = static_cast<FVulkanSamplerState*>(InSamplerState);
+	mFrameState.Textures[RealBinding] = FVulkanTextureSlot(nullptr, pSamplerState);
 
-	if (auto Iter = mFrameState.Textures.find(RealBinding); Iter != mFrameState.Textures.end())
+	/*if (auto Iter = mFrameState.Textures.find(RealBinding); Iter != mFrameState.Textures.end())
 	{
 		Iter->second.SamplerState = pSamplerState;
 	}
 	else
 	{
 		mFrameState.Textures[RealBinding] = FVulkanTextureSlot(nullptr, pSamplerState);
-	}
+	}*/
 }
 
 void FVulkanContext::RHIBindProgram(FRHIShaderProgram* InProgram)
