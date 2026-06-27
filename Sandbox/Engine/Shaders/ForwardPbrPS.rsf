@@ -1,28 +1,33 @@
-#include "/Engine/Shaders/Core/Light.rsh"
+#include "Engine/Shaders/Core/Light.rsh"
 
 cbuffer SceneUB : register(b0)
 {
-	FSceneUniform uScene;
+    FSceneUniform uScene;
 };
 
 cbuffer LightUB : register(b2)
 {
-	FDirectionalLightUniform uDirectionalLight;
+    FDirectionalLightUniform uDirectionalLight;
 };
 
 struct FPBRMaterialUniform
 {
-	float4 BaseColorFactor;
-	float Metallic;
-	float Roughness;
-	float NormalScale;
-	float OcclusionStrength;
-	float3 EmissiveFactor;
+    float4 BaseColorFactor;
+    float Metallic;
+    float Roughness;
+    float NormalScale;
+    float OcclusionStrength;
+    float3 EmissiveFactor;
 };
 
 cbuffer PBRMaterialUB : register(b3)
 {
-	FPBRMaterialUniform uPBRMaterial;
+    FPBRMaterialUniform uPBRMaterial;
+};
+
+cbuffer ShadowUB : register(b4)
+{
+    FShadowUniform uShadow;
 };
 
 SAMPLER2D(sBaseColor, 0);
@@ -50,41 +55,41 @@ struct PSOutput
 PSOutput main(const PSInput Input)
 {
     float4 BaseColor = sBaseColor.Sample(Input.vTexCoord0);
-	BaseColor *= uPBRMaterial.BaseColorFactor;
+    BaseColor *= uPBRMaterial.BaseColorFactor;
 
-	float3x3 TBN = MatrixFromCols(Input.vTangent, Input.vBitangent, Input.vNormal);
+    float3x3 TBN = MatrixFromCols(Input.vTangent, Input.vBitangent, Input.vNormal);
     float3 TexNormal = normalize((sNormal.Sample(Input.vTexCoord0).xyz * 2.0 - 1.0) * float3(uPBRMaterial.NormalScale, uPBRMaterial.NormalScale, 1.0f));
     float3 Normal = normalize(mul(TBN, TexNormal));
 
-	float Metallic = uPBRMaterial.Metallic * sMetallicRoughness.Sample(Input.vTexCoord0).b;
+    float Metallic = uPBRMaterial.Metallic * sMetallicRoughness.Sample(Input.vTexCoord0).b;
     float Roughness = uPBRMaterial.Roughness * sMetallicRoughness.Sample(Input.vTexCoord0).g;
-	float Occlution = uPBRMaterial.OcclusionStrength * sOcclusion.Sample(Input.vTexCoord0).r;
+    float Occlution = uPBRMaterial.OcclusionStrength * sOcclusion.Sample(Input.vTexCoord0).r;
     float3 Emissive = sEmissive.Sample(Input.vTexCoord0).rgb * uPBRMaterial.EmissiveFactor;
 
-	float3 ViewDir = normalize(uScene.ViewPos.xyz - Input.vWorldPos);
+    float3 ViewDir = normalize(uScene.ViewPos.xyz - Input.vWorldPos);
     float NdV = max(dot(Normal, ViewDir), 0.0);
     float3 F0 = lerp(kDielectric, BaseColor.rgb, Metallic);
 
-	float3 SumLightColor = float3(0.0);
+    // Compute view-space depth for cascade selection
+    float ViewSpaceDepth = length(Input.vWorldPos - uScene.ViewPos.xyz);
+
+    float3 SumLightColor = float3(0.0);
     for(uint i = 0; i < uDirectionalLight.Count; i++)
     {
         float3 LightDir = -uDirectionalLight.Lights[i].Direction.xyz;
         float Radiance = uDirectionalLight.Lights[i].Intensity;
-        /*
-        if(Radiance == 0.0)
-        {
-            continue;
-        }
-        */
+
         float3 LightColor = ComputeLightPBR(BaseColor.rgb, Roughness, Metallic, Normal, ViewDir, LightDir, NdV, F0, Radiance);
         LightColor *= uDirectionalLight.Lights[i].Color.rgb;
-        //TODO: Shadow
 
-        //LightColor += (diffuseBRDF + specularBRDF) * Radiance * NdL;
+        // Apply cascaded shadow
+        float ShadowFactor = ComputeShadowFactor(Input.vWorldPos, ViewSpaceDepth, uShadow);
+        LightColor *= ShadowFactor;
+
         SumLightColor += LightColor;
     }
 
-	//TODO: IBL Lighting
+    //TODO: IBL Lighting
     float3 AmbientColor = kAmbientFactor * BaseColor.rgb * Occlution;
 
     PSOutput Result;

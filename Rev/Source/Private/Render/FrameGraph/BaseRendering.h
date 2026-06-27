@@ -13,6 +13,7 @@ public:
 		FFGHandle ColorTexMS;
 		FFGHandle DepthTex;
 		FFGHandle DepthTexMS;
+		FFGHandle ShadowMap;
 	};
 
 	FFGBasePass(FFrameGraph& InGraph, const FFGViewData& InViewData);

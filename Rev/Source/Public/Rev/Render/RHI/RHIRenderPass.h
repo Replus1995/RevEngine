@@ -24,6 +24,8 @@ struct FRHIRenderPassDesc
 	{
 		FRHITexture* DepthStencilTarget = nullptr;
 		FRHITexture* ResolveTarget = nullptr;
+		int32 ArraySlice = -1;
+		uint8 MipIndex = 0;
 		ERenderTargetLoadAction DepthLoadAction = RTL_DontCare;
 		ERenderTargetStoreAction DepthStoreAction = RTS_DontCare;
 		ERenderTargetLoadAction StencilLoadAction = RTL_DontCare;

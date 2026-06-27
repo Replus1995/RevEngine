@@ -21,6 +21,8 @@ constexpr IndexType SEmissiveTex			= SPbrStart + 4;
 
 constexpr IndexType SEnviornmentTex = 11;
 
+constexpr IndexType SShadowMap = 5;
+
 //Uniform Buffer Binding
 constexpr IndexType BScene = 0;
 constexpr IndexType BStaticMesh = 1;

@@ -1,9 +1,10 @@
 #ifndef _BASE_RSH_
 #define _BASE_RSH_
 
-#include "/Engine/Shaders/Core/Defines.rsh"
-#include "/Engine/Shaders/Core/Samplers.rsh"
-#include "/Engine/Shaders/Core/Utils.rsh"
+#include "Engine/Shaders/Core/Defines.rsh"
+#include "Engine/Shaders/Core/Samplers.rsh"
+#include "Engine/Shaders/Core/Utils.rsh"
+#include "Engine/Shaders/Core/Shadow.rsh"
 
 struct FRect2D
 {

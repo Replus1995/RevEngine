@@ -250,6 +250,15 @@ inline TVector3<T> TVector3<T>::Cross(const TVector3<T>& InVecA, const TVector3<
 }
 
 template<typename T>
+inline TVector3<T> TVector3<T>::Lerp(const TVector3<T>& InVecA, const TVector3<T>& InVecB, T By)
+{
+	return TVector3<T>(
+		InVecA.X + By * (InVecB.X - InVecA.X),
+		InVecA.Y + By * (InVecB.Y - InVecA.Y),
+		InVecA.Z + By * (InVecB.Z - InVecA.Z)
+	);
+}
+template<typename T>
 inline T TVector3<T>::Length() const
 {
 	return std::sqrt(X * X + Y * Y + Z * Z);

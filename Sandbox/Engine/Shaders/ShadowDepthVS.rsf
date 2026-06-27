@@ -1,0 +1,31 @@
+#include "Engine/Shaders/Core/Base.rsh"
+
+cbuffer StaticMeshUB : register(b1)
+{
+    FStaticMeshUniform uStaticMesh;
+};
+
+cbuffer ShadowUB : register(b4)
+{
+    float4x4 uLightViewProj;
+    float4 uCascadeSplits;
+    uint uCascadeIndex;
+};
+
+struct VSInput
+{
+    float4 aPosition : POSITION0;
+};
+
+struct VSOutput
+{
+    float4 vPosition : SV_POSITION;
+};
+
+VSOutput main(VSInput Input)
+{
+    VSOutput Result;
+    float4 wPosition = mul(uStaticMesh.ModelMat, Input.aPosition);
+    Result.vPosition = mul(uLightViewProj, wPosition);
+    return Result;
+}

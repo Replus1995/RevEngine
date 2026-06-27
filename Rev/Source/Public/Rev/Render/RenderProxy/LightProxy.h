@@ -17,6 +17,8 @@ public:
 	void Prepare(const Ref<FScene>& Scene);
 	void SyncResource(FRHICommandList& RHICmdList);
 
+	const FDirectionalLightUniform& GetDirectionalLightParams() const { return mDirectionalLightParams; }
+
 private:
 	FDirectionalLightUniform mDirectionalLightParams;
 	Ref<FRHIUniformBuffer> mLightUB;

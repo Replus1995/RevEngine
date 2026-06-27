@@ -10,3 +10,6 @@
 #include "Matrix4.h"
 #include "Transform.h"
 #include "Color.h"
+#include "BoundingBox.h"
+#include "Frustum.h"
+#include "ShadowUtils.h"

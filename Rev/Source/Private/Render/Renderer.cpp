@@ -10,6 +10,7 @@
 
 #include "FrameGraph/BaseRendering.h"
 #include "FrameGraph/SkyRendering.h"
+#include "FrameGraph/ShadowRendering.h"
 
 
 namespace Rev
@@ -66,6 +67,7 @@ void FRenderer::BuildFrameGraph()
 	mGraph.Reset();
 
 	FFGViewData ViewData = { FrameWidth,  FrameHeight };
+	FFGShadowPass ShadowPass(mGraph, ViewData, mSceneProxy);
 	FFGBasePass BasePass(mGraph, ViewData);
 	FFGSkyPass SkyPass(mGraph, ViewData);
 	FFGBlitPass BlitPass(mGraph, ViewData);

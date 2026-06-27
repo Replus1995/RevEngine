@@ -52,6 +52,7 @@ public:
 
 	static T Dot(const TVector3<T>& InVecA, const TVector3<T>& InVecB);
 	static TVector3<T> Cross(const TVector3<T>& InVecA, const TVector3<T>& InVecB);
+	static TVector3<T> Lerp(const TVector3<T>& InVecA, const TVector3<T>& InVecB, T By);
 
 	T Length() const;
 	void Normalize();

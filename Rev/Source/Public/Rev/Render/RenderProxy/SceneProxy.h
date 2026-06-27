@@ -25,14 +25,14 @@ public:
 	void DrawSceneOpaque(FRHICommandList& RHICmdList);
 	void DrawSkybox(FRHICommandList& RHICmdList);
 
-protected:
-	FSceneUniform mSceneParams;
-	Ref<FRHIUniformBuffer> mSceneUB;
-
 	FCameraProxy mCameraProxy;
 	FStaticMeshProxy mStaticMeshProxy;
 	FLightProxy mLightProxy;
 	FSkyProxy mSkyProxy;
+
+protected:
+	FSceneUniform mSceneParams;
+	Ref<FRHIUniformBuffer> mSceneUB;
 
 };
 

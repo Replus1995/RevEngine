@@ -45,24 +45,8 @@ struct FSamplerCube
     uniform SamplerState _name ## Sampler : REGISTER(s, _reg); \
     static FSamplerCube _name = { _name ## Texture, _name ## Sampler }
 
-
-//Default SamplerStates
-/*
-static SamplerState GTextureSampler
-{
-    Filter = MIN_MAG_MIP_LINEAR;
-    AddressU = Wrap;
-    AddressV = Wrap;
-    AddressW = Wrap;
-};
-
-static SamplerComparisonState GShadowSampler
-{
-    Filter = COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
-    AddressU = MIRROR;
-    AddressV = MIRROR;
-    ComparisonFunc = LESS;
-};
-*/
+#define SHADOWMAP2DARRAY(_name, _reg) \
+    uniform Texture2DArray _name ## Texture : REGISTER(t, _reg); \
+    uniform SamplerComparisonState _name ## Sampler : REGISTER(s, _reg)
 
 #endif

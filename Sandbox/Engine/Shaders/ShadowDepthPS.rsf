@@ -1,0 +1,13 @@
+// Shadow depth pass: no color output, depth-only rasterization
+// This shader exists only to satisfy the pipeline creation requirement
+// The depth value is written automatically by the fixed-function depth test
+
+struct PSInput
+{
+    float4 vPosition : SV_POSITION;
+};
+
+void main(PSInput Input)
+{
+    // Depth is written automatically by the fixed-function pipeline
+}

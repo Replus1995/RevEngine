@@ -7,8 +7,10 @@
 #include "Rev/Render/RHI/RHIContext.h"
 #include "Rev/Render/RHI/DynamicRHI.h"
 #include "Rev/Render/RHI/RHIPipeline.h"
+#include "Rev/Render/UniformLayout.h"
 
 #include "SkyRendering.h"
+#include "ShadowRendering.h"
 
 namespace Rev
 {
@@ -24,6 +26,14 @@ FFGBasePass::FFGBasePass(FFrameGraph& InGraph, const FFGViewData& InViewData)
 	FFGHandle DepthTex = InGraph.Import<FFGTexture>("Scene Depth", DescDepth, FFGTexture(DescDepth));
 	FFGHandle DepthTexMS = InGraph.Import<FFGTexture>("Scene Depth MS", DescDepthMS, FFGTexture(DescDepthMS));
 
+		// Look up shadow map from the blackboard
+		FFGHandle ShadowMapHandle = KFGInvalidHandle;
+		if (auto* ShadowPassData = InGraph.TryGetPassData<FFGShadowPass::Data>())
+		{
+			ShadowMapHandle = ShadowPassData->ShadowMap;
+		}
+
+
 	InGraph.AddPass<FFGBasePass::Data>(
 		"Base Pass",
 		[&](FFGBuilder& InBuilder, FFGBasePass::Data& InData) {
@@ -33,11 +43,30 @@ FFGBasePass::FFGBasePass(FFrameGraph& InGraph, const FFGViewData& InViewData)
 			FFGHandle DepthTex = InBuilder.Create<FFGTexture>("Scene Depth", DescDepth);
 			FFGHandle DepthTexMS = InBuilder.Create<FFGTexture>("Scene Depth MS", DescDepthMS);*/
 
+		// Look up shadow map from the blackboard
+		FFGHandle ShadowMapHandle = KFGInvalidHandle;
+		if (auto* ShadowPassData = InGraph.TryGetPassData<FFGShadowPass::Data>())
+		{
+			ShadowMapHandle = ShadowPassData->ShadowMap;
+		}
+
+
 
 			InData.ColorTex = InBuilder.Write(ColorTex);
 			InData.ColorTexMS = InBuilder.Write(ColorTexMS);
 			InData.DepthTex = InBuilder.Write(DepthTex);
 			InData.DepthTexMS = InBuilder.Write(DepthTexMS);
+
+				// Read shadow map if available
+				if (ShadowMapHandle != KFGInvalidHandle)
+				{
+					InData.ShadowMap = InBuilder.Read(ShadowMapHandle);
+				}
+				else
+				{
+					InData.ShadowMap = KFGInvalidHandle;
+				}
+
 
 			InData.SetColorTarget(0, ColorTexMS, ColorTex, RTL_Clear);
 			InData.SetDepthStencilTarget(DepthTexMS, DepthTex, RTL_Clear, RTL_Clear);
@@ -45,6 +74,21 @@ FFGBasePass::FFGBasePass(FFrameGraph& InGraph, const FFGViewData& InViewData)
 		[=](const FFGBasePass::Data& InData, FFGPassResources& InResources, FFGContextData& InContextData) {
 
 			auto& RHICmdList = InContextData.RHICmdList;
+
+				// Bind shadow map for PBR shading
+				if (InData.ShadowMap != KFGInvalidHandle)
+				{
+					auto& ShadowTex = InResources.Get<FFGTexture>(InData.ShadowMap);
+					FRHISamplerStateDesc ShadowSamplerDesc;
+					ShadowSamplerDesc.Filter = SF_Bilinear;
+					ShadowSamplerDesc.WarpU = SW_Clamp;
+					ShadowSamplerDesc.WarpV = SW_Clamp;
+					ShadowSamplerDesc.WarpW = SW_Clamp;
+					ShadowSamplerDesc.CompareFunc = SCF_Less;
+					Ref<FRHISamplerState> ShadowSampler = GDynamicRHI->RHICreateSamplerState(ShadowSamplerDesc);
+					RHICmdList.GetContext()->RHIBindTexture(UL::SShadowMap, ShadowTex.GetTextureRHI(), ShadowSampler.get());
+				}
+
 
 			FRHIGraphicsPipelineStateDesc PipelineStateDesc;
 			PipelineStateDesc.VertexInputState = GStaticMeshVertexInputState.VertexInputStateRHI.get();
@@ -88,6 +132,8 @@ FFGBlitPass::FFGBlitPass(FFrameGraph& InGraph, const FFGViewData& InViewData)
 		[=](const FFGBlitPass::Data& InData, FFGPassResources& InResources, FFGContextData& InContextData) {
 
 			auto& RHICmdList = InContextData.RHICmdList;
+
+
 
 			auto& ColorTex = InResources.Get<FFGTexture>(InData.ColorTex);
 			RHICmdList.GetContext()->RHIBlitToBackTexture(ColorTex.GetTextureRHI());

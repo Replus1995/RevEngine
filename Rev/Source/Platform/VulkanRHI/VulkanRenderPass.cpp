@@ -59,13 +59,13 @@ void FVulkanRenderPass::PrepareForDraw()
 	if (PassDesc.DepthStencilRenderTarget.DepthStencilTarget)
 	{
 		FVulkanTexture* DepthStencilTarget = FVulkanTexture::Cast(PassDesc.DepthStencilRenderTarget.DepthStencilTarget);
-		FrameImageViews[NumAttachmentViews] = CreateImageView(DepthStencilTarget, -1, 0);
+		FrameImageViews[NumAttachmentViews] = CreateImageView(DepthStencilTarget, PassDesc.DepthStencilRenderTarget.ArraySlice, PassDesc.DepthStencilRenderTarget.MipIndex);
 		NumAttachmentViews++;
 
 		if (PassDesc.DepthStencilRenderTarget.ResolveTarget)
 		{
 			FVulkanTexture* ResolveTarget = FVulkanTexture::Cast(PassDesc.DepthStencilRenderTarget.ResolveTarget);
-			FrameImageViews[NumAttachmentViews] = CreateImageView(ResolveTarget, -1, 0);
+			FrameImageViews[NumAttachmentViews] = CreateImageView(ResolveTarget, PassDesc.DepthStencilRenderTarget.ArraySlice, PassDesc.DepthStencilRenderTarget.MipIndex);
 			NumAttachmentViews++;
 		}
 
