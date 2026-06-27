@@ -26,3 +26,4 @@ Sandbox/imgui.ini
 /.vscode
 /Sandbox/assets/cache
 /Sandbox/ShaderCache
+FrameGraph.dot

@@ -39,10 +39,11 @@ void FRenderer::BeginFrame(FRHICommandList& RHICmdList)
 		bDirtyFG = true;
 	}
 
-	if (bDirtyFG)
+	if (bDirtyFG || GRenderOptions.NeedsFrameGraphRebuild())
 	{
 		BuildFrameGraph();
 		bDirtyFG = false;
+		GRenderOptions.MarkFrameGraphRebuilt();
 	}
 
 }
@@ -71,7 +72,9 @@ void FRenderer::BuildFrameGraph()
 
 	mGraph.Compile();
 
+#ifdef REV_DEBUG
 	std::ofstream{ "FrameGraph.dot" } << mGraph;
+#endif
 }
 
 }

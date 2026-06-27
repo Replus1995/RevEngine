@@ -14,8 +14,12 @@ public:
 	uint8 REV_API GetNumSamples() const { return NumSamples; }
 
 
+public:
+	bool NeedsFrameGraphRebuild() const { return bFrameGraphNeedRebuild; }
+	void MarkFrameGraphRebuilt() { bFrameGraphNeedRebuild = false; }
+
 private:
-	bool bRenderGraphNeedRebuild = false;
+	bool bFrameGraphNeedRebuild = false;
 	uint8 NumSamples = 1;
 };
 

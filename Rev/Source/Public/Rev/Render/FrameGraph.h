@@ -37,7 +37,7 @@ public:
     }
     void destroy(const Desc&, void*)
     {
-        //TextureRHI.reset();
+        TextureRHI.reset();
     }
     void preRead(const Desc&, uint32_t, void*) const {}
     void preWrite() const {}
@@ -57,6 +57,11 @@ public:
     FFGTextureExternal() : TextureRHI(nullptr) {}
     FFGTextureExternal(FRHITexture* InTextureRHI) : TextureRHI(InTextureRHI) {}
     FFGTextureExternal(FFGTextureExternal&&) noexcept = default;
+
+    FORCEINLINE FRHITexture* GetTextureRHI() const
+    {
+        return TextureRHI;
+    }
 
     void create(const Desc& InDesc, void*){}
     void destroy(const Desc&, void*){}
@@ -244,6 +249,7 @@ public:
     {
         Graph = CreateScope<FrameGraph>();
         Blackboard = CreateScope<FrameGraphBlackboard>();
+        LastPassData = nullptr;
     }
 
     void Compile()
@@ -373,7 +379,7 @@ public:
 private:
     Scope<FrameGraph> Graph;
     Scope<FrameGraphBlackboard> Blackboard;
-    FFGPassData* LastPassData;
+    FFGPassData* LastPassData = nullptr;
 };
 
 
