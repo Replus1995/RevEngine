@@ -26,10 +26,12 @@ constexpr IndexType SShadowMap = 5;
 //Uniform Buffer Binding
 constexpr IndexType BScene = 0;
 constexpr IndexType BStaticMesh = 1;
-constexpr IndexType BLight = 2;
-constexpr IndexType BMaterial = 3;
-
+constexpr IndexType BMaterial = 2;
+constexpr IndexType BLight = 3;
 constexpr IndexType BShadow = 4;
+
+//For Shadow Pass
+constexpr IndexType BCascadeShadow = 3;
 
 }
 }

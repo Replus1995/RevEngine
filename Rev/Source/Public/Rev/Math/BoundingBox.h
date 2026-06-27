@@ -1,7 +1,9 @@
 #pragma once
+#include "Rev/Core/Base.h"
 #include "Vector3.h"
 #include "Matrix4.h"
 #include <array>
+#include <limits>
 
 namespace Rev
 {
@@ -11,10 +13,13 @@ namespace Math
 /** Axis-aligned bounding box. */
 struct FBox
 {
-    FVector3 Min = FVector3(FLT_MAX);
-    FVector3 Max = FVector3(-FLT_MAX);
+    FVector3 Min;
+    FVector3 Max;
 
-    FBox() = default;
+    FBox()
+        : Min( std::numeric_limits<float>::max(),  std::numeric_limits<float>::max(),  std::numeric_limits<float>::max())
+        , Max(-std::numeric_limits<float>::max(), -std::numeric_limits<float>::max(), -std::numeric_limits<float>::max())
+    {}
     FBox(const FVector3& InMin, const FVector3& InMax) : Min(InMin), Max(InMax) {}
 
     FORCEINLINE FVector3 GetCenter() const { return (Min + Max) * 0.5f; }

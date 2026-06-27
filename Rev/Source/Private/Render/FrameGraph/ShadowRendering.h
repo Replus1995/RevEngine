@@ -12,7 +12,7 @@ public:
         FFGHandle ShadowMap;
     };
 
-    FFGShadowPass(FFrameGraph& InGraph, const FFGViewData& InViewData, class FSceneProxy* InSceneProxy);
+    FFGShadowPass(FFrameGraph& InGraph, const FFGViewData& InViewData);
 };
 
 }

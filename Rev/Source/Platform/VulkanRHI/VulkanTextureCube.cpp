@@ -79,7 +79,7 @@ void FVulkanTextureCube::Init()
     ImageViewCreateInfo.format = ImageFormat;
     ImageViewCreateInfo.subresourceRange.aspectMask = ImageAspectFlags;
     ImageViewCreateInfo.subresourceRange.baseMipLevel = 0;
-    ImageViewCreateInfo.subresourceRange.levelCount = 1;
+    ImageViewCreateInfo.subresourceRange.levelCount = TextureDesc.NumMips;
     ImageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
     ImageViewCreateInfo.subresourceRange.layerCount = 6;
 

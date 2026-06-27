@@ -9,6 +9,7 @@
 #include "Rev/Render/RHI/RHICommandList.h"
 #include "Rev/Render/RHI/RHIShaderLibrary.h"
 #include "Rev/Render/RHI/RHITexture.h"
+#include "Rev/Render/RHI/RHIPipeline.h"
 #include "Rev/Render/UniformDefine.h"
 #include "Rev/Render/UniformLayout.h"
 #include "Rev/Math/Maths.h"
@@ -21,15 +22,14 @@ static constexpr uint32 kShadowMapSize = 2048;
 static constexpr uint32 kNumCascades = 4;
 static constexpr float kCascadeLambda = 0.5f;
 
-FFGShadowPass::FFGShadowPass(FFrameGraph& InGraph, const FFGViewData& InViewData, FSceneProxy* InSceneProxy)
+FFGShadowPass::FFGShadowPass(FFrameGraph& InGraph, const FFGViewData& InViewData)
 {
     // Shadow map texture descriptor (2D array, one layer per cascade)
-    FRHITextureDesc ShadowDesc = FRHITextureDesc::Create2D(
-        kShadowMapSize, kShadowMapSize, PF_ShadowDepth
+    FRHITextureDesc ShadowDesc = FRHITextureDesc::Create2DArray(
+        kShadowMapSize, kShadowMapSize, kNumCascades, PF_ShadowDepth
     ).SetClearColor(FRHITextureClearColor(1.0f, 0))
      .SetFlags(ETextureCreateFlags::DepthStencilTarget | ETextureCreateFlags::ShaderResource);
-    ShadowDesc.Dimension = ETextureDimension::Texture2DArray;
-    ShadowDesc.ArraySize = kNumCascades;
+
     ShadowDesc.NumSamples = 1;
 
     InGraph.AddPass<FFGShadowPass::Data>(
@@ -38,6 +38,8 @@ FFGShadowPass::FFGShadowPass(FFrameGraph& InGraph, const FFGViewData& InViewData
             FFGHandle CreatedShadowMap = InBuilder.Create<FFGTexture>("ShadowMap", ShadowDesc);
             InData.ShadowMap = InBuilder.Write(CreatedShadowMap);
             InBuilder.SetSideEffect();
+
+            InData.SetDepthStencilTarget(InData.ShadowMap, KFGInvalidHandle, RTL_Clear, RTL_Clear);
         },
         [=](const FFGShadowPass::Data& InData, FFGPassResources& InResources, FFGContextData& InContextData) {
 
@@ -83,7 +85,7 @@ FFGShadowPass::FFGShadowPass(FFrameGraph& InGraph, const FFGViewData& InViewData
                 FRHIShaderCreateDesc("/Engine/Shaders/ShadowDepthPS")
             );
 
-            if (!ShadowProgram) return;
+            if (!ShadowProgram)
                 return;
 
             // Render each cascade
@@ -119,7 +121,26 @@ FFGShadowPass::FFGShadowPass(FFrameGraph& InGraph, const FFGViewData& InViewData
 
                 Ref<FRHIUniformBuffer> CascadeUniformBuffer = GDynamicRHI->RHICreateUniformBuffer(sizeof(CascadeUB));
                 CascadeUniformBuffer->UpdateSubData(&CascadeUB, sizeof(CascadeUB));
-                RHICmdList.GetContext()->RHIBindUniformBuffer(UL::BShadow, CascadeUniformBuffer.get());
+                RHICmdList.GetContext()->RHIBindUniformBuffer(UL::BCascadeShadow, CascadeUniformBuffer.get());
+
+                FRHIGraphicsPipelineStateDesc PipelineStateDesc;
+                PipelineStateDesc.VertexInputState = GStaticMeshVertexInputState.VertexInputStateRHI.get();
+                PipelineStateDesc.NumSamples = GRenderOptions.GetNumSamples();
+
+                FRHIRasterizerStateDesc RasterizerStateDesc;
+                RasterizerStateDesc.CullMode = CM_Back;
+                PipelineStateDesc.RasterizerState = FRHIPipelineStateCache::Get()->GetOrCreateRasterizerState(RasterizerStateDesc);
+
+                FRHIDepthStencilStateDesc DepthStencilStateDesc;
+                DepthStencilStateDesc.bEnableDepthWrite = true;
+                DepthStencilStateDesc.DepthTestFunc = CF_Less;
+                PipelineStateDesc.DepthStencilState = FRHIPipelineStateCache::Get()->GetOrCreateDepthStencilState(DepthStencilStateDesc);
+
+                FRHIColorBlendStateDesc ColorBlendStateDesc;
+                ColorBlendStateDesc.Attachments[0].bEnableBlend = false;
+                PipelineStateDesc.ColorBlendState = FRHIPipelineStateCache::Get()->GetOrCreateColorBlendState(ColorBlendStateDesc);
+
+                RHICmdList.GetContext()->RHISetGraphicsPipelineState(PipelineStateDesc);
 
                 // Draw depth-only
                 SceneProxy->mStaticMeshProxy.DrawMeshesDepth(RHICmdList);

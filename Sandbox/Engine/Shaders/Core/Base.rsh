@@ -13,6 +13,7 @@ struct FRect2D
     uint Width;
     uint Height;
 };
+
 struct FSceneUniform
 {
     FRect2D ViewExtent;

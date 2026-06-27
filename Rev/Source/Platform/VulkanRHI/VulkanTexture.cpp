@@ -4,7 +4,10 @@
 
 #include "VulkanDynamicRHI.h"
 #include "VulkanTexture2D.h"
+#include "VulkanTexture2DArray.h"
 #include "VulkanTextureCube.h"
+#include "VulkanTextureCubeArray.h"
+#include "VulkanTexture3D.h"
 
 namespace Rev
 {
@@ -155,13 +158,13 @@ Ref<FRHITexture> FVulkanDynamicRHI::RHICreateTexture(const FRHITextureDesc& InDe
 	case ETextureDimension::Texture2D:
 		return CreateRef<FVulkanTexture2D>(InDesc);
 	case ETextureDimension::Texture2DArray:
-		//return CreateRef<FOpenGLTexture2DArray>(InDesc, InSamplerDesc);
+		return CreateRef<FVulkanTexture2DArray>(InDesc);
 	case ETextureDimension::TextureCube:
 		return CreateRef<FVulkanTextureCube>(InDesc);
 	case ETextureDimension::TextureCubeArray:
-		//return CreateRef<FOpenGLTextureCubeArray>(InDesc, InSamplerDesc);
+		return CreateRef<FVulkanTextureCubeArray>(InDesc);
 	case ETextureDimension::Texture3D:
-		//return CreateRef<FOpenGLTexture3D>(InDesc, InSamplerDesc);
+		return CreateRef<FVulkanTexture3D>(InDesc);
 	default:
 		break;
 	}

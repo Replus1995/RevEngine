@@ -10,7 +10,7 @@ namespace Rev
 
 class FTexture;
 
-struct FImageStorage
+struct REV_API FImageStorage
 {
 public:
 	FImageStorage() = default;
@@ -29,7 +29,7 @@ private:
 	uint16 mNumLayers = 0;
 };
 
-struct FTextureStorage
+struct REV_API FTextureStorage
 {
 public:
 	FTextureStorage() = default;
@@ -41,7 +41,7 @@ public:
 	FRHITextureDesc TextureDesc;
 	FImageStorage ImageData;
 
-	REV_API Ref<FTexture> CreateTexture(bool bForceSRGB = false);
+	Ref<FTexture> CreateTexture(bool bForceSRGB = false);
 private:
 	Ref<FTexture> mCache = nullptr;
 };

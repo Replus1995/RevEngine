@@ -1,4 +1,4 @@
-#include "VulkanTexture2DArray.h"
+#include "VulkanTextureCubeArray.h"
 #include "VulkanPixelFormat.h"
 #include "VulkanUtils.h"
 #include "VulkanDynamicRHI.h"
@@ -8,23 +8,24 @@
 namespace Rev
 {
 
-FVulkanTexture2DArray::FVulkanTexture2DArray(const FRHITextureDesc& InDesc)
-	: FVulkanTexture(InDesc)
+FVulkanTextureCubeArray::FVulkanTextureCubeArray(const FRHITextureDesc& InDesc)
+    : FVulkanTexture(InDesc)
 {
-	REV_CORE_ASSERT(InDesc.Dimension == ETextureDimension::Texture2DArray);
-    REV_CORE_ASSERT(InDesc.Depth == 1)
-    REV_CORE_ASSERT(InDesc.NumSamples == 1, "Only texture2d can be multisampled.");
+    REV_CORE_ASSERT(InDesc.Dimension == ETextureDimension::TextureCubeArray);
+    REV_CORE_ASSERT(InDesc.Depth == 1);
+    REV_CORE_ASSERT(InDesc.NumSamples == 1, "Cube array does not support multisampling.");
     Init();
 }
 
-FVulkanTexture2DArray::~FVulkanTexture2DArray()
+FVulkanTextureCubeArray::~FVulkanTextureCubeArray()
 {
     Release();
 }
 
-void FVulkanTexture2DArray::UpdateContent(FVulkanContext* Context, const void* InContent, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex)
+void FVulkanTextureCubeArray::UpdateContent(FVulkanContext* Context, const void* InContent, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex)
 {
-    REV_CORE_ASSERT(InArrayIndex < TextureDesc.ArraySize, "ArrayIndex out of range");
+    uint32 TotalLayers = TextureDesc.ArraySize * 6;
+    REV_CORE_ASSERT(InArrayIndex < TotalLayers, "ArrayIndex out of range for cube array texture");
     REV_CORE_ASSERT(InMipLevel < TextureDesc.NumMips, "MipLevel out of range");
 
     VkExtent2D MipSize = CalculateMipSize2D(InMipLevel);
@@ -33,53 +34,52 @@ void FVulkanTexture2DArray::UpdateContent(FVulkanContext* Context, const void* I
     FVulkanUtils::ImmediateUploadImage(Context, Image, ImageAspectFlags, { MipSize.width, MipSize.height, 1 }, InContent, InSize, InMipLevel, InArrayIndex);
 }
 
-void FVulkanTexture2DArray::Init()
+void FVulkanTextureCubeArray::Init()
 {
     REV_CORE_ASSERT(FVulkanDynamicRHI::GetDevice());
     REV_CORE_ASSERT(FVulkanDynamicRHI::GetAllocator());
 
-    PlatformFormat = (VkFormat)GPixelFormats[TextureDesc.Format].PlatformFormat;
-    VkImageCreateFlags ImageFlags = 0;
+    VkFormat ImageFormat = (VkFormat)GPixelFormats[TextureDesc.Format].PlatformFormat;
+    VkImageCreateFlags ImageFlags = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
     if (EnumHasAllFlags(TextureDesc.Flags, ETextureCreateFlags::SRGB))
     {
-        PlatformFormat = FVulkanPixelFormat::GetPlatformFormatSRGB(PlatformFormat);
+        ImageFormat = FVulkanPixelFormat::GetPlatformFormatSRGB(ImageFormat);
         ImageFlags |= VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT;
     }
+
+    uint32 TotalLayers = TextureDesc.ArraySize * 6;
 
     VkImageCreateInfo ImageCreateInfo{};
     ImageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     ImageCreateInfo.pNext = nullptr;
     ImageCreateInfo.flags = ImageFlags;
     ImageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
-    ImageCreateInfo.format = PlatformFormat;
+    ImageCreateInfo.format = ImageFormat;
     ImageCreateInfo.extent = GetExtent();
     ImageCreateInfo.mipLevels = TextureDesc.NumMips;
-    ImageCreateInfo.arrayLayers = TextureDesc.ArraySize;
+    ImageCreateInfo.arrayLayers = TotalLayers;
     ImageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
     ImageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
     ImageCreateInfo.usage = TranslateImageUsageFlags(TextureDesc.Flags);
     ImageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-    ImageCreateInfo.initialLayout = ImageLayout;
+    ImageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 
-    //for the draw image, we want to allocate it from gpu local memory
     VmaAllocationCreateInfo ImageAllocinfo = {};
     ImageAllocinfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
     ImageAllocinfo.requiredFlags = VkMemoryPropertyFlags(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-    //allocate and create the image
     REV_VK_CHECK(vmaCreateImage(FVulkanDynamicRHI::GetAllocator(), &ImageCreateInfo, &ImageAllocinfo, &Image, &Allocation, nullptr));
 
-    //build a image-view for the draw image to use for rendering
-    VkImageViewCreateInfo ImageViewCreateInfo{}; // = FVkInit::ImageViewCreateInfo2D(mFormatInfo.Format, mImage, VK_IMAGE_ASPECT_COLOR_BIT);
+    VkImageViewCreateInfo ImageViewCreateInfo{};
     ImageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-    ImageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY;
+    ImageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_CUBE_ARRAY;
     ImageViewCreateInfo.image = Image;
-    ImageViewCreateInfo.format = PlatformFormat;
+    ImageViewCreateInfo.format = ImageFormat;
     ImageViewCreateInfo.subresourceRange.aspectMask = ImageAspectFlags;
     ImageViewCreateInfo.subresourceRange.baseMipLevel = 0;
     ImageViewCreateInfo.subresourceRange.levelCount = TextureDesc.NumMips;
     ImageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
-    ImageViewCreateInfo.subresourceRange.layerCount = TextureDesc.ArraySize;
+    ImageViewCreateInfo.subresourceRange.layerCount = TotalLayers;
 
     REV_VK_CHECK(vkCreateImageView(FVulkanDynamicRHI::GetDevice(), &ImageViewCreateInfo, nullptr, &ImageView));
 }

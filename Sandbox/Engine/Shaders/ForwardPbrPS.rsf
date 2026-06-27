@@ -1,15 +1,5 @@
 #include "Engine/Shaders/Core/Light.rsh"
 
-cbuffer SceneUB : register(b0)
-{
-    FSceneUniform uScene;
-};
-
-cbuffer LightUB : register(b2)
-{
-    FDirectionalLightUniform uDirectionalLight;
-};
-
 struct FPBRMaterialUniform
 {
     float4 BaseColorFactor;
@@ -20,9 +10,19 @@ struct FPBRMaterialUniform
     float3 EmissiveFactor;
 };
 
-cbuffer PBRMaterialUB : register(b3)
+cbuffer SceneUB : register(b0)
+{
+    FSceneUniform uScene;
+};
+
+cbuffer PBRMaterialUB : register(b2)
 {
     FPBRMaterialUniform uPBRMaterial;
+};
+
+cbuffer LightUB : register(b3)
+{
+    FDirectionalLightUniform uDirectionalLight;
 };
 
 cbuffer ShadowUB : register(b4)
