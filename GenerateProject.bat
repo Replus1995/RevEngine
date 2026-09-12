@@ -3,6 +3,13 @@ setlocal
 
 echo ====== Generate Visual Studio Solution ======
 
+set "OPEN_SOLUTION=1"
+set "FORCE_FRESH=0"
+for %%I in (%*) do (
+    if /I "%%~I"=="noopen" set "OPEN_SOLUTION=0"
+    if /I "%%~I"=="fresh" set "FORCE_FRESH=1"
+)
+
 for %%I in ("%~dp0.") do set "ROOT_DIR=%%~fI"
 set "BUILD_DIR=%ROOT_DIR%\build"
 set "VSWHERE=%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
@@ -59,7 +66,25 @@ echo CMake: %CMAKE_EXE%
 echo Generator: %CMAKE_GENERATOR%
 echo Vulkan SDK: %VULKAN_SDK%
 
-"%CMAKE_EXE%" -S "%ROOT_DIR%" -B "%BUILD_DIR%" --fresh -G "%CMAKE_GENERATOR%" -A x64 -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+set "CMAKE_FRESH_ARG="
+if "%FORCE_FRESH%"=="1" set "CMAKE_FRESH_ARG=--fresh"
+
+if exist "%BUILD_DIR%\CMakeCache.txt" (
+    findstr /l /x /c:"CMAKE_GENERATOR:INTERNAL=%CMAKE_GENERATOR%" "%BUILD_DIR%\CMakeCache.txt" >nul
+    if errorlevel 1 set "CMAKE_FRESH_ARG=--fresh"
+
+    for /f "tokens=1,* delims==" %%I in ('findstr /b /c:"CMAKE_GENERATOR_INSTANCE:INTERNAL=" "%BUILD_DIR%\CMakeCache.txt"') do set "CACHED_VS_INSTANCE=%%J"
+)
+
+if defined CACHED_VS_INSTANCE if not exist "%CACHED_VS_INSTANCE%" set "CMAKE_FRESH_ARG=--fresh"
+
+if defined CMAKE_FRESH_ARG (
+    echo Configure mode: fresh
+) else (
+    echo Configure mode: incremental
+)
+
+"%CMAKE_EXE%" -S "%ROOT_DIR%" -B "%BUILD_DIR%" %CMAKE_FRESH_ARG% -G "%CMAKE_GENERATOR%" -A x64 -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 if errorlevel 1 exit /b %errorlevel%
 
 set "SOLUTION_FILE=%BUILD_DIR%\RevEngine.%SOLUTION_EXTENSION%"
@@ -69,7 +94,7 @@ if not exist "%SOLUTION_FILE%" (
     exit /b 1
 )
 
-if not "%~1"=="" goto DONE
+if "%OPEN_SOLUTION%"=="0" goto DONE
 
 set "DEVENV_EXE=%VS_INSTALL%\Common7\IDE\devenv.exe"
 if not exist "%DEVENV_EXE%" (
