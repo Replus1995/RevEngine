@@ -1,7 +1,7 @@
 #ifndef _LIGHT_RSH_
 #define _LIGHT_RSH_
 
-#include "Engine/Shaders/Core/Base.rsh"
+#include "/Engine/Shaders/Core/Base.rsh"
 
 #define REV_MAX_DIRECTIONAL_LIGHTS 4
 #define REV_MAX_POINT_LIGHTS 16

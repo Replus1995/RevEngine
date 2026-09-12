@@ -24,7 +24,8 @@ static Ref<FMaterial> sDefaultSurfaceMaterial = nullptr;
 
 void FAssetLibrary::Init()
 {
-	IFileManager::Get().Mount("/Engine", (std::filesystem::current_path() / "Engine").generic_string().c_str());
+	const std::filesystem::path EngineShaderDirectory = REV_ENGINE_SHADER_DIR;
+	IFileManager::Get().Mount("/Engine/Shaders", EngineShaderDirectory.generic_string().c_str());
 }
 
 void FAssetLibrary::Shutdown()

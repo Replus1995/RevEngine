@@ -2,11 +2,19 @@ cmake_minimum_required(VERSION 3.19.0)
 project(Rev)
 
 file(GLOB_RECURSE REV_SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/Source/*)
+file(GLOB_RECURSE REV_SHADER_FILES CONFIGURE_DEPENDS
+    ${CMAKE_CURRENT_SOURCE_DIR}/Shaders/*.rsf
+    ${CMAKE_CURRENT_SOURCE_DIR}/Shaders/*.rsh
+)
 group_source(REV_SRC_FILES)
+group_source(REV_SHADER_FILES)
+
+set_source_files_properties(${REV_SHADER_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
 
 add_library(Rev
 SHARED
     ${REV_SRC_FILES}
+    ${REV_SHADER_FILES}
 )
 
 set_target_properties(Rev PROPERTIES UNITY_BUILD OFF)
@@ -20,6 +28,7 @@ PUBLIC
     _SCL_SECURE_NO_WARNINGS #spdlog
 PRIVATE
     REV_BUILD_DLL
+    REV_ENGINE_SHADER_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/Shaders\"
     GLFW_INCLUDE_NONE
 )
 
