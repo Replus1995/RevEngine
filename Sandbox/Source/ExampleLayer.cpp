@@ -20,7 +20,8 @@ ExampleLayer::ExampleLayer()
 {
 	//Load shader
 
-	IFileManager::Get().Mount("/Game", (std::filesystem::current_path() / "Game").generic_string().c_str());
+	IFileManager::Get().Mount("/Game/Content", (std::filesystem::current_path() / "Content").generic_string().c_str());
+	IFileManager::Get().Mount("/Game/Shaders", (std::filesystem::current_path() / "Shaders").generic_string().c_str());
 
 	//Create Sandbox Scene
 	mScene = CreateRef<Rev::FScene>();
@@ -42,8 +43,8 @@ ExampleLayer::ExampleLayer()
 	//}
 
 	{
-		//auto importRes = FAssetLibrary::ImportModel("/Game/Assets/Models/Cube/Cube.gltf");
-		auto importRes = FAssetLibrary::ImportModel("/Game/Assets/Models/DamagedHelmet.glb");
+		//auto importRes = FAssetLibrary::ImportModel("/Game/Content/Assets/Models/Cube/Cube.gltf");
+		auto importRes = FAssetLibrary::ImportModel("/Game/Content/Assets/Models/DamagedHelmet.glb");
 		if (!importRes.StaticMeshes.empty())
 		{
 			auto meshEntity = mScene->CreateEntity();
@@ -102,12 +103,12 @@ ExampleLayer::ExampleLayer()
 	{
 		//CubeMap
 		auto CubeTexStorage = FAssetLibrary::ImportTextureCube(
-			"/Game/Assets/Textures/Skybox/right.jpg", 
-			"/Game/Assets/Textures/Skybox/left.jpg",
-			"/Game/Assets/Textures/Skybox/top.jpg",
-			"/Game/Assets/Textures/Skybox/bottom.jpg",
-			"/Game/Assets/Textures/Skybox/front.jpg",
-			"/Game/Assets/Textures/Skybox/back.jpg",
+			"/Game/Content/Assets/Textures/Skybox/right.jpg",
+			"/Game/Content/Assets/Textures/Skybox/left.jpg",
+			"/Game/Content/Assets/Textures/Skybox/top.jpg",
+			"/Game/Content/Assets/Textures/Skybox/bottom.jpg",
+			"/Game/Content/Assets/Textures/Skybox/front.jpg",
+			"/Game/Content/Assets/Textures/Skybox/back.jpg",
 			true);
 		auto CubeTex = CubeTexStorage.CreateTexture();
 		if (CubeTex)
