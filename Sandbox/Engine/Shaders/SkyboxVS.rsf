@@ -24,6 +24,8 @@ VSOutput main(VSInput Input)
 
     VSOutput Result;
     Result.ViewDir = mul(transpose(float3x3(uScene.ViewMat)), normalize(Pos));
-    Result.Position = float4(Input.Position.xy, 1.0, 1.0);
+    // Reversed-Z uses 0 as the far/background depth.  With GreaterEqual
+    // this passes only where SceneDepth is still its cleared value.
+    Result.Position = float4(Input.Position.xy, 0.0, 1.0);
     return Result;
 }
