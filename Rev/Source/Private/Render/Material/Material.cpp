@@ -15,12 +15,12 @@ FMaterial::~FMaterial()
 
 void FMaterial::PreDraw(FRHICommandList& RHICmdList)
 {
-	RHICmdList.GetContext()->RHIBindProgram(ShaderProgram.get());
+	RHICmdList.BindProgram(ShaderProgram.get());
 }
 
 void FMaterial::PostDraw(FRHICommandList& RHICmdList)
 {
-	RHICmdList.GetContext()->RHIBindProgram(nullptr);
+	RHICmdList.BindProgram(nullptr);
 }
 
 }

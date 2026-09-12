@@ -36,9 +36,6 @@ public:
 	virtual Ref<FRHIColorBlendState> RHICreateColorBlendState(const FRHIColorBlendStateDesc& InDesc) override;
 	virtual Ref<FRHIVertexInputState> RHICreateVertexInputState(const FRHIVertexInputStateDesc& InDesc) override;
 
-	//Pipeline
-	virtual Ref<FRHIRenderPass> RHICreateRenderPass(const FRHIRenderPassDesc& InDesc) override;
-
 public:
 	static FVulkanDynamicRHI* GetVulkanRHI();
 	static VkInstance GetInstance() { return GetVulkanRHI()->mInstance.GetInstance(); };

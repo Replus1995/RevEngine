@@ -3,6 +3,7 @@
 #include "VulkanPixelFormat.h"
 #include <vulkan/vulkan.h>
 #include <vk_mem_alloc.h>
+#include <unordered_map>
 
 namespace Rev
 {
@@ -16,6 +17,7 @@ public:
 
 	VkImage GetImage() const { return Image; } //For easy to understand
 	VkImageView GetImageView() const { return ImageView; }
+	VkImageView GetImageView(const FRHITextureSubresourceRange& InRange);
 	VkImageAspectFlags GetAspectFlags() const { return ImageAspectFlags; }
 	VkImageLayout GetImageLayout() const { return ImageLayout; }
 	VkClearValue GetClearValue() const;
@@ -26,6 +28,7 @@ public:
 	static FVulkanTexture* Cast(FRHITexture* InTexture) { return static_cast<FVulkanTexture*>(InTexture); }
 
 	void DoTransition(VkCommandBuffer InCmdBuffer, VkImageLayout TargetLayout);
+	void SetImageLayout(VkImageLayout InLayout) { ImageLayout = InLayout; }
 
 	virtual void UpdateContent(FVulkanContext* Context, const void* InContent, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex) = 0;
 	void ClearContent(FVulkanContext* Context, uint8 InMipLevel, uint8 InMipCount, uint16 InArrayIndex, uint16 InArrayCount);
@@ -49,6 +52,7 @@ protected:
 	VkImageLayout ImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 	VmaAllocation Allocation = VK_NULL_HANDLE;
 	VkFormat PlatformFormat = VK_FORMAT_UNDEFINED;
+	std::unordered_map<uint64, VkImageView> ImageViewCache;
 };
 
 }

@@ -23,8 +23,8 @@ struct FDirectionalLightUniform
 };
 
 //PBR const
-static const float3 kDielectric = float3(0.04);
-static const float3 kAmbientFactor = float3(0.03);
+static const float3 kDielectric = float3(0.04, 0.04, 0.04);
+static const float3 kAmbientFactor = float3(0.03, 0.03, 0.03);
 
 
 //copies of UE4
@@ -33,7 +33,7 @@ static const float3 kAmbientFactor = float3(0.03);
 //NdL = dot(Normal, LightDir)
 float3 F_Schlick(in float3 F0, in float cosTheta)
 {
-    return F0 + (float3(1.0) - F0) * pow(1.0 - cosTheta, 5.0);
+    return F0 + (float3(1.0, 1.0, 1.0) - F0) * pow(1.0 - cosTheta, 5.0);
 }
 
 float D_Blinn(in float roughness, in float NdH)
@@ -112,7 +112,7 @@ float3 ComputeLightPBR(
     float D = D_GGX(Roughness, NdH);
     float G = G_SchlickGGX(Roughness, NdV, NdL);
 
-    float3 kd = lerp(float3(1.0) - F, float3(0.0), Metallic);
+    float3 kd = lerp(float3(1.0, 1.0, 1.0) - F, float3(0.0, 0.0, 0.0), Metallic);
     float3 diffuseBRDF = kd * BaseColor / PI;
     float3 specularBRDF = (F * D * G) / max(EPSILON, 4.0 * NdL * NdV);
 

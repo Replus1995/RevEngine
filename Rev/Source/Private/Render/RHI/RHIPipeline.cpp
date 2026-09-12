@@ -10,7 +10,8 @@ bool operator==(const FRHIGraphicsPipelineStateDesc& A, const FRHIGraphicsPipeli
 		A.RasterizerState == B.RasterizerState &&
 		A.DepthStencilState == B.DepthStencilState &&
 		A.ColorBlendState == B.ColorBlendState &&
-		A.VertexInputState == B.VertexInputState;
+		A.VertexInputState == B.VertexInputState &&
+		A.NumSamples == B.NumSamples;
 	return bSame;
 }
 

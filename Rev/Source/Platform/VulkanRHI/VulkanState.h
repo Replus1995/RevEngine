@@ -86,7 +86,6 @@ struct FVulkanVertexStream
 	uint32 Offset = 0;
 };
 
-class FVulkanRenderPass;
 class FVulkanShaderProgram;
 class FVulkanUniformBuffer;
 class FVulkanTexture;
@@ -94,9 +93,10 @@ class FVulkanSamplerState;
 
 struct FVulkanGraphicsFrameState
 {
-	FVulkanRenderPass* CurrentPass = nullptr;
 	FVulkanShaderProgram* CurrentProgram = nullptr;
 	FRHIGraphicsPipelineStateDesc CurrentState = {};
+	FRHIRenderTargetLayout CurrentRenderTargetLayout = {};
+	bool bRendering = false;
 
 	FVulkanVertexStream VertexStreams[REV_MAX_VERTEX_ELEMENTS];
 	bool bVertexStreamsDirty = true;
@@ -109,12 +109,15 @@ struct FVulkanGraphicsFrameState
 		Textures.clear();
 		UniformBuffers.clear();
 		CurrentProgram = nullptr;
-		CurrentPass = nullptr;
+		CurrentState = {};
+		CurrentRenderTargetLayout = {};
+		bRendering = false;
+		bVertexStreamsDirty = true;
 	}
 
 	bool ReadyForDraw()
 	{
-		return CurrentPass != nullptr && CurrentProgram != nullptr;
+		return bRendering && CurrentProgram != nullptr;
 	}
 
 	void PrepareForDraw(VkCommandBuffer InCmdBuffer);

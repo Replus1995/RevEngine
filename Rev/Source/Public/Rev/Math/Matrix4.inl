@@ -105,7 +105,7 @@ inline TMatrix4<T>& TMatrix4<T>::operator-=(const TMatrix4<T>& InMat)
 template<typename T>
 inline TMatrix4<T> TMatrix4<T>::operator*(const TMatrix4<T>& InMat) const
 {
-	//From GLM
+	// Column-major matrix multiplication.
 	TVector4<T> const SrcA0 = Columns[0];
 	TVector4<T> const SrcA1 = Columns[1];
 	TVector4<T> const SrcA2 = Columns[2];
@@ -166,7 +166,7 @@ inline void TMatrix4<T>::Invert()
 template<typename T>
 inline TMatrix4<T> TMatrix4<T>::Inverse() const
 {
-	//From GLM
+	// Right-handed Vulkan projection with [0, 1] NDC and reversed Z.
 	T Coef00 = Columns[2][2] * Columns[3][3] - Columns[3][2] * Columns[2][3];
 	T Coef02 = Columns[1][2] * Columns[3][3] - Columns[3][2] * Columns[1][3];
 	T Coef03 = Columns[1][2] * Columns[2][3] - Columns[2][2] * Columns[1][3];
@@ -368,23 +368,23 @@ inline TMatrix4<T> TMatrix4<T>::Perspective(float InFOV, float InAspectRatio, fl
 	TMatrix4<T> Result;
 	Result[0][0] = 1.0F / (InAspectRatio * tanHalfFovy);
 	Result[1][1] = 1.0F / (tanHalfFovy);
-	Result[2][2] = -(InFar + InNear) / (InFar - InNear);
+	Result[2][2] = InNear / (InFar - InNear);
 	Result[2][3] = -1.0F;
-	Result[3][2] = -(2.0F * InFar * InNear) / (InFar - InNear);
+	Result[3][2] = (InFar * InNear) / (InFar - InNear);
 	return Result;
 }
 
 template<typename T>
 inline TMatrix4<T> TMatrix4<T>::Othographic(float InLeft, float InRight, float InBottom, float InTop, float InNear, float InFar)
 {
-	//From GLM
+	// Right-handed Vulkan orthographic projection with reversed Z.
 	TMatrix4<T> Result(1.0F);
 	Result[0][0] = 2.0F / (InRight - InLeft);
 	Result[1][1] = 2.0F / (InTop - InBottom);
-	Result[2][2] = 2.0F / (InFar - InNear);
+	Result[2][2] = 1.0F / (InFar - InNear);
 	Result[3][0] = -(InRight + InLeft) / (InRight - InLeft);
 	Result[3][1] = -(InTop + InBottom) / (InTop - InBottom);
-	Result[3][2] = -(InFar + InNear) / (InFar - InNear);
+	Result[3][2] = InFar / (InFar - InNear);
 	return Result;
 }
 

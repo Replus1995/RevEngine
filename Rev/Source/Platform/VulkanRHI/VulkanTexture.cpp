@@ -81,12 +81,47 @@ void FVulkanTexture::Release()
 	REV_CORE_ASSERT(FVulkanDynamicRHI::GetDevice());
 	REV_CORE_ASSERT(FVulkanDynamicRHI::GetAllocator());
 
+	for (const auto& Pair : ImageViewCache)
+		vkDestroyImageView(FVulkanDynamicRHI::GetDevice(), Pair.second, nullptr);
+	ImageViewCache.clear();
 	vkDestroyImageView(FVulkanDynamicRHI::GetDevice(), ImageView, nullptr);
 	vmaDestroyImage(FVulkanDynamicRHI::GetAllocator(), Image, Allocation);
 	Image = VK_NULL_HANDLE;
 	ImageView = VK_NULL_HANDLE;
 	//ImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 	Allocation = VK_NULL_HANDLE;
+}
+
+VkImageView FVulkanTexture::GetImageView(const FRHITextureSubresourceRange& InRange)
+{
+	const uint32 NumMips = InRange.NumMips ? InRange.NumMips : TextureDesc.NumMips - InRange.BaseMip;
+	const uint32 TotalLayers = TextureDesc.Dimension == ETextureDimension::TextureCube ? 6u : TextureDesc.ArraySize;
+	const uint32 NumLayers = InRange.NumLayers ? InRange.NumLayers : TotalLayers - InRange.BaseLayer;
+	VkImageAspectFlags Aspect = ImageAspectFlags;
+	if (InRange.Aspect != ERHITextureAspect::Auto)
+	{
+		Aspect = 0;
+		if (EnumHasAnyFlags(InRange.Aspect, ERHITextureAspect::Color)) Aspect |= VK_IMAGE_ASPECT_COLOR_BIT;
+		if (EnumHasAnyFlags(InRange.Aspect, ERHITextureAspect::Depth)) Aspect |= VK_IMAGE_ASPECT_DEPTH_BIT;
+		if (EnumHasAnyFlags(InRange.Aspect, ERHITextureAspect::Stencil)) Aspect |= VK_IMAGE_ASPECT_STENCIL_BIT;
+	}
+	if (InRange.BaseMip == 0 && NumMips == TextureDesc.NumMips && InRange.BaseLayer == 0 && NumLayers == TotalLayers && Aspect == ImageAspectFlags)
+		return ImageView;
+
+	const uint64 Key = uint64(Aspect) | (uint64(InRange.BaseMip) << 8) | (uint64(NumMips) << 16) |
+		(uint64(InRange.BaseLayer) << 24) | (uint64(NumLayers) << 40);
+	if (auto It = ImageViewCache.find(Key); It != ImageViewCache.end()) return It->second;
+
+	VkImageViewCreateInfo Info{};
+	Info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+	Info.image = Image;
+	Info.format = PlatformFormat;
+	Info.viewType = NumLayers == 1 ? VK_IMAGE_VIEW_TYPE_2D : VK_IMAGE_VIEW_TYPE_2D_ARRAY;
+	Info.subresourceRange = { Aspect, InRange.BaseMip, NumMips, InRange.BaseLayer, NumLayers };
+	VkImageView View = VK_NULL_HANDLE;
+	REV_VK_CHECK(vkCreateImageView(FVulkanDynamicRHI::GetDevice(), &Info, nullptr, &View));
+	ImageViewCache.emplace(Key, View);
+	return View;
 }
 
 VkExtent2D FVulkanTexture::CalculateMipSize2D(uint32 InMipLevel)
@@ -101,19 +136,24 @@ VkExtent3D FVulkanTexture::CalculateMipSize3D(uint32 InMipLevel)
 
 VkImageUsageFlags FVulkanTexture::TranslateImageUsageFlags(ETextureCreateFlags InFlags)
 {
-	VkImageUsageFlags OutFlags = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+	VkImageUsageFlags OutFlags = 0;
+	if (EnumHasAnyFlags(InFlags, ETextureCreateFlags::ShaderResource)) OutFlags |= VK_IMAGE_USAGE_SAMPLED_BIT;
+	if (EnumHasAnyFlags(InFlags, ETextureCreateFlags::TransferSrc)) OutFlags |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+	if (EnumHasAnyFlags(InFlags, ETextureCreateFlags::TransferDst)) OutFlags |= VK_IMAGE_USAGE_TRANSFER_DST_BIT;
 	if (EnumHasAnyFlags(InFlags, ETextureCreateFlags::ColorTarget | ETextureCreateFlags::ColorResolveTarget))
 	{
 		OutFlags |= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 		if (EnumHasAnyFlags(InFlags, ETextureCreateFlags::ColorResolveTarget))
 			OutFlags |= VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT;
 	}
-	else if (EnumHasAnyFlags(InFlags, ETextureCreateFlags::DepthStencilTarget | ETextureCreateFlags::DepthStencilResolveTarget))
+	if (EnumHasAnyFlags(InFlags, ETextureCreateFlags::DepthStencilTarget | ETextureCreateFlags::DepthStencilResolveTarget))
 	{
 		OutFlags |= VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
 		/*if (EnumHasAnyFlags(InFlags, ETextureCreateFlags::DepthStencilResolveTarget))
 			OutFlags |= VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT;*/
 	}
+	// Upload/clear are part of the public texture API.
+	OutFlags |= VK_IMAGE_USAGE_TRANSFER_DST_BIT;
 
 	return OutFlags;
 }

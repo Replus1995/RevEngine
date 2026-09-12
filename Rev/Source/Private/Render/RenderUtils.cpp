@@ -80,8 +80,8 @@ void FRenderUtils::Shutdown()
 void FRenderUtils::PostProcessDraw(FRHICommandList& RHICmdList)
 {
 
-	RHICmdList.GetContext()->RHISetVertexStream(0, G2DQuadVertexBuffer.VertexBufferRHI.get());
-	RHICmdList.GetContext()->RHIDrawPrimitiveIndexed(G2DQuadIndexBuffer.IndexBufferRHI.get(), 2, 0);
+	RHICmdList.SetVertexStream(0, G2DQuadVertexBuffer.VertexBufferRHI.get());
+	RHICmdList.DrawPrimitiveIndexed(G2DQuadIndexBuffer.IndexBufferRHI.get(), 2, 0);
 }
 
 

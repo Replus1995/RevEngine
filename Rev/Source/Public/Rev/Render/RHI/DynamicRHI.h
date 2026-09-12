@@ -5,7 +5,6 @@
 #include "Rev/Render/RHI/RHIState.h"
 #include "Rev/Render/RHI/RHIBuffer.h"
 #include "Rev/Render/RHI/RHITexture.h"
-#include "Rev/Render/RHI/RHIRenderPass.h"
 
 namespace Rev
 {
@@ -35,9 +34,6 @@ public:
 	virtual Ref<FRHIDepthStencilState> RHICreateDepthStencilStateState(const FRHIDepthStencilStateDesc& InDesc) = 0;
 	virtual Ref<FRHIColorBlendState> RHICreateColorBlendState(const FRHIColorBlendStateDesc& InDesc) = 0;
 	virtual Ref<FRHIVertexInputState> RHICreateVertexInputState(const FRHIVertexInputStateDesc& InDesc) = 0;
-
-	//Pipeline
-	virtual Ref<FRHIRenderPass> RHICreateRenderPass(const FRHIRenderPassDesc& InDesc) = 0;
 
 };
 

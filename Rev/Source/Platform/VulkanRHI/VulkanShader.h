@@ -7,7 +7,6 @@
 namespace Rev
 {
 class FVulkanContext;
-class FVulkanRenderPass;
 class FVulkanPrimitive;
 
 struct FVulkanUniformInfo : public FRHIShaderUniform

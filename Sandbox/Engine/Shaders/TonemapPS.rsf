@@ -1,0 +1,16 @@
+#include "/Engine/Shaders/Core/Base.rsh"
+cbuffer SceneUB : register(b0) { FSceneUniform uScene; };
+SAMPLER2D(sSceneColor, 9);
+struct PSInput { float4 Position : SV_POSITION; };
+struct PSOutput { float4 Color : SV_Target; };
+float3 ACESFitted(float3 X)
+{
+    const float A = 2.51; const float B = 0.03; const float C = 2.43; const float D = 0.59; const float E = 0.14;
+    return saturate((X * (A * X + B)) / (X * (C * X + D) + E));
+}
+PSOutput main(PSInput Input)
+{
+    float2 UV = Input.Position.xy / float2(uScene.ViewExtent.Width, uScene.ViewExtent.Height);
+    float3 Linear = sSceneColor.Sample(UV).rgb;
+    PSOutput Result; Result.Color = float4(pow(ACESFitted(Linear), float3(1.0 / 2.2, 1.0 / 2.2, 1.0 / 2.2)), 1.0); return Result;
+}

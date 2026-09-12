@@ -2,7 +2,6 @@
 #include "VulkanPixelFormat.h"
 #include "VulkanBuffer.h"
 #include "VulkanTexture.h"
-#include "VulkanRenderPass.h"
 #include "VulkanContext.h"
 #include "Rev/Core/Hash.h"
 

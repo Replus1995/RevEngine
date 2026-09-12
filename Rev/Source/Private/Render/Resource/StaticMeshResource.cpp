@@ -79,13 +79,13 @@ void FStaticMeshVertexBuffer::UpdateVertexStreams(FRHICommandList& RHICmdList) c
 	if (!PositionBuffer.VertexBufferRHI)
 		return;
 
-	RHICmdList.GetContext()->RHISetVertexStream(0, PositionBuffer.VertexBufferRHI.get());
-	RHICmdList.GetContext()->RHISetVertexStream(1, ColorBuffer.VertexBufferRHI ? ColorBuffer.VertexBufferRHI.get() : GNullVertexBuffer.VertexBufferRHI.get());
-	RHICmdList.GetContext()->RHISetVertexStream(2, NormalBuffer.VertexBufferRHI ? NormalBuffer.VertexBufferRHI.get() : GNullVertexBuffer.VertexBufferRHI.get());
-	RHICmdList.GetContext()->RHISetVertexStream(3, TangentBuffer.VertexBufferRHI ? TangentBuffer.VertexBufferRHI.get() : GNullVertexBuffer.VertexBufferRHI.get());
+	RHICmdList.SetVertexStream(0, PositionBuffer.VertexBufferRHI.get());
+	RHICmdList.SetVertexStream(1, ColorBuffer.VertexBufferRHI ? ColorBuffer.VertexBufferRHI.get() : GNullVertexBuffer.VertexBufferRHI.get());
+	RHICmdList.SetVertexStream(2, NormalBuffer.VertexBufferRHI ? NormalBuffer.VertexBufferRHI.get() : GNullVertexBuffer.VertexBufferRHI.get());
+	RHICmdList.SetVertexStream(3, TangentBuffer.VertexBufferRHI ? TangentBuffer.VertexBufferRHI.get() : GNullVertexBuffer.VertexBufferRHI.get());
 	for (uint32 i = 0; i < 2; i++)
 	{
-		RHICmdList.GetContext()->RHISetVertexStream(4 + i, TexCoordBuffer[i].VertexBufferRHI ? TexCoordBuffer[i].VertexBufferRHI.get() : GNullVertexBuffer.VertexBufferRHI.get());
+		RHICmdList.SetVertexStream(4 + i, TexCoordBuffer[i].VertexBufferRHI ? TexCoordBuffer[i].VertexBufferRHI.get() : GNullVertexBuffer.VertexBufferRHI.get());
 	}
 }
 

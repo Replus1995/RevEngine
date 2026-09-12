@@ -79,7 +79,7 @@ void FSkyProxy::SyncResource(FRHICommandList& RHICmdList) const
 	}
 	if (auto& EnvTex = mSkybox.GetEnvironmentTexture(); EnvTex)
 	{
-		RHICmdList.GetContext()->RHIBindTexture(UL::SEnviornmentTex, EnvTex->GetTextureRHI(), EnvTex->GetSamplerStateRHI());
+		RHICmdList.BindTexture(UL::SEnviornmentTex, EnvTex->GetTextureRHI(), EnvTex->GetSamplerStateRHI());
 	}
 }
 

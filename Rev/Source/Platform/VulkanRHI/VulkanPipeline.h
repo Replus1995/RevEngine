@@ -9,7 +9,6 @@
 
 namespace Rev
 {
-class FVulkanRenderPass;
 class FVulkanShaderProgram;
 
 class FVulkanPipelineLayout
@@ -33,7 +32,7 @@ public:
 
     void BuildGraphics(FVulkanPipelineLayout* InLayout, 
         const FRHIGraphicsPipelineStateDesc& InStateDesc,
-        const FVulkanRenderPass* RenderPass,
+        const FRHIRenderTargetLayout& InRenderTargetLayout,
         const FVulkanShaderProgram* InProgram);
 
     void Release();
@@ -55,10 +54,10 @@ struct FVulkanPipelineLayoutDesc
 struct FVulkanGraphicsPipelineDesc
 {
     FRHIGraphicsPipelineStateDesc PipelineState;
-    VkRenderPass RenderPass;
-    VkShaderModule ShaderModules[SS_NumGraphics];
+    FRHIRenderTargetLayout RenderTargetLayout;
+    VkShaderModule ShaderModules[SS_NumGraphics] = {};
 
-    FVulkanGraphicsPipelineDesc(const FRHIGraphicsPipelineStateDesc& InPipelineState, const FVulkanRenderPass* InRenderPass, const FVulkanShaderProgram* InProgram);
+    FVulkanGraphicsPipelineDesc(const FRHIGraphicsPipelineStateDesc& InPipelineState, const FRHIRenderTargetLayout& InRenderTargetLayout, const FVulkanShaderProgram* InProgram);
 
     friend bool operator==(const FVulkanGraphicsPipelineDesc& A, const FVulkanGraphicsPipelineDesc& B);
 };
@@ -80,7 +79,7 @@ public:
 
     FVulkanPipeline* GetOrCreatePipeline(
         const FRHIGraphicsPipelineStateDesc& InStateDesc, 
-        const FVulkanRenderPass* InRenderPass,
+        const FRHIRenderTargetLayout& InRenderTargetLayout,
         const FVulkanShaderProgram* InProgram);
 
     void ClearAll();

@@ -30,7 +30,7 @@ void FSceneProxy::SyncResource(FRHICommandList& RHICmdList)
 	mSkyProxy.SyncResource(RHICmdList);
 
 	{
-		mSceneParams.ViewExtent = { 0, 0, RHICmdList.GetContext()->RHIGetFrameWidth(), RHICmdList.GetContext()->RHIGetFrameHeight() };
+		mSceneParams.ViewExtent = { 0, 0, RHICmdList.GetFrameWidth(), RHICmdList.GetFrameHeight() };
 		mSceneParams.ViewPos = mCameraProxy.GetViewPos();
 		mSceneParams.ViewMat = mCameraProxy.GetViewMat();
 		mSceneParams.ProjMat = mCameraProxy.GetProjMat();
@@ -41,7 +41,7 @@ void FSceneProxy::SyncResource(FRHICommandList& RHICmdList)
 
 		mSceneUB->UpdateSubData(&mSceneParams, sizeof(FSceneUniform));
 
-		RHICmdList.GetContext()->RHIBindUniformBuffer(UL::BScene, mSceneUB.get());
+		RHICmdList.BindUniformBuffer(UL::BScene, mSceneUB.get());
 	}
 
 }

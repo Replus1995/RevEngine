@@ -53,6 +53,7 @@ enum EPixelFormat : uint16
 
 	PF_R11G11B10_FLOAT		= 39,
 	PF_R10G10B10A2			= 40,
+	PF_B8G8R8A8				= 41,
 
 	PF_Count
 };

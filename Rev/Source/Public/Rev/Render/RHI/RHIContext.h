@@ -3,6 +3,8 @@
 #include "Rev/Core/Base.h"
 #include "Rev/Math/Maths.h"
 #include "Rev/Render/RenderCore.h"
+#include "Rev/Render/RHI/RHIDefinitions.h"
+#include <span>
 
 namespace Rev
 {
@@ -12,7 +14,6 @@ class FRHIShaderProgram;
 class FRHITexture;
 class FRHISamplerState;
 class FRHIRenderTarget;
-class FRHIRenderPass;
 class FRHIGraphicsPipelineStateDesc;
 
 class IRHIContext
@@ -38,9 +39,9 @@ public:
 	virtual uint32 RHIGetFrameHeight() = 0;
 	virtual FRHITexture* RHIGetBackTexture() = 0;
 
-	virtual void RHIBeginRenderPass(FRHIRenderPass* InRenderPass) = 0;
-	virtual void RHIEndRenderPass() = 0;
-	virtual void RHINextSubpass() = 0;
+	virtual void RHITransition(std::span<const FRHITextureBarrier> InTextureBarriers, std::span<const FRHIBufferBarrier> InBufferBarriers) = 0;
+	virtual void RHIBeginRendering(const FRHIRenderingInfo& InInfo) = 0;
+	virtual void RHIEndRendering() = 0;
 
 
 	virtual void RHIUpdateTexture(FRHITexture* InTexture, const void* InContent, uint32 InSize, uint8 InMipLevel = 0, uint16 InArrayIndex = 0) = 0;
@@ -64,6 +65,7 @@ public:
 	virtual void RHIBindProgram(FRHIShaderProgram* InProgram) = 0;
 
 	virtual void RHISetGraphicsPipelineState(const FRHIGraphicsPipelineStateDesc& InState) = 0;
+	virtual void RHISetRenderTargetLayout(const FRHIRenderTargetLayout& InLayout) = 0;
 
 	virtual void RHISetVertexStream(uint32 StreamIndex, FRHIBuffer* VertexBuffer,  uint32 Offset = 0) = 0;
 	virtual void RHIDrawPrimitive(uint32 NumPrimitives, uint32 StartVertex = 0) = 0;

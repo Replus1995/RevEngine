@@ -45,7 +45,7 @@ void FLightProxy::SyncResource(FRHICommandList& RHICmdList)
 		mLightUB = GDynamicRHI->RHICreateUniformBuffer(sizeof(FDirectionalLightUniform));
 
 	mLightUB->UpdateSubData(&mDirectionalLightParams, sizeof(FDirectionalLightUniform));
-	RHICmdList.GetContext()->RHIBindUniformBuffer(UL::BLight, mLightUB.get());
+	RHICmdList.BindUniformBuffer(UL::BLight, mLightUB.get());
 }
 
 }

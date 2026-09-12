@@ -1,0 +1,49 @@
+#include "/Engine/Shaders/Core/Base.rsh"
+
+struct FPBRMaterialUniform
+{
+    float4 BaseColorFactor;
+    float Metallic;
+    float Roughness;
+    float NormalScale;
+    float OcclusionStrength;
+    float3 EmissiveFactor;
+};
+cbuffer PBRMaterialUB : register(b3) { FPBRMaterialUniform uPBRMaterial; };
+
+SAMPLER2D(sBaseColor, 0);
+SAMPLER2D(sMetallicRoughness, 1);
+SAMPLER2D(sNormal, 2);
+SAMPLER2D(sOcclusion, 3);
+SAMPLER2D(sEmissive, 4);
+
+struct PSInput
+{
+    float4 Position : SV_POSITION;
+    uint Color : COLOR0;
+    float2 TexCoord0 : TEXCOORD0;
+    float3 WorldPos : TEXCOORD1;
+    float3 Normal : NORMAL;
+    float3 Tangent : TANGENT;
+    float3 Bitangent : BINORMAL;
+};
+struct PSOutput
+{
+    float4 GBufferA : SV_Target0;
+    float4 GBufferB : SV_Target1;
+    float4 GBufferC : SV_Target2;
+};
+
+PSOutput main(PSInput Input)
+{
+    float4 BaseColor = sBaseColor.Sample(Input.TexCoord0) * uPBRMaterial.BaseColorFactor;
+    float4 MetalRough = sMetallicRoughness.Sample(Input.TexCoord0);
+    float3x3 TBN = MatrixFromCols(Input.Tangent, Input.Bitangent, Input.Normal);
+    float3 TangentNormal = normalize((sNormal.Sample(Input.TexCoord0).xyz * 2.0 - 1.0) * float3(uPBRMaterial.NormalScale, uPBRMaterial.NormalScale, 1.0));
+    float3 WorldNormal = normalize(mul(TBN, TangentNormal));
+    PSOutput Result;
+    Result.GBufferA = float4(BaseColor.rgb, saturate(sOcclusion.Sample(Input.TexCoord0).r * uPBRMaterial.OcclusionStrength));
+    Result.GBufferB = float4(WorldNormal, saturate(MetalRough.g * uPBRMaterial.Roughness));
+    Result.GBufferC = float4(sEmissive.Sample(Input.TexCoord0).rgb * uPBRMaterial.EmissiveFactor, saturate(MetalRough.b * uPBRMaterial.Metallic));
+    return Result;
+}

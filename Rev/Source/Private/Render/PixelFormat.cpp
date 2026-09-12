@@ -73,6 +73,7 @@ FPixelFormatInfo GPixelFormats[PF_Count] = {
 
 	FPixelFormatInfo(PF_R11G11B10_FLOAT,	"R11G11B10_FLOAT",		1,			1,			1,			4,			3,			0),
 	FPixelFormatInfo(PF_R10G10B10A2,		"R32G32_UINT",			1,			1,			1,			4,			4,			0),
+	FPixelFormatInfo(PF_B8G8R8A8,			"B8G8R8A8",				1,			1,			1,			4,			4,			1),
 };
 
 

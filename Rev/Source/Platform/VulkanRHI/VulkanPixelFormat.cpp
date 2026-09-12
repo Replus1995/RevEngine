@@ -49,6 +49,7 @@ constexpr VkFormat sVkFormatMappings[] = {
 
 	VK_FORMAT_UNDEFINED,
 	VK_FORMAT_UNDEFINED,
+	VK_FORMAT_B8G8R8A8_UNORM,
 };
 
 

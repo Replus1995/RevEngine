@@ -27,7 +27,7 @@ void FPBRMaterial::Compile()
 
 	ShaderProgram = FRHIShaderLibrary::Get()->CreateGraphicsProgram("PbrProgram",
 		{ "/Engine/Shaders/CommonVS" },
-		{ "/Engine/Shaders/ForwardPbrPS", FragCompileOps }
+		{ "/Engine/Shaders/GBufferPS", FragCompileOps }
 	);
 }
 
@@ -41,7 +41,7 @@ void FPBRMaterial::PreDraw(FRHICommandList& RHICmdList)
 		MaterialUB = GDynamicRHI->RHICreateUniformBuffer(sizeof(FPBRMaterialUniform));
 
 	MaterialUB->UpdateSubData(&PBRMaterialParams, sizeof(FPBRMaterialUniform));
-	RHICmdList.GetContext()->RHIBindUniformBuffer(UL::BMaterial, MaterialUB.get());
+	RHICmdList.BindUniformBuffer(UL::BMaterial, MaterialUB.get());
 
 	/*mProgram->SetUniform(UL::LBaseColorFactor, BaseColorFactor);
 	mProgram->SetUniform(UL::LMetallic, Metallic);
@@ -54,29 +54,29 @@ void FPBRMaterial::PreDraw(FRHICommandList& RHICmdList)
 	//FAssetLibrary::GetDefaultNormalTexture()->GetResource()->Bind(1);
 	
 	if (BaseColorTexture)
-		RHICmdList.GetContext()->RHIBindTexture(UL::SBaseColorTex, BaseColorTexture->GetTextureRHI(), BaseColorTexture->GetSamplerStateRHI());
+		RHICmdList.BindTexture(UL::SBaseColorTex, BaseColorTexture->GetTextureRHI(), BaseColorTexture->GetSamplerStateRHI());
 	else
-		RHICmdList.GetContext()->RHIBindTexture(UL::SBaseColorTex, GWhiteTexture->GetTextureRHI(), GWhiteTexture->GetSamplerStateRHI());
+		RHICmdList.BindTexture(UL::SBaseColorTex, GWhiteTexture->GetTextureRHI(), GWhiteTexture->GetSamplerStateRHI());
 
 	if (MetallicRoughnessTexture)
-		RHICmdList.GetContext()->RHIBindTexture(UL::SMetallicRoughnessTex, MetallicRoughnessTexture->GetTextureRHI(), MetallicRoughnessTexture->GetSamplerStateRHI());
+		RHICmdList.BindTexture(UL::SMetallicRoughnessTex, MetallicRoughnessTexture->GetTextureRHI(), MetallicRoughnessTexture->GetSamplerStateRHI());
 	else
-		RHICmdList.GetContext()->RHIBindTexture(UL::SMetallicRoughnessTex, GWhiteTexture->GetTextureRHI(), GWhiteTexture->GetSamplerStateRHI());
+		RHICmdList.BindTexture(UL::SMetallicRoughnessTex, GWhiteTexture->GetTextureRHI(), GWhiteTexture->GetSamplerStateRHI());
 
 	if (NormalTexture)
-		RHICmdList.GetContext()->RHIBindTexture(UL::SNormalTex, NormalTexture->GetTextureRHI(), NormalTexture->GetSamplerStateRHI());
+		RHICmdList.BindTexture(UL::SNormalTex, NormalTexture->GetTextureRHI(), NormalTexture->GetSamplerStateRHI());
 	else
-		RHICmdList.GetContext()->RHIBindTexture(UL::SNormalTex, GNormalTexture->GetTextureRHI(), GNormalTexture->GetSamplerStateRHI());
+		RHICmdList.BindTexture(UL::SNormalTex, GNormalTexture->GetTextureRHI(), GNormalTexture->GetSamplerStateRHI());
 
 	if (OcclusionTexture)
-		RHICmdList.GetContext()->RHIBindTexture(UL::SOcclusionTex, OcclusionTexture->GetTextureRHI(), OcclusionTexture->GetSamplerStateRHI());
+		RHICmdList.BindTexture(UL::SOcclusionTex, OcclusionTexture->GetTextureRHI(), OcclusionTexture->GetSamplerStateRHI());
 	else
-		RHICmdList.GetContext()->RHIBindTexture(UL::SOcclusionTex, GWhiteTexture->TextureRHI.get(), GWhiteTexture->SamplerStateRHI.get());
+		RHICmdList.BindTexture(UL::SOcclusionTex, GWhiteTexture->TextureRHI.get(), GWhiteTexture->SamplerStateRHI.get());
 
 	if (EmissiveTexture)
-		RHICmdList.GetContext()->RHIBindTexture(UL::SEmissiveTex, EmissiveTexture->GetTextureRHI(), EmissiveTexture->GetSamplerStateRHI());
+		RHICmdList.BindTexture(UL::SEmissiveTex, EmissiveTexture->GetTextureRHI(), EmissiveTexture->GetSamplerStateRHI());
 	else
-		RHICmdList.GetContext()->RHIBindTexture(UL::SEmissiveTex, GBlackTexture->TextureRHI.get(), GBlackTexture->SamplerStateRHI.get());
+		RHICmdList.BindTexture(UL::SEmissiveTex, GBlackTexture->TextureRHI.get(), GBlackTexture->SamplerStateRHI.get());
 }
 
 }

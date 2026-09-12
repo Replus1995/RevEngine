@@ -67,7 +67,7 @@ void SceneLayer::OnDraw(FRHICommandList& RHICmdList)
 {
 	mSceneProxy->Prepare(mScene);
 
-	RHICmdList.GetContext()->RHISetViewport(0, 0, RHICmdList.GetContext()->RHIGetFrameWidth(), RHICmdList.GetContext()->RHIGetFrameHeight());
+	RHICmdList.SetViewport(0, 0, RHICmdList.GetFrameWidth(), RHICmdList.GetFrameHeight());
 
 	mRenderer->BeginFrame(RHICmdList);
 	mRenderer->DrawFrame(RHICmdList);

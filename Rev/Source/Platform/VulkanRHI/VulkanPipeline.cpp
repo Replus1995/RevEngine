@@ -1,6 +1,5 @@
 #include "VulkanPipeline.h"
 #include "VulkanDynamicRHI.h"
-#include "VulkanRenderPass.h"
 #include "VulkanShader.h"
 #include "VulkanState.h"
 #include "Core/VulkanEnum.h"
@@ -14,7 +13,7 @@ class FVulkanPipelineBuilder
 public:
     static VkPipeline BuildGraphics(VkDevice InDevice, VkPipelineLayout InLayout,
         const FRHIGraphicsPipelineStateDesc& InStateDesc,
-        const FVulkanRenderPass* RenderPass,
+        const FRHIRenderTargetLayout& InRenderTargetLayout,
         const FVulkanShaderProgram* InProgram);
 
 private:
@@ -30,11 +29,10 @@ private:
 
 VkPipeline FVulkanPipelineBuilder::BuildGraphics(VkDevice InDevice, VkPipelineLayout InLayout, 
     const FRHIGraphicsPipelineStateDesc& InStateDesc,
-    const FVulkanRenderPass* RenderPass, 
+    const FRHIRenderTargetLayout& InRenderTargetLayout,
     const FVulkanShaderProgram* InProgram)
 {
-    const FRHIRenderPassDesc& RenderPassDesc = RenderPass->GetDesc();
-    uint32 ColorAttachmentCount = RenderPassDesc.NumColorRenderTargets;
+    uint32 ColorAttachmentCount = InRenderTargetLayout.NumColorAttachments;
     REV_CORE_ASSERT(ColorAttachmentCount <= RTA_MaxColorAttachments);
 
     REV_CORE_ASSERT(InStateDesc.RasterizerState);
@@ -56,13 +54,12 @@ VkPipeline FVulkanPipelineBuilder::BuildGraphics(VkDevice InDevice, VkPipelineLa
     VkFormat ColorFormats[RTA_MaxColorAttachments];
     for (uint32 i = 0; i < ColorAttachmentCount; i++)
     {
-        REV_CORE_ASSERT(RenderPassDesc.ColorRenderTargets[i].ColorTarget);
-        ColorFormats[i] = (VkFormat)GPixelFormats[RenderPassDesc.ColorRenderTargets[i].ColorTarget->GetFormat()].PlatformFormat;
+        ColorFormats[i] = (VkFormat)GPixelFormats[InRenderTargetLayout.ColorFormats[i]].PlatformFormat;
     }
     VkFormat DepthFormat = VK_FORMAT_UNDEFINED;
-    if (RenderPassDesc.DepthStencilRenderTarget.DepthStencilTarget)
+    if (InRenderTargetLayout.DepthStencilFormat != PF_Unknown)
     {
-        DepthFormat = (VkFormat)GPixelFormats[RenderPassDesc.DepthStencilRenderTarget.DepthStencilTarget->GetFormat()].PlatformFormat;
+        DepthFormat = (VkFormat)GPixelFormats[InRenderTargetLayout.DepthStencilFormat].PlatformFormat;
     }
 
     bool bEnableAlphaToCoverage = InStateDesc.NumSamples > 1 && ColorBlendStateRHI->Desc.bUseAlphaToCoverage;
@@ -94,7 +91,7 @@ VkPipeline FVulkanPipelineBuilder::BuildGraphics(VkDevice InDevice, VkPipelineLa
     PipelineInfo.pColorBlendState = &ColorBlendState;
     PipelineInfo.pDynamicState = &DynamicState;
     PipelineInfo.layout = InLayout;
-    PipelineInfo.renderPass = (VkRenderPass)RenderPass->GetNativeHandle();
+    PipelineInfo.renderPass = VK_NULL_HANDLE;
     PipelineInfo.subpass = 0;
 
 
@@ -235,13 +232,13 @@ FVulkanPipeline::~FVulkanPipeline()
     Release();
 }
 
-void FVulkanPipeline::BuildGraphics(FVulkanPipelineLayout* InLayout, const FRHIGraphicsPipelineStateDesc& InStateDesc, const FVulkanRenderPass* RenderPass, const FVulkanShaderProgram* InProgram)
+void FVulkanPipeline::BuildGraphics(FVulkanPipelineLayout* InLayout, const FRHIGraphicsPipelineStateDesc& InStateDesc, const FRHIRenderTargetLayout& InRenderTargetLayout, const FVulkanShaderProgram* InProgram)
 {
     REV_CORE_ASSERT(InLayout != nullptr);
     REV_CORE_ASSERT(InLayout->PipelineLayout != VK_NULL_HANDLE);
 
     Release();
-    Pipeline = FVulkanPipelineBuilder::BuildGraphics(FVulkanDynamicRHI::GetDevice(), InLayout->PipelineLayout, InStateDesc, RenderPass, InProgram);
+    Pipeline = FVulkanPipelineBuilder::BuildGraphics(FVulkanDynamicRHI::GetDevice(), InLayout->PipelineLayout, InStateDesc, InRenderTargetLayout, InProgram);
     PipelineLayout = InLayout;
 }
 
@@ -261,12 +258,12 @@ FVulkanGraphicsPipelineCache::~FVulkanGraphicsPipelineCache()
 
 FVulkanPipeline* FVulkanGraphicsPipelineCache::GetOrCreatePipeline(
     const FRHIGraphicsPipelineStateDesc& InStateDesc,
-    const FVulkanRenderPass* InRenderPass, 
+    const FRHIRenderTargetLayout& InRenderTargetLayout,
     const FVulkanShaderProgram* InProgram)
 {
     REV_CORE_ASSERT(InStateDesc.VertexInputState);
 
-    FVulkanGraphicsPipelineDesc PipelineDesc(InStateDesc, InRenderPass, InProgram);
+    FVulkanGraphicsPipelineDesc PipelineDesc(InStateDesc, InRenderTargetLayout, InProgram);
     FVulkanPipeline* pPipeline = nullptr;
     if (auto PipelineIter = mPipelineCache.find(PipelineDesc); PipelineIter != mPipelineCache.end())
     {
@@ -291,7 +288,7 @@ FVulkanPipeline* FVulkanGraphicsPipelineCache::GetOrCreatePipeline(
         }
 
         Scope<FVulkanPipeline> NewPipeline = CreateScope<FVulkanPipeline>();
-        NewPipeline->BuildGraphics(pLayout, InStateDesc, InRenderPass, InProgram);
+        NewPipeline->BuildGraphics(pLayout, InStateDesc, InRenderTargetLayout, InProgram);
         auto PipelineIter = mPipelineCache.emplace(PipelineDesc, std::move(NewPipeline)).first;
         pPipeline = PipelineIter->second.get();
     }
@@ -319,7 +316,7 @@ bool operator==(const FVulkanPipelineLayoutDesc& A, const FVulkanPipelineLayoutD
 
 bool operator==(const FVulkanGraphicsPipelineDesc& A, const FVulkanGraphicsPipelineDesc& B)
 {
-    bool bSame = A.PipelineState == B.PipelineState && A.RenderPass == B.RenderPass;
+    bool bSame = A.PipelineState == B.PipelineState && A.RenderTargetLayout == B.RenderTargetLayout;
     for (int i = 0; i < 5; i++)
     {
         bSame &= A.ShaderModules[i] == B.ShaderModules[i];
@@ -334,13 +331,11 @@ FVulkanPipelineLayoutDesc::FVulkanPipelineLayoutDesc(const FVulkanShaderProgram*
     NumBindings = InProgram->GenLayoutBindings(Bindings);
 }
 
-FVulkanGraphicsPipelineDesc::FVulkanGraphicsPipelineDesc(const FRHIGraphicsPipelineStateDesc& InPipelineState, const FVulkanRenderPass* InRenderPass, const FVulkanShaderProgram* InProgram)
+FVulkanGraphicsPipelineDesc::FVulkanGraphicsPipelineDesc(const FRHIGraphicsPipelineStateDesc& InPipelineState, const FRHIRenderTargetLayout& InRenderTargetLayout, const FVulkanShaderProgram* InProgram)
     : PipelineState(InPipelineState)
+	, RenderTargetLayout(InRenderTargetLayout)
 {
-    REV_CORE_ASSERT(InRenderPass != nullptr);
     REV_CORE_ASSERT(InProgram != nullptr);
-
-    RenderPass = (VkRenderPass)InRenderPass->GetNativeHandle();
     for (uint8 i = SS_Vertex; i < SS_NumGraphics; i++)
     {
         auto& Shader = InProgram->GetShaders()[i];
@@ -361,5 +356,5 @@ bool operator==(const VkDescriptorSetLayoutBinding& A, const VkDescriptorSetLayo
         A.descriptorCount == B.descriptorCount &&
         A.stageFlags == B.stageFlags &&
         A.pImmutableSamplers == B.pImmutableSamplers;
-    return false;
+    return bSame;
 }

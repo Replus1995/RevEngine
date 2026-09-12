@@ -1,0 +1,45 @@
+#include "/Engine/Shaders/Core/Light.rsh"
+cbuffer SceneUB : register(b0) { FSceneUniform uScene; };
+cbuffer LightUB : register(b2) { FDirectionalLightUniform uDirectionalLight; };
+struct FDeferredDebugUniform { uint Mode; float3 Padding; };
+cbuffer DeferredDebugUB : register(b5) { FDeferredDebugUniform uDebug; };
+
+SAMPLER2D(sGBufferA, 5);
+SAMPLER2D(sGBufferB, 6);
+SAMPLER2D(sGBufferC, 7);
+SAMPLER2D(sSceneDepth, 8);
+
+struct PSInput { float4 Position : SV_POSITION; };
+struct PSOutput { float4 Color : SV_Target; };
+float2 ScreenUV(float4 Pixel) { return Pixel.xy / float2(uScene.ViewExtent.Width, uScene.ViewExtent.Height); }
+
+PSOutput main(PSInput Input)
+{
+    float2 UV = ScreenUV(Input.Position);
+    float4 A = sGBufferA.Sample(UV);
+    float4 B = sGBufferB.Sample(UV);
+    float4 C = sGBufferC.Sample(UV);
+    float Depth = sSceneDepth.Sample(UV).r;
+    float4 Clip = float4(UV * 2.0 - 1.0, Depth, 1.0);
+    float4 WorldH = mul(uScene.InvViewProjMat, Clip);
+    float3 WorldPos = WorldH.xyz / max(abs(WorldH.w), EPSILON);
+    float3 Normal = normalize(B.xyz);
+    float3 ViewDir = normalize(uScene.ViewPos.xyz - WorldPos);
+    float3 F0 = lerp(kDielectric, A.rgb, C.a);
+    float NdV = max(dot(Normal, ViewDir), 0.0);
+    float3 Lighting = 0.0;
+    for (uint I = 0; I < uDirectionalLight.Count; ++I)
+    {
+        float3 L = -uDirectionalLight.Lights[I].Direction.xyz;
+        Lighting += ComputeLightPBR(A.rgb, B.a, C.a, Normal, ViewDir, L, NdV, F0, uDirectionalLight.Lights[I].Intensity) * uDirectionalLight.Lights[I].Color.rgb;
+    }
+    float3 Final = kAmbientFactor * A.rgb * A.a + Lighting + C.rgb;
+    if (uDebug.Mode == 1) Final = A.rgb;
+    else if (uDebug.Mode == 2) Final = Normal * 0.5 + 0.5;
+    else if (uDebug.Mode == 3) Final = B.aaa;
+    else if (uDebug.Mode == 4) Final = C.aaa;
+    else if (uDebug.Mode == 5) Final = A.aaa;
+    else if (uDebug.Mode == 6) Final = C.rgb;
+    else if (uDebug.Mode == 7) Final = Depth.xxx;
+    PSOutput Result; Result.Color = float4(Final, 1.0); return Result;
+}

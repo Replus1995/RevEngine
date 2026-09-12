@@ -15,6 +15,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_CURRENT_BINARY_DIR}/Release/B
 #set(CMAKE_UNITY_BUILD TRUE)
 
 project(RevEngine)
+include(CTest)
 if(MSVC)
     add_compile_options(
         #$<$<CONFIG:Debug>:/MDd>
@@ -33,6 +34,12 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/vendor/vendor.cmake)
 #Rev
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Rev ${CMAKE_CURRENT_BINARY_DIR}/Rev)
 group_target(Rev "Core")
+
+if(BUILD_TESTING)
+    add_executable(RevRenderGraphTests Rev/Tests/RenderGraphTests.cpp)
+    target_link_libraries(RevRenderGraphTests PRIVATE Rev)
+    add_test(NAME Rev.RenderGraph COMMAND RevRenderGraphTests)
+endif()
 
 #SandBox
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Sandbox ${CMAKE_CURRENT_BINARY_DIR}/Sandbox)

@@ -69,7 +69,7 @@ float4 DecodeColor(in uint InColor)
 
 float3 ToLinear(in float3 InColor)
 {
-    return pow(abs(InColor), float3(2.2) );
+    return pow(abs(InColor), float3(2.2, 2.2, 2.2));
 }
 
 float4 ToLinear(in float4 InColor)
@@ -79,7 +79,7 @@ float4 ToLinear(in float4 InColor)
 
 float3 ToGamma(in float3 InColor)
 {
-	return pow(abs(InColor), float3(1.0/2.2) );
+        return pow(abs(InColor), float3(1.0/2.2, 1.0/2.2, 1.0/2.2));
 }
 
 float4 ToGamma(in float4 InColor)

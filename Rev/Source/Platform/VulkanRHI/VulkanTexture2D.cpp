@@ -90,7 +90,7 @@ void FVulkanTexture2D::Init()
 }
 
 FVulkanTextureSwapchain::FVulkanTextureSwapchain(VkImage InSwapchainImage, VkFormat InFormat, uint16 InWidth, uint16 InHeight)
-    : FVulkanTexture(FRHITextureDesc::Create2D(InWidth, InHeight, PF_Unknown))  
+    : FVulkanTexture(FRHITextureDesc::Create2D(InWidth, InHeight, InFormat == VK_FORMAT_B8G8R8A8_UNORM ? PF_B8G8R8A8 : PF_R8G8B8A8).SetFlags(ETextureCreateFlags::ColorTarget))
 {
     Image = InSwapchainImage;
     PlatformFormat = InFormat;
@@ -127,7 +127,10 @@ void FVulkanTextureSwapchain::Release()
 {
     REV_CORE_ASSERT(FVulkanDynamicRHI::GetDevice());
 
-    vkDestroyImageView(FVulkanDynamicRHI::GetDevice(), ImageView, nullptr);
+	for (const auto& Pair : ImageViewCache)
+		vkDestroyImageView(FVulkanDynamicRHI::GetDevice(), Pair.second, nullptr);
+	ImageViewCache.clear();
+	vkDestroyImageView(FVulkanDynamicRHI::GetDevice(), ImageView, nullptr);
     Image = VK_NULL_HANDLE;
     ImageView = VK_NULL_HANDLE;
 }

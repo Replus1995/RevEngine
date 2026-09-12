@@ -15,7 +15,6 @@
 namespace Rev
 {
 
-class FVulkanRenderPass;
 class FVulkanShaderProgram;
 class FVulkanUniformBuffer;
 class FVulkanTexture;
@@ -56,15 +55,16 @@ public:
 	virtual void RHIUpdateBufferData(FRHIBuffer* Buffer, const void* Content, uint32 Size, uint32 Offset = 0) override;
 
 //Draw
-	virtual void RHIBeginRenderPass(FRHIRenderPass* InRenderPass) override;
-	virtual void RHIEndRenderPass() override;
-	virtual void RHINextSubpass() override;
+	virtual void RHITransition(std::span<const FRHITextureBarrier> InTextureBarriers, std::span<const FRHIBufferBarrier> InBufferBarriers) override;
+	virtual void RHIBeginRendering(const FRHIRenderingInfo& InInfo) override;
+	virtual void RHIEndRendering() override;
 
 	virtual void RHIBindUniformBuffer(uint16 InBinding, FRHIUniformBuffer* InBuffer) override;
 	virtual void RHIBindTexture(uint16 InBinding, FRHITexture* InTexture, FRHISamplerState* InSamplerState) override;
 	virtual void RHIBindProgram(FRHIShaderProgram* InProgram) override;
 
 	virtual void RHISetGraphicsPipelineState(const FRHIGraphicsPipelineStateDesc& InState) override;
+	virtual void RHISetRenderTargetLayout(const FRHIRenderTargetLayout& InLayout) override;
 
 	virtual void RHISetVertexStream(uint32 StreamIndex, FRHIBuffer* VertexBuffer, uint32 Offset) override;
 	virtual void RHIDrawPrimitive(uint32 NumPrimitives, uint32 StartVertex) override;

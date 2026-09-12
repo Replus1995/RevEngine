@@ -1,10 +1,14 @@
 #pragma once
 #include "Rev/Core/Base.h"
+#include "Rev/Render/PixelFormat.h"
 
 #define REV_MAX_VERTEX_ELEMENTS 16
+#define REV_MAX_RENDER_TARGETS 8
 
 namespace Rev
 {
+class FRHITexture;
+class FRHIBuffer;
 //Resource
 enum EResourceLockMode
 {
@@ -55,8 +59,28 @@ enum class ETextureCreateFlags : uint64
 	DepthStencilResolveTarget	= 1ull << 3,
 	ShaderResource					= 1ull << 4,
 	SRGB							= 1ull << 5,
+	TransferSrc					= 1ull << 6,
+	TransferDst					= 1ull << 7,
 };
 ENUM_CLASS_FLAGS(ETextureCreateFlags)
+
+// Explicit resource states used by the command list and RenderGraph.  These are
+// deliberately API independent; a backend maps them to stages, access masks and
+// layouts.
+enum class ERHIAccess : uint8
+{
+	Unknown,
+	Present,
+	ColorAttachment,
+	DepthStencilWrite,
+	DepthStencilRead,
+	ShaderRead,
+	CopySrc,
+	CopyDst,
+	VertexBuffer,
+	IndexBuffer,
+	UniformRead,
+};
 
 enum ETextureCubeFace : uint8
 {
@@ -251,6 +275,77 @@ enum ERenderTargetStoreAction : uint8
 	RTS_DontCare
 };
 
+enum class ERHITextureAspect : uint8
+{
+	Auto = 0,
+	Color = 1 << 0,
+	Depth = 1 << 1,
+	Stencil = 1 << 2,
+};
+ENUM_CLASS_FLAGS(ERHITextureAspect)
+
+struct FRHITextureSubresourceRange
+{
+	ERHITextureAspect Aspect = ERHITextureAspect::Auto;
+	uint8 BaseMip = 0;
+	uint8 NumMips = 0; // zero means all remaining mips
+	uint16 BaseLayer = 0;
+	uint16 NumLayers = 0; // zero means all remaining layers
+};
+
+struct FRHITextureBarrier
+{
+	FRHITexture* Texture = nullptr;
+	ERHIAccess Before = ERHIAccess::Unknown;
+	ERHIAccess After = ERHIAccess::Unknown;
+	FRHITextureSubresourceRange Range;
+};
+
+struct FRHIBufferBarrier
+{
+	FRHIBuffer* Buffer = nullptr;
+	ERHIAccess Before = ERHIAccess::Unknown;
+	ERHIAccess After = ERHIAccess::Unknown;
+};
+
+struct FRHIRenderingAttachment
+{
+	FRHITexture* Texture = nullptr;
+	FRHITexture* ResolveTexture = nullptr;
+	FRHITextureSubresourceRange Subresource;
+	ERenderTargetLoadAction LoadAction = RTL_DontCare;
+	ERenderTargetStoreAction StoreAction = RTS_Store;
+};
+
+struct FRHIRenderingInfo
+{
+	uint32 Width = 0;
+	uint32 Height = 0;
+	uint8 NumColorAttachments = 0;
+	FRHIRenderingAttachment ColorAttachments[REV_MAX_RENDER_TARGETS];
+	FRHIRenderingAttachment DepthAttachment;
+	FRHIRenderingAttachment StencilAttachment;
+	bool bDepthReadOnly = false;
+	bool bStencilReadOnly = false;
+};
+
+struct FRHIRenderTargetLayout
+{
+	uint8 NumColorAttachments = 0;
+	EPixelFormat ColorFormats[REV_MAX_RENDER_TARGETS] = {};
+	EPixelFormat DepthStencilFormat = PF_Unknown;
+	uint8 NumSamples = 1;
+
+	friend bool operator==(const FRHIRenderTargetLayout& A, const FRHIRenderTargetLayout& B)
+	{
+		if (A.NumColorAttachments != B.NumColorAttachments || A.DepthStencilFormat != B.DepthStencilFormat || A.NumSamples != B.NumSamples)
+			return false;
+		for (uint8 Index = 0; Index < A.NumColorAttachments; ++Index)
+			if (A.ColorFormats[Index] != B.ColorFormats[Index]) return false;
+		return true;
+	}
+};
+
 //Utils
 enum class ERHIPipeline : uint8
 {
@@ -269,7 +364,6 @@ struct FRHIDeviceCapacity
 };
 
 class FRHICommandList;
-class FRHIRenderPass;
 class FRHITexture;
 class FRHIBuffer;
 class FRHIUniformBuffer;
@@ -281,7 +375,6 @@ class FRHIDepthStencilState;
 class FRHIColorBlendState;
 class FRHIVertexInputState;
 
-using FRHIRenderPassRef		= Ref<FRHIRenderPass>;
 using FRHITextureRef		= Ref<FRHITexture>;
 using FRHIBufferRef			= Ref<FRHIBuffer>;
 using FRHIUniformBufferRef	= Ref<FRHIUniformBuffer>;
