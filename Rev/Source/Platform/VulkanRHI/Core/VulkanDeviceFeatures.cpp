@@ -3,8 +3,10 @@
 namespace Rev
 {
 
-FVulkanPhysicalDeviceFeatures::FVulkanPhysicalDeviceFeatures()
+FVulkanPhysicalDeviceFeatures::FVulkanPhysicalDeviceFeatures(VkPhysicalDevice InPhysicalDevice)
 {
+	VkPhysicalDeviceFeatures SupportedFeatures{};
+	vkGetPhysicalDeviceFeatures(InPhysicalDevice, &SupportedFeatures);
 	mDynamicRenderingFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES;
 	mDynamicRenderingFeatures.dynamicRendering = VK_TRUE;
 	mDynamicRenderingFeatures.pNext = nullptr;
@@ -21,6 +23,7 @@ FVulkanPhysicalDeviceFeatures::FVulkanPhysicalDeviceFeatures()
 
 	mFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
 	mFeatures.features = {};
+	mFeatures.features.samplerAnisotropy = SupportedFeatures.samplerAnisotropy;
 	mFeatures.pNext = &mSyncFeatures;
 
 }

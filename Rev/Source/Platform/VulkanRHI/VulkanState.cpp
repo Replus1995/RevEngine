@@ -3,6 +3,7 @@
 #include "Core/VulkanEnum.h"
 #include "Rev/Core/Assert.h"
 #include "Rev/Core/Hash.h"
+#include <algorithm>
 
 namespace Rev
 {
@@ -33,15 +34,24 @@ void FVulkanSamplerState::FillCreateInfo(const FRHISamplerStateDesc& InDesc, VkS
 	OutCreateInfo.mipLodBias = InDesc.MipBias;
 	
 	OutCreateInfo.maxAnisotropy = 1.0f;
-	if (InDesc.Filter == SF_AnisotropicLinear || InDesc.Filter == SF_AnisotropicNearest)
+	const bool bWantsAnisotropy = InDesc.Filter == SF_AnisotropicLinear || InDesc.Filter == SF_AnisotropicNearest;
+	VkPhysicalDeviceFeatures Features{};
+	vkGetPhysicalDeviceFeatures(FVulkanDynamicRHI::GetPhysicalDevice(), &Features);
+	if (bWantsAnisotropy && Features.samplerAnisotropy)
 	{
-		//OutCreateInfo.maxAnisotropy = FMath::Clamp((float)ComputeAnisotropyRT(Initializer.MaxAnisotropy), 1.0f, InDevice.GetLimits().maxSamplerAnisotropy);
-		OutCreateInfo.maxAnisotropy = (float)InDesc.MaxAnisotropy;
+		VkPhysicalDeviceProperties Properties{};
+		vkGetPhysicalDeviceProperties(FVulkanDynamicRHI::GetPhysicalDevice(), &Properties);
+		const float Requested = InDesc.MaxAnisotropy > 1 ? float(InDesc.MaxAnisotropy) : Properties.limits.maxSamplerAnisotropy;
+		OutCreateInfo.maxAnisotropy = std::clamp(Requested, 1.0f, Properties.limits.maxSamplerAnisotropy);
+		OutCreateInfo.anisotropyEnable = OutCreateInfo.maxAnisotropy > 1.0f;
 	}
-	OutCreateInfo.anisotropyEnable = OutCreateInfo.maxAnisotropy > 1.0f;
+	else
+	{
+		OutCreateInfo.anisotropyEnable = VK_FALSE;
+	}
 
 	OutCreateInfo.compareEnable = InDesc.CompareFunc != SCF_Never ? VK_TRUE : VK_FALSE;
-	OutCreateInfo.compareOp = VkCompareOp(InDesc.CompareFunc);
+	OutCreateInfo.compareOp = InDesc.CompareFunc == SCF_Less ? VK_COMPARE_OP_LESS : VK_COMPARE_OP_NEVER;
 	OutCreateInfo.minLod = InDesc.MinMipLevel;
 	OutCreateInfo.maxLod = InDesc.MaxMipLevel;
 	OutCreateInfo.borderColor = InDesc.BorderColor == 0 ? VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK : VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;

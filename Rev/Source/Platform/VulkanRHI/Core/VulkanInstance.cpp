@@ -263,7 +263,7 @@ void FVulkanInstance::CreateLogicalDevice()
 	PopulateQueueCreateInfos(QueueCreateInfos, mQueueFamilies);
 
 	//physical device features
-	FVulkanPhysicalDeviceFeatures Features;
+	FVulkanPhysicalDeviceFeatures Features(mPhysicalDevice);
 
 	//extenisons
 	const std::vector<const char*> EnabledExtensions = GetDeviceRequiredExtensions();

@@ -8,7 +8,7 @@ namespace Rev
 struct FVulkanPhysicalDeviceFeatures
 {
 public:
-	FVulkanPhysicalDeviceFeatures();
+	explicit FVulkanPhysicalDeviceFeatures(VkPhysicalDevice InPhysicalDevice);
 	VkPhysicalDeviceFeatures2* Get() { return &mFeatures; }
 
 private:

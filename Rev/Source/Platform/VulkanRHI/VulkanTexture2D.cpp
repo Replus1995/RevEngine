@@ -35,7 +35,7 @@ void FVulkanTexture2D::UpdateContent(FVulkanContext* Context, const void* InCont
     VkExtent2D MipSize = CalculateMipSize2D(InMipLevel);
     REV_CORE_ASSERT(InSize == MipSize.width * MipSize.height * GPixelFormats[TextureDesc.Format].BlockBytes, "Data size mismatch");
 
-    FVulkanUtils::ImmediateUploadImage(Context, Image, ImageAspectFlags, { MipSize.width, MipSize.height, 1 }, InContent, InSize, InMipLevel);
+    UploadContent(Context, InContent, InSize, { MipSize.width, MipSize.height, 1 }, InMipLevel, 0);
 }
 
 void FVulkanTexture2D::Init()

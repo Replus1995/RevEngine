@@ -546,12 +546,25 @@ std::vector<Ref<FStaticMesh>> FGLTFUtils::ImportStaticMesh(const tinygltf::Mesh&
 
 Ref<FTextureStorage> FGLTFUtils::ImportTexture(const tinygltf::Texture& InTexture, const tinygltf::Model& InModel)
 {
+	REV_CORE_ASSERT(InTexture.source >= 0 && InTexture.source < int(InModel.images.size()));
 	const tinygltf::Image& InImage = InModel.images[InTexture.source];
-	const tinygltf::Sampler& InSampler = InModel.samplers[InTexture.sampler];
+	const tinygltf::Sampler DefaultSampler{};
+	const tinygltf::Sampler& InSampler = (InTexture.sampler >= 0 && InTexture.sampler < int(InModel.samplers.size())) ? InModel.samplers[InTexture.sampler] : DefaultSampler;
 
 	Ref<FTextureStorage> Storage = CreateRef<FTextureStorage>();
 	Storage->TextureDesc = FRHITextureDesc::Create2D(InImage.width, InImage.height, TranslateImageFormat(InImage));
 	Storage->SamplerDesc = TranslateSampler(InSampler);
+	switch (InSampler.minFilter)
+	{
+	case TINYGLTF_TEXTURE_FILTER_NEAREST_MIPMAP_NEAREST:
+	case TINYGLTF_TEXTURE_FILTER_NEAREST_MIPMAP_LINEAR:
+	case TINYGLTF_TEXTURE_FILTER_LINEAR_MIPMAP_NEAREST:
+	case TINYGLTF_TEXTURE_FILTER_LINEAR_MIPMAP_LINEAR:
+		Storage->TextureDesc.SetNumMips(FRHITextureDesc::CalculateFullMipCount(InImage.width, InImage.height));
+		break;
+	default:
+		break;
+	}
 	{
 		REV_CORE_ASSERT(InImage.component != 3);
 

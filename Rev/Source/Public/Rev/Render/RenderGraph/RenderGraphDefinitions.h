@@ -31,6 +31,22 @@ struct FRGTextureDesc : FRHITextureDesc
 	{
 		return FRGTextureDesc(FRHITextureDesc::Create2D(Width, Height, Format).SetClearColor(Clear).SetFlags(Flags).SetNumMips(NumMips).SetNumSamples(NumSamples));
 	}
+	static FRGTextureDesc Create2DArray(uint16 Width, uint16 Height, uint16 Layers, EPixelFormat Format, ETextureCreateFlags Flags)
+	{
+		return FRGTextureDesc(FRHITextureDesc::Create2DArray(Width, Height, Layers, Format).SetFlags(Flags));
+	}
+	static FRGTextureDesc CreateCube(uint16 Size, EPixelFormat Format, ETextureCreateFlags Flags)
+	{
+		return FRGTextureDesc(FRHITextureDesc::CreateCube(Size, Format).SetFlags(Flags));
+	}
+	static FRGTextureDesc CreateCubeArray(uint16 Size, uint16 Cubes, EPixelFormat Format, ETextureCreateFlags Flags)
+	{
+		return FRGTextureDesc(FRHITextureDesc::CreateCubeArray(Size, Cubes, Format).SetFlags(Flags));
+	}
+	static FRGTextureDesc Create3D(uint16 Width, uint16 Height, uint16 Depth, EPixelFormat Format, ETextureCreateFlags Flags)
+	{
+		return FRGTextureDesc(FRHITextureDesc::Create3D(Width, Height, Depth, Format).SetFlags(Flags));
+	}
 };
 
 struct FRGTextureHandle

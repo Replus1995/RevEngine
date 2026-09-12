@@ -12,7 +12,7 @@ FVulkanTexture2DArray::FVulkanTexture2DArray(const FRHITextureDesc& InDesc)
 	: FVulkanTexture(InDesc)
 {
 	REV_CORE_ASSERT(InDesc.Dimension == ETextureDimension::Texture2DArray);
-    REV_CORE_ASSERT(InDesc.Depth == 1)
+	REV_CORE_ASSERT(InDesc.Depth == 1);
     REV_CORE_ASSERT(InDesc.NumSamples == 1, "Only texture2d can be multisampled.");
     Init();
 }
@@ -30,7 +30,7 @@ void FVulkanTexture2DArray::UpdateContent(FVulkanContext* Context, const void* I
     VkExtent2D MipSize = CalculateMipSize2D(InMipLevel);
     REV_CORE_ASSERT(InSize == MipSize.width * MipSize.height * GPixelFormats[TextureDesc.Format].BlockBytes, "Data size mismatch");
 
-    FVulkanUtils::ImmediateUploadImage(Context, Image, ImageAspectFlags, { MipSize.width, MipSize.height, 1 }, InContent, InSize, InMipLevel, InArrayIndex);
+    UploadContent(Context, InContent, InSize, { MipSize.width, MipSize.height, 1 }, InMipLevel, InArrayIndex);
 }
 
 void FVulkanTexture2DArray::Init()
@@ -72,7 +72,7 @@ void FVulkanTexture2DArray::Init()
     //build a image-view for the draw image to use for rendering
     VkImageViewCreateInfo ImageViewCreateInfo{}; // = FVkInit::ImageViewCreateInfo2D(mFormatInfo.Format, mImage, VK_IMAGE_ASPECT_COLOR_BIT);
     ImageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-    ImageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+    ImageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY;
     ImageViewCreateInfo.image = Image;
     ImageViewCreateInfo.format = PlatformFormat;
     ImageViewCreateInfo.subresourceRange.aspectMask = ImageAspectFlags;

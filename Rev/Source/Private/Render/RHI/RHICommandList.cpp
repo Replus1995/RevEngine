@@ -20,6 +20,10 @@ void FRHICommandList::Transition(std::span<const FRHITextureBarrier> InTextureBa
 	mContext->RHITransition(InTextureBarriers, InBufferBarriers);
 }
 
+void FRHICommandList::UpdateTexture(FRHITexture* Texture, const FRHITextureUpdateDesc& Desc) { mContext->RHIUpdateTexture(Texture, Desc); }
+void FRHICommandList::CopyTexture(FRHITexture* DstTexture, FRHITexture* SrcTexture, const FRHITextureCopyDesc& Desc) { mContext->RHICopyTexture(DstTexture, SrcTexture, Desc); }
+bool FRHICommandList::GenerateMips(FRHITexture* Texture) { return mContext->RHIGenerateMips(Texture); }
+
 void FRHICommandList::BeginRendering(const FRHIRenderingInfo& InInfo)
 {
 	mContext->RHIBeginRendering(InInfo);

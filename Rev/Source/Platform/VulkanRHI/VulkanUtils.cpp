@@ -6,7 +6,7 @@
 namespace Rev
 {
 
-void FVulkanUtils::TransitionImage(VkCommandBuffer CmdBuffer, VkImage Image, VkImageLayout CurrentLayout, VkImageLayout NextLayout, VkImageAspectFlags AspectMask)
+void FVulkanUtils::TransitionImage(VkCommandBuffer CmdBuffer, VkImage Image, VkImageLayout CurrentLayout, VkImageLayout NextLayout, VkImageAspectFlags AspectMask, uint32 BaseMip, uint32 NumMips, uint32 BaseLayer, uint32 NumLayers)
 {
 	VkImageMemoryBarrier2 ImageBarrier{};
 	ImageBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2;
@@ -22,10 +22,10 @@ void FVulkanUtils::TransitionImage(VkCommandBuffer CmdBuffer, VkImage Image, VkI
 
 	VkImageSubresourceRange ImageRange{};
 	ImageRange.aspectMask = AspectMask;
-	ImageRange.baseMipLevel = 0;
-	ImageRange.levelCount = VK_REMAINING_MIP_LEVELS;
-	ImageRange.baseArrayLayer = 0;
-	ImageRange.layerCount = VK_REMAINING_ARRAY_LAYERS;
+	ImageRange.baseMipLevel = BaseMip;
+	ImageRange.levelCount = NumMips;
+	ImageRange.baseArrayLayer = BaseLayer;
+	ImageRange.layerCount = NumLayers;
 
 	ImageBarrier.subresourceRange = ImageRange;
 	ImageBarrier.image = Image;
@@ -78,37 +78,38 @@ void FVulkanUtils::BlitImage(VkCommandBuffer CmdBuffer, VkImage DstImage, VkExte
 	vkCmdBlitImage2(CmdBuffer, &BlitInfo);
 }
 
-void FVulkanUtils::ImmediateUploadImage(FVulkanContext* Context, VkImage Image, VkImageAspectFlags AspectMask, VkExtent3D Extent, const void* InData, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex, uint16 InArrayCount)
+void FVulkanUtils::ImmediateUploadImage(FVulkanContext* Context, VkImage Image, VkImageAspectFlags AspectMask, VkExtent3D Extent, const void* InData, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex, uint16 InArrayCount, VkImageLayout OldLayout, VkOffset3D Offset, uint32 BufferRowLength, uint32 BufferImageHeight)
 {
 	FVulkanStageBuffer UploadBuffer(InSize);
 	memcpy(UploadBuffer.GetMappedData(), InData, InSize);
 
 	Context->ImmediateSubmit([&](VkCommandBuffer ImmCmdBuffer) {
-		TransitionImage(ImmCmdBuffer, Image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, AspectMask);
+		TransitionImage(ImmCmdBuffer, Image, OldLayout, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, AspectMask, InMipLevel, 1, InArrayIndex, InArrayCount);
 
 		VkBufferImageCopy CopyRegion = {};
 		CopyRegion.bufferOffset = 0;
-		CopyRegion.bufferRowLength = 0;
-		CopyRegion.bufferImageHeight = 0;
+		CopyRegion.bufferRowLength = BufferRowLength;
+		CopyRegion.bufferImageHeight = BufferImageHeight;
 
 		CopyRegion.imageSubresource.aspectMask = AspectMask;
 		CopyRegion.imageSubresource.mipLevel = InMipLevel;
 		CopyRegion.imageSubresource.baseArrayLayer = InArrayIndex;
 		CopyRegion.imageSubresource.layerCount = InArrayCount;
+		CopyRegion.imageOffset = Offset;
 		CopyRegion.imageExtent = Extent;
 
 		// copy the buffer into the image
 		vkCmdCopyBufferToImage(ImmCmdBuffer, UploadBuffer.Buffer, Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &CopyRegion);
 
-		TransitionImage(ImmCmdBuffer, Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, AspectMask);
+		TransitionImage(ImmCmdBuffer, Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, AspectMask, InMipLevel, 1, InArrayIndex, InArrayCount);
 	});
 }
 
-void FVulkanUtils::ImmediateClearImage(FVulkanContext* Context, VkImage Image, VkImageAspectFlags AspectMask, VkClearValue InClearValue, uint8 InMipLevel, uint8 InMipCount, uint16 InArrayIndex, uint16 InArrayCount)
+void FVulkanUtils::ImmediateClearImage(FVulkanContext* Context, VkImage Image, VkImageAspectFlags AspectMask, VkClearValue InClearValue, uint8 InMipLevel, uint8 InMipCount, uint16 InArrayIndex, uint16 InArrayCount, VkImageLayout OldLayout)
 {
 	bool bColorImage = AspectMask & VK_IMAGE_ASPECT_COLOR_BIT;
 	Context->ImmediateSubmit([&](VkCommandBuffer ImmCmdBuffer) {
-		TransitionImage(ImmCmdBuffer, Image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL, AspectMask);
+		TransitionImage(ImmCmdBuffer, Image, OldLayout, VK_IMAGE_LAYOUT_GENERAL, AspectMask, InMipLevel, InMipCount, InArrayIndex, InArrayCount);
 
 		VkImageSubresourceRange Range{};
 		Range.aspectMask = AspectMask;
@@ -126,7 +127,7 @@ void FVulkanUtils::ImmediateClearImage(FVulkanContext* Context, VkImage Image, V
 			vkCmdClearDepthStencilImage(ImmCmdBuffer, Image, VK_IMAGE_LAYOUT_GENERAL, &InClearValue.depthStencil, 1, &Range);
 		}
 
-		TransitionImage(ImmCmdBuffer, Image, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, AspectMask);
+		TransitionImage(ImmCmdBuffer, Image, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, AspectMask, InMipLevel, InMipCount, InArrayIndex, InArrayCount);
 	});
 }
 

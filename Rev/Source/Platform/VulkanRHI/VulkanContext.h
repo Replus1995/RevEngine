@@ -47,7 +47,10 @@ public:
 
 //Data transfer
 	virtual void RHIUpdateTexture(FRHITexture* InTexture, const void* InContent, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex) override;
+	virtual void RHIUpdateTexture(FRHITexture* InTexture, const FRHITextureUpdateDesc& InDesc) override;
 	virtual void RHIClearTexture(FRHITexture* InTexture, uint8 InMipLevel, uint8 InMipCount, uint16 InArrayIndex, uint16 InArrayCount) override;
+	virtual void RHICopyTexture(FRHITexture* DstTexture, FRHITexture* SrcTexture, const FRHITextureCopyDesc& InDesc) override;
+	virtual bool RHIGenerateMips(FRHITexture* InTexture) override;
 	virtual void RHIBlitTexture(FRHITexture* DstTexture, FRHITexture* SrcTexture) override;
 	virtual void RHIBlitToBackTexture(FRHITexture* SrcTexture) override;
 

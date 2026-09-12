@@ -13,6 +13,8 @@ class FRHIUniformBuffer;
 class FRHIShaderProgram;
 class FRHITexture;
 class FRHISamplerState;
+struct FRHITextureUpdateDesc;
+struct FRHITextureCopyDesc;
 class FRHICommandList
 {
 public:
@@ -21,6 +23,9 @@ public:
 
 	IRHIContext* GetContext() { return mContext; };
 	void Transition(std::span<const FRHITextureBarrier> InTextureBarriers, std::span<const FRHIBufferBarrier> InBufferBarriers = {});
+	void UpdateTexture(FRHITexture* Texture, const FRHITextureUpdateDesc& Desc);
+	void CopyTexture(FRHITexture* DstTexture, FRHITexture* SrcTexture, const FRHITextureCopyDesc& Desc);
+	bool GenerateMips(FRHITexture* Texture);
 	void BeginRendering(const FRHIRenderingInfo& InInfo);
 	void EndRendering();
 	void SetGraphicsPipelineState(const FRHIGraphicsPipelineStateDesc& InState, const FRHIRenderTargetLayout& InLayout);

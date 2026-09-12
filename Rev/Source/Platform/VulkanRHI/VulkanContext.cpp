@@ -66,6 +66,8 @@ void FVulkanContext::BeginFrame(bool bClearBackBuffer)
 	REV_VK_CHECK(vkResetFences(FVulkanDynamicRHI::GetDevice(), 1, &FrameData.Fence));
 
 	mSwapchain.NextFrame(kWaitTime, FrameData.SwapchainSemaphore, nullptr);
+	// A newly-created swapchain image has not been presented yet, so its tracked
+	// layout remains UNDEFINED until RenderGraph transitions it for the first use.
 
 	FrameData.DescriptorPool.ResetPool(FVulkanDynamicRHI::GetDevice());
 
@@ -127,6 +129,12 @@ void FVulkanContext::PresentFrame()
 	else if (PresentRes != VK_SUCCESS)
 	{
 		throw std::runtime_error("[FVkContext] Failed to present swap chain image!");
+	}
+	else
+	{
+		FVulkanTexture* BackTexture = mSwapchain.GetCurrentTexture();
+		BackTexture->SetImageLayout(VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+		BackTexture->SetSubresourceLayout(0, 0, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 	}
 
 	mFrameDataIndex = (mFrameDataIndex + 1) % REV_VK_FRAME_OVERLAP;
@@ -205,7 +213,36 @@ FRHITexture* FVulkanContext::RHIGetBackTexture()
 void FVulkanContext::RHIUpdateTexture(FRHITexture* InTexture, const void* InContent, uint32 InSize, uint8 InMipLevel, uint16 InArrayIndex)
 {
 	if(!InTexture) return;
+	REV_CORE_ASSERT(InTexture->GetDesc().NumSamples == 1, "MSAA textures cannot be uploaded from CPU memory");
 	FVulkanTexture::Cast(InTexture)->UpdateContent(this, InContent, InSize, InMipLevel, InArrayIndex);
+}
+
+void FVulkanContext::RHIUpdateTexture(FRHITexture* InTexture, const FRHITextureUpdateDesc& InDesc)
+{
+	if (!InTexture || !InDesc.Data || InDesc.DataSize == 0) return;
+	const FRHITextureDesc& TextureDesc = InTexture->GetDesc();
+	REV_CORE_ASSERT(TextureDesc.NumSamples == 1, "MSAA textures cannot be uploaded from CPU memory");
+	REV_CORE_ASSERT(InDesc.Subresource.MipLevel < TextureDesc.NumMips);
+	REV_CORE_ASSERT(InDesc.Subresource.ArrayLayer < TextureDesc.GetPhysicalLayerCount());
+	const Math::FVector3 MipExtent = TextureDesc.GetMipExtent(InDesc.Subresource.MipLevel);
+	const uint32 Width = InDesc.Region.Width ? InDesc.Region.Width : uint32(MipExtent.X) - InDesc.Region.X;
+	const uint32 Height = InDesc.Region.Height ? InDesc.Region.Height : uint32(MipExtent.Y) - InDesc.Region.Y;
+	const uint32 Depth = InDesc.Region.Depth ? InDesc.Region.Depth : uint32(MipExtent.Z) - InDesc.Region.Z;
+	REV_CORE_ASSERT(Width > 0 && Height > 0 && Depth > 0);
+	REV_CORE_ASSERT(InDesc.Region.X + Width <= uint32(MipExtent.X) && InDesc.Region.Y + Height <= uint32(MipExtent.Y) && InDesc.Region.Z + Depth <= uint32(MipExtent.Z));
+	const FPixelFormatInfo& FormatInfo = GPixelFormats[TextureDesc.Format];
+	REV_CORE_ASSERT(FormatInfo.BlockSizeX == 1 && FormatInfo.BlockSizeY == 1 && FormatInfo.BlockSizeZ == 1, "Compressed texture updates are not supported");
+	const uint32 TightRowPitch = Width * FormatInfo.BlockBytes;
+	const uint32 RowPitch = InDesc.RowPitch ? InDesc.RowPitch : TightRowPitch;
+	const uint32 SlicePitch = InDesc.SlicePitch ? InDesc.SlicePitch : RowPitch * Height;
+	REV_CORE_ASSERT(RowPitch >= TightRowPitch && RowPitch % FormatInfo.BlockBytes == 0);
+	REV_CORE_ASSERT(SlicePitch >= RowPitch * Height && SlicePitch % RowPitch == 0);
+	const uint64 RequiredSize = uint64(SlicePitch) * (Depth - 1) + uint64(RowPitch) * (Height - 1) + TightRowPitch;
+	REV_CORE_ASSERT(InDesc.DataSize >= RequiredSize);
+	REV_CORE_ASSERT(InDesc.DataSize <= 0xFFFFFFFFull);
+	FVulkanTexture* Texture = FVulkanTexture::Cast(InTexture);
+	FVulkanUtils::ImmediateUploadImage(this, Texture->GetImage(), Texture->GetAspectFlags(), { Width, Height, Depth }, InDesc.Data, uint32(InDesc.DataSize), uint8(InDesc.Subresource.MipLevel), InDesc.Subresource.ArrayLayer, 1, Texture->GetSubresourceLayout(uint8(InDesc.Subresource.MipLevel), InDesc.Subresource.ArrayLayer), { int32(InDesc.Region.X), int32(InDesc.Region.Y), int32(InDesc.Region.Z) }, RowPitch / FormatInfo.BlockBytes, SlicePitch / RowPitch);
+	Texture->SetSubresourceLayout(uint8(InDesc.Subresource.MipLevel), InDesc.Subresource.ArrayLayer, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
 void FVulkanContext::RHIClearTexture(FRHITexture* InTexture, uint8 InMipLevel, uint8 InMipCount, uint16 InArrayIndex, uint16 InArrayCount)
@@ -259,6 +296,97 @@ FVulkanAccessInfo TranslateAccess(ERHIAccess Access, bool bDepth)
 	}
 }
 
+}
+
+void FVulkanContext::RHICopyTexture(FRHITexture* DstTexture, FRHITexture* SrcTexture, const FRHITextureCopyDesc& InDesc)
+{
+	if (!DstTexture || !SrcTexture) return;
+	FVulkanTexture* Dst = FVulkanTexture::Cast(DstTexture);
+	FVulkanTexture* Src = FVulkanTexture::Cast(SrcTexture);
+	const FRHITextureDesc& SrcDesc = SrcTexture->GetDesc();
+	const FRHITextureDesc& DstDesc = DstTexture->GetDesc();
+	REV_CORE_ASSERT(Src->GetPlatformFormat() == Dst->GetPlatformFormat() && Src->GetAspectFlags() == Dst->GetAspectFlags(), "Texture copy requires matching formats and aspects");
+	REV_CORE_ASSERT(InDesc.LayerCount > 0);
+	REV_CORE_ASSERT(InDesc.SourceSubresource.MipLevel < SrcDesc.NumMips && InDesc.DestinationSubresource.MipLevel < DstDesc.NumMips);
+	REV_CORE_ASSERT(InDesc.SourceSubresource.ArrayLayer + InDesc.LayerCount <= SrcDesc.GetPhysicalLayerCount());
+	REV_CORE_ASSERT(InDesc.DestinationSubresource.ArrayLayer + InDesc.LayerCount <= DstDesc.GetPhysicalLayerCount());
+	const Math::FVector3 SourceMip = SrcDesc.GetMipExtent(InDesc.SourceSubresource.MipLevel);
+	const uint32 Width = InDesc.SourceRegion.Width ? InDesc.SourceRegion.Width : uint32(SourceMip.X);
+	const uint32 Height = InDesc.SourceRegion.Height ? InDesc.SourceRegion.Height : uint32(SourceMip.Y);
+	const uint32 Depth = InDesc.SourceRegion.Depth ? InDesc.SourceRegion.Depth : uint32(SourceMip.Z);
+	const Math::FVector3 DestinationMip = DstDesc.GetMipExtent(InDesc.DestinationSubresource.MipLevel);
+	REV_CORE_ASSERT(InDesc.SourceRegion.X + Width <= uint32(SourceMip.X) && InDesc.SourceRegion.Y + Height <= uint32(SourceMip.Y) && InDesc.SourceRegion.Z + Depth <= uint32(SourceMip.Z));
+	REV_CORE_ASSERT(InDesc.DestinationRegion.X + Width <= uint32(DestinationMip.X) && InDesc.DestinationRegion.Y + Height <= uint32(DestinationMip.Y) && InDesc.DestinationRegion.Z + Depth <= uint32(DestinationMip.Z));
+	ImmediateSubmit([&](VkCommandBuffer Cmd) {
+		auto TransitionSubresource = [&](FVulkanTexture* Texture, uint16 Mip, uint16 Layer, uint16 LayerCount, VkImageLayout Layout, VkAccessFlags2 Access) {
+			VkImageMemoryBarrier2 Barrier{ VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2 };
+			Barrier.srcStageMask = VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT; Barrier.srcAccessMask = VK_ACCESS_2_MEMORY_READ_BIT | VK_ACCESS_2_MEMORY_WRITE_BIT;
+			Barrier.dstStageMask = Layout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL ? VK_PIPELINE_STAGE_2_VERTEX_SHADER_BIT | VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT : VK_PIPELINE_STAGE_2_TRANSFER_BIT; Barrier.dstAccessMask = Access;
+			Barrier.oldLayout = Texture->GetSubresourceLayout(uint8(Mip), Layer); Barrier.newLayout = Layout; Barrier.image = Texture->GetImage();
+			Barrier.subresourceRange = { Texture->GetAspectFlags(), Mip, 1, Layer, LayerCount };
+			VkDependencyInfo Dependency{ VK_STRUCTURE_TYPE_DEPENDENCY_INFO }; Dependency.imageMemoryBarrierCount = 1; Dependency.pImageMemoryBarriers = &Barrier; vkCmdPipelineBarrier2(Cmd, &Dependency);
+			for (uint16 Index = 0; Index < LayerCount; ++Index) Texture->SetSubresourceLayout(uint8(Mip), Layer + Index, Layout);
+		};
+		TransitionSubresource(Src, InDesc.SourceSubresource.MipLevel, InDesc.SourceSubresource.ArrayLayer, InDesc.LayerCount, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, VK_ACCESS_2_TRANSFER_READ_BIT);
+		TransitionSubresource(Dst, InDesc.DestinationSubresource.MipLevel, InDesc.DestinationSubresource.ArrayLayer, InDesc.LayerCount, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_ACCESS_2_TRANSFER_WRITE_BIT);
+		VkImageCopy Region{};
+		Region.srcSubresource = { Src->GetAspectFlags(), InDesc.SourceSubresource.MipLevel, InDesc.SourceSubresource.ArrayLayer, InDesc.LayerCount };
+		Region.dstSubresource = { Dst->GetAspectFlags(), InDesc.DestinationSubresource.MipLevel, InDesc.DestinationSubresource.ArrayLayer, InDesc.LayerCount };
+		Region.srcOffset = { int32(InDesc.SourceRegion.X), int32(InDesc.SourceRegion.Y), int32(InDesc.SourceRegion.Z) };
+		Region.dstOffset = { int32(InDesc.DestinationRegion.X), int32(InDesc.DestinationRegion.Y), int32(InDesc.DestinationRegion.Z) };
+		Region.extent = { Width, Height, Depth };
+		vkCmdCopyImage(Cmd, Src->GetImage(), VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, Dst->GetImage(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &Region);
+		TransitionSubresource(Src, InDesc.SourceSubresource.MipLevel, InDesc.SourceSubresource.ArrayLayer, InDesc.LayerCount, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_ACCESS_2_SHADER_SAMPLED_READ_BIT);
+		TransitionSubresource(Dst, InDesc.DestinationSubresource.MipLevel, InDesc.DestinationSubresource.ArrayLayer, InDesc.LayerCount, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_ACCESS_2_SHADER_SAMPLED_READ_BIT);
+	});
+}
+
+bool FVulkanContext::RHIGenerateMips(FRHITexture* InTexture)
+{
+	if (!InTexture) return false;
+	FVulkanTexture* Texture = FVulkanTexture::Cast(InTexture);
+	const FRHITextureDesc& Desc = Texture->GetDesc();
+	if (Desc.NumMips < 2 || Desc.NumSamples != 1 || FPixelFormatInfo::HasDepth(Desc.Format) || FPixelFormatInfo::HasStencil(Desc.Format) ||
+		!EnumHasAllFlags(Desc.Flags, ETextureCreateFlags::TransferSrc | ETextureCreateFlags::TransferDst)) return false;
+	VkFormatProperties Properties{};
+	vkGetPhysicalDeviceFormatProperties(FVulkanDynamicRHI::GetPhysicalDevice(), Texture->GetPlatformFormat(), &Properties);
+	const VkFormatFeatureFlags Required = VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT;
+	if ((Properties.optimalTilingFeatures & Required) != Required) return false;
+	const uint32 Layers = Desc.Dimension == ETextureDimension::Texture3D ? 1 : Desc.GetPhysicalLayerCount();
+	ImmediateSubmit([&](VkCommandBuffer Cmd) {
+		for (uint32 Mip = 1; Mip < Desc.NumMips; ++Mip)
+		{
+			const VkImageLayout PreviousLayout = Texture->GetSubresourceLayout(uint8(Mip - 1), 0);
+			const VkImageLayout CurrentLayout = Texture->GetSubresourceLayout(uint8(Mip), 0);
+			VkImageMemoryBarrier2 Barriers[2]{};
+			for (VkImageMemoryBarrier2& Barrier : Barriers) { Barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2; Barrier.srcStageMask = VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT; Barrier.dstStageMask = VK_PIPELINE_STAGE_2_TRANSFER_BIT; Barrier.image = Texture->GetImage(); Barrier.subresourceRange.aspectMask = Texture->GetAspectFlags(); Barrier.subresourceRange.baseArrayLayer = 0; Barrier.subresourceRange.layerCount = Layers; }
+			Barriers[0].srcAccessMask = PreviousLayout == VK_IMAGE_LAYOUT_UNDEFINED ? VK_ACCESS_2_NONE : VK_ACCESS_2_SHADER_SAMPLED_READ_BIT; Barriers[0].dstAccessMask = VK_ACCESS_2_TRANSFER_READ_BIT; Barriers[0].oldLayout = PreviousLayout; Barriers[0].newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL; Barriers[0].subresourceRange.baseMipLevel = Mip - 1; Barriers[0].subresourceRange.levelCount = 1;
+			Barriers[1].srcAccessMask = CurrentLayout == VK_IMAGE_LAYOUT_UNDEFINED ? VK_ACCESS_2_NONE : VK_ACCESS_2_SHADER_SAMPLED_READ_BIT; Barriers[1].dstAccessMask = VK_ACCESS_2_TRANSFER_WRITE_BIT; Barriers[1].oldLayout = CurrentLayout; Barriers[1].newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL; Barriers[1].subresourceRange.baseMipLevel = Mip; Barriers[1].subresourceRange.levelCount = 1;
+			VkDependencyInfo Dependency{ VK_STRUCTURE_TYPE_DEPENDENCY_INFO }; Dependency.imageMemoryBarrierCount = 2; Dependency.pImageMemoryBarriers = Barriers; vkCmdPipelineBarrier2(Cmd, &Dependency);
+			const Math::FVector3 Source = Desc.GetMipExtent(uint8(Mip - 1));
+			const Math::FVector3 Destination = Desc.GetMipExtent(uint8(Mip));
+			VkImageBlit Blit{};
+			Blit.srcSubresource = { Texture->GetAspectFlags(), Mip - 1, 0, Layers }; Blit.dstSubresource = { Texture->GetAspectFlags(), Mip, 0, Layers };
+			Blit.srcOffsets[1] = { int32(Source.X), int32(Source.Y), int32(Source.Z) }; Blit.dstOffsets[1] = { int32(Destination.X), int32(Destination.Y), int32(Destination.Z) };
+			vkCmdBlitImage(Cmd, Texture->GetImage(), VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, Texture->GetImage(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &Blit, VK_FILTER_LINEAR);
+			VkImageMemoryBarrier2 Complete{ VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2 };
+			Complete.srcStageMask = VK_PIPELINE_STAGE_2_TRANSFER_BIT; Complete.srcAccessMask = VK_ACCESS_2_TRANSFER_READ_BIT; Complete.dstStageMask = VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT; Complete.dstAccessMask = VK_ACCESS_2_SHADER_SAMPLED_READ_BIT;
+			Complete.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL; Complete.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL; Complete.image = Texture->GetImage(); Complete.subresourceRange = { Texture->GetAspectFlags(), Mip - 1, 1, 0, Layers };
+			VkDependencyInfo CompleteDependency{ VK_STRUCTURE_TYPE_DEPENDENCY_INFO }; CompleteDependency.imageMemoryBarrierCount = 1; CompleteDependency.pImageMemoryBarriers = &Complete; vkCmdPipelineBarrier2(Cmd, &CompleteDependency);
+			for (uint16 Layer = 0; Layer < Layers; ++Layer) Texture->SetSubresourceLayout(uint8(Mip - 1), Layer, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+		}
+		VkImageMemoryBarrier2 Complete{ VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2 };
+		Complete.srcStageMask = VK_PIPELINE_STAGE_2_TRANSFER_BIT; Complete.srcAccessMask = VK_ACCESS_2_TRANSFER_WRITE_BIT; Complete.dstStageMask = VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT; Complete.dstAccessMask = VK_ACCESS_2_SHADER_SAMPLED_READ_BIT;
+		Complete.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL; Complete.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL; Complete.image = Texture->GetImage(); Complete.subresourceRange = { Texture->GetAspectFlags(), uint32(Desc.NumMips - 1), 1, 0, Layers };
+		VkDependencyInfo CompleteDependency{ VK_STRUCTURE_TYPE_DEPENDENCY_INFO }; CompleteDependency.imageMemoryBarrierCount = 1; CompleteDependency.pImageMemoryBarriers = &Complete; vkCmdPipelineBarrier2(Cmd, &CompleteDependency);
+		for (uint16 Layer = 0; Layer < Layers; ++Layer) Texture->SetSubresourceLayout(uint8(Desc.NumMips - 1), Layer, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+		Texture->SetImageLayout(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+	});
+	return true;
+}
+
+namespace
+{
 VkImageAspectFlags TranslateAspect(const FVulkanTexture& Texture, ERHITextureAspect Aspect)
 {
 	if (Aspect == ERHITextureAspect::Auto) return Texture.GetAspectFlags();
@@ -285,7 +413,8 @@ void FVulkanContext::RHITransition(std::span<const FRHITextureBarrier> InTexture
 		Out.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2;
 		Out.srcStageMask = Src.Stages; Out.srcAccessMask = Src.Access;
 		Out.dstStageMask = Dst.Stages; Out.dstAccessMask = Dst.Access;
-		Out.oldLayout = (Barrier.Before == ERHIAccess::Unknown || Texture->GetImageLayout() == VK_IMAGE_LAYOUT_UNDEFINED) ? Texture->GetImageLayout() : Src.Layout;
+		const VkImageLayout ActualLayout = Texture->GetSubresourceLayout(Barrier.Range.BaseMip, Barrier.Range.BaseLayer);
+		Out.oldLayout = (Barrier.Before == ERHIAccess::Unknown || ActualLayout == VK_IMAGE_LAYOUT_UNDEFINED) ? ActualLayout : Src.Layout;
 		Out.newLayout = Dst.Layout;
 		Out.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED; Out.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 		Out.image = Texture->GetImage();
@@ -293,9 +422,21 @@ void FVulkanContext::RHITransition(std::span<const FRHITextureBarrier> InTexture
 		Out.subresourceRange.baseMipLevel = Barrier.Range.BaseMip;
 		Out.subresourceRange.levelCount = Barrier.Range.NumMips ? Barrier.Range.NumMips : Texture->GetDesc().NumMips - Barrier.Range.BaseMip;
 		Out.subresourceRange.baseArrayLayer = Barrier.Range.BaseLayer;
-		const uint32 TotalLayers = Texture->GetDesc().Dimension == ETextureDimension::TextureCube ? 6u : Texture->GetDesc().ArraySize;
+		const uint32 TotalLayers = Texture->GetDesc().GetPhysicalLayerCount();
 		Out.subresourceRange.layerCount = Barrier.Range.NumLayers ? Barrier.Range.NumLayers : TotalLayers - Barrier.Range.BaseLayer;
+		if (Barrier.Before != ERHIAccess::Unknown)
+		{
+			for (uint32 Layer = Out.subresourceRange.baseArrayLayer; Layer < Out.subresourceRange.baseArrayLayer + Out.subresourceRange.layerCount; ++Layer)
+				for (uint32 Mip = Out.subresourceRange.baseMipLevel; Mip < Out.subresourceRange.baseMipLevel + Out.subresourceRange.levelCount; ++Mip)
+				{
+					const VkImageLayout KnownLayout = Texture->GetSubresourceLayout(uint8(Mip), uint16(Layer));
+					REV_CORE_ASSERT(KnownLayout == VK_IMAGE_LAYOUT_UNDEFINED || KnownLayout == Src.Layout, "Texture barrier before-access does not match the tracked subresource state");
+				}
+		}
 		Images.push_back(Out);
+		for (uint32 Layer = Out.subresourceRange.baseArrayLayer; Layer < Out.subresourceRange.baseArrayLayer + Out.subresourceRange.layerCount; ++Layer)
+			for (uint32 Mip = Out.subresourceRange.baseMipLevel; Mip < Out.subresourceRange.baseMipLevel + Out.subresourceRange.levelCount; ++Mip)
+				Texture->SetSubresourceLayout(uint8(Mip), uint16(Layer), Dst.Layout);
 		Texture->SetImageLayout(Dst.Layout);
 	}
 	for (const FRHIBufferBarrier& Barrier : InBufferBarriers)
@@ -322,6 +463,12 @@ void FVulkanContext::RHITransition(std::span<const FRHITextureBarrier> InTexture
 void FVulkanContext::RHIBeginRendering(const FRHIRenderingInfo& InInfo)
 {
 	REV_CORE_ASSERT(!mFrameState.bRendering);
+	uint32 RenderingLayerCount = 1;
+	auto GetLayerCount = [](const FRHIRenderingAttachment& Attachment) {
+		if (!Attachment.Texture) return 1u;
+		const FRHITextureDesc& Desc = Attachment.Texture->GetDesc();
+		return Attachment.Subresource.NumLayers ? uint32(Attachment.Subresource.NumLayers) : uint32(Desc.GetPhysicalLayerCount() - Attachment.Subresource.BaseLayer);
+	};
 	std::array<VkRenderingAttachmentInfo, REV_MAX_RENDER_TARGETS> Colors{};
 	for (uint32 Index = 0; Index < InInfo.NumColorAttachments; ++Index)
 	{
@@ -329,14 +476,15 @@ void FVulkanContext::RHIBeginRendering(const FRHIRenderingInfo& InInfo)
 		FVulkanTexture* Texture = FVulkanTexture::Cast(Source.Texture);
 		VkRenderingAttachmentInfo& Target = Colors[Index];
 		Target.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
-		Target.imageView = Texture->GetImageView(Source.Subresource);
+		Target.imageView = Texture->GetImageView({ Source.Subresource, ERHITextureViewType::Attachment });
 		Target.imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 		Target.loadOp = FVulkanEnum::Translate(Source.LoadAction); Target.storeOp = FVulkanEnum::Translate(Source.StoreAction);
 		Target.clearValue = Texture->GetClearValue();
+		RenderingLayerCount = std::max(RenderingLayerCount, GetLayerCount(Source));
 		if (Source.ResolveTexture)
 		{
 			Target.resolveMode = VK_RESOLVE_MODE_AVERAGE_BIT;
-			Target.resolveImageView = FVulkanTexture::Cast(Source.ResolveTexture)->GetImageView(Source.Subresource);
+			Target.resolveImageView = FVulkanTexture::Cast(Source.ResolveTexture)->GetImageView({ Source.Subresource, ERHITextureViewType::Attachment });
 			Target.resolveImageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 		}
 	}
@@ -346,7 +494,7 @@ void FVulkanContext::RHIBeginRendering(const FRHIRenderingInfo& InInfo)
 		if (!Source.Texture) return Result;
 		FVulkanTexture* Texture = FVulkanTexture::Cast(Source.Texture);
 		Result.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
-		Result.imageView = Texture->GetImageView(Source.Subresource);
+		Result.imageView = Texture->GetImageView({ Source.Subresource, ERHITextureViewType::Attachment });
 		Result.imageLayout = bReadOnly ? VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL : VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 		Result.loadOp = FVulkanEnum::Translate(Source.LoadAction); Result.storeOp = FVulkanEnum::Translate(Source.StoreAction);
 		Result.clearValue = Texture->GetClearValue();
@@ -354,9 +502,11 @@ void FVulkanContext::RHIBeginRendering(const FRHIRenderingInfo& InInfo)
 	};
 	VkRenderingAttachmentInfo Depth = MakeDepthStencil(InInfo.DepthAttachment, InInfo.bDepthReadOnly);
 	VkRenderingAttachmentInfo Stencil = MakeDepthStencil(InInfo.StencilAttachment, InInfo.bStencilReadOnly);
+	if (InInfo.DepthAttachment.Texture) RenderingLayerCount = std::max(RenderingLayerCount, GetLayerCount(InInfo.DepthAttachment));
+	if (InInfo.StencilAttachment.Texture) RenderingLayerCount = std::max(RenderingLayerCount, GetLayerCount(InInfo.StencilAttachment));
 	VkRenderingInfo Rendering{};
 	Rendering.sType = VK_STRUCTURE_TYPE_RENDERING_INFO;
-	Rendering.renderArea.extent = { InInfo.Width, InInfo.Height }; Rendering.layerCount = 1;
+	Rendering.renderArea.extent = { InInfo.Width, InInfo.Height }; Rendering.layerCount = RenderingLayerCount;
 	Rendering.colorAttachmentCount = InInfo.NumColorAttachments; Rendering.pColorAttachments = Colors.data();
 	Rendering.pDepthAttachment = InInfo.DepthAttachment.Texture ? &Depth : nullptr;
 	Rendering.pStencilAttachment = InInfo.StencilAttachment.Texture ? &Stencil : nullptr;
@@ -554,7 +704,7 @@ VkDescriptorSet FVulkanContext::GetDescriptorSet(const FVulkanShaderProgram* InP
 				ImageInfos[ImageCount].imageLayout = FPixelFormatInfo::HasDepth(Texture->GetFormat()) ? VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL : VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 				FRHITextureSubresourceRange SampleRange;
 				if (FPixelFormatInfo::HasDepth(Texture->GetFormat())) SampleRange.Aspect = ERHITextureAspect::Depth;
-				ImageInfos[ImageCount].imageView = Texture->GetImageView(SampleRange);
+				ImageInfos[ImageCount].imageView = Texture->GetImageView({ SampleRange, ERHITextureViewType::ShaderResource });
 				ImageInfos[ImageCount].sampler = SamplerState ? SamplerState->Sampler : VK_NULL_HANDLE;
 				
 				Writes[WriteCount].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;

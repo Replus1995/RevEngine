@@ -1,5 +1,6 @@
 #include "Rev/Render/RenderGraph/RenderGraphBuilder.h"
 #include "Rev/Render/RHI/RHITexture.h"
+#include "Rev/Asset/TextureStorage.h"
 #include <iostream>
 #include <stdexcept>
 
@@ -78,11 +79,28 @@ void TestReversedZ()
 	auto OrthoDepth = [&](float ViewZ) { return Ortho[2][2] * ViewZ + Ortho[3][2]; };
 	Check(std::abs(OrthoDepth(-Near) - 1.0f) < 0.0001f && std::abs(OrthoDepth(-Far)) < 0.0001f, "orthographic reversed-Z mapping failed");
 }
+
+void TestTextureDescriptors()
+{
+	Check(FRHITextureDesc::CalculateFullMipCount(16, 8) == 5, "2D mip count is incorrect");
+	Check(FRHITextureDesc::CalculateFullMipCount(8, 8, 8) == 4, "3D mip count is incorrect");
+	const FRHITextureDesc Array = FRHITextureDesc::Create2DArray(16, 16, 3, PF_R8G8B8A8);
+	const FRHITextureDesc Cube = FRHITextureDesc::CreateCube(16, PF_R8G8B8A8);
+	const FRHITextureDesc CubeArray = FRHITextureDesc::CreateCubeArray(16, 4, PF_R8G8B8A8);
+	const FRHITextureDesc Volume = FRHITextureDesc::Create3D(16, 8, 4, PF_R8G8B8A8);
+	Check(Array.GetPhysicalLayerCount() == 3 && Cube.GetPhysicalLayerCount() == 6 && CubeArray.GetPhysicalLayerCount() == 24 && Volume.GetPhysicalLayerCount() == 1, "physical layer counts are incorrect");
+	Check(Volume.GetMipExtent(2) == Math::FVector3(4, 2, 1), "3D mip extent is incorrect");
+	Check(Cube.Validate() && CubeArray.Validate() && Volume.Validate(), "valid texture descriptor was rejected");
+	auto InvalidCube = FRHITextureDesc::CreateCube(16, PF_R8G8B8A8); InvalidCube.Height = 8;
+	Check(!InvalidCube.Validate(), "invalid cube descriptor was accepted");
+	FImageStorage Images; Images.Resize(3, 2); Images.At(2, 1).Allocate(1);
+	Check(Images.NumMips() == 3 && Images.NumLayers() == 2, "image storage mip/layer layout is incorrect");
+}
 }
 
 int main()
 {
-	try { TestLinearAndCulling(); TestFanOutAndNeverCull(); TestInvalidUses(); TestPresentAndExtract(); TestReversedZ(); }
+	try { TestLinearAndCulling(); TestFanOutAndNeverCull(); TestInvalidUses(); TestPresentAndExtract(); TestReversedZ(); TestTextureDescriptors(); }
 	catch (const std::exception& E) { std::cerr << E.what() << '\n'; return 1; }
 	std::cout << "RenderGraph CPU tests passed\n"; return 0;
 }

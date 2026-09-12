@@ -14,7 +14,8 @@ namespace
 bool SameDesc(const FRHITextureDesc& A, const FRHITextureDesc& B)
 {
 	return A.Width == B.Width && A.Height == B.Height && A.Depth == B.Depth && A.ArraySize == B.ArraySize &&
-		A.Dimension == B.Dimension && A.Format == B.Format && A.NumMips == B.NumMips && A.NumSamples == B.NumSamples && A.Flags == B.Flags;
+		A.Dimension == B.Dimension && A.Format == B.Format && A.NumMips == B.NumMips && A.NumSamples == B.NumSamples && A.Flags == B.Flags &&
+		A.ClearColor.RGBA == B.ClearColor.RGBA;
 }
 void AddUnique(std::vector<uint32>& Values, uint32 Value)
 {
