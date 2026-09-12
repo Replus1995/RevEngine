@@ -19,7 +19,7 @@ namespace fs = std::filesystem;
 namespace Rev
 {
 
-namespace
+namespace ShadercUtilsPrivate
 {
 
 template<typename T>
@@ -160,6 +160,8 @@ FShadercSource FShadercUtils::LoadShaderSource(const char* InPath)
 
 	return Result;
 }
+
+using namespace ShadercUtilsPrivate;
 
 bool FShadercUtils::LoadShaderCompiledData(const std::filesystem::path& ShaderCachePath, FShadercCompiledData& OutCompiledData)
 {

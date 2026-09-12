@@ -11,7 +11,7 @@
 
 namespace Rev
 {
-namespace
+namespace RendererPrivate
 {
 struct FGBufferParameters { FRGTextureHandle A, B, C, Depth; };
 struct FLightingParameters { FRGTextureHandle A, B, C, Depth, SceneColor; };
@@ -33,6 +33,7 @@ FRHIGraphicsPipelineStateDesc MakePipeline(bool bMesh, ECompareFunction DepthCom
 	return State;
 }
 }
+using namespace RendererPrivate;
 
 FRenderer::FRenderer(FSceneProxy* InSceneProxy) : mSceneProxy(InSceneProxy) {}
 FRenderer::~FRenderer() = default;

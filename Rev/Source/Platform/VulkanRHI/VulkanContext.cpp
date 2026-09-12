@@ -274,7 +274,7 @@ void FVulkanContext::RHIUpdateBufferData(FRHIBuffer* Buffer, const void* Content
 	FVulkanUtils::ImmediateUploadBuffer(this, (VkBuffer)Buffer->GetNativeHandle(), Content, Size, Offset);
 }
 
-namespace
+namespace VulkanContextPrivate
 {
 struct FVulkanAccessInfo { VkPipelineStageFlags2 Stages; VkAccessFlags2 Access; VkImageLayout Layout; };
 
@@ -297,6 +297,8 @@ FVulkanAccessInfo TranslateAccess(ERHIAccess Access, bool bDepth)
 }
 
 }
+
+using namespace VulkanContextPrivate;
 
 void FVulkanContext::RHICopyTexture(FRHITexture* DstTexture, FRHITexture* SrcTexture, const FRHITextureCopyDesc& InDesc)
 {
@@ -385,7 +387,7 @@ bool FVulkanContext::RHIGenerateMips(FRHITexture* InTexture)
 	return true;
 }
 
-namespace
+namespace VulkanContextPrivate
 {
 VkImageAspectFlags TranslateAspect(const FVulkanTexture& Texture, ERHITextureAspect Aspect)
 {
@@ -397,6 +399,8 @@ VkImageAspectFlags TranslateAspect(const FVulkanTexture& Texture, ERHITextureAsp
 	return Result;
 }
 }
+
+using namespace VulkanContextPrivate;
 
 void FVulkanContext::RHITransition(std::span<const FRHITextureBarrier> InTextureBarriers, std::span<const FRHIBufferBarrier> InBufferBarriers)
 {

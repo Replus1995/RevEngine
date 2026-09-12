@@ -16,7 +16,7 @@
 namespace Rev
 {
 
-namespace
+namespace VulkanInstancePrivate
 {
 
 static bool sVkEnableValidationLayers = false;
@@ -136,6 +136,7 @@ static void PopulateQueueCreateInfos(std::vector<VkDeviceQueueCreateInfo>& Queue
 
 }
 
+using namespace VulkanInstancePrivate;
 
 void FVulkanInstance::CreateInstance()
 {

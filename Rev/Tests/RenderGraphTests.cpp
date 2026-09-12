@@ -5,7 +5,7 @@
 #include <stdexcept>
 
 using namespace Rev;
-namespace
+namespace RenderGraphTestsPrivate
 {
 struct FParams { FRGTextureHandle Input, Output; };
 class FTestTexture final : public FRHITexture
@@ -32,7 +32,6 @@ void TestLinearAndCulling()
 	Check(Dot.find("DeadPass") == std::string::npos, "dead pass was not culled");
 	Check(Graph.DumpResourceLifetimes().find("[0, 1]") != std::string::npos, "incorrect resource lifetime");
 }
-
 void TestFanOutAndNeverCull()
 {
 	FRGTransientResourcePool Pool; FRGBuilder Graph(Pool); auto T = Graph.CreateTexture(Desc(), FRGName("FanOut"));
@@ -97,6 +96,7 @@ void TestTextureDescriptors()
 	Check(Images.NumMips() == 3 && Images.NumLayers() == 2, "image storage mip/layer layout is incorrect");
 }
 }
+using namespace RenderGraphTestsPrivate;
 
 int main()
 {

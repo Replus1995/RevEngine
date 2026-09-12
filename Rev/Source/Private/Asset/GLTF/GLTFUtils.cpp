@@ -14,7 +14,7 @@
 namespace Rev
 {
 
-namespace
+namespace GLTFUtilsPrivate
 {
 
 FBuffer UnpackTightBuffer(const uint8* InDataMem, const tinygltf::BufferView& InBufferView, size_t DstStride)
@@ -264,6 +264,7 @@ FBuffer LoadIndexData(const tinygltf::Accessor& InAccessor, const tinygltf::Mode
 
 }
 
+using namespace GLTFUtilsPrivate;
 
 uint32 FGLTFUtils::GetIndexStride(int InComponentType)
 {

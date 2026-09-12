@@ -9,7 +9,7 @@
 
 namespace Rev
 {
-namespace
+namespace RenderGraphBuilderPrivate
 {
 bool SameDesc(const FRHITextureDesc& A, const FRHITextureDesc& B)
 {
@@ -22,6 +22,7 @@ void AddUnique(std::vector<uint32>& Values, uint32 Value)
 	if (std::find(Values.begin(), Values.end(), Value) == Values.end()) Values.push_back(Value);
 }
 }
+using namespace RenderGraphBuilderPrivate;
 
 FRHITextureRef FRGTransientResourcePool::AcquireTexture(const FRGTextureDesc& InDesc)
 {
