@@ -108,8 +108,9 @@ void FCascadeShadowMap::Prepare(const FCameraProxy& InCamera, FLightProxy& Light
 		Math::FVector3 Center(0.0f); for (const Math::FVector3& Corner : Corners) Center += Corner; Center /= float(Corners.size());
 		float Radius = 0.0f; for (const Math::FVector3& Corner : Corners) Radius = std::max(Radius, (Corner - Center).Length()); Radius = std::ceil(Radius * 16.0f) / 16.0f;
 		Math::FMatrix4 View = MakeLightView(Center, Lights.GetShadowDirection(), Radius + Settings.CasterExtrusion);
-		const Math::FVector3 CenterLS = TransformPoint(View, Center); const float TexelSize = (Radius * 2.0f) / float(Resolution);
-		View[3][0] += std::floor(CenterLS.X / TexelSize) * TexelSize - CenterLS.X; View[3][1] += std::floor(CenterLS.Y / TexelSize) * TexelSize - CenterLS.Y;
+		const float TexelSize = (Radius * 2.0f) / float(Resolution);
+		View[3][0] = std::round(View[3][0] / TexelSize) * TexelSize;
+		View[3][1] = std::round(View[3][1] / TexelSize) * TexelSize;
 		float MinimumZ = FLT_MAX, MaximumZ = -FLT_MAX;
 		for (const Math::FVector3& Corner : Corners) { const float Z = TransformPoint(View, Corner).Z; MinimumZ = std::min(MinimumZ, Z); MaximumZ = std::max(MaximumZ, Z); }
 		const float LightNear = std::max(0.01f, -MaximumZ - Settings.CasterExtrusion); const float LightFar = std::max(LightNear + 0.01f, -MinimumZ + Settings.CasterExtrusion);

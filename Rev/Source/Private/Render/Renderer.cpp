@@ -82,6 +82,7 @@ void FRenderer::DrawFrame(FRHICommandList& Cmd)
 	const FLightingParameters& Lighting = Graph.AddPass<FLightingParameters>(FRGName("DeferredLighting"), ERGPassFlags::Raster,
 		[&](FRGPassBuilder& Builder, FLightingParameters& P) { P.A = Builder.ReadTexture(GBuffer.A); P.B = Builder.ReadTexture(GBuffer.B); P.C = Builder.ReadTexture(GBuffer.C); P.Depth = Builder.ReadTexture(GBuffer.Depth); P.Shadow = Builder.ReadTexture(Shadow); P.SceneColor = Builder.UseColorAttachment(0, SceneColor, RTL_Clear); },
 		[this, &Graph](FRHICommandList& RHICmd, const FLightingParameters& P) {
+			RHICmd.SetViewport(0, 0, FrameWidth, FrameHeight);
 			RHICmd.BindProgram(DeferredLightingProgram.get());
 			RHICmd.BindTexture(UL::SGBufferA, Graph.GetTexture(P.A), GDefaultSamplerState.SamplerStateRHI.get());
 			RHICmd.BindTexture(UL::SGBufferB, Graph.GetTexture(P.B), GDefaultSamplerState.SamplerStateRHI.get());
@@ -95,11 +96,12 @@ void FRenderer::DrawFrame(FRHICommandList& Cmd)
 
 	const FSkyParameters& Sky = Graph.AddPass<FSkyParameters>(FRGName("Sky"), ERGPassFlags::Raster,
 		[&](FRGPassBuilder& Builder, FSkyParameters& P) { P.SceneColor = Builder.UseColorAttachment(0, Lighting.SceneColor, RTL_Load); P.Depth = Builder.UseDepthStencil(GBuffer.Depth, RTL_Load, RTS_DontCare, true); },
-		[this](FRHICommandList& RHICmd, const FSkyParameters&) { RHICmd.SetGraphicsPipelineState(MakePipeline(false, CF_GreaterEqual, false)); mSceneProxy->DrawSkybox(RHICmd); });
+		[this](FRHICommandList& RHICmd, const FSkyParameters&) { RHICmd.SetViewport(0, 0, FrameWidth, FrameHeight); RHICmd.SetGraphicsPipelineState(MakePipeline(false, CF_GreaterEqual, false)); mSceneProxy->DrawSkybox(RHICmd); });
 
 	const FTonemapParameters& Tonemap = Graph.AddPass<FTonemapParameters>(FRGName("Tonemap"), ERGPassFlags::Raster,
 		[&](FRGPassBuilder& Builder, FTonemapParameters& P) { P.SceneColor = Builder.ReadTexture(Sky.SceneColor); P.BackBuffer = Builder.UseColorAttachment(0, BackBuffer, RTL_DontCare); },
 		[this, &Graph](FRHICommandList& RHICmd, const FTonemapParameters& P) {
+			RHICmd.SetViewport(0, 0, FrameWidth, FrameHeight);
 			RHICmd.BindProgram(TonemapProgram.get());
 			RHICmd.BindTexture(UL::SSceneColor, Graph.GetTexture(P.SceneColor), GDefaultSamplerState.SamplerStateRHI.get());
 			RHICmd.SetGraphicsPipelineState(MakePipeline(false, CF_Always, false));
