@@ -14,7 +14,8 @@ void Camera::SetPerspective(float fov, float dnear, float dfar)
 	mPerspectiveFOV = fov;
 	mPerspectiveNear = dnear;
 	mPerspectiveFar = dfar;
-	SetProjectionType(ProjectionType::Perspective);
+	if (mProjectionType != ProjectionType::Perspective) mProjectionType = ProjectionType::Perspective;
+	RecalculateProjection();
 }
 
 void Camera::SetOrthographic(float size, float dnear, float dfar)
@@ -22,7 +23,8 @@ void Camera::SetOrthographic(float size, float dnear, float dfar)
 	mOrthographicSize = size;
 	mOrthographicNear = dnear;
 	mOrthographicFar = dfar;
-	SetProjectionType(ProjectionType::Orthographic);
+	if (mProjectionType != ProjectionType::Orthographic) mProjectionType = ProjectionType::Orthographic;
+	RecalculateProjection();
 }
 
 void Camera::SetAspectRatio(float ratio)
@@ -60,4 +62,19 @@ void Camera::RecalculateProjection()
 	}
 }
 
+}
+
+namespace Rev
+{
+Camera::FCameraProjectionInfo Camera::GetProjectionInfo() const
+{
+	FCameraProjectionInfo Result;
+	Result.Type = mProjectionType;
+	Result.NearClip = mProjectionType == ProjectionType::Perspective ? mPerspectiveNear : mOrthographicNear;
+	Result.FarClip = mProjectionType == ProjectionType::Perspective ? mPerspectiveFar : mOrthographicFar;
+	Result.VerticalFOV = mPerspectiveFOV;
+	Result.AspectRatio = mAspectRatio;
+	Result.OrthographicSize = mOrthographicSize;
+	return Result;
+}
 }

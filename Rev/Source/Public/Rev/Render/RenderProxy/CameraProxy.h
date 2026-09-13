@@ -22,11 +22,13 @@ public:
 	const Math::FMatrix4& GetViewMat() const { return mViewMatrix; }
 	const Math::FMatrix4& GetProjMat() const { return mProjMatrix; }
 	Math::FMatrix4 GetViewProjMat() const { return mProjMatrix * mViewMatrix; }
+	const Camera::FCameraProjectionInfo& GetProjectionInfo() const { return mProjectionInfo; }
 
 private:
 	Math::FVector3 mViewPos;
 	Math::FMatrix4 mViewMatrix;
 	Math::FMatrix4 mProjMatrix;
+	Camera::FCameraProjectionInfo mProjectionInfo;
 };
 
 }

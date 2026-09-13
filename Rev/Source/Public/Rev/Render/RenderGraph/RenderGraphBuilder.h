@@ -63,7 +63,7 @@ private:
 		FRHITextureRef Physical;
 		ERHIAccess InitialAccess = ERHIAccess::Unknown;
 		ERHIAccess FinalAccess = ERHIAccess::Unknown;
-		ERHIAccess CurrentAccess = ERHIAccess::Unknown;
+		std::vector<ERHIAccess> SubresourceAccesses;
 		uint32 CurrentVersion = 0;
 		std::vector<int32> Producers{ -1 };
 		bool bExternal = false;

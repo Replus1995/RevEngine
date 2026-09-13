@@ -21,6 +21,19 @@ void AddUnique(std::vector<uint32>& Values, uint32 Value)
 {
 	if (std::find(Values.begin(), Values.end(), Value) == Values.end()) Values.push_back(Value);
 }
+
+FRHITextureSubresourceRange NormalizeRange(const FRHITextureDesc& Desc, FRHITextureSubresourceRange Range)
+{
+	const uint16 TotalLayers = Desc.GetPhysicalLayerCount();
+	if (Range.NumMips == 0) Range.NumMips = uint8(Desc.NumMips - Range.BaseMip);
+	if (Range.NumLayers == 0) Range.NumLayers = uint16(TotalLayers - Range.BaseLayer);
+	return Range;
+}
+
+size_t SubresourceIndex(const FRHITextureDesc& Desc, uint8 Mip, uint16 Layer)
+{
+	return size_t(Layer) * Desc.NumMips + Mip;
+}
 }
 using namespace RenderGraphBuilderPrivate;
 
@@ -97,9 +110,9 @@ FRGTextureHandle FRGPassBuilder::UseColorAttachment(uint32 Slot, FRGTextureHandl
 	if (Slot >= REV_MAX_RENDER_TARGETS) throw std::out_of_range("RenderGraph color attachment slot");
 	return Graph.WriteTexture(PassIndex, H, ERHIAccess::ColorAttachment, {}, int32(Slot), L, S, false);
 }
-FRGTextureHandle FRGPassBuilder::UseDepthStencil(FRGTextureHandle H, ERenderTargetLoadAction L, ERenderTargetStoreAction S, bool ReadOnly)
+FRGTextureHandle FRGPassBuilder::UseDepthStencil(FRGTextureHandle H, ERenderTargetLoadAction L, ERenderTargetStoreAction S, bool ReadOnly, FRHITextureSubresourceRange R)
 {
-	return Graph.WriteTexture(PassIndex, H, ReadOnly ? ERHIAccess::DepthStencilRead : ERHIAccess::DepthStencilWrite, {}, -2, L, S, ReadOnly);
+	return Graph.WriteTexture(PassIndex, H, ReadOnly ? ERHIAccess::DepthStencilRead : ERHIAccess::DepthStencilWrite, R, -2, L, S, ReadOnly);
 }
 
 void FRGBuilder::Present(FRGTextureHandle Handle) { ValidateHandle(Handle); PresentRoots.push_back(Handle); Resources[Handle.ResourceIndex].FinalAccess = ERHIAccess::Present; }
@@ -131,7 +144,11 @@ void FRGBuilder::Compile()
 	std::deque<uint32> Ready; for (uint32 I = 0; I < Passes.size(); ++I) if (Live[I] && InDegree[I] == 0) Ready.push_back(I);
 	while (!Ready.empty()) { uint32 I = Ready.front(); Ready.pop_front(); ExecutionOrder.push_back(I); for (uint32 C : Consumers[I]) if (--InDegree[C] == 0) Ready.push_back(C); }
 	if (ExecutionOrder.size() != size_t(std::count(Live.begin(), Live.end(), uint8(1)))) throw std::logic_error("RenderGraph contains a cycle");
-	for (FResource& Resource : Resources) { Resource.CurrentAccess = Resource.InitialAccess; if (!Resource.bExternal && GDynamicRHI) Resource.Physical = Pool.AcquireTexture(Resource.Desc); }
+	for (FResource& Resource : Resources)
+	{
+		if (!Resource.bExternal && GDynamicRHI) Resource.Physical = Pool.AcquireTexture(Resource.Desc);
+		Resource.SubresourceAccesses.assign(size_t(Resource.Desc.NumMips) * Resource.Desc.GetPhysicalLayerCount(), Resource.InitialAccess);
+	}
 	for (uint32 OrderIndex = 0; OrderIndex < ExecutionOrder.size(); ++OrderIndex)
 	{
 		FPassBase& Pass = *Passes[ExecutionOrder[OrderIndex]]; Pass.bCulled = false;
@@ -139,11 +156,28 @@ void FRGBuilder::Compile()
 		{
 			FResource& Resource = Resources[Access.Handle.ResourceIndex];
 			if (Resource.FirstUse < 0) Resource.FirstUse = int32(OrderIndex); Resource.LastUse = int32(OrderIndex);
-			if (Resource.CurrentAccess != Access.Access) { Pass.Barriers.push_back({ Resource.Physical.get(), Resource.CurrentAccess, Access.Access, Access.Range }); Resource.CurrentAccess = Access.Access; }
+			const FRHITextureSubresourceRange Range = NormalizeRange(Resource.Desc, Access.Range);
+			for (uint16 Layer = Range.BaseLayer; Layer < Range.BaseLayer + Range.NumLayers; ++Layer)
+				for (uint8 Mip = Range.BaseMip; Mip < Range.BaseMip + Range.NumMips; ++Mip)
+				{
+					ERHIAccess& Current = Resource.SubresourceAccesses[SubresourceIndex(Resource.Desc, Mip, Layer)];
+					if (Current != Access.Access)
+					{
+						FRHITextureSubresourceRange SingleRange = Range;
+						SingleRange.BaseMip = Mip; SingleRange.NumMips = 1; SingleRange.BaseLayer = Layer; SingleRange.NumLayers = 1;
+						Pass.Barriers.push_back({ Resource.Physical.get(), Current, Access.Access, SingleRange });
+						Current = Access.Access;
+					}
+				}
 		}
 	}
-	for (FResource& Resource : Resources) if (Resource.bExternal && Resource.FinalAccess != ERHIAccess::Unknown && Resource.CurrentAccess != Resource.FinalAccess)
-		FinalBarriers.push_back({ Resource.Physical.get(), Resource.CurrentAccess, Resource.FinalAccess, {} });
+	for (FResource& Resource : Resources) if (Resource.bExternal && Resource.FinalAccess != ERHIAccess::Unknown)
+		for (uint16 Layer = 0; Layer < Resource.Desc.GetPhysicalLayerCount(); ++Layer)
+			for (uint8 Mip = 0; Mip < Resource.Desc.NumMips; ++Mip)
+			{
+				const ERHIAccess Current = Resource.SubresourceAccesses[SubresourceIndex(Resource.Desc, Mip, Layer)];
+				if (Current != Resource.FinalAccess) FinalBarriers.push_back({ Resource.Physical.get(), Current, Resource.FinalAccess, { ERHITextureAspect::Auto, Mip, 1, Layer, 1 } });
+			}
 	bCompiled = true;
 }
 

@@ -25,11 +25,18 @@ struct alignas(16) FStaticMeshUniform
 	Math::FMatrix4 ModelMat;
 };
 
-struct FShadowUniform
+constexpr uint32 REV_MAX_CSM_CASCADES = 4;
+
+struct alignas(16) FDirectionalShadowUniform
 {
-	Math::FMatrix4 LightProjMats[6];
-	Math::FMatrix4 LightViewMats[6];
-	Math::FVector4 LightParams; //X = ViewCount
+	Math::FMatrix4 LightViewProjMats[REV_MAX_CSM_CASCADES];
+	Math::FVector4 CascadeSplits;
+	Math::FVector4 Params; // X = cascade count, Y = inverse resolution, Z = transition fraction, W = normal bias
+};
+
+struct alignas(16) FShadowPassUniform
+{
+	Math::FMatrix4 LightViewProjMat;
 };
 
 struct FDirectionalLightUniform

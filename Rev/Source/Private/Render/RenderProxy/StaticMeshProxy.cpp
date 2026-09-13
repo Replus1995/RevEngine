@@ -49,6 +49,7 @@ void FStaticMeshProxy::Prepare(const Ref<FScene>& Scene)
 		}
 		MeshCount++;
 	}
+	mRenderDataArr.resize(MeshCount);
 
 }
 
@@ -69,11 +70,15 @@ void FStaticMeshProxy::DrawMeshesDepth(FRHICommandList& RHICmdList)
 	for (auto& RenderData : mRenderDataArr)
 	{
 		PrepareMeshDraw(RHICmdList, RenderData);
-		for (uint32 i = 0; i < RenderData.StaticMesh->GetNumSections(); i++)
+		for (uint32 i = 0; i < RenderData.StaticMesh->GetNumMaterials(); i++)
 		{
-			auto Section = RenderData.StaticMesh->GetSection(i);
-			FRHIBuffer* IndexBufferRHI = RenderData.StaticMesh->GetIndexBuffer().GetIndexBufferRHI();
-			RHICmdList.DrawPrimitiveIndexed(IndexBufferRHI, Section->NumTriangles, Section->StartIndex);
+			auto Material = RenderData.StaticMesh->GetMaterial(i);
+			if (!Material || Material->BlendMode != MBM_Opaque) continue;
+			for (auto Section : RenderData.StaticMesh->GetSectionsForMaterial(i))
+			{
+				FRHIBuffer* IndexBufferRHI = RenderData.StaticMesh->GetIndexBuffer().GetIndexBufferRHI();
+				RHICmdList.DrawPrimitiveIndexed(IndexBufferRHI, Section->NumTriangles, Section->StartIndex);
+			}
 		}
 	}
 }

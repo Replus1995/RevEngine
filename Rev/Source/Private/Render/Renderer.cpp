@@ -8,13 +8,14 @@
 #include "Rev/Render/RHI/RHIPipeline.h"
 #include "Rev/Render/RenderUtils.h"
 #include "Rev/Render/UniformLayout.h"
+#include "Shadow/CascadeShadowMap.h"
 
 namespace Rev
 {
 namespace RendererPrivate
 {
 struct FGBufferParameters { FRGTextureHandle A, B, C, Depth; };
-struct FLightingParameters { FRGTextureHandle A, B, C, Depth, SceneColor; };
+struct FLightingParameters { FRGTextureHandle A, B, C, Depth, Shadow, SceneColor; };
 struct FSkyParameters { FRGTextureHandle SceneColor, Depth; };
 struct FTonemapParameters { FRGTextureHandle SceneColor, BackBuffer; };
 struct alignas(16) FDeferredDebugUniform { uint32 Mode = 0; uint32 Padding[3] = {}; };
@@ -35,7 +36,7 @@ FRHIGraphicsPipelineStateDesc MakePipeline(bool bMesh, ECompareFunction DepthCom
 }
 using namespace RendererPrivate;
 
-FRenderer::FRenderer(FSceneProxy* InSceneProxy) : mSceneProxy(InSceneProxy) {}
+FRenderer::FRenderer(FSceneProxy* InSceneProxy) : mSceneProxy(InSceneProxy), CascadeShadowMap(CreateScope<FCascadeShadowMap>()) {}
 FRenderer::~FRenderer() = default;
 
 void FRenderer::InitializeDeferredPrograms()
@@ -57,6 +58,7 @@ void FRenderer::DrawFrame(FRHICommandList& Cmd)
 {
 	if (!FrameWidth || !FrameHeight) return;
 	InitializeDeferredPrograms();
+	CascadeShadowMap->Prepare(mSceneProxy->GetCameraProxy(), mSceneProxy->GetLightProxy());
 	mSceneProxy->SyncResource(Cmd);
 	FDeferredDebugUniform Debug; Debug.Mode = uint32(DebugView); DebugUniformBuffer->UpdateSubData(&Debug, sizeof(Debug));
 	Cmd.BindUniformBuffer(UL::BDeferredDebug, DebugUniformBuffer.get());
@@ -68,22 +70,24 @@ void FRenderer::DrawFrame(FRHICommandList& Cmd)
 	FRGTextureHandle C = Graph.CreateTexture(FRGTextureDesc::Create2D(FrameWidth, FrameHeight, PF_R16G16B16A16_FLOAT, Math::FLinearColor(0, 0, 0, 0), GBufferFlags), FRGName("GBufferC"));
 	FRGTextureHandle Depth = Graph.CreateTexture(FRGTextureDesc::Create2D(FrameWidth, FrameHeight, PF_DepthStencil, FRHITextureClearColor(0.0f, 0), ETextureCreateFlags::DepthStencilTarget | ETextureCreateFlags::ShaderResource), FRGName("SceneDepth"));
 	FRGTextureHandle SceneColor = Graph.CreateTexture(FRGTextureDesc::Create2D(FrameWidth, FrameHeight, PF_R16G16B16A16_FLOAT, Math::FLinearColor(0, 0, 0, 1), GBufferFlags), FRGName("SceneColor"));
+	FRGTextureHandle Shadow = CascadeShadowMap->AddPasses(Graph, mSceneProxy);
 	FRHITexture* BackRaw = Cmd.GetBackTexture();
 	FRHITextureRef Back(BackRaw, [](FRHITexture*) {});
 	FRGTextureHandle BackBuffer = Graph.RegisterExternalTexture(Back, ERHIAccess::Present, ERHIAccess::Present, FRGName("BackBuffer"));
 
 	const FGBufferParameters& GBuffer = Graph.AddPass<FGBufferParameters>(FRGName("GBuffer"), ERGPassFlags::Raster,
 		[&](FRGPassBuilder& Builder, FGBufferParameters& P) { P.A = Builder.UseColorAttachment(0, A, RTL_Clear); P.B = Builder.UseColorAttachment(1, B, RTL_Clear); P.C = Builder.UseColorAttachment(2, C, RTL_Clear); P.Depth = Builder.UseDepthStencil(Depth, RTL_Clear, RTS_Store, false); },
-		[this](FRHICommandList& RHICmd, const FGBufferParameters&) { RHICmd.SetGraphicsPipelineState(MakePipeline(true, CF_Greater, true)); mSceneProxy->DrawSceneOpaque(RHICmd); });
+		[this](FRHICommandList& RHICmd, const FGBufferParameters&) { RHICmd.SetViewport(0, 0, FrameWidth, FrameHeight); RHICmd.SetGraphicsPipelineState(MakePipeline(true, CF_Greater, true)); mSceneProxy->DrawSceneOpaque(RHICmd); });
 
 	const FLightingParameters& Lighting = Graph.AddPass<FLightingParameters>(FRGName("DeferredLighting"), ERGPassFlags::Raster,
-		[&](FRGPassBuilder& Builder, FLightingParameters& P) { P.A = Builder.ReadTexture(GBuffer.A); P.B = Builder.ReadTexture(GBuffer.B); P.C = Builder.ReadTexture(GBuffer.C); P.Depth = Builder.ReadTexture(GBuffer.Depth); P.SceneColor = Builder.UseColorAttachment(0, SceneColor, RTL_Clear); },
+		[&](FRGPassBuilder& Builder, FLightingParameters& P) { P.A = Builder.ReadTexture(GBuffer.A); P.B = Builder.ReadTexture(GBuffer.B); P.C = Builder.ReadTexture(GBuffer.C); P.Depth = Builder.ReadTexture(GBuffer.Depth); P.Shadow = Builder.ReadTexture(Shadow); P.SceneColor = Builder.UseColorAttachment(0, SceneColor, RTL_Clear); },
 		[this, &Graph](FRHICommandList& RHICmd, const FLightingParameters& P) {
 			RHICmd.BindProgram(DeferredLightingProgram.get());
 			RHICmd.BindTexture(UL::SGBufferA, Graph.GetTexture(P.A), GDefaultSamplerState.SamplerStateRHI.get());
 			RHICmd.BindTexture(UL::SGBufferB, Graph.GetTexture(P.B), GDefaultSamplerState.SamplerStateRHI.get());
 			RHICmd.BindTexture(UL::SGBufferC, Graph.GetTexture(P.C), GDefaultSamplerState.SamplerStateRHI.get());
 			RHICmd.BindTexture(UL::SSceneDepth, Graph.GetTexture(P.Depth), GDefaultSamplerState.SamplerStateRHI.get());
+			CascadeShadowMap->BindLighting(RHICmd, Graph.GetTexture(P.Shadow));
 			RHICmd.SetGraphicsPipelineState(MakePipeline(false, CF_Always, false));
 			FRenderUtils::PostProcessDraw(RHICmd);
 			RHICmd.BindProgram(nullptr);

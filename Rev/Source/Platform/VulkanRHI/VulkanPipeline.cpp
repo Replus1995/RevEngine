@@ -23,7 +23,7 @@ private:
     static VkPipelineMultisampleStateCreateInfo MakeMultisampleStateInfo(VkSampleCountFlagBits SampleCountFlag, bool bAlphaToCoverage);
     static VkPipelineColorBlendStateCreateInfo MakeColorBlendStateInfo(const VkPipelineColorBlendAttachmentState* InColorBlendStates, uint32 InNumColorBlendStates);
     static VkPipelineDynamicStateCreateInfo MakeDynamicStateInfo(const VkDynamicState* InDynaimcStates, uint32 InNumDynaimcStates);
-    static VkPipelineRenderingCreateInfo MakeRenderingInfo(const VkFormat* InColorFomats, uint32 InNumColorFormats, VkFormat InDepthFormat);
+    static VkPipelineRenderingCreateInfo MakeRenderingInfo(const VkFormat* InColorFomats, uint32 InNumColorFormats, VkFormat InDepthFormat, VkFormat InStencilFormat);
 
 };
 
@@ -70,7 +70,8 @@ VkPipeline FVulkanPipelineBuilder::BuildGraphics(VkDevice InDevice, VkPipelineLa
     VkPipelineMultisampleStateCreateInfo MultisampleState = MakeMultisampleStateInfo((VkSampleCountFlagBits)InStateDesc.NumSamples, bEnableAlphaToCoverage);
     VkPipelineColorBlendStateCreateInfo ColorBlendState = MakeColorBlendStateInfo(ColorBlendStateRHI->Attachments, ColorAttachmentCount);
     VkPipelineDynamicStateCreateInfo DynamicState = MakeDynamicStateInfo(DynamicStates, sizeof(DynamicStates) / sizeof(VkDynamicState));
-    VkPipelineRenderingCreateInfo Rendering = MakeRenderingInfo(ColorFormats, ColorAttachmentCount, DepthFormat);
+    const VkFormat StencilFormat = FPixelFormatInfo::HasStencil(InRenderTargetLayout.DepthStencilFormat) ? DepthFormat : VK_FORMAT_UNDEFINED;
+    VkPipelineRenderingCreateInfo Rendering = MakeRenderingInfo(ColorFormats, ColorAttachmentCount, DepthFormat, StencilFormat);
 
     // build the actual pipeline
     // we now use all of the info structs we have been writing into into this one
@@ -174,14 +175,14 @@ VkPipelineDynamicStateCreateInfo FVulkanPipelineBuilder::MakeDynamicStateInfo(co
     return StateInfo;
 }
 
-VkPipelineRenderingCreateInfo FVulkanPipelineBuilder::MakeRenderingInfo(const VkFormat* InColorFomats, uint32 InNumColorFormats, VkFormat InDepthFormat)
+VkPipelineRenderingCreateInfo FVulkanPipelineBuilder::MakeRenderingInfo(const VkFormat* InColorFomats, uint32 InNumColorFormats, VkFormat InDepthFormat, VkFormat InStencilFormat)
 {
    VkPipelineRenderingCreateInfo StateInfo{};
    StateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO;
    StateInfo.pColorAttachmentFormats = InColorFomats;
    StateInfo.colorAttachmentCount = InNumColorFormats;
    StateInfo.depthAttachmentFormat = InDepthFormat;
-   StateInfo.stencilAttachmentFormat = InDepthFormat;
+   StateInfo.stencilAttachmentFormat = InStencilFormat;
    return StateInfo;
 }
 

@@ -34,12 +34,6 @@ enum ESamplerWarpMode : uint8
 	SW_Border
 };
 
-enum ESamplerCompareFunction : uint8
-{
-	SCF_Never,
-	SCF_Less
-};
-
 //Texture
 enum class ETextureDimension : uint8
 {

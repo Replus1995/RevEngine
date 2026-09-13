@@ -26,6 +26,7 @@ if(MSVC)
         #$<$<CONFIG:Release>:/MD>
         "/MD"
         "/std:c++20"
+        "/EHsc"
         "-DUNICODE"
         "-D_UNICODE"
     )

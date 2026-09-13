@@ -50,8 +50,8 @@ void FVulkanSamplerState::FillCreateInfo(const FRHISamplerStateDesc& InDesc, VkS
 		OutCreateInfo.anisotropyEnable = VK_FALSE;
 	}
 
-	OutCreateInfo.compareEnable = InDesc.CompareFunc != SCF_Never ? VK_TRUE : VK_FALSE;
-	OutCreateInfo.compareOp = InDesc.CompareFunc == SCF_Less ? VK_COMPARE_OP_LESS : VK_COMPARE_OP_NEVER;
+	OutCreateInfo.compareEnable = InDesc.CompareFunc != CF_Never ? VK_TRUE : VK_FALSE;
+	OutCreateInfo.compareOp = FVulkanEnum::Translate(InDesc.CompareFunc);
 	OutCreateInfo.minLod = InDesc.MinMipLevel;
 	OutCreateInfo.maxLod = InDesc.MaxMipLevel;
 	OutCreateInfo.borderColor = InDesc.BorderColor == 0 ? VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK : VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;

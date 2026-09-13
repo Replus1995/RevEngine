@@ -19,7 +19,7 @@ void FCameraProxy::Prepare(const Ref<FScene>& Scene)
 	PlayerCameraSystem* pSystem = Scene->GetSystem<PlayerCameraSystem>();
 	if (pSystem)
 	{
-		pSystem->FillCameraData(mViewPos, mViewMatrix, mProjMatrix);
+		pSystem->FillCameraData(mViewPos, mViewMatrix, mProjMatrix, mProjectionInfo);
 	}
 }
 

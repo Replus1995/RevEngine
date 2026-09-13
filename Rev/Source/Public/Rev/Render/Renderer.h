@@ -7,7 +7,8 @@ namespace Rev
 {
 class FRHIShaderProgram;
 class FRHIUniformBuffer;
-enum class EDeferredDebugView : uint32 { Final, BaseColor, Normal, Roughness, Metallic, AO, Emissive, Depth };
+class FCascadeShadowMap;
+enum class EDeferredDebugView : uint32 { Final, BaseColor, Normal, Roughness, Metallic, AO, Emissive, Depth, ShadowCascades };
 class FRenderer
 {
 public:
@@ -26,6 +27,7 @@ private:
 	Ref<FRHIShaderProgram> DeferredLightingProgram;
 	Ref<FRHIShaderProgram> TonemapProgram;
 	Ref<FRHIUniformBuffer> DebugUniformBuffer;
+	Scope<FCascadeShadowMap> CascadeShadowMap;
 	EDeferredDebugView DebugView = EDeferredDebugView::Final;
 };
 }

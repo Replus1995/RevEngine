@@ -58,6 +58,11 @@ void FSceneProxy::DrawSceneOpaque(FRHICommandList& RHICmdList)
 	
 }
 
+void FSceneProxy::DrawSceneDepth(FRHICommandList& RHICmdList)
+{
+	mStaticMeshProxy.DrawMeshesDepth(RHICmdList);
+}
+
 void FSceneProxy::DrawSkybox(FRHICommandList& RHICmdList)
 {
 	mSkyProxy.DrawSkybox(RHICmdList);

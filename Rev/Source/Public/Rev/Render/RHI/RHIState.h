@@ -75,7 +75,7 @@ struct FRHISamplerStateDesc
 	float MinMipLevel = 0.0f;
 	float MaxMipLevel = FLT_MAX;
 	uint32 BorderColor = 0;
-	ESamplerCompareFunction CompareFunc = SCF_Never;
+	ECompareFunction CompareFunc = CF_Never;
 
 	FRHISamplerStateDesc() {}
 	FRHISamplerStateDesc(
@@ -89,7 +89,7 @@ struct FRHISamplerStateDesc
 		float InMaxMipLevel = FLT_MAX,
 		uint32 InBorderColor = 0,
 		/** Only supported in D3D11 */
-		ESamplerCompareFunction InCompareFunc = SCF_Never
+		ECompareFunction InCompareFunc = CF_Never
 	)
 		: Filter(InFilter)
 		, WarpU(InWarpU)

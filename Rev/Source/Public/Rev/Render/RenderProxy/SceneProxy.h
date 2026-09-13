@@ -23,7 +23,10 @@ public:
 	void Cleanup();
 
 	void DrawSceneOpaque(FRHICommandList& RHICmdList);
+	void DrawSceneDepth(FRHICommandList& RHICmdList);
 	void DrawSkybox(FRHICommandList& RHICmdList);
+	const FCameraProxy& GetCameraProxy() const { return mCameraProxy; }
+	FLightProxy& GetLightProxy() { return mLightProxy; }
 
 protected:
 	FSceneUniform mSceneParams;

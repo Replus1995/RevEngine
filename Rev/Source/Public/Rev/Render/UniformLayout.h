@@ -25,6 +25,7 @@ constexpr IndexType SGBufferB = 6;
 constexpr IndexType SGBufferC = 7;
 constexpr IndexType SSceneDepth = 8;
 constexpr IndexType SSceneColor = 9;
+constexpr IndexType SDirectionalShadow = 10;
 
 //Uniform Buffer Binding
 constexpr IndexType BScene = 0;

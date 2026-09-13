@@ -45,6 +45,10 @@ struct FSamplerCube
     uniform SamplerState _name ## Sampler : REGISTER(s, _reg); \
     static FSamplerCube _name = { _name ## Texture, _name ## Sampler }
 
+#define SAMPLER2DARRAY_CMP(_name, _reg) \
+    uniform Texture2DArray _name ## Texture : REGISTER(t, _reg); \
+    uniform SamplerComparisonState _name ## Sampler : REGISTER(s, _reg)
+
 
 //Default SamplerStates
 /*

@@ -10,7 +10,7 @@ public:
 	FRGTextureHandle ReadTexture(FRGTextureHandle, ERHIAccess = ERHIAccess::ShaderRead, FRHITextureSubresourceRange = {});
 	FRGTextureHandle WriteTexture(FRGTextureHandle, ERHIAccess, FRHITextureSubresourceRange = {});
 	FRGTextureHandle UseColorAttachment(uint32 Slot, FRGTextureHandle, ERenderTargetLoadAction, ERenderTargetStoreAction = RTS_Store);
-	FRGTextureHandle UseDepthStencil(FRGTextureHandle, ERenderTargetLoadAction, ERenderTargetStoreAction, bool bReadOnly);
+	FRGTextureHandle UseDepthStencil(FRGTextureHandle, ERenderTargetLoadAction, ERenderTargetStoreAction, bool bReadOnly, FRHITextureSubresourceRange = {});
 private:
 	FRGPassBuilder(FRGBuilder& InGraph, uint32 InPassIndex) : Graph(InGraph), PassIndex(InPassIndex) {}
 	FRGBuilder& Graph;

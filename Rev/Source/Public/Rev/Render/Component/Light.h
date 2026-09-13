@@ -39,6 +39,11 @@ public:
 	DirectionalLight(float InDistance, float InIntensity, const Math::FLinearColor& InColor);
 	virtual ~DirectionalLight();
 	virtual ELightKind GetKind() const override { return LK_Directional; }
+	bool CastsShadows() const { return mCastShadows; }
+	void SetCastShadows(bool InCastShadows) { mCastShadows = InCastShadows; }
+
+private:
+	bool mCastShadows = false;
 };
 
 class REV_API SpotLight : public Light

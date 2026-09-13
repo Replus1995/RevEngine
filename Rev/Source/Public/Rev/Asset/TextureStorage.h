@@ -10,7 +10,7 @@ namespace Rev
 
 class FTexture;
 
-struct FImageStorage
+struct REV_API FImageStorage
 {
 public:
 	FImageStorage() = default;

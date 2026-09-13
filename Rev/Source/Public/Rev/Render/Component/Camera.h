@@ -9,6 +9,15 @@ class Camera
 {
 public:
 	enum class ProjectionType { Perspective = 0, Orthographic = 1 };
+	struct FCameraProjectionInfo
+	{
+		ProjectionType Type = ProjectionType::Perspective;
+		float NearClip = 0.01f;
+		float FarClip = 10000.0f;
+		float VerticalFOV = 45.0f;
+		float AspectRatio = 1.0f;
+		float OrthographicSize = 10.0f;
+	};
 public:
 	REV_API Camera();
 	REV_API virtual ~Camera() = default;
@@ -20,6 +29,7 @@ public:
 	REV_API ProjectionType GetProjectionType() const { return mProjectionType; }
 	REV_API void SetProjectionType(ProjectionType type);
 	REV_API Math::FMatrix4 GetProjectionMatrix() const { return mProjection; }
+	REV_API FCameraProjectionInfo GetProjectionInfo() const;
 
 private:
 	void RecalculateProjection();
