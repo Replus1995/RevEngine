@@ -17,7 +17,7 @@ SHARED
     ${REV_SHADER_FILES}
 )
 
-set_target_properties(Rev PROPERTIES UNITY_BUILD OFF)
+set_target_properties(Rev PROPERTIES UNITY_BUILD ON)
 
 target_compile_definitions(Rev
 PUBLIC
