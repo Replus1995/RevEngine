@@ -365,7 +365,7 @@ inline TMatrix4<T> TMatrix4<T>::Perspective(float InFOV, float InAspectRatio, fl
 
 	float const tanHalfFovy = std::tan(InFOV / 2.0F);
 
-	TMatrix4<T> Result;
+	TMatrix4<T> Result(0.0F);
 	Result[0][0] = 1.0F / (InAspectRatio * tanHalfFovy);
 	Result[1][1] = 1.0F / (tanHalfFovy);
 	Result[2][2] = InNear / (InFar - InNear);

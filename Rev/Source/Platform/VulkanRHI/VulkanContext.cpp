@@ -181,6 +181,9 @@ void FVulkanContext::RHISetViewport(uint32 InX, uint32 InY, uint32 InWidth, uint
 	mScissor.offset.y = InY;
 	mScissor.extent.width = InWidth;
 	mScissor.extent.height = InHeight;
+
+	vkCmdSetViewport(GetActiveCmdBuffer(), 0, 1, &mViewport);
+	vkCmdSetScissor(GetActiveCmdBuffer(), 0, 1, &mScissor);
 }
 
 void FVulkanContext::RHIClearBackTexture(const Math::FLinearColor& InColor)

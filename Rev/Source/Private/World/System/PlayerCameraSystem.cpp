@@ -8,6 +8,19 @@
 
 namespace Rev
 {
+namespace PlayerCameraSystemPrivate
+{
+float GetFramebufferAspectRatio()
+{
+	Window* FrameWindow = Application::GetApp().GetWindow();
+	int32 FrameWidth = 0;
+	int32 FrameHeight = 0;
+	FrameWindow->GetFrameSize(FrameWidth, FrameHeight);
+	return FrameHeight > 0 ? float(FrameWidth) / float(FrameHeight) : 1.0f;
+}
+}
+
+using namespace PlayerCameraSystemPrivate;
 
 void PlayerCameraSystem::OnInit()
 {
@@ -38,9 +51,7 @@ void PlayerCameraSystem::FillCameraData(Math::FVector3& ViewPos, Math::FMatrix4&
 		auto& [transformComp, cameraComp] = Comps;
 		if (cameraComp.AutoAspectRatio)
 		{
-			auto window = Application::GetApp().GetWindow();
-			float asp = float(window->GetWidth()) / float(window->GetHeight());
-			cameraComp.Camera.SetAspectRatio(asp);
+			cameraComp.Camera.SetAspectRatio(GetFramebufferAspectRatio());
 		}
 		ProjMatrix = cameraComp.Camera.GetProjectionMatrix();
 		ProjectionInfo = cameraComp.Camera.GetProjectionInfo();
@@ -49,8 +60,7 @@ void PlayerCameraSystem::FillCameraData(Math::FVector3& ViewPos, Math::FMatrix4&
 	}
 	else
 	{
-		auto window = Application::GetApp().GetWindow();
-		float asp = float(window->GetWidth()) / float(window->GetHeight());
+		const float asp = GetFramebufferAspectRatio();
 		ProjMatrix = Math::FMatrix4::Perspective(Math::Radians(45.0f), asp, 0.01f, 1000.0f);
 		ProjectionInfo = {};
 		ProjectionInfo.AspectRatio = asp;
