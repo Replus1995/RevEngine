@@ -21,11 +21,11 @@ void TestLinearAndCulling()
 {
 	FRGTransientResourcePool Pool; FRGBuilder Graph(Pool);
 	auto Texture = Graph.CreateTexture(Desc(), FRGName("LinearTexture"));
-	const auto& Produce = Graph.AddPass<FParams>(FRGName("Produce"), ERGPassFlags::Raster,
+	const auto& Produce = Graph.AddPass<FParams>(FRGName("Produce"), ERGPassFlags::Raster, ERGPassPhase::BasePass,
 		[&](FRGPassBuilder& B, FParams& P) { P.Output = B.UseColorAttachment(0, Texture, RTL_Clear); }, [](FRHICommandList&, const FParams&) {});
-	const auto& Consume = Graph.AddPass<FParams>(FRGName("Consume"), ERGPassFlags::Raster,
+	const auto& Consume = Graph.AddPass<FParams>(FRGName("Consume"), ERGPassFlags::Raster, ERGPassPhase::BasePass,
 		[&](FRGPassBuilder& B, FParams& P) { P.Input = B.ReadTexture(Produce.Output); P.Output = B.UseColorAttachment(0, Produce.Output, RTL_Load); }, [](FRHICommandList&, const FParams&) {});
-	Graph.AddPass<FParams>(FRGName("DeadPass"), ERGPassFlags::None, [](FRGPassBuilder&, FParams&) {}, [](FRHICommandList&, const FParams&) {});
+	Graph.AddPass<FParams>(FRGName("DeadPass"), ERGPassFlags::None, ERGPassPhase::BasePass, [](FRGPassBuilder&, FParams&) {}, [](FRHICommandList&, const FParams&) {});
 	FRHITextureRef Extracted; Graph.ExtractTexture(Consume.Output, &Extracted); Graph.Compile();
 	const std::string Dot = Graph.ExportGraphviz();
 	Check(Dot.find("Produce") != std::string::npos && Dot.find("Consume") != std::string::npos, "linear passes were culled");
@@ -35,8 +35,8 @@ void TestLinearAndCulling()
 void TestFanOutAndNeverCull()
 {
 	FRGTransientResourcePool Pool; FRGBuilder Graph(Pool); auto T = Graph.CreateTexture(Desc(), FRGName("FanOut"));
-	const auto& P = Graph.AddPass<FParams>(FRGName("Root"), ERGPassFlags::Raster, [&](FRGPassBuilder& B, FParams& X) { X.Output = B.UseColorAttachment(0, T, RTL_Clear); }, [](FRHICommandList&, const FParams&) {});
-	for (int I = 0; I != 2; ++I) Graph.AddPass<FParams>(FRGName(I ? "FanB" : "FanA"), ERGPassFlags::NeverCull, [&](FRGPassBuilder& B, FParams& X) { X.Input = B.ReadTexture(P.Output); }, [](FRHICommandList&, const FParams&) {});
+	const auto& P = Graph.AddPass<FParams>(FRGName("Root"), ERGPassFlags::Raster, ERGPassPhase::BasePass, [&](FRGPassBuilder& B, FParams& X) { X.Output = B.UseColorAttachment(0, T, RTL_Clear); }, [](FRHICommandList&, const FParams&) {});
+	for (int I = 0; I != 2; ++I) Graph.AddPass<FParams>(FRGName(I ? "FanB" : "FanA"), ERGPassFlags::NeverCull, ERGPassPhase::BasePass, [&](FRGPassBuilder& B, FParams& X) { X.Input = B.ReadTexture(P.Output); }, [](FRHICommandList&, const FParams&) {});
 	Graph.Compile(); const std::string Dot = Graph.ExportGraphviz();
 	Check(Dot.find("FanA") != std::string::npos && Dot.find("FanB") != std::string::npos, "fan-out/NeverCull failed");
 }
@@ -46,13 +46,13 @@ void TestInvalidUses()
 	FRGTransientResourcePool Pool;
 	{
 		FRGBuilder Graph(Pool); auto T = Graph.CreateTexture(Desc(), FRGName("Unproduced")); bool Threw = false;
-		try { Graph.AddPass<FParams>(FRGName("BadRead"), ERGPassFlags::None, [&](FRGPassBuilder& B, FParams& P) { P.Input = B.ReadTexture(T); }, [](FRHICommandList&, const FParams&) {}); } catch (const std::logic_error&) { Threw = true; }
+		try { Graph.AddPass<FParams>(FRGName("BadRead"), ERGPassFlags::None, ERGPassPhase::BasePass, [&](FRGPassBuilder& B, FParams& P) { P.Input = B.ReadTexture(T); }, [](FRHICommandList&, const FParams&) {}); } catch (const std::logic_error&) { Threw = true; }
 		Check(Threw, "read-before-produce was accepted");
 	}
 	{
 		FRGBuilder Graph(Pool); auto T = Graph.CreateTexture(Desc(), FRGName("Stale"));
-		Graph.AddPass<FParams>(FRGName("FirstWrite"), ERGPassFlags::None, [&](FRGPassBuilder& B, FParams& P) { P.Output = B.WriteTexture(T, ERHIAccess::CopyDst); }, [](FRHICommandList&, const FParams&) {});
-		bool Threw = false; try { Graph.AddPass<FParams>(FRGName("StaleWrite"), ERGPassFlags::None, [&](FRGPassBuilder& B, FParams& P) { P.Output = B.WriteTexture(T, ERHIAccess::CopyDst); }, [](FRHICommandList&, const FParams&) {}); } catch (const std::logic_error&) { Threw = true; }
+		Graph.AddPass<FParams>(FRGName("FirstWrite"), ERGPassFlags::None, ERGPassPhase::BasePass, [&](FRGPassBuilder& B, FParams& P) { P.Output = B.WriteTexture(T, ERHIAccess::CopyDst); }, [](FRHICommandList&, const FParams&) {});
+		bool Threw = false; try { Graph.AddPass<FParams>(FRGName("StaleWrite"), ERGPassFlags::None, ERGPassPhase::BasePass, [&](FRGPassBuilder& B, FParams& P) { P.Output = B.WriteTexture(T, ERHIAccess::CopyDst); }, [](FRHICommandList&, const FParams&) {}); } catch (const std::logic_error&) { Threw = true; }
 		Check(Threw, "stale write handle was accepted");
 	}
 }
@@ -62,9 +62,42 @@ void TestPresentAndExtract()
 	FRGTransientResourcePool Pool; FRGBuilder Graph(Pool);
 	auto External = CreateRef<FTestTexture>(FRHITextureDesc::Create2D(16, 16, PF_R8G8B8A8));
 	auto Back = Graph.RegisterExternalTexture(External, ERHIAccess::Present, ERHIAccess::Present, FRGName("Back"));
-	const auto& P = Graph.AddPass<FParams>(FRGName("PresentWriter"), ERGPassFlags::Raster, [&](FRGPassBuilder& B, FParams& X) { X.Output = B.UseColorAttachment(0, Back, RTL_DontCare); }, [](FRHICommandList&, const FParams&) {});
+	const auto& P = Graph.AddPass<FParams>(FRGName("PresentWriter"), ERGPassFlags::Raster, ERGPassPhase::PostProcess, [&](FRGPassBuilder& B, FParams& X) { X.Output = B.UseColorAttachment(0, Back, RTL_DontCare); }, [](FRHICommandList&, const FParams&) {});
 	FRHITextureRef Out; Graph.Present(P.Output); Graph.ExtractTexture(P.Output, &Out); Graph.Compile();
 	Check(Graph.ExportGraphviz().find("PresentWriter") != std::string::npos, "Present/Extract root failed");
+}
+
+void TestPassPhaseOrdering()
+{
+	FRGTransientResourcePool Pool; FRGBuilder Graph(Pool);
+	auto BaseTexture = Graph.CreateTexture(Desc(), FRGName("BaseTexture"));
+	auto ShadowTextureA = Graph.CreateTexture(Desc(), FRGName("ShadowTextureA"));
+	auto ShadowTextureB = Graph.CreateTexture(Desc(), FRGName("ShadowTextureB"));
+	const auto& Base = Graph.AddPass<FParams>(FRGName("Base"), ERGPassFlags::None, ERGPassPhase::BasePass,
+		[&](FRGPassBuilder& B, FParams& P) { P.Output = B.WriteTexture(BaseTexture, ERHIAccess::CopyDst); }, [](FRHICommandList&, const FParams&) {});
+	const auto& ShadowA = Graph.AddPass<FParams>(FRGName("ShadowA"), ERGPassFlags::None, ERGPassPhase::ShadowDepth,
+		[&](FRGPassBuilder& B, FParams& P) { P.Output = B.WriteTexture(ShadowTextureA, ERHIAccess::CopyDst); }, [](FRHICommandList&, const FParams&) {});
+	const auto& ShadowB = Graph.AddPass<FParams>(FRGName("ShadowB"), ERGPassFlags::None, ERGPassPhase::ShadowDepth,
+		[&](FRGPassBuilder& B, FParams& P) { P.Output = B.WriteTexture(ShadowTextureB, ERHIAccess::CopyDst); }, [](FRHICommandList&, const FParams&) {});
+	FRHITextureRef BaseOut, ShadowOutA, ShadowOutB;
+	Graph.ExtractTexture(Base.Output, &BaseOut); Graph.ExtractTexture(ShadowA.Output, &ShadowOutA); Graph.ExtractTexture(ShadowB.Output, &ShadowOutB); Graph.Compile();
+	const std::string Lifetimes = Graph.DumpResourceLifetimes();
+	Check(Lifetimes.find("BaseTexture: [2, 2]") != std::string::npos, "BasePass executed before ShadowDepth");
+	Check(Lifetimes.find("ShadowTextureA: [0, 0]") != std::string::npos, "ShadowDepth phase was not scheduled first");
+	Check(Lifetimes.find("ShadowTextureB: [1, 1]") != std::string::npos, "same-phase registration order was not preserved");
+}
+
+void TestPassPhaseViolation()
+{
+	FRGTransientResourcePool Pool; FRGBuilder Graph(Pool);
+	auto Texture = Graph.CreateTexture(Desc(), FRGName("PhaseViolation"));
+	const auto& Base = Graph.AddPass<FParams>(FRGName("BaseProducer"), ERGPassFlags::None, ERGPassPhase::BasePass,
+		[&](FRGPassBuilder& B, FParams& P) { P.Output = B.WriteTexture(Texture, ERHIAccess::CopyDst); }, [](FRHICommandList&, const FParams&) {});
+	Graph.AddPass<FParams>(FRGName("ShadowConsumer"), ERGPassFlags::NeverCull, ERGPassPhase::ShadowDepth,
+		[&](FRGPassBuilder& B, FParams& P) { P.Input = B.ReadTexture(Base.Output); }, [](FRHICommandList&, const FParams&) {});
+	bool Threw = false;
+	try { Graph.Compile(); } catch (const std::logic_error&) { Threw = true; }
+	Check(Threw, "earlier phase was allowed to depend on a later phase");
 }
 
 void TestReversedZ()
@@ -100,7 +133,7 @@ using namespace RenderGraphTestsPrivate;
 
 int main()
 {
-	try { TestLinearAndCulling(); TestFanOutAndNeverCull(); TestInvalidUses(); TestPresentAndExtract(); TestReversedZ(); TestTextureDescriptors(); }
+	try { TestLinearAndCulling(); TestFanOutAndNeverCull(); TestInvalidUses(); TestPresentAndExtract(); TestPassPhaseOrdering(); TestPassPhaseViolation(); TestReversedZ(); TestTextureDescriptors(); }
 	catch (const std::exception& E) { std::cerr << E.what() << '\n'; return 1; }
 	std::cout << "RenderGraph CPU tests passed\n"; return 0;
 }

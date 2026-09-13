@@ -10,6 +10,14 @@ namespace Rev
 enum class ERGPassFlags : uint8 { None = 0, Raster = 1 << 0, Copy = 1 << 1, NeverCull = 1 << 2 };
 ENUM_CLASS_FLAGS(ERGPassFlags)
 
+enum class ERGPassPhase : uint8
+{
+	ShadowDepth,
+	BasePass,
+	Lighting,
+	PostProcess
+};
+
 class REV_API FRGName
 {
 public:

@@ -20,7 +20,7 @@ public:
 	void Present(FRGTextureHandle);
 	void ExtractTexture(FRGTextureHandle, FRHITextureRef* OutTexture);
 	template<class TParameters, class TSetupLambda, class TExecuteLambda>
-	const TParameters& AddPass(FRGName, ERGPassFlags, TSetupLambda&&, TExecuteLambda&&);
+	const TParameters& AddPass(FRGName, ERGPassFlags, ERGPassPhase, TSetupLambda&&, TExecuteLambda&&);
 	void Compile();
 	void Execute(FRHICommandList&);
 	FRHITexture* GetTexture(FRGTextureHandle) const;
@@ -42,6 +42,7 @@ private:
 	{
 		FRGName Name;
 		ERGPassFlags Flags = ERGPassFlags::None;
+		ERGPassPhase Phase = ERGPassPhase::BasePass;
 		std::vector<FAccess> Accesses;
 		std::vector<uint32> Dependencies;
 		std::vector<FRHITextureBarrier> Barriers;
@@ -89,11 +90,11 @@ private:
 };
 
 template<class TParameters, class TSetupLambda, class TExecuteLambda>
-const TParameters& FRGBuilder::AddPass(FRGName InName, ERGPassFlags InFlags, TSetupLambda&& InSetup, TExecuteLambda&& InExecute)
+const TParameters& FRGBuilder::AddPass(FRGName InName, ERGPassFlags InFlags, ERGPassPhase InPhase, TSetupLambda&& InSetup, TExecuteLambda&& InExecute)
 {
 	using FExecute = std::decay_t<TExecuteLambda>;
 	auto Pass = std::make_unique<TPass<TParameters, FExecute>>(std::forward<TExecuteLambda>(InExecute));
-	Pass->Name = std::move(InName); Pass->Flags = InFlags;
+	Pass->Name = std::move(InName); Pass->Flags = InFlags; Pass->Phase = InPhase;
 	const uint32 Index = uint32(Passes.size());
 	auto* Result = Pass.get();
 	Passes.push_back(std::move(Pass));

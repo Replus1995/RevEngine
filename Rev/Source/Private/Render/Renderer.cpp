@@ -75,11 +75,11 @@ void FRenderer::DrawFrame(FRHICommandList& Cmd)
 	FRHITextureRef Back(BackRaw, [](FRHITexture*) {});
 	FRGTextureHandle BackBuffer = Graph.RegisterExternalTexture(Back, ERHIAccess::Present, ERHIAccess::Present, FRGName("BackBuffer"));
 
-	const FGBufferParameters& GBuffer = Graph.AddPass<FGBufferParameters>(FRGName("GBuffer"), ERGPassFlags::Raster,
+	const FGBufferParameters& GBuffer = Graph.AddPass<FGBufferParameters>(FRGName("GBuffer"), ERGPassFlags::Raster, ERGPassPhase::BasePass,
 		[&](FRGPassBuilder& Builder, FGBufferParameters& P) { P.A = Builder.UseColorAttachment(0, A, RTL_Clear); P.B = Builder.UseColorAttachment(1, B, RTL_Clear); P.C = Builder.UseColorAttachment(2, C, RTL_Clear); P.Depth = Builder.UseDepthStencil(Depth, RTL_Clear, RTS_Store, false); },
 		[this](FRHICommandList& RHICmd, const FGBufferParameters&) { RHICmd.SetViewport(0, 0, FrameWidth, FrameHeight); RHICmd.SetGraphicsPipelineState(MakePipeline(true, CF_Greater, true)); mSceneProxy->DrawSceneOpaque(RHICmd); });
 
-	const FLightingParameters& Lighting = Graph.AddPass<FLightingParameters>(FRGName("DeferredLighting"), ERGPassFlags::Raster,
+	const FLightingParameters& Lighting = Graph.AddPass<FLightingParameters>(FRGName("DeferredLighting"), ERGPassFlags::Raster, ERGPassPhase::Lighting,
 		[&](FRGPassBuilder& Builder, FLightingParameters& P) { P.A = Builder.ReadTexture(GBuffer.A); P.B = Builder.ReadTexture(GBuffer.B); P.C = Builder.ReadTexture(GBuffer.C); P.Depth = Builder.ReadTexture(GBuffer.Depth); P.Shadow = Builder.ReadTexture(Shadow); P.SceneColor = Builder.UseColorAttachment(0, SceneColor, RTL_Clear); },
 		[this, &Graph](FRHICommandList& RHICmd, const FLightingParameters& P) {
 			RHICmd.SetViewport(0, 0, FrameWidth, FrameHeight);
@@ -94,11 +94,11 @@ void FRenderer::DrawFrame(FRHICommandList& Cmd)
 			RHICmd.BindProgram(nullptr);
 		});
 
-	const FSkyParameters& Sky = Graph.AddPass<FSkyParameters>(FRGName("Sky"), ERGPassFlags::Raster,
+	const FSkyParameters& Sky = Graph.AddPass<FSkyParameters>(FRGName("Sky"), ERGPassFlags::Raster, ERGPassPhase::Lighting,
 		[&](FRGPassBuilder& Builder, FSkyParameters& P) { P.SceneColor = Builder.UseColorAttachment(0, Lighting.SceneColor, RTL_Load); P.Depth = Builder.UseDepthStencil(GBuffer.Depth, RTL_Load, RTS_DontCare, true); },
 		[this](FRHICommandList& RHICmd, const FSkyParameters&) { RHICmd.SetViewport(0, 0, FrameWidth, FrameHeight); RHICmd.SetGraphicsPipelineState(MakePipeline(false, CF_GreaterEqual, false)); mSceneProxy->DrawSkybox(RHICmd); });
 
-	const FTonemapParameters& Tonemap = Graph.AddPass<FTonemapParameters>(FRGName("Tonemap"), ERGPassFlags::Raster,
+	const FTonemapParameters& Tonemap = Graph.AddPass<FTonemapParameters>(FRGName("Tonemap"), ERGPassFlags::Raster, ERGPassPhase::PostProcess,
 		[&](FRGPassBuilder& Builder, FTonemapParameters& P) { P.SceneColor = Builder.ReadTexture(Sky.SceneColor); P.BackBuffer = Builder.UseColorAttachment(0, BackBuffer, RTL_DontCare); },
 		[this, &Graph](FRHICommandList& RHICmd, const FTonemapParameters& P) {
 			RHICmd.SetViewport(0, 0, FrameWidth, FrameHeight);

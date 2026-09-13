@@ -3,7 +3,7 @@
 #include "Rev/Render/RHI/RHICommandList.h"
 #include "Rev/Render/RHI/RHIContext.h"
 #include <algorithm>
-#include <deque>
+#include <queue>
 #include <sstream>
 #include <stdexcept>
 
@@ -141,8 +141,17 @@ void FRGBuilder::Compile()
 	for (uint32 I = 0; I < Passes.size(); ++I) if (EnumHasAnyFlags(Passes[I]->Flags, ERGPassFlags::NeverCull)) Mark(I);
 	std::vector<uint32> InDegree(Passes.size(), 0); std::vector<std::vector<uint32>> Consumers(Passes.size());
 	for (uint32 I = 0; I < Passes.size(); ++I) if (Live[I]) for (uint32 D : Passes[I]->Dependencies) if (Live[D]) { ++InDegree[I]; Consumers[D].push_back(I); }
-	std::deque<uint32> Ready; for (uint32 I = 0; I < Passes.size(); ++I) if (Live[I] && InDegree[I] == 0) Ready.push_back(I);
-	while (!Ready.empty()) { uint32 I = Ready.front(); Ready.pop_front(); ExecutionOrder.push_back(I); for (uint32 C : Consumers[I]) if (--InDegree[C] == 0) Ready.push_back(C); }
+	for (uint32 I = 0; I < Passes.size(); ++I) if (Live[I])
+		for (uint32 D : Passes[I]->Dependencies) if (Live[D] && Passes[I]->Phase < Passes[D]->Phase)
+			throw std::logic_error("RenderGraph phase violation: " + Passes[I]->Name.GetName() + " depends on later phase pass " + Passes[D]->Name.GetName());
+	auto CompareReady = [this](uint32 A, uint32 B)
+	{
+		if (Passes[A]->Phase != Passes[B]->Phase) return Passes[A]->Phase > Passes[B]->Phase;
+		return A > B;
+	};
+	std::priority_queue<uint32, std::vector<uint32>, decltype(CompareReady)> Ready(CompareReady);
+	for (uint32 I = 0; I < Passes.size(); ++I) if (Live[I] && InDegree[I] == 0) Ready.push(I);
+	while (!Ready.empty()) { uint32 I = Ready.top(); Ready.pop(); ExecutionOrder.push_back(I); for (uint32 C : Consumers[I]) if (--InDegree[C] == 0) Ready.push(C); }
 	if (ExecutionOrder.size() != size_t(std::count(Live.begin(), Live.end(), uint8(1)))) throw std::logic_error("RenderGraph contains a cycle");
 	for (FResource& Resource : Resources)
 	{

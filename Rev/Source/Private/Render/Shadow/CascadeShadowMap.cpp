@@ -129,7 +129,7 @@ FRGTextureHandle FCascadeShadowMap::AddPasses(FRGBuilder& Graph, FSceneProxy* Sc
 	for (uint32 Cascade = 0; Cascade < CascadeCount; ++Cascade)
 	{
 		struct FPassParameters { FRGTextureHandle Shadow; }; const uint32 CascadeIndex = Cascade;
-		const FPassParameters& Pass = Graph.AddPass<FPassParameters>(FRGName(std::string("CascadeShadow") + std::to_string(Cascade)), ERGPassFlags::Raster,
+		const FPassParameters& Pass = Graph.AddPass<FPassParameters>(FRGName(std::string("CascadeShadow") + std::to_string(Cascade)), ERGPassFlags::Raster, ERGPassPhase::ShadowDepth,
 			[&](FRGPassBuilder& Builder, FPassParameters& Parameters) { Parameters.Shadow = Builder.UseDepthStencil(ShadowTexture, RTL_Clear, RTS_Store, false, { ERHITextureAspect::Depth, 0, 1, uint16(CascadeIndex), 1 }); },
 			[this, Scene, CascadeIndex, Settings](FRHICommandList& Cmd, const FPassParameters&) { Cmd.SetViewport(0, 0, Resolution, Resolution); if (!bActive) return; Cmd.BindProgram(ShadowProgram.get()); Cmd.BindUniformBuffer(UL::BShadow, PassUniformBuffers[CascadeIndex].get()); Cmd.SetGraphicsPipelineState(MakeShadowPipeline(Settings.DepthBias, Settings.SlopeBias)); Scene->DrawSceneDepth(Cmd); Cmd.BindProgram(nullptr); });
 		ShadowTexture = Pass.Shadow;
