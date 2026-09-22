@@ -5,6 +5,7 @@
 #include <Rev/World/System/PlayerCameraSystem.h>
 #include <Rev/Render/Material/PBRMaterial.h>
 #include <Rev/Render/RHI/RHIShaderLibrary.h>
+#include <Rev/Render/RenderOptions.h>
 #include <Rev/Asset/AssetLibrary.h>
 #include <Rev/Asset/TextureStorage.h>
 #include <Rev/HAL/FIleManager.h>
@@ -18,6 +19,8 @@ using namespace Rev;
 ExampleLayer::ExampleLayer()
 	: SceneLayer("ExampleLayer")
 {
+	//Rev::GRenderOptions.SetDirectionalShadowMode(Rev::EDirectionalShadowMode::ShadowMap);
+
 	//Load shader
 
 	IFileManager::Get().Mount("/Game/Content", (std::filesystem::current_path() / "Content").generic_string().c_str());

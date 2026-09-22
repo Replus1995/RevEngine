@@ -1,4 +1,5 @@
 #include "Rev/Render/RenderGraph/RenderGraphBuilder.h"
+#include "Rev/Render/RenderOptions.h"
 #include "Rev/Render/RHI/RHITexture.h"
 #include "Rev/Asset/TextureStorage.h"
 #include <iostream>
@@ -128,12 +129,30 @@ void TestTextureDescriptors()
 	FImageStorage Images; Images.Resize(3, 2); Images.At(2, 1).Allocate(1);
 	Check(Images.NumMips() == 3 && Images.NumLayers() == 2, "image storage mip/layer layout is incorrect");
 }
+
+void TestDirectionalShadowOptions()
+{
+	Check(GRenderOptions.GetDirectionalShadowMode() == EDirectionalShadowMode::CascadedShadowMap, "directional shadow mode does not default to CSM");
+	GRenderOptions.SetDirectionalShadowMode(EDirectionalShadowMode::ShadowMap);
+	Check(GRenderOptions.GetDirectionalShadowMode() == EDirectionalShadowMode::ShadowMap, "directional shadow mode was not updated");
+	FCSMSettings Settings;
+	Settings.CascadeCount = 0;
+	Settings.Resolution = 0;
+	Settings.MaxDistance = 0.0f;
+	Settings.SplitLambda = 2.0f;
+	Settings.TransitionFraction = -1.0f;
+	Settings.CasterExtrusion = -1.0f;
+	GRenderOptions.SetCSMSettings(Settings);
+	const FCSMSettings& Clamped = GRenderOptions.GetCSMSettings();
+	Check(Clamped.CascadeCount == 1 && Clamped.Resolution == 1, "CSM integer settings were not clamped");
+	Check(Clamped.MaxDistance == 0.01f && Clamped.SplitLambda == 1.0f && Clamped.TransitionFraction == 0.0f && Clamped.CasterExtrusion == 0.0f, "CSM float settings were not clamped");
+}
 }
 using namespace RenderGraphTestsPrivate;
 
 int main()
 {
-	try { TestLinearAndCulling(); TestFanOutAndNeverCull(); TestInvalidUses(); TestPresentAndExtract(); TestPassPhaseOrdering(); TestPassPhaseViolation(); TestReversedZ(); TestTextureDescriptors(); }
+	try { TestLinearAndCulling(); TestFanOutAndNeverCull(); TestInvalidUses(); TestPresentAndExtract(); TestPassPhaseOrdering(); TestPassPhaseViolation(); TestReversedZ(); TestTextureDescriptors(); TestDirectionalShadowOptions(); }
 	catch (const std::exception& E) { std::cerr << E.what() << '\n'; return 1; }
 	std::cout << "RenderGraph CPU tests passed\n"; return 0;
 }

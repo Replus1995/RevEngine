@@ -15,12 +15,15 @@ SAMPLER2DARRAY_CMP(sDirectionalShadow, 10);
 struct PSInput { float4 Position : SV_POSITION; };
 struct PSOutput { float4 Color : SV_Target; };
 float2 ScreenUV(float4 Pixel) { return Pixel.xy / float2(uScene.ViewExtent.Width, uScene.ViewExtent.Height); }
+// Vulkan vertex shaders invert clip-space Y, so clip and texture coordinates need the same conversion here.
+float2 ClipToTextureUV(float2 ClipXY) { return float2(ClipXY.x * 0.5 + 0.5, 0.5 - ClipXY.y * 0.5); }
+float2 TextureUVToClip(float2 UV) { return float2(UV.x * 2.0 - 1.0, 1.0 - UV.y * 2.0); }
 
 float ShadowVisibility(float3 WorldPos, uint Cascade)
 {
     float4 ShadowH = mul(uShadow.LightViewProjMats[Cascade], float4(WorldPos, 1.0));
     float3 ShadowCoord = ShadowH.xyz / max(abs(ShadowH.w), EPSILON);
-    float2 UV = ShadowCoord.xy * 0.5 + 0.5;
+    float2 UV = ClipToTextureUV(ShadowCoord.xy);
     if (any(UV < 0.0) || any(UV > 1.0) || ShadowCoord.z < 0.0 || ShadowCoord.z > 1.0) return 1.0;
     float Sum = 0.0; const float Texel = uShadow.Params.y;
     [unroll] for (int Y = -1; Y <= 1; ++Y)
@@ -53,7 +56,7 @@ PSOutput main(PSInput Input)
     float4 B = sGBufferB.Sample(UV);
     float4 C = sGBufferC.Sample(UV);
     float Depth = sSceneDepth.Sample(UV).r;
-    float4 Clip = float4(UV * 2.0 - 1.0, Depth, 1.0);
+    float4 Clip = float4(TextureUVToClip(UV), Depth, 1.0);
     float4 WorldH = mul(uScene.InvViewProjMat, Clip);
     float3 WorldPos = WorldH.xyz / max(abs(WorldH.w), EPSILON);
     float3 Normal = normalize(B.xyz);

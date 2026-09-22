@@ -11,6 +11,12 @@ void FRenderOptions::SetNumSamples(uint8 InNumSamples)
 	bRenderGraphNeedRebuild = true;
 }
 
+void FRenderOptions::SetDirectionalShadowMode(EDirectionalShadowMode InMode)
+{
+	DirectionalShadowMode = InMode;
+	bRenderGraphNeedRebuild = true;
+}
+
 void FRenderOptions::SetCSMSettings(const FCSMSettings& InSettings)
 {
 	CSMSettings = InSettings;

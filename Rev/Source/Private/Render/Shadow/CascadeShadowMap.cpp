@@ -86,7 +86,8 @@ void FCascadeShadowMap::Prepare(const FCameraProxy& InCamera, FLightProxy& Light
 {
 	InitializeResources();
 	const FCSMSettings& Settings = GRenderOptions.GetCSMSettings();
-	Resolution = Settings.Resolution; bActive = Lights.HasShadowCastingDirectionalLight(); CascadeCount = bActive ? Settings.CascadeCount : 1;
+	const bool bUseCascades = GRenderOptions.GetDirectionalShadowMode() == EDirectionalShadowMode::CascadedShadowMap;
+	Resolution = Settings.Resolution; bActive = Lights.HasShadowCastingDirectionalLight(); CascadeCount = bActive && bUseCascades ? Settings.CascadeCount : 1;
 	ShadowUniform = {}; for (Math::FMatrix4& Matrix : ShadowUniform.LightViewProjMats) Matrix = Math::FMatrix4(1.0f);
 	if (!bActive)
 	{
@@ -125,7 +126,7 @@ FRGTextureHandle FCascadeShadowMap::AddPasses(FRGBuilder& Graph, FSceneProxy* Sc
 {
 	const FCSMSettings Settings = GRenderOptions.GetCSMSettings();
 	FRGTextureDesc Desc = FRGTextureDesc::Create2DArray(Resolution, Resolution, CascadeCount, PF_ShadowDepth, ETextureCreateFlags::DepthStencilTarget | ETextureCreateFlags::ShaderResource); Desc.SetClearColor(FRHITextureClearColor(0.0f, 0));
-	FRGTextureHandle ShadowTexture = Graph.CreateTexture(Desc, FRGName("DirectionalCSM"));
+	FRGTextureHandle ShadowTexture = Graph.CreateTexture(Desc, FRGName("DirectionalShadowMap"));
 	for (uint32 Cascade = 0; Cascade < CascadeCount; ++Cascade)
 	{
 		struct FPassParameters { FRGTextureHandle Shadow; }; const uint32 CascadeIndex = Cascade;
